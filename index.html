@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" id="htmlRoot">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -178,7 +178,7 @@
             <!-- Login -->
             <div id="modalLoginBox">
                 <div class="auth-modal-header">
-                    <span class="auth-modal-logo">🪁 TOBİLİST</span>
+                    <span class="auth-modal-logo" style="display:flex;align-items:center;gap:.4rem;justify-content:center;"><svg width="22" height="22" viewBox="0 0 40 40" fill="none"><ellipse cx="20" cy="21" rx="17" ry="16" fill="#E8630A"/><path d="M20 13 Q24 13 26 17 Q28 21 24 23 Q20 25 18 22 Q16 19 18 17 Q19 15 20 14" stroke="#fff" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.7"/><ellipse cx="24" cy="18" rx="4" ry="4.5" fill="#1a0a00"/><circle cx="25.5" cy="16.5" r="1.2" fill="rgba(255,255,255,0.5)"/><ellipse cx="20" cy="21" rx="17" ry="16" stroke="#c45500" stroke-width="1.5" fill="none"/></svg>TOBİLİST</span>
                     <h3>Tekrar hoş geldin!</h3>
                     <p>Hesabına giriş yap ve devam et</p>
                 </div>
@@ -213,7 +213,7 @@
             <!-- Register -->
             <div id="modalRegisterBox" style="display:none;">
                 <div class="auth-modal-header">
-                    <span class="auth-modal-logo">🪁 TOBİLİST</span>
+                    <span class="auth-modal-logo" style="display:flex;align-items:center;gap:.4rem;justify-content:center;"><svg width="22" height="22" viewBox="0 0 40 40" fill="none"><ellipse cx="20" cy="21" rx="17" ry="16" fill="#E8630A"/><path d="M20 13 Q24 13 26 17 Q28 21 24 23 Q20 25 18 22 Q16 19 18 17 Q19 15 20 14" stroke="#fff" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.7"/><ellipse cx="24" cy="18" rx="4" ry="4.5" fill="#1a0a00"/><circle cx="25.5" cy="16.5" r="1.2" fill="rgba(255,255,255,0.5)"/><ellipse cx="20" cy="21" rx="17" ry="16" stroke="#c45500" stroke-width="1.5" fill="none"/></svg>TOBİLİST</span>
                     <h3>Hesap oluştur</h3>
                     <p>Ücretsiz kayıt ol, koleksiyonunu başlat</p>
                 </div>
@@ -253,7 +253,7 @@
             <!-- Forgot Password -->
             <div id="modalForgotBox" style="display:none;">
                 <div class="auth-modal-header">
-                    <span class="auth-modal-logo">🪁 TOBİLİST</span>
+                    <span class="auth-modal-logo" style="display:flex;align-items:center;gap:.4rem;justify-content:center;"><svg width="22" height="22" viewBox="0 0 40 40" fill="none"><ellipse cx="20" cy="21" rx="17" ry="16" fill="#E8630A"/><path d="M20 13 Q24 13 26 17 Q28 21 24 23 Q20 25 18 22 Q16 19 18 17 Q19 15 20 14" stroke="#fff" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.7"/><ellipse cx="24" cy="18" rx="4" ry="4.5" fill="#1a0a00"/><circle cx="25.5" cy="16.5" r="1.2" fill="rgba(255,255,255,0.5)"/><ellipse cx="20" cy="21" rx="17" ry="16" stroke="#c45500" stroke-width="1.5" fill="none"/></svg>TOBİLİST</span>
                     <h3>Şifre Sıfırlama</h3>
                     <p>E-postanıza sıfırlama bağlantısı gönderilecek</p>
                 </div>
@@ -278,7 +278,7 @@
 
         <!-- Loading Screen -->
         <div class="loading-screen" id="loadingScreen">
-            <div class="loading-logo">🪁 TOBİLİST</div>
+            <div class="loading-logo" style="display:flex;align-items:center;gap:.5rem;justify-content:center;"><svg width="36" height="36" viewBox="0 0 40 40" fill="none"><ellipse cx="20" cy="21" rx="17" ry="16" fill="#E8630A"/><path d="M20 13 Q24 13 26 17 Q28 21 24 23 Q20 25 18 22 Q16 19 18 17 Q19 15 20 14" stroke="#fff" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.7"/><ellipse cx="24" cy="18" rx="4" ry="4.5" fill="#1a0a00"/><circle cx="25.5" cy="16.5" r="1.2" fill="rgba(255,255,255,0.5)"/><ellipse cx="20" cy="21" rx="17" ry="16" stroke="#c45500" stroke-width="1.5" fill="none"/></svg>TOBİLİST</div>
             <div class="loader"></div>
             <div class="loading-text">Yükleniyor...</div>
         </div>
@@ -298,7 +298,7 @@
         </div>
 
         <div class="guest-app-banner" id="guestAppBanner" style="display:none;">
-            🎭 Misafir modundasınız —
+            <svg width="16" height="16" viewBox="0 0 40 40" fill="none" style="vertical-align:middle"><ellipse cx="20" cy="21" rx="17" ry="16" fill="#E8630A"/><ellipse cx="24" cy="18" rx="4" ry="4.5" fill="#1a0a00"/><ellipse cx="20" cy="21" rx="17" ry="16" stroke="#c45500" stroke-width="2" fill="none"/></svg> Misafir modundasınız —
             <strong>Kayıt ol veya giriş yap</strong> ile listeni kaydet!
             <button onclick="openAuthModal('register')">Kayıt Ol</button>
             <button onclick="openAuthModal('login')" style="background:transparent;border:1px solid rgba(255,255,255,0.4);color:white;padding:0.35rem 0.9rem;border-radius:6px;cursor:pointer;font-size:0.82rem;font-family:'DM Sans',sans-serif;">Giriş Yap</button>
@@ -310,7 +310,23 @@
             <header>
                 <div class="header-content">
                     <div class="logo-section">
-                        <h1 class="logo" onclick="switchSection('home')">🪁 TobiList</h1>
+                        <h1 class="logo" onclick="switchSection('home')" style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;">
+                            <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+                                <ellipse cx="20" cy="21" rx="17" ry="16" fill="#E8630A"/>
+                                <ellipse cx="20" cy="21" rx="17" ry="16" fill="url(#tlmg)"/>
+                                <path d="M20 13 Q24 13 26 17 Q28 21 24 23 Q20 25 18 22 Q16 19 18 17 Q19 15 20 14" stroke="#fff" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.7"/>
+                                <ellipse cx="24" cy="18" rx="4" ry="4.5" fill="#1a0a00"/>
+                                <circle cx="25.5" cy="16.5" r="1.2" fill="rgba(255,255,255,0.5)"/>
+                                <ellipse cx="20" cy="21" rx="17" ry="16" stroke="#c45500" stroke-width="1.5" fill="none"/>
+                                <defs>
+                                    <radialGradient id="tlmg" cx="35%" cy="30%">
+                                        <stop offset="0%" stop-color="#ff8c00" stop-opacity="0.6"/>
+                                        <stop offset="100%" stop-color="#E8630A" stop-opacity="0"/>
+                                    </radialGradient>
+                                </defs>
+                            </svg>
+                            TobiList
+                        </h1>
                         <div class="level-badge" id="levelBadge" style="display:none;">
                             <span>🏆</span>
                             <div class="xp-container">
