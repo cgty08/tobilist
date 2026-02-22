@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>TobiList — Anime, Manga & Webtoon Takip Platformu | Ücretsiz</title>
+
+    <meta name="description" content="TobiList ile anime, manga ve webtoon'larını kolayca takip et. Kişisel liste oluştur, puan ver, istatistiklerini gör. Tamamen ücretsiz, Türkçe anime takip uygulaması.">
+    <meta name="keywords" content="anime takip, manga takip, webtoon takip, anime listesi, mal alternatif, anime app türkçe, anime izleme listesi, anime tracker, anilist alternatif türkçe">
+    <meta name="author" content="TobiList">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="language" content="Turkish">
+    <meta name="revisit-after" content="3 days">
+    <meta name="theme-color" content="#ff3366">
+
+    <!-- ===== CANONICAL ===== -->
+    <link rel="canonical" href="https://tobilist.com/">
+
+    <!-- ===== OPEN GRAPH (Facebook, Discord, WhatsApp) ===== -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://tobilist.com/">
+    <meta property="og:title" content="TobiList — Anime, Manga & Webtoon Takip Platformu">
+    <meta property="og:description" content="Anime, manga ve webtoon'larını ücretsiz takip et. Kişisel liste, puan sistemi, başarımlar ve çok daha fazlası!">
+    <meta property="og:image" content="https://tobilist.com/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="TobiList - Anime & Manga Takip Platformu">
+    <meta property="og:site_name" content="TobiList">
+    <meta property="og:locale" content="tr_TR">
+
+    <!-- ===== TWITTER CARD ===== -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://tobilist.com/">
+    <meta name="twitter:title" content="TobiList — Anime, Manga & Webtoon Takip">
+    <meta name="twitter:description" content="Anime, manga ve webtoon'larını ücretsiz takip et. Türkçe anime tracker!">
+    <meta name="twitter:image" content="https://tobilist.com/og-image.png">
+
+    <!-- ===== PWA / APP ===== -->
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="TobiList">
+    <meta name="application-name" content="TobiList">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- ===== SCHEMA.ORG YAPISAL VERİ ===== -->
+    <script type="application/ld+json">
+    {
+    "@context": "https://schema.org",
+    "@graph": [
+        {
+        "@type": "WebApplication",
+        "@id": "https://tobilist.com/#webapp",
+        "name": "TobiList",
+        "description": "Anime, manga ve webtoon takip platformu. Ücretsiz kişisel liste oluştur, puan ver, istatistiklerini takip et.",
+        "url": "https://tobilist.com/",
+        "applicationCategory": "EntertainmentApplication",
+        "operatingSystem": "Web, iOS, Android",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "TRY"
+        },
+        "featureList": [
+            "Anime takip listesi",
+            "Manga takip listesi",
+            "Webtoon takip listesi",
+            "XP ve level sistemi",
+            "Başarım rozetleri",
+            "Kişisel istatistikler",
+            "Takvim görünümü",
+            "AI öneriler"
+        ],
+        "inLanguage": "tr",
+        "audience": {
+            "@type": "Audience",
+            "audienceType": "Anime ve manga hayranları"
+        }
+        },
+        {
+        "@type": "WebSite",
+        "@id": "https://tobilist.com/#website",
+        "url": "https://tobilist.com/",
+        "name": "TobiList",
+        "description": "Türkçe anime, manga ve webtoon takip platformu",
+        "inLanguage": "tr",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+            "@type": "EntryPoint",
+            "urlTemplate": "https://tobilist.com/?search={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+        }
+        },
+        {
+        "@type": "Organization",
+        "@id": "https://tobilist.com/#organization",
+        "name": "TobiList",
+        "url": "https://tobilist.com/",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "https://tobilist.com/icons/logo-512.png",
+            "width": 512,
+            "height": 512
+        }
+        },
+        {
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+            "@type": "Question",
+            "name": "TobiList ücretsiz mi?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Evet, TobiList tamamen ücretsizdir. Kayıt olup hemen kullanmaya başlayabilirsiniz."
+            }
+            },
+            {
+            "@type": "Question",
+            "name": "TobiList'e nasıl kayıt olurum?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Siteye girerek 'Kayıt Ol' butonuna tıklayın, e-posta ve şifrenizle ücretsiz hesap oluşturun."
+            }
+            },
+            {
+            "@type": "Question",
+            "name": "Hangi içerikleri takip edebilirim?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "TobiList ile anime, manga ve webtoon takip edebilirsiniz. İçeriklere puan verebilir, durumlarını güncelleyebilirsiniz."
+            }
+            }
+        ]
+        }
+    ]
+    }
+    </script>
+
+    <!-- ===== PRECONNECT (hız için) ===== -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com">
+    <link rel="dns-prefetch" href="https://qhfjpuwduuxzojurngte.supabase.co">
+
+    <!-- ===== FONTS (optimize) ===== -->
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700;900&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/auth.css">
+
+    <!-- Supabase CDN -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script>
+        const SUPABASE_URL = 'https://qhfjpuwduuxzojurngte.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoZmpwdXdkdXV4em9qdXJuZ3RlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2NzU1MTksImV4cCI6MjA4NzI1MTUxOX0.lgtxEwGFW07P1vY9Soid2s_sM47jODk_nsUECznHSFA';
+        try {
+            window.supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } catch(e) {
+            console.warn('Supabase init error:', e);
+            window.supabaseClient = null;
+        }
+    </script>
+</head>
+<body data-theme="dark">
+
+    <!-- ========== AUTH MODAL ========== -->
+    <div id="authModal" class="auth-modal" style="display:none;">
+        <div class="auth-modal-backdrop"></div>
+        <div class="auth-modal-content">
+            <button class="auth-modal-close" onclick="closeAuthModal()" title="Kapat">✕</button>
+
+            <!-- Login -->
+            <div id="modalLoginBox">
+                <div class="auth-modal-header">
+                    <span class="auth-modal-logo">🪁 TOBİLİST</span>
+                    <h3>Tekrar hoş geldin!</h3>
+                    <p>Hesabına giriş yap ve devam et</p>
+                </div>
+                <form id="loginForm" onsubmit="handleLogin(event)" autocomplete="on">
+                    <div class="auth-field">
+                        <label for="loginEmail">📧 E-posta</label>
+                        <input type="email" id="loginEmail" name="email" placeholder="ornek@mail.com" required autocomplete="email">
+                    </div>
+                    <div class="auth-field">
+                        <label for="loginPassword">🔒 Şifre</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="loginPassword" name="password" placeholder="Şifreniz" required autocomplete="current-password">
+                            <button type="button" class="toggle-pw" onclick="togglePassword('loginPassword', this)" title="Şifreyi göster/gizle">👁️</button>
+                        </div>
+                    </div>
+                    <div class="auth-options">
+                        <label class="remember-me">
+                            <input type="checkbox" id="rememberMe" checked>
+                            Beni hatırla
+                        </label>
+                        <button type="button" class="forgot-pw" onclick="showModalForgot()">Şifremi unuttum</button>
+                    </div>
+                    <div id="loginError" class="auth-error"></div>
+                    <button type="submit" class="auth-btn auth-btn-primary" id="loginBtn">
+                        <span>Giriş Yap</span><span class="btn-arrow">→</span>
+                    </button>
+                </form>
+                <div class="auth-divider"><span>veya</span></div>
+                <div class="auth-switch">Hesabın yok mu? <span onclick="showModalRegister()">Kayıt ol →</span></div>
+            </div>
+
+            <!-- Register -->
+            <div id="modalRegisterBox" style="display:none;">
+                <div class="auth-modal-header">
+                    <span class="auth-modal-logo">🪁 TOBİLİST</span>
+                    <h3>Hesap oluştur</h3>
+                    <p>Ücretsiz kayıt ol, koleksiyonunu başlat</p>
+                </div>
+                <form id="registerForm" onsubmit="handleRegister(event)" autocomplete="on">
+                    <div class="auth-field">
+                        <label for="registerUsername">👤 Kullanıcı Adı</label>
+                        <input type="text" id="registerUsername" name="username" placeholder="anime_hunter" required minlength="3" maxlength="20" autocomplete="username">
+                    </div>
+                    <div class="auth-field">
+                        <label for="registerEmail">📧 E-posta</label>
+                        <input type="email" id="registerEmail" name="email" placeholder="ornek@mail.com" required autocomplete="email">
+                    </div>
+                    <div class="auth-field">
+                        <label for="registerPassword">🔒 Şifre</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="registerPassword" name="password" placeholder="En az 6 karakter" required minlength="6" autocomplete="new-password" oninput="checkPasswordStrength(this.value)">
+                            <button type="button" class="toggle-pw" onclick="togglePassword('registerPassword', this)">👁️</button>
+                        </div>
+                        <div class="password-strength"><div class="strength-bar" id="strengthBar"></div></div>
+                        <div class="strength-text" id="strengthText"></div>
+                    </div>
+                    <div class="auth-field">
+                        <label for="registerPasswordConfirm">🔒 Şifre Tekrar</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="registerPasswordConfirm" name="confirm" placeholder="Şifrenizi tekrar girin" required autocomplete="new-password">
+                            <button type="button" class="toggle-pw" onclick="togglePassword('registerPasswordConfirm', this)">👁️</button>
+                        </div>
+                    </div>
+                    <div id="registerError" class="auth-error"></div>
+                    <button type="submit" class="auth-btn auth-btn-primary" id="registerBtn">
+                        <span>Hesap Oluştur</span><span class="btn-arrow">→</span>
+                    </button>
+                </form>
+                <div class="auth-switch">Zaten hesabın var mı? <span onclick="showModalLogin()">Giriş yap →</span></div>
+            </div>
+
+            <!-- Forgot Password -->
+            <div id="modalForgotBox" style="display:none;">
+                <div class="auth-modal-header">
+                    <span class="auth-modal-logo">🪁 TOBİLİST</span>
+                    <h3>Şifre Sıfırlama</h3>
+                    <p>E-postanıza sıfırlama bağlantısı gönderilecek</p>
+                </div>
+                <div class="auth-field">
+                    <label for="forgotEmail">📧 E-posta</label>
+                    <input type="email" id="forgotEmail" placeholder="ornek@mail.com" autocomplete="email">
+                </div>
+                <div id="forgotError" class="auth-error"></div>
+                <div id="forgotSuccess" class="auth-success"></div>
+                <button class="auth-btn auth-btn-primary" onclick="handleForgotPassword()">
+                    <span>Sıfırlama Linki Gönder</span>
+                </button>
+                <div class="auth-switch" style="margin-top:1rem;">
+                    <span onclick="showModalLogin()">← Giriş ekranına dön</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MAIN APP ========== -->
+    <div id="mainApp">
+
+        <!-- Loading Screen -->
+        <div class="loading-screen" id="loadingScreen">
+            <div class="loading-logo">🪁 TOBİLİST</div>
+            <div class="loader"></div>
+            <div class="loading-text">Yükleniyor...</div>
+        </div>
+
+        <!-- Banners -->
+        <div class="offline-banner" id="offlineBanner">⚠️ İnternet bağlantınız yok — Offline modda çalışıyorsunuz</div>
+
+        <div class="install-banner" id="installBanner">
+            <div>
+                <div class="install-title">📱 Uygulamayı Yükleyin</div>
+                <div style="font-size:0.85rem;">Cihazınıza ekleyin, offline kullanın!</div>
+            </div>
+            <div class="install-actions">
+                <button class="btn-install" onclick="installPWA()">Yükle</button>
+                <button class="btn-dismiss" onclick="dismissInstall()">Daha Sonra</button>
+            </div>
+        </div>
+
+        <div class="guest-app-banner" id="guestAppBanner" style="display:none;">
+            🎭 Misafir modundasınız —
+            <strong>Kayıt ol veya giriş yap</strong> ile listeni kaydet!
+            <button onclick="openAuthModal('register')">Kayıt Ol</button>
+            <button onclick="openAuthModal('login')" style="background:transparent;border:1px solid rgba(255,255,255,0.4);color:white;padding:0.35rem 0.9rem;border-radius:6px;cursor:pointer;font-size:0.82rem;font-family:'DM Sans',sans-serif;">Giriş Yap</button>
+        </div>
+
+        <div class="container">
+
+            <!-- Header -->
+            <header>
+                <div class="header-content">
+                    <div class="logo-section">
+                        <h1 class="logo" onclick="switchSection('home')">🪁 TobiList</h1>
+                        <div class="level-badge" id="levelBadge" style="display:none;">
+                            <span>🏆</span>
+                            <div class="xp-container">
+                                <div class="level-number">Lv. <span id="userLevel">1</span></div>
+                                <div class="xp-bar"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
+                                <div class="xp-text"><span id="currentXP">0</span>/<span id="nextLevelXP">100</span> XP</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="header-actions">
+                        <div class="stats-badge" id="streakBadge" style="display:none;">🔥 <strong id="streakDays">0</strong> gün</div>
+                        <div class="stats-badge" id="totalBadge" style="display:none;">📚 <strong id="totalCount">0</strong></div>
+                        <select class="language-selector" id="languageSelect" onchange="changeLanguage()">
+                            <option value="tr">🇹🇷 TR</option>
+                            <option value="en">🇬🇧 EN</option>
+                        </select>
+                        <div id="guestHeaderBtns" style="display:flex;gap:0.5rem;align-items:center;">
+                            <button class="btn btn-ghost" onclick="openAuthModal('login')">Giriş Yap</button>
+                            <button class="btn btn-primary" onclick="openAuthModal('register')">Kayıt Ol</button>
+                        </div>
+                        <div class="user-menu-wrapper" id="userMenuWrapper" style="display:none;">
+                            <div class="user-avatar-btn" onclick="toggleUserDropdown()">
+                                <span id="headerAvatar">👤</span>
+                                <span id="headerUsername">Kullanıcı</span>
+                                <span class="dropdown-arrow">▾</span>
+                            </div>
+                            <div class="user-dropdown" id="userDropdown">
+                                <div class="dropdown-profile">
+                                    <div class="dropdown-avatar" id="dropdownAvatar">👤</div>
+                                    <div>
+                                        <div class="dropdown-name" id="dropdownName">-</div>
+                                        <div class="dropdown-email" id="dropdownEmail">-</div>
+                                    </div>
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <div class="dropdown-item" onclick="switchSection('profile'); closeUserDropdown()">👤 Profilim</div>
+                                <div class="dropdown-item" onclick="switchSection('settings'); closeUserDropdown()">⚙️ Ayarlar</div>
+                                <div class="dropdown-item" onclick="switchSection('achievements'); closeUserDropdown()">🏆 Başarımlar</div>
+                                <div class="dropdown-divider"></div>
+                                <div class="dropdown-item danger" onclick="handleLogout()">🚪 Çıkış Yap</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" id="addContentBtn" onclick="openAddModal()" style="display:none;">+ Ekle</button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Navigation -->
+            <nav>
+                <div class="nav-tabs">
+                    <button class="nav-tab active" onclick="switchSection('home')" data-section="home">🏠 <span data-i18n="home">Ana Sayfa</span></button>
+                    <button class="nav-tab locked-tab" onclick="requireAuth('library')" data-section="library">📚 <span data-i18n="library">Kütüphanem</span></button>
+                    <button class="nav-tab" onclick="switchSection('discover')" data-section="discover">🔍 <span data-i18n="discover">Keşfet</span></button>
+                    <button class="nav-tab locked-tab" onclick="requireAuth('calendar')" data-section="calendar">📅 <span data-i18n="calendar">Takvim</span></button>
+                    <button class="nav-tab locked-tab" onclick="requireAuth('analytics')" data-section="analytics">📊 <span data-i18n="analytics">Analitik</span></button>
+                    <button class="nav-tab locked-tab" onclick="requireAuth('ai')" data-section="ai">🤖 <span data-i18n="ai">AI Öneriler</span></button>
+                    <button class="nav-tab locked-tab" onclick="requireAuth('achievements')" data-section="achievements">🏆 <span data-i18n="achievements">Başarımlar</span></button>
+                </div>
+            </nav>
+
+            <div class="main-content">
+
+                <!-- HOME -->
+                <div id="homeSection" class="section active">
+                    <div class="anilist-banner">
+                        <div class="banner-bg-anim">
+                            <div class="banner-particle p1"></div>
+                            <div class="banner-particle p2"></div>
+                            <div class="banner-particle p3"></div>
+                        </div>
+                        <div class="banner-left">
+                            <div class="banner-greeting" id="bannerGreeting">Hoş geldiniz 👋</div>
+                            <h2 class="banner-title">Anime Dünyanıza<br><span class="gradient-text">Hoş Geldiniz</span></h2>
+                            <p class="banner-sub">Anime, manga ve webtoon'larını takip et. Keşfet, puan ver, büyüyen koleksiyonunu izle.</p>
+                            <div class="banner-actions" id="bannerActions"></div>
+                        </div>
+                        <div class="banner-right">
+                            <div class="banner-stat-cards">
+                                <div class="bsc"><div class="bsc-icon">🎬</div><div class="bsc-num" id="heroAnimeCount">0</div><div class="bsc-label">Anime</div></div>
+                                <div class="bsc"><div class="bsc-icon">📖</div><div class="bsc-num" id="heroMangaCount">0</div><div class="bsc-label">Manga</div></div>
+                                <div class="bsc"><div class="bsc-icon">📱</div><div class="bsc-num" id="heroWebtoonCount">0</div><div class="bsc-label">Webtoon</div></div>
+                                <div class="bsc"><div class="bsc-icon">⭐</div><div class="bsc-num" id="heroXP">0</div><div class="bsc-label">Toplam XP</div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="home-section-block">
+                        <div class="section-header-row">
+                            <h3 class="sh-title">🔥 Şu An Trend</h3>
+                            <button class="sh-more" onclick="switchSection('discover')">Tümünü Gör →</button>
+                        </div>
+                        <div class="media-row" id="trendingGrid"></div>
+                    </div>
+
+                    <div class="home-section-block" id="continueWatchingBlock" style="display:none;">
+                        <div class="section-header-row">
+                            <h3 class="sh-title">▶️ Devam Et</h3>
+                            <button class="sh-more" onclick="switchSection('library')">Kütüphane →</button>
+                        </div>
+                        <div class="media-row" id="continueWatchingGrid"></div>
+                    </div>
+
+                    <div class="home-section-block">
+                        <div class="section-header-row">
+                            <h3 class="sh-title">🌸 Bu Sezon Popüler</h3>
+                            <button class="sh-more" onclick="switchSection('discover')">Hepsi →</button>
+                        </div>
+                        <div class="media-row" id="seasonPopularGrid"></div>
+                    </div>
+
+                    <div class="quick-stats-row" id="quickStatsRow" style="display:none;">
+                        <div class="qs-card"><div class="qs-icon">📺</div><div class="qs-val" id="watchingCount">0</div><div class="qs-label">İzliyorum</div></div>
+                        <div class="qs-card"><div class="qs-icon">✅</div><div class="qs-val" id="completedCount">0</div><div class="qs-label">Tamamlandı</div></div>
+                        <div class="qs-card"><div class="qs-icon">📋</div><div class="qs-val" id="planToWatchCount">0</div><div class="qs-label">İzlenecek</div></div>
+                        <div class="qs-card"><div class="qs-icon">⏸️</div><div class="qs-val" id="onHoldCount">0</div><div class="qs-label">Beklemede</div></div>
+                        <div class="qs-card"><div class="qs-icon">⭐</div><div class="qs-val" id="avgRatingHome">0.0</div><div class="qs-label">Ort. Puan</div></div>
+                        <div class="qs-card"><div class="qs-icon">🔥</div><div class="qs-val" id="streakHome">0</div><div class="qs-label">Streak</div></div>
+                    </div>
+
+                    <div id="guestCTA" style="display:none;">
+                        <div class="guest-cta-card">
+                            <div class="guest-cta-icon">🎌</div>
+                            <h3>Anime listenizi kaydedin!</h3>
+                            <p>Ücretsiz hesap oluşturun, izlediklerinizi takip edin, puan verin ve kişisel istatistiklerinizi görün.</p>
+                            <div class="guest-cta-btns">
+                                <button class="btn btn-primary btn-large" onclick="openAuthModal('register')">✨ Ücretsiz Kayıt Ol</button>
+                                <button class="btn btn-ghost btn-large" onclick="openAuthModal('login')">Giriş Yap</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="home-section-block">
+                        <div class="section-header-row">
+                            <h3 class="sh-title">💡 Yüksek Puanlı</h3>
+                            <button class="sh-more" onclick="requireAuth('ai')">AI Önerileri →</button>
+                        </div>
+                        <div class="media-row" id="homeRecommendationsGrid"></div>
+                    </div>
+                </div>
+
+                <!-- DISCOVER -->
+                <div id="discoverSection" class="section">
+                    <div class="page-header">
+                        <h2 class="page-title">🔍 Keşfet</h2>
+                        <p class="page-sub" id="discoverStats">Anime, manga ve webtoon dünyasını keşfet</p>
+                    </div>
+                    <div class="discover-tabs">
+                        <button class="discover-tab active" onclick="filterDiscoverType('all', this)">Tümü</button>
+                        <button class="discover-tab" onclick="filterDiscoverType('anime', this)">🎬 Anime</button>
+                        <button class="discover-tab" onclick="filterDiscoverType('manga', this)">📖 Manga</button>
+                        <button class="discover-tab" onclick="filterDiscoverType('webtoon', this)">📱 Webtoon</button>
+                    </div>
+                    <div class="genre-filters">
+                        <button class="genre-tag active" onclick="filterByGenre('all', this)">Tümü</button>
+                        <button class="genre-tag" onclick="filterByGenre('action', this)">⚔️ Aksiyon</button>
+                        <button class="genre-tag" onclick="filterByGenre('adventure', this)">🗺️ Macera</button>
+                        <button class="genre-tag" onclick="filterByGenre('comedy', this)">😂 Komedi</button>
+                        <button class="genre-tag" onclick="filterByGenre('drama', this)">🎭 Drama</button>
+                        <button class="genre-tag" onclick="filterByGenre('fantasy', this)">🔮 Fantastik</button>
+                        <button class="genre-tag" onclick="filterByGenre('romance', this)">💕 Romantik</button>
+                        <button class="genre-tag" onclick="filterByGenre('scifi', this)">🚀 Sci-Fi</button>
+                        <button class="genre-tag" onclick="filterByGenre('horror', this)">👻 Korku</button>
+                        <button class="genre-tag" onclick="filterByGenre('mystery', this)">🔍 Gizem</button>
+                        <button class="genre-tag" onclick="filterByGenre('psychological', this)">🧠 Psikolojik</button>
+                        <button class="genre-tag" onclick="filterByGenre('sports', this)">⚽ Spor</button>
+                    </div>
+                    <div class="discover-search-bar">
+                        <div class="discover-search-box">
+                            <span class="dsb-icon">🔍</span>
+                            <input type="text" id="discoverSearch" placeholder="Ara..." oninput="onDiscoverSearch()">
+                        </div>
+                        <select id="discoverSort" onchange="discoverPage=1; renderDiscoverGrid()">
+                            <option value="rating">Puana Göre</option>
+                            <option value="name">İsme Göre</option>
+                            <option value="year">Yıla Göre</option>
+                        </select>
+                    </div>
+                    <div class="discover-grid" id="discoverGrid"></div>
+                </div>
+
+                <!-- LIBRARY -->
+                <div id="librarySection" class="section">
+                    <div class="page-header"><h2 class="page-title">📚 Kütüphanem</h2></div>
+                    <div class="filter-bar">
+                        <div class="search-box">
+                            <input type="text" id="searchInput" placeholder="İçerik ara..." oninput="filterItems()">
+                        </div>
+                        <select id="typeFilter" onchange="filterItems()">
+                            <option value="all">Tüm Tipler</option>
+                            <option value="anime">🎬 Anime</option>
+                            <option value="manga">📖 Manga</option>
+                            <option value="webtoon">📱 Webtoon</option>
+                        </select>
+                        <select id="statusFilter" onchange="filterItems()">
+                            <option value="all">Tüm Durumlar</option>
+                            <option value="watching">▶️ İzliyorum</option>
+                            <option value="completed">✅ Tamamlandı</option>
+                            <option value="onhold">⏸️ Beklemede</option>
+                            <option value="plantowatch">📋 İzlenecek</option>
+                            <option value="dropped">❌ Bırakıldı</option>
+                        </select>
+                        <select id="sortBy" onchange="filterItems()">
+                            <option value="recent">En Yeni</option>
+                            <option value="name">İsim (A-Z)</option>
+                            <option value="rating">Puan</option>
+                            <option value="progress">İlerleme</option>
+                        </select>
+                    </div>
+                    <div id="itemsGrid" class="items-grid"></div>
+                </div>
+
+                <!-- PROFILE -->
+                <div id="profileSection" class="section">
+                    <div class="profile-header-card">
+                        <div class="profile-cover" id="profileCoverBg"></div>
+                        <div class="profile-main">
+                            <div class="profile-avatar-large" id="profileAvatarLarge" onclick="editProfile()" title="Profili düzenle">👤</div>
+                            <div>
+                                <h2 class="profile-username" id="profileUsername">Kullanıcı</h2>
+                                <p class="profile-email-display" id="profileEmailDisplay"></p>
+                                <p class="profile-bio-text" id="profileBioText">Anime, manga ve webtoon takipçisi</p>
+                                <div class="profile-badges">
+                                    <span class="profile-badge level-badge-sm">🏆 Lv. <span id="profileLvBadge">1</span></span>
+                                    <span class="profile-badge streak-badge">🔥 <span id="profileStreakBadge">0</span> gün</span>
+                                </div>
+                                <div style="display:flex;gap:0.8rem;margin-top:1rem;flex-wrap:wrap;">
+                                    <button class="btn btn-secondary" onclick="editProfile()">✏️ Düzenle</button>
+                                    <button class="btn btn-ghost" onclick="shareProfile()">📤 Paylaş</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="profile-stats-grid">
+                        <div class="profile-stat-card"><div class="psc-icon">🎬</div><div class="psc-val" id="profileTotalAnime">0</div><div class="psc-label">Anime</div></div>
+                        <div class="profile-stat-card"><div class="psc-icon">📖</div><div class="psc-val" id="profileTotalManga">0</div><div class="psc-label">Manga</div></div>
+                        <div class="profile-stat-card"><div class="psc-icon">📱</div><div class="psc-val" id="profileTotalWebtoon">0</div><div class="psc-label">Webtoon</div></div>
+                        <div class="profile-stat-card"><div class="psc-icon">✅</div><div class="psc-val" id="profileCompletedTotal">0</div><div class="psc-label">Tamamlanan</div></div>
+                        <div class="profile-stat-card"><div class="psc-icon">⭐</div><div class="psc-val" id="profileXPTotal">0</div><div class="psc-label">Toplam XP</div></div>
+                        <div class="profile-stat-card"><div class="psc-icon">🔥</div><div class="psc-val" id="profileStreakVal">0</div><div class="psc-label">En Uzun Streak</div></div>
+                    </div>
+                    <div class="profile-two-col">
+                        <div class="profile-section-block">
+                            <h3 class="psb-title">📋 Son Aktiviteler</h3>
+                            <div class="activity-list" id="activityList"></div>
+                        </div>
+                        <div class="profile-section-block">
+                            <h3 class="psb-title">💖 Favori Türler</h3>
+                            <div class="favorite-genres" id="favoriteGenres"></div>
+                            <h3 class="psb-title" style="margin-top:1.5rem;">🏆 Son Başarımlar</h3>
+                            <div class="recent-achievements" id="recentAchievements"></div>
+                        </div>
+                    </div>
+                    <div class="profile-section-block">
+                        <h3 class="psb-title">📤 Paylaş & Dışa Aktar</h3>
+                        <div class="share-btns">
+                            <button class="share-btn twitter" onclick="shareToTwitter()">🐦 Twitter</button>
+                            <button class="share-btn copy" onclick="copyProfileLink()">🔗 Link Kopyala</button>
+                            <button class="share-btn export" onclick="exportData('json')">📥 JSON İndir</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CALENDAR -->
+                <div id="calendarSection" class="section">
+                    <div class="page-header"><h2 class="page-title">📅 Yayın Takvimi</h2></div>
+                    <div class="calendar-container">
+                        <div class="calendar-header-row">
+                            <span>Haftalık Yayın Takvimi</span>
+                            <button class="btn btn-secondary" onclick="syncCalendar()">🔄 Senkronize Et</button>
+                        </div>
+                        <div class="weekdays" id="weekdaysContainer"></div>
+                    </div>
+                </div>
+
+                <!-- ANALYTICS -->
+                <div id="analyticsSection" class="section">
+                    <div class="page-header"><h2 class="page-title">📊 Analitik</h2></div>
+                    <div class="analytics-grid" id="analyticsGrid"></div>
+                </div>
+
+                <!-- AI -->
+                <div id="aiSection" class="section">
+                    <div class="ai-header-card">
+                        <div class="ai-header-glow"></div>
+                        <div class="ai-header-content">
+                            <div class="ai-robot-icon">🤖</div>
+                            <div>
+                                <h2 class="ai-title">AI Öneri Motoru</h2>
+                                <p class="ai-sub">İzleme alışkanlıklarını analiz ederek sana özel içerikler buluyor</p>
+                            </div>
+                        </div>
+                        <div class="ai-analysis-cards">
+                            <div class="aac"><div class="aac-icon">📊</div><div class="aac-label">İzleme Paterni</div><div class="aac-val" id="aiWatchingPattern">-</div></div>
+                            <div class="aac"><div class="aac-icon">🎯</div><div class="aac-label">Favori Tür</div><div class="aac-val" id="aiFavoriteGenres">-</div></div>
+                            <div class="aac"><div class="aac-icon">⭐</div><div class="aac-label">Ort. Puan</div><div class="aac-val" id="aiAvgRating">-</div></div>
+                            <div class="aac"><div class="aac-icon">🔮</div><div class="aac-label">AI Doğruluğu</div><div class="aac-val">98%</div></div>
+                        </div>
+                        <div class="ai-btn-row">
+                            <button class="btn btn-primary btn-large" onclick="generateAIRecommendations()">✨ Yeni Öneriler Al</button>
+                            <button class="btn btn-secondary" onclick="refreshAIAnalysis()">🔄 Yenile</button>
+                        </div>
+                    </div>
+                    <div class="ai-recs-section">
+                        <div class="section-header-row">
+                            <h3 class="sh-title">💎 Size Özel</h3>
+                        </div>
+                        <div class="media-row" id="aiRecommendations"></div>
+                    </div>
+                    <div class="ai-recs-section">
+                        <div class="section-header-row">
+                            <h3 class="sh-title">🎭 Beğendiklerinize Benzer</h3>
+                        </div>
+                        <div class="media-row" id="aiSimilarRecommendations"></div>
+                    </div>
+                </div>
+
+                <!-- ACHIEVEMENTS -->
+                <div id="achievementsSection" class="section">
+                    <div class="page-header">
+                        <h2 class="page-title">🏆 Başarımlar</h2>
+                        <p class="page-sub">İçerik ekle, tamamla ve seviyeleri geç</p>
+                    </div>
+                    <div id="achievementsGrid" class="achievements-grid"></div>
+                </div>
+
+                <!-- SETTINGS -->
+                <div id="settingsSection" class="section">
+                    <div class="page-header"><h2 class="page-title">⚙️ Ayarlar</h2></div>
+                    <div class="settings-grid">
+                        <div class="chart-container">
+                            <h3 class="chart-title">🎨 Tema</h3>
+                            <div class="theme-grid">
+                                <div class="theme-option theme-dark active" onclick="setTheme('dark')"><div class="theme-name">Karanlık</div></div>
+                                <div class="theme-option theme-light" onclick="setTheme('light')"><div class="theme-name">Aydınlık</div></div>
+                                <div class="theme-option theme-neon" onclick="setTheme('neon')"><div class="theme-name">Neon</div></div>
+                                <div class="theme-option theme-pastel" onclick="setTheme('pastel')"><div class="theme-name">Pastel</div></div>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <h3 class="chart-title">📤 Veri Yönetimi</h3>
+                            <p style="color:var(--text-secondary);font-size:0.88rem;margin-bottom:1rem;">Verilerinizi dışa aktarın veya içe aktarın</p>
+                            <div style="display:flex;gap:0.8rem;flex-wrap:wrap;">
+                                <button class="btn btn-primary" onclick="exportData('json')">📥 JSON İndir</button>
+                                <button class="btn btn-primary" onclick="exportData('csv')">📥 CSV İndir</button>
+                                <button class="btn btn-secondary" onclick="importData()">📤 Veri Yükle</button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <h3 class="chart-title">🔔 Bildirimler</h3>
+                            <label class="toggle-label">
+                                <input type="checkbox" id="pushNotifications" onchange="toggleNotifications()">
+                                <span>Push bildirimleri etkinleştir</span>
+                            </label>
+                        </div>
+                        <div class="chart-container danger-zone">
+                            <h3 class="chart-title">⚠️ Hesap İşlemleri</h3>
+                            <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:1rem;">Bu işlemler geri alınamaz.</p>
+                            <button class="btn-danger" onclick="handleLogout()">🚪 Çıkış Yap</button>
+                            <button class="btn-danger-outline" onclick="deleteAccount()">🗑️ Hesabı Sil</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /main-content -->
+        </div><!-- /container -->
+
+        <!-- Add Modal -->
+        <div id="addModal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <div class="modal-top">
+                    <h2 class="modal-title">✨ Yeni İçerik Ekle</h2>
+                    <button class="modal-close" onclick="closeModal()">✕</button>
+                </div>
+                <form id="addForm" onsubmit="addItem(event)">
+                    <div class="form-group">
+                        <label>🔍 Jikan API'den Ara (opsiyonel)</label>
+                        <input type="text" id="apiSearch" placeholder="Anime veya manga adı yazın..." oninput="searchAPI()">
+                        <div id="apiResults"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>İsim *</label>
+                            <input type="text" id="itemName" required placeholder="Anime / Manga adı">
+                        </div>
+                        <div class="form-group">
+                            <label>Tip *</label>
+                            <select id="itemType" required>
+                                <option value="anime">🎬 Anime</option>
+                                <option value="manga">📖 Manga</option>
+                                <option value="webtoon">📱 Webtoon</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Poster URL (opsiyonel)</label>
+                        <input type="url" id="itemPoster" placeholder="https://...">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Durum</label>
+                            <select id="itemStatus">
+                                <option value="plantowatch">📋 İzlenecek</option>
+                                <option value="watching">▶️ İzliyorum</option>
+                                <option value="completed">✅ Tamamlandı</option>
+                                <option value="onhold">⏸️ Beklemede</option>
+                                <option value="dropped">❌ Bırakıldı</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Tür</label>
+                            <select id="itemGenre">
+                                <option value="">Seçiniz</option>
+                                <option value="action">Aksiyon</option>
+                                <option value="adventure">Macera</option>
+                                <option value="comedy">Komedi</option>
+                                <option value="drama">Drama</option>
+                                <option value="fantasy">Fantastik</option>
+                                <option value="romance">Romantik</option>
+                                <option value="scifi">Sci-Fi</option>
+                                <option value="horror">Korku</option>
+                                <option value="mystery">Gizem</option>
+                                <option value="sports">Spor</option>
+                                <option value="psychological">Psikolojik</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Notlar</label>
+                        <textarea id="itemNotes" rows="2" placeholder="Düşüncelerinizi yazın..."></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">İptal</button>
+                        <button type="submit" class="btn btn-primary">✨ Ekle</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Edit Profile Modal -->
+        <div id="editProfileModal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <div class="modal-top">
+                    <h2 class="modal-title">✏️ Profili Düzenle</h2>
+                    <button class="modal-close" onclick="closeEditProfile()">✕</button>
+                </div>
+                <form id="editProfileForm" onsubmit="saveProfile(event)">
+                    <div class="form-group">
+                        <label>Kullanıcı Adı</label>
+                        <input type="text" id="editUsername" required maxlength="30">
+                    </div>
+                    <div class="form-group">
+                        <label>Bio</label>
+                        <textarea id="editBio" rows="3" placeholder="Kendinizi tanıtın..." maxlength="200"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Avatar Seç</label>
+                        <div class="avatar-selector">
+                            <button type="button" class="avatar-option" onclick="selectAvatar('👤')">👤</button>
+                            <button type="button" class="avatar-option" onclick="selectAvatar('😊')">😊</button>
+                            <button type="button" class="avatar-option" onclick="selectAvatar('🎮')">🎮</button>
+                            <button type="button" class="avatar-option" onclick="selectAvatar('🎬')">🎬</button>
+                            <button type="button" class="avatar-option" onclick="selectAvatar('📺')">📺</button>
+                            <button type="button" class="avatar-option" onclick="selectAvatar('🌟')">🌟</button>
+                            <button type="button" class="avatar-option" onclick="selectAvatar('⚡')">⚡</button>
+                            <button type="button" class="avatar-option" onclick="selectAvatar('🔥')">🔥</button>
+                            <button type="button" class="avatar-option" onclick="selectAvatar('💫')">💫</button>
+                            <button type="button" class="avatar-option" onclick="selectAvatar('🎯')">🎯</button>
+                            <button type="button" class="avatar-option" onclick="selectAvatar('🐉')">🐉</button>
+                            <button type="button" class="avatar-option" onclick="selectAvatar('⚔️')">⚔️</button>
+                            <button type="button" class="avatar-option" onclick="selectAvatar('🌙')">🌙</button>
+                            <button type="button" class="avatar-option" onclick="selectAvatar('🦊')">🦊</button>
+                            <button type="button" class="avatar-option" onclick="selectAvatar('🌸')">🌸</button>
+                        </div>
+                        <input type="hidden" id="selectedAvatar" value="👤">
+                    </div>
+                    <div class="form-group">
+                        <label>Kapak Rengi</label>
+                        <div class="cover-colors">
+                            <div class="cc-opt" style="background:linear-gradient(135deg,#ff3366,#7c3aed)" onclick="selectCoverColor('gradient1')" data-color="gradient1"></div>
+                            <div class="cc-opt" style="background:linear-gradient(135deg,#00d4ff,#0ea5e9)" onclick="selectCoverColor('gradient2')" data-color="gradient2"></div>
+                            <div class="cc-opt" style="background:linear-gradient(135deg,#10b981,#059669)" onclick="selectCoverColor('gradient3')" data-color="gradient3"></div>
+                            <div class="cc-opt" style="background:linear-gradient(135deg,#f59e0b,#ef4444)" onclick="selectCoverColor('gradient4')" data-color="gradient4"></div>
+                            <div class="cc-opt" style="background:linear-gradient(135deg,#8b5cf6,#ec4899)" onclick="selectCoverColor('gradient5')" data-color="gradient5"></div>
+                        </div>
+                        <input type="hidden" id="selectedCoverColor" value="gradient1">
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeEditProfile()">İptal</button>
+                        <button type="submit" class="btn btn-primary">💾 Kaydet</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Notification -->
+        <div id="notification" class="notification"></div>
+
+        <!-- Import Input -->
+        <input type="file" id="importInput" accept=".json,.csv" style="display:none;" onchange="handleImport(event)">
+
+    </div><!-- /mainApp -->
+
+    <!-- Scripts - DOĞRU SIRADA -->
+    <script src="js/data-manager.js"></script>
+    <script src="js/xp-system.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/auth.js"></script>
+
+</body>
+</html>

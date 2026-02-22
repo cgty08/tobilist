@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Allow: /index.html
+
+# Admin paneline bot erişimi engelle
+Disallow: /admin.html
+Disallow: /admin/
+
+# Sitemap
+Sitemap: https://tobilist.com/sitemap.xml
+
+# Crawl hızı (agresif botları yavaşlatır)
+Crawl-delay: 1
