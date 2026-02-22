@@ -212,7 +212,86 @@
 
         @media(max-width:1024px){.chart-grid-2,.chart-grid-eq,.settings-grid{grid-template-columns:1fr;}}
         @media(max-width:768px){#sidebar{transform:translateX(-100%);}#mainContent{margin-left:0;}.form-row{grid-template-columns:1fr;}}
-    </style>
+    
+        /* ===== BAN MODAL ===== */
+        .ban-modal-overlay {
+            position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);
+            z-index:9999;display:flex;align-items:center;justify-content:center;
+            opacity:0;pointer-events:none;transition:opacity .25s;
+        }
+        .ban-modal-overlay.open { opacity:1;pointer-events:all; }
+        .ban-modal {
+            background:#111318;border:1px solid rgba(239,68,68,0.25);
+            border-radius:20px;padding:2rem;width:100%;max-width:480px;
+            box-shadow:0 25px 80px rgba(0,0,0,0.6),0 0 0 1px rgba(239,68,68,0.1);
+            transform:scale(0.95) translateY(20px);transition:transform .25s;
+            position:relative;
+        }
+        .ban-modal-overlay.open .ban-modal { transform:scale(1) translateY(0); }
+        .ban-modal-header {
+            display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;
+        }
+        .ban-modal-title {
+            font-size:1.3rem;font-weight:900;color:#ef4444;
+            display:flex;align-items:center;gap:0.5rem;
+        }
+        .ban-modal-close {
+            width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);
+            background:rgba(255,255,255,0.05);color:var(--text2);cursor:pointer;
+            font-size:1rem;display:flex;align-items:center;justify-content:center;
+            transition:all .2s;
+        }
+        .ban-modal-close:hover { background:rgba(239,68,68,0.2);color:#ef4444;border-color:rgba(239,68,68,0.4); }
+        .ban-user-card {
+            display:flex;align-items:center;gap:1rem;
+            background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);
+            border-radius:12px;padding:1rem;margin-bottom:1.5rem;
+        }
+        .ban-user-av {
+            width:46px;height:46px;border-radius:50%;
+            background:linear-gradient(135deg,#ef4444,#7c3aed);
+            display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;
+        }
+        .ban-user-name { font-weight:700;font-size:1rem;color:var(--text1); }
+        .ban-user-sub  { font-size:0.78rem;color:var(--text2);margin-top:0.1rem; }
+        .ban-field { margin-bottom:1.2rem; }
+        .ban-field label {
+            display:block;font-size:0.75rem;font-weight:700;letter-spacing:1px;
+            text-transform:uppercase;color:var(--text2);margin-bottom:0.5rem;
+        }
+        .ban-field select,
+        .ban-field textarea {
+            width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
+            border-radius:10px;padding:0.75rem 1rem;color:var(--text1);font-family:'DM Sans',sans-serif;
+            font-size:0.9rem;transition:border-color .2s;resize:none;
+        }
+        .ban-field select:focus,
+        .ban-field textarea:focus { outline:none;border-color:rgba(239,68,68,0.5); }
+        .ban-reason-chips { display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.7rem; }
+        .ban-chip {
+            background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
+            border-radius:20px;padding:0.25rem 0.7rem;font-size:0.78rem;color:var(--text2);
+            cursor:pointer;transition:all .2s;
+        }
+        .ban-chip:hover,.ban-chip.active {
+            background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.4);color:#ef4444;
+        }
+        .ban-modal-actions { display:flex;gap:0.8rem;margin-top:1.5rem; }
+        .btn-ban-confirm {
+            flex:1;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;
+            border:none;border-radius:10px;padding:0.85rem;font-size:0.95rem;font-weight:700;
+            cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;
+        }
+        .btn-ban-confirm:hover { transform:translateY(-1px);box-shadow:0 8px 25px rgba(239,68,68,0.4); }
+        .btn-ban-cancel {
+            flex:1;background:rgba(255,255,255,0.05);color:var(--text1);
+            border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:0.85rem;
+            font-size:0.95rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;
+        }
+        .btn-ban-cancel:hover { background:rgba(255,255,255,0.09); }
+        .ban-duration-row { display:grid;grid-template-columns:1fr 1fr;gap:0.8rem; }
+
+        </style>
 </head>
 <body>
 
@@ -804,19 +883,49 @@ function viewUser(u) {
     openModal('userModal');
 }
 
+// Ban modal state
+let _banUid = null;
+let _banName = null;
+
 function confirmBan(uid, name) {
-    openConfirm('Ban User', `Ban "${name}"? They will be locked out of their account.`, () => setBan(uid, true, name));
+    _banUid = uid;
+    _banName = name;
+    document.getElementById('banTargetName').textContent = name;
+    document.getElementById('banTargetId').textContent = uid.substring(0,16) + '…';
+    document.getElementById('banReasonInput').value = '';
+    document.getElementById('banDuration').value = 'permanent';
+    document.querySelectorAll('.ban-chip').forEach(c => c.classList.remove('active'));
+    document.getElementById('banModalOverlay').classList.add('open');
 }
 
-async function setBan(uid, ban, name) {
+function closeBanModal(e) {
+    if (e && e.target !== document.getElementById('banModalOverlay')) return;
+    document.getElementById('banModalOverlay').classList.remove('open');
+}
+
+function selectChip(el, reason) {
+    document.querySelectorAll('.ban-chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('banReasonInput').value = reason;
+}
+
+async function executeBan() {
+    const reason = document.getElementById('banReasonInput').value.trim() || 'Kural ihlali';
+    const duration = document.getElementById('banDuration').value;
+    document.getElementById('banModalOverlay').classList.remove('open');
+    await setBan(_banUid, true, _banName, reason, duration);
+}
+
+async function setBan(uid, ban, name, reason='Kural ihlali', duration='permanent') {
     const { data: row, error } = await sb.from('user_data').select('data').eq('user_id',uid).single();
-    if (error||!row) { toast('User not found','error'); return; }
-    const newData = { ...row.data, banned: ban };
+    if (error||!row) { toast('Kullanıcı bulunamadı','error'); return; }
+    const banExpiry = duration === 'permanent' ? null : new Date(Date.now() + parseInt(duration)*86400000).toISOString();
+    const newData = { ...row.data, banned: ban, ban_reason: ban ? reason : null, ban_expiry: ban ? banExpiry : null, ban_date: ban ? new Date().toISOString() : null };
     const { error: e2 } = await sb.from('user_data')
         .update({ data: newData, updated_at: new Date().toISOString() })
         .eq('user_id', uid);
-    if (e2) { toast('Update failed: '+e2.message,'error'); return; }
-    toast(ban ? `🚫 ${name} banned` : `✅ ${name} unbanned`, ban?'error':'success');
+    if (e2) { toast('Güncelleme hatası: '+e2.message,'error'); return; }
+    toast(ban ? `🚫 ${name} banlandı` : `✅ ${name} ban kaldırıldı`, ban?'error':'success');
     loadUsers();
     if (!ban) loadBans();
 }
@@ -844,13 +953,17 @@ async function loadBans() {
         tbody.innerHTML='<tr><td colspan="4"><div class="empty-state"><div class="ei">✅</div><h3>No banned users</h3><p>All users are in good standing.</p></div></td></tr>';
         return;
     }
-    tbody.innerHTML = banned.map(u=>`<tr>
+    tbody.innerHTML = banned.map(u=>{
+        const d=u.data, name=esc(d?.social?.name||'User');
+        const reason=d?.ban_reason||'Kural ihlali';
+        const expiry=d?.ban_expiry ? `<span style="color:var(--text2);font-size:0.8rem;">⏱ ${fmtDate(d.ban_expiry)}'e kadar</span>` : '<span class="badge bg-red">♾️ Kalıcı</span>';
+        return `<tr>
         <td><div class="user-cell"><div class="user-av">🚫</div>
-        <div><div class="user-name">${esc(u.data?.social?.name||'User')}</div><div class="user-email mono">${u.user_id.substring(0,12)}…</div></div></div></td>
+        <div><div class="user-name">${name}</div><div class="user-email mono">${u.user_id.substring(0,12)}…</div></div></div></td>
         <td style="color:var(--text2);">${fmtDate(u.updated_at)}</td>
-        <td><span class="badge bg-red">Policy violation</span></td>
-        <td><button class="act-btn btn-unban" onclick="setBan('${u.user_id}',false,'${esc(u.data?.social?.name||'User')}')">✅ Lift Ban</button></td>
-    </tr>`).join('');
+        <td><div style="display:flex;flex-direction:column;gap:0.25rem;"><span class="badge bg-red">${esc(reason)}</span>${expiry}</div></td>
+        <td><button class="act-btn btn-unban" onclick="setBan('${u.user_id}',false,'${name}')">✅ Banı Kaldır</button></td>
+    </tr>`;}).join('');
 }
 
 // ===== CONTENT =====
@@ -1048,5 +1161,59 @@ function toast(msg, type='info') {
 function fmtDate(s){return s?new Date(s).toLocaleDateString('en-US'):'—';}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 </script>
+
+    <!-- ===== BAN MODAL ===== -->
+    <div class="ban-modal-overlay" id="banModalOverlay" onclick="closeBanModal(event)">
+        <div class="ban-modal">
+            <div class="ban-modal-header">
+                <div class="ban-modal-title">🚫 Kullanıcıyı Banla</div>
+                <button class="ban-modal-close" onclick="closeBanModal()">✕</button>
+            </div>
+
+            <!-- User info -->
+            <div class="ban-user-card">
+                <div class="ban-user-av">👤</div>
+                <div>
+                    <div class="ban-user-name" id="banTargetName">Kullanıcı</div>
+                    <div class="ban-user-sub" id="banTargetId">—</div>
+                </div>
+            </div>
+
+            <!-- Quick reason chips -->
+            <div class="ban-field">
+                <label>⚡ Hızlı Sebep Seç</label>
+                <div class="ban-reason-chips">
+                    <span class="ban-chip" onclick="selectChip(this, 'Spam / Reklam')">🔁 Spam</span>
+                    <span class="ban-chip" onclick="selectChip(this, 'Uygunsuz içerik')">🔞 Uygunsuz İçerik</span>
+                    <span class="ban-chip" onclick="selectChip(this, 'Hakaret / Küfür')">🤬 Hakaret</span>
+                    <span class="ban-chip" onclick="selectChip(this, 'Sahte hesap')">🎭 Sahte Hesap</span>
+                    <span class="ban-chip" onclick="selectChip(this, 'Kural ihlali')">⚠️ Kural İhlali</span>
+                </div>
+            </div>
+
+            <!-- Custom reason -->
+            <div class="ban-field">
+                <label>📝 Ban Sebebi</label>
+                <textarea id="banReasonInput" rows="3" placeholder="Ban sebebini açıklayın..."></textarea>
+            </div>
+
+            <!-- Duration -->
+            <div class="ban-field">
+                <label>⏱️ Ban Süresi</label>
+                <select id="banDuration">
+                    <option value="permanent">♾️ Kalıcı Ban</option>
+                    <option value="7">📅 7 Gün</option>
+                    <option value="30">📅 30 Gün</option>
+                    <option value="90">📅 90 Gün</option>
+                </select>
+            </div>
+
+            <div class="ban-modal-actions">
+                <button class="btn-ban-cancel" onclick="closeBanModal()">İptal</button>
+                <button class="btn-ban-confirm" onclick="executeBan()">🚫 Banla</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>

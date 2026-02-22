@@ -269,13 +269,6 @@
     .footer-links span:not(:nth-child(even)):hover { color:rgba(255,255,255,.5); }
     </style>
 
-    <!-- ===== GOOGLE ADSENSE ===== -->
-    <!-- ADIM: ca-pub-XXXXXXXXXXXXXXXX yerine kendi Publisher ID'ni yaz -->
-    <!-- AdSense onayı alındıktan sonra aşağıdaki script'i aktif et: -->
-    <!--
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
-    -->
-
     <!-- Supabase CDN -->
     <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script>
@@ -587,19 +580,10 @@
                         <div class="ad-inner">
                             <span class="ad-tag">Reklam</span>
                             <div class="ad-placeholder">
-                                <!-- AdSense onayı alındıktan sonra aşağıdaki bloğu aktif et,
-                                     placeholder div'ini sil, publisher ID ve slot ID'yi güncelle -->
-                                <!--
-                                <ins class="adsbygoogle"
-                                     style="display:block"
-                                     data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-                                     data-ad-slot="XXXXXXXXXX"
-                                     data-ad-format="auto"
-                                     data-full-width-responsive="true"></ins>
-                                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-                                -->
+                                <!-- Google AdSense kodu buraya gelecek -->
+                                <!-- <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="XXXXXXXXXX" data-ad-format="auto" data-full-width-responsive="true"></ins> -->
                                 <div class="ad-placeholder-inner">
-                                    <span style="color:var(--text-muted);font-size:0.78rem;opacity:0.5;">Reklam Alanı</span>
+                                    <span style="color:var(--text-muted);font-size:0.78rem;opacity:0.5;">Reklam Alanı — 728×90</span>
                                 </div>
                             </div>
                         </div>
@@ -718,19 +702,8 @@
                         <div class="ad-inner">
                             <span class="ad-tag">Reklam</span>
                             <div class="ad-placeholder">
-                                <!-- AdSense onayı alındıktan sonra aşağıdaki bloğu aktif et,
-                                     placeholder div'ini sil, publisher ID ve slot ID'yi güncelle -->
-                                <!--
-                                <ins class="adsbygoogle"
-                                     style="display:block"
-                                     data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-                                     data-ad-slot="YYYYYYYYYY"
-                                     data-ad-format="auto"
-                                     data-full-width-responsive="true"></ins>
-                                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-                                -->
                                 <div class="ad-placeholder-inner">
-                                    <span style="color:var(--text-muted);font-size:0.78rem;opacity:0.5;">Reklam Alanı</span>
+                                    <span style="color:var(--text-muted);font-size:0.78rem;opacity:0.5;">Reklam Alanı — 728×90</span>
                                 </div>
                             </div>
                         </div>
@@ -812,8 +785,6 @@
                             <span onclick="openAuthModal('register')" style="cursor:pointer;">Kayıt Ol</span>
                             <span>·</span>
                             <span onclick="switchSection('home')" style="cursor:pointer;">Ana Sayfa</span>
-                            <span>·</span>
-                            <a href="/privacy.html" style="cursor:pointer;color:inherit;text-decoration:none;" target="_blank">Gizlilik Politikası</a>
                         </div>
                     </div>
 
@@ -1246,7 +1217,45 @@
     document.addEventListener('DOMContentLoaded',()=>{
         setTimeout(loadHomeLiveStats, 2000);
         setInterval(loadHomeLiveStats, 60000);
+        setTimeout(loadAnnouncements, 1000);
     });
+
+    async function loadAnnouncements() {
+        try {
+            if (!window.supabaseClient) return;
+            const { data, error } = await window.supabaseClient
+                .from('announcements')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(1);
+            if (error || !data || !data.length) return;
+            const dismissed = JSON.parse(localStorage.getItem('dismissed_announcements') || '[]');
+            const ann = data.find(a => !dismissed.includes(a.id));
+            if (!ann) return;
+            if (document.getElementById('announcementBanner')) return;
+            const colors = {
+                success: { bg: 'rgba(16,185,129,0.12)', border: 'rgba(16,185,129,0.3)', text: '#10b981' },
+                warning: { bg: 'rgba(245,158,11,0.12)',  border: 'rgba(245,158,11,0.3)',  text: '#f59e0b' },
+                new:     { bg: 'rgba(124,58,237,0.12)',  border: 'rgba(124,58,237,0.3)',  text: '#a78bfa' },
+                info:    { bg: 'rgba(0,212,255,0.10)',   border: 'rgba(0,212,255,0.25)',  text: '#00d4ff' },
+            };
+            const c = colors[ann.type] || colors.info;
+            const banner = document.createElement('div');
+            banner.id = 'announcementBanner';
+            banner.style.cssText = `background:${c.bg};border-bottom:1px solid ${c.border};padding:0.65rem 1.5rem;text-align:center;font-size:0.88rem;color:${c.text};display:flex;align-items:center;justify-content:center;gap:0.8rem;flex-wrap:wrap;`;
+            banner.innerHTML = `<span>${ann.icon || '📢'} <strong>${ann.title}</strong> — ${ann.body}</span><button onclick="dismissAnnouncement(${ann.id})" style="background:transparent;border:1px solid ${c.border};color:${c.text};padding:0.2rem 0.7rem;border-radius:6px;cursor:pointer;font-size:0.78rem;font-family:'DM Sans',sans-serif;">Kapat ✕</button>`;
+            const offlineBanner = document.getElementById('offlineBanner');
+            if (offlineBanner) offlineBanner.after(banner);
+        } catch(e) { console.warn('Announcement error:', e); }
+    }
+
+    function dismissAnnouncement(id) {
+        const dismissed = JSON.parse(localStorage.getItem('dismissed_announcements') || '[]');
+        dismissed.push(id);
+        localStorage.setItem('dismissed_announcements', JSON.stringify(dismissed));
+        const el = document.getElementById('announcementBanner');
+        if (el) el.remove();
+    }
     </script>
 </body>
 </html>
