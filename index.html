@@ -269,6 +269,13 @@
     .footer-links span:not(:nth-child(even)):hover { color:rgba(255,255,255,.5); }
     </style>
 
+    <!-- ===== GOOGLE ADSENSE ===== -->
+    <!-- ADIM: ca-pub-XXXXXXXXXXXXXXXX yerine kendi Publisher ID'ni yaz -->
+    <!-- AdSense onayı alındıktan sonra aşağıdaki script'i aktif et: -->
+    <!--
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+    -->
+
     <!-- Supabase CDN -->
     <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script>
@@ -580,10 +587,19 @@
                         <div class="ad-inner">
                             <span class="ad-tag">Reklam</span>
                             <div class="ad-placeholder">
-                                <!-- Google AdSense kodu buraya gelecek -->
-                                <!-- <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="XXXXXXXXXX" data-ad-format="auto" data-full-width-responsive="true"></ins> -->
+                                <!-- AdSense onayı alındıktan sonra aşağıdaki bloğu aktif et,
+                                     placeholder div'ini sil, publisher ID ve slot ID'yi güncelle -->
+                                <!--
+                                <ins class="adsbygoogle"
+                                     style="display:block"
+                                     data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                                     data-ad-slot="XXXXXXXXXX"
+                                     data-ad-format="auto"
+                                     data-full-width-responsive="true"></ins>
+                                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+                                -->
                                 <div class="ad-placeholder-inner">
-                                    <span style="color:var(--text-muted);font-size:0.78rem;opacity:0.5;">Reklam Alanı — 728×90</span>
+                                    <span style="color:var(--text-muted);font-size:0.78rem;opacity:0.5;">Reklam Alanı</span>
                                 </div>
                             </div>
                         </div>
@@ -702,8 +718,19 @@
                         <div class="ad-inner">
                             <span class="ad-tag">Reklam</span>
                             <div class="ad-placeholder">
+                                <!-- AdSense onayı alındıktan sonra aşağıdaki bloğu aktif et,
+                                     placeholder div'ini sil, publisher ID ve slot ID'yi güncelle -->
+                                <!--
+                                <ins class="adsbygoogle"
+                                     style="display:block"
+                                     data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                                     data-ad-slot="YYYYYYYYYY"
+                                     data-ad-format="auto"
+                                     data-full-width-responsive="true"></ins>
+                                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+                                -->
                                 <div class="ad-placeholder-inner">
-                                    <span style="color:var(--text-muted);font-size:0.78rem;opacity:0.5;">Reklam Alanı — 728×90</span>
+                                    <span style="color:var(--text-muted);font-size:0.78rem;opacity:0.5;">Reklam Alanı</span>
                                 </div>
                             </div>
                         </div>
@@ -785,6 +812,8 @@
                             <span onclick="openAuthModal('register')" style="cursor:pointer;">Kayıt Ol</span>
                             <span>·</span>
                             <span onclick="switchSection('home')" style="cursor:pointer;">Ana Sayfa</span>
+                            <span>·</span>
+                            <a href="/privacy.html" style="cursor:pointer;color:inherit;text-decoration:none;" target="_blank">Gizlilik Politikası</a>
                         </div>
                     </div>
 

@@ -36,4 +36,12 @@
     <priority>0.7</priority>
   </url>
 
+  <!-- Gizlilik Politikası -->
+  <url>
+    <loc>https://tobilist.com/privacy.html</loc>
+    <lastmod>2025-02-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
 </urlset>

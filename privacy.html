@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gizlilik Politikası — TobiList</title>
+    <meta name="description" content="TobiList gizlilik politikası. Kişisel verilerinizin nasıl toplandığı, kullanıldığı ve korunduğu hakkında bilgi.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://tobilist.com/privacy.html">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: #07090f;
+            color: #c8d0e0;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .priv-header {
+            background: rgba(255,255,255,0.03);
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            padding: 1.2rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .priv-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Bebas Neue', cursive;
+            font-size: 1.4rem;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, #ff3366, #00d4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+        }
+
+        .priv-back {
+            color: #8892a4;
+            text-decoration: none;
+            font-size: 0.88rem;
+            transition: color 0.2s;
+        }
+        .priv-back:hover { color: #ff3366; }
+
+        /* Hero */
+        .priv-hero {
+            text-align: center;
+            padding: 3.5rem 1rem 2.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .priv-hero h1 {
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 0.6rem;
+        }
+
+        .priv-hero p {
+            color: #8892a4;
+            font-size: 0.95rem;
+        }
+
+        .priv-badge {
+            display: inline-block;
+            background: rgba(16,185,129,0.12);
+            border: 1px solid rgba(16,185,129,0.3);
+            color: #10b981;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 0.3rem 0.9rem;
+            border-radius: 20px;
+            margin-bottom: 1.2rem;
+        }
+
+        /* Content */
+        .priv-container {
+            max-width: 780px;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem 4rem;
+        }
+
+        .priv-toc {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 14px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .priv-toc h3 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #8892a4;
+            margin-bottom: 1rem;
+        }
+
+        .priv-toc ol {
+            padding-left: 1.2rem;
+        }
+
+        .priv-toc li {
+            margin-bottom: 0.4rem;
+        }
+
+        .priv-toc a {
+            color: #ff3366;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: opacity 0.2s;
+        }
+        .priv-toc a:hover { opacity: 0.7; text-decoration: underline; }
+
+        .priv-section {
+            margin-bottom: 2.5rem;
+            scroll-margin-top: 80px;
+        }
+
+        .priv-section h2 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 1rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .priv-section h2 .sec-num {
+            background: linear-gradient(135deg, #ff3366, #ff5580);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1rem;
+        }
+
+        .priv-section p {
+            margin-bottom: 0.9rem;
+            color: #b0b8cc;
+        }
+
+        .priv-section ul {
+            padding-left: 1.4rem;
+            margin-bottom: 0.9rem;
+        }
+
+        .priv-section ul li {
+            margin-bottom: 0.4rem;
+            color: #b0b8cc;
+        }
+
+        .priv-section ul li::marker {
+            color: #ff3366;
+        }
+
+        .priv-highlight {
+            background: rgba(255,51,102,0.06);
+            border-left: 3px solid #ff3366;
+            border-radius: 0 8px 8px 0;
+            padding: 0.9rem 1.2rem;
+            margin: 1rem 0;
+            color: #c8d0e0;
+            font-size: 0.92rem;
+        }
+
+        .priv-info-box {
+            background: rgba(0,212,255,0.05);
+            border: 1px solid rgba(0,212,255,0.15);
+            border-radius: 10px;
+            padding: 1rem 1.2rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            color: #a0d4e8;
+        }
+
+        /* Contact */
+        .priv-contact-card {
+            background: linear-gradient(135deg, rgba(255,51,102,0.08), rgba(0,212,255,0.05));
+            border: 1px solid rgba(255,51,102,0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .priv-contact-card h3 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        .priv-contact-card p {
+            color: #8892a4;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .priv-contact-card a {
+            color: #ff3366;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        /* Footer */
+        .priv-footer {
+            text-align: center;
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            color: #4b5563;
+            font-size: 0.8rem;
+        }
+
+        .priv-footer a { color: #ff3366; text-decoration: none; }
+
+        @media (max-width: 600px) {
+            .priv-hero h1 { font-size: 1.6rem; }
+            .priv-header { padding: 1rem; }
+            .priv-container { padding: 1.5rem 1rem 3rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="priv-header">
+        <a href="/" class="priv-logo">
+            <svg width="24" height="24" viewBox="0 0 40 40" fill="none">
+                <ellipse cx="20" cy="21" rx="17" ry="16" fill="#E8630A"/>
+                <ellipse cx="24" cy="18" rx="4" ry="4.5" fill="#1a0a00"/>
+                <circle cx="25.5" cy="16.5" r="1.2" fill="rgba(255,255,255,0.5)"/>
+                <ellipse cx="20" cy="21" rx="17" ry="16" stroke="#c45500" stroke-width="1.5" fill="none"/>
+            </svg>
+            TobiList
+        </a>
+        <a href="/" class="priv-back">← Ana Sayfaya Dön</a>
+    </header>
+
+    <!-- Hero -->
+    <div class="priv-hero">
+        <div class="priv-badge">🔒 GDPR Uyumlu</div>
+        <h1>🔒 Gizlilik Politikası</h1>
+        <p>Son güncelleme: 22 Şubat 2025 &nbsp;·&nbsp; Versiyon 1.0</p>
+    </div>
+
+    <!-- Content -->
+    <div class="priv-container">
+
+        <!-- TOC -->
+        <div class="priv-toc">
+            <h3>📋 İçindekiler</h3>
+            <ol>
+                <li><a href="#s1">Toplanan Veriler</a></li>
+                <li><a href="#s2">Verilerin Kullanım Amacı</a></li>
+                <li><a href="#s3">Çerezler (Cookies)</a></li>
+                <li><a href="#s4">Üçüncü Taraf Hizmetler</a></li>
+                <li><a href="#s5">Verilerin Saklanması ve Güvenliği</a></li>
+                <li><a href="#s6">Kullanıcı Hakları</a></li>
+                <li><a href="#s7">Reklamlar (Google AdSense)</a></li>
+                <li><a href="#s8">Değişiklikler</a></li>
+                <li><a href="#s9">İletişim</a></li>
+            </ol>
+        </div>
+
+        <!-- Intro -->
+        <div class="priv-highlight">
+            Bu gizlilik politikası, TobiList'in (<strong>tobilist.com</strong>) kişisel verilerinizi nasıl topladığını, kullandığını ve koruduğunu açıklamaktadır. Sitemizi kullanarak bu politikayı kabul etmiş sayılırsınız.
+        </div>
+
+        <!-- Section 1 -->
+        <div class="priv-section" id="s1">
+            <h2><span class="sec-num">1.</span> Toplanan Veriler</h2>
+            <p>TobiList, aşağıdaki bilgileri toplayabilir:</p>
+            <ul>
+                <li><strong>Hesap Bilgileri:</strong> Kayıt sırasında verdiğiniz e-posta adresi ve kullanıcı adı.</li>
+                <li><strong>Kullanım Verileri:</strong> Anime/manga listeleriniz, puanlarınız, XP ve seviye bilgileriniz, streak verileriniz.</li>
+                <li><strong>Profil Bilgileri:</strong> Gönüllü olarak girdiğiniz kullanıcı adı, bio ve avatar seçiminiz.</li>
+                <li><strong>Teknik Veriler:</strong> IP adresi, tarayıcı türü, ziyaret tarihi ve sayfalar arası gezinme bilgileri (anonim).</li>
+            </ul>
+            <div class="priv-info-box">
+                ℹ️ Kredi kartı veya ödeme bilgisi <strong>kesinlikle toplanmamaktadır</strong>. TobiList tamamen ücretsiz bir platformdur.
+            </div>
+        </div>
+
+        <!-- Section 2 -->
+        <div class="priv-section" id="s2">
+            <h2><span class="sec-num">2.</span> Verilerin Kullanım Amacı</h2>
+            <p>Toplanan veriler aşağıdaki amaçlarla kullanılmaktadır:</p>
+            <ul>
+                <li>Hesabınızı oluşturmak ve yönetmek</li>
+                <li>Anime, manga ve webtoon listenizi kaydetmek ve senkronize etmek</li>
+                <li>XP, başarım ve streak sisteminizi çalıştırmak</li>
+                <li>Platform istatistikleri ve sıralamalar oluşturmak (anonim toplam veriler)</li>
+                <li>Hizmet kalitesini ve güvenliğini artırmak</li>
+                <li>Reklam gösterimi (AdSense üzerinden, kişiselleştirilmiş veya genel)</li>
+            </ul>
+            <p>Verileriniz <strong>üçüncü taraflara satılmaz</strong>.</p>
+        </div>
+
+        <!-- Section 3 -->
+        <div class="priv-section" id="s3">
+            <h2><span class="sec-num">3.</span> Çerezler (Cookies)</h2>
+            <p>TobiList, aşağıdaki çerez türlerini kullanmaktadır:</p>
+            <ul>
+                <li><strong>Zorunlu Çerezler:</strong> Oturum yönetimi için (Supabase Auth). Bu çerezler olmadan giriş yapamazsınız.</li>
+                <li><strong>Fonksiyonel Çerezler:</strong> Tema ve dil tercihinizi hatırlamak için localStorage kullanılır.</li>
+                <li><strong>Reklam Çerezleri:</strong> Google AdSense, kişiselleştirilmiş reklamlar sunmak için çerez kullanabilir. Bu çerezler reddedilebilir.</li>
+                <li><strong>Analitik Çerezler:</strong> Anonim ziyaret istatistikleri için.</li>
+            </ul>
+            <p>Tarayıcı ayarlarınızdan çerezleri devre dışı bırakabilirsiniz; ancak bazı özellikler çalışmayabilir.</p>
+        </div>
+
+        <!-- Section 4 -->
+        <div class="priv-section" id="s4">
+            <h2><span class="sec-num">4.</span> Üçüncü Taraf Hizmetler</h2>
+            <p>TobiList, aşağıdaki üçüncü taraf hizmetleri kullanmaktadır:</p>
+            <ul>
+                <li><strong>Supabase</strong> — Veritabanı ve kimlik doğrulama. <a href="https://supabase.com/privacy" target="_blank" style="color:#ff3366;">Gizlilik Politikası →</a></li>
+                <li><strong>Google AdSense</strong> — Reklam gösterimi. <a href="https://policies.google.com/privacy" target="_blank" style="color:#ff3366;">Google Gizlilik Politikası →</a></li>
+                <li><strong>Jikan API</strong> — Anime/manga veri kaynağı (MyAnimeList verileri). Kişisel veri aktarımı yapılmaz.</li>
+                <li><strong>Google Fonts</strong> — Font yükleme. IP adresi aktarımı yapılabilir.</li>
+                <li><strong>Vercel</strong> — Barındırma (hosting). <a href="https://vercel.com/legal/privacy-policy" target="_blank" style="color:#ff3366;">Gizlilik Politikası →</a></li>
+            </ul>
+        </div>
+
+        <!-- Section 5 -->
+        <div class="priv-section" id="s5">
+            <h2><span class="sec-num">5.</span> Verilerin Saklanması ve Güvenliği</h2>
+            <p>Verileriniz Supabase altyapısında güvenli biçimde saklanmaktadır. Şifreler açık metin olarak tutulmaz; Supabase'in güvenli kimlik doğrulama sistemi kullanılır.</p>
+            <p>Hesabınızı sildiğinizde, tüm kişisel verileriniz kalıcı olarak silinir.</p>
+            <div class="priv-highlight">
+                Verilerinizi istediğiniz zaman JSON veya CSV olarak dışa aktarabilirsiniz. Ayarlar → Veri Yönetimi bölümünden erişebilirsiniz.
+            </div>
+        </div>
+
+        <!-- Section 6 -->
+        <div class="priv-section" id="s6">
+            <h2><span class="sec-num">6.</span> Kullanıcı Hakları</h2>
+            <p>GDPR ve KVKK kapsamında aşağıdaki haklara sahipsiniz:</p>
+            <ul>
+                <li><strong>Erişim Hakkı:</strong> Hangi verilerinizin tutulduğunu öğrenebilirsiniz.</li>
+                <li><strong>Düzeltme Hakkı:</strong> Hatalı verileri düzeltme talebinde bulunabilirsiniz.</li>
+                <li><strong>Silme Hakkı:</strong> Hesabınızı ve tüm verilerinizi silebilirsiniz (Ayarlar → Hesap İşlemleri).</li>
+                <li><strong>Taşınabilirlik Hakkı:</strong> Verilerinizi JSON/CSV olarak indirebilirsiniz.</li>
+                <li><strong>İtiraz Hakkı:</strong> Kişiselleştirilmiş reklamlara itiraz edebilirsiniz.</li>
+            </ul>
+        </div>
+
+        <!-- Section 7 -->
+        <div class="priv-section" id="s7">
+            <h2><span class="sec-num">7.</span> Reklamlar (Google AdSense)</h2>
+            <p>TobiList, ücretsiz hizmetini sürdürebilmek için Google AdSense aracılığıyla reklam göstermektedir.</p>
+            <p>Google, ziyaretlerinize dayalı reklamlar göstermek için çerez kullanabilir. Kişiselleştirilmiş reklamları devre dışı bırakmak için:</p>
+            <ul>
+                <li><a href="https://www.google.com/settings/ads" target="_blank" style="color:#ff3366;">Google Reklam Ayarları →</a></li>
+                <li><a href="https://www.networkadvertising.org/managing/opt_out.asp" target="_blank" style="color:#ff3366;">NAI Opt-Out Aracı →</a></li>
+            </ul>
+            <div class="priv-info-box">
+                ℹ️ TobiList, reklam gelirini yalnızca platform geliştirme ve sunucu maliyetleri için kullanır.
+            </div>
+        </div>
+
+        <!-- Section 8 -->
+        <div class="priv-section" id="s8">
+            <h2><span class="sec-num">8.</span> Politika Değişiklikleri</h2>
+            <p>Bu gizlilik politikası zaman zaman güncellenebilir. Önemli değişikliklerde kullanıcılar bilgilendirilir. Güncel politikayı her zaman bu sayfada bulabilirsiniz.</p>
+            <p>Son güncelleme: <strong>22 Şubat 2025</strong></p>
+        </div>
+
+        <!-- Section 9 -->
+        <div class="priv-section" id="s9">
+            <h2><span class="sec-num">9.</span> İletişim</h2>
+            <p>Gizlilik ile ilgili sorularınız için bizimle iletişime geçebilirsiniz.</p>
+        </div>
+
+        <!-- Contact Card -->
+        <div class="priv-contact-card">
+            <h3>📬 Bize Ulaşın</h3>
+            <p>Gizlilik politikamız hakkında sorularınız mı var? Yardımcı olmaktan memnuniyet duyarız.</p>
+            <p>E-posta: <a href="mailto:privacy@tobilist.com">privacy@tobilist.com</a></p>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer class="priv-footer">
+        <p>&copy; 2025 TobiList &nbsp;·&nbsp; <a href="/">Ana Sayfa</a> &nbsp;·&nbsp; Anime, Manga & Webtoon Takip Platformu</p>
+    </footer>
+
+</body>
+</html>
