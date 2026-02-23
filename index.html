@@ -1324,155 +1324,105 @@
         setTimeout(loadAnnouncements, 1000);
     });
 
-    async function loadAnnouncements() {
+    // ===== DUYURU SİSTEMİ - MODAL =====
+    window.checkAnnouncements = async function() {
+        if (!window.supabaseClient) return;
         try {
-            if (!window.supabaseClient) return;
-            const { data, error } = await window.supabaseClient
+            var r = await window.supabaseClient
                 .from('announcements')
                 .select('*')
                 .order('created_at', { ascending: false })
-                .limit(1);
-            if (error || !data || !data.length) return;
-            const dismissed = JSON.parse(localStorage.getItem('dismissed_announcements') || '[]');
-            const ann = data.find(a => !dismissed.includes(a.id));
-            if (!ann) return;
-            if (document.getElementById('announcementBanner')) return;
-            const colors = {
-                success: { bg: 'rgba(16,185,129,0.12)', border: 'rgba(16,185,129,0.3)', text: '#10b981' },
-                warning: { bg: 'rgba(245,158,11,0.12)',  border: 'rgba(245,158,11,0.3)',  text: '#f59e0b' },
-                new:     { bg: 'rgba(124,58,237,0.12)',  border: 'rgba(124,58,237,0.3)',  text: '#a78bfa' },
-                info:    { bg: 'rgba(0,212,255,0.10)',   border: 'rgba(0,212,255,0.25)',  text: '#00d4ff' },
-            };
-            const c = colors[ann.type] || colors.info;
-            const banner = document.createElement('div');
-            banner.id = 'announcementBanner';
-            banner.style.cssText = `background:${c.bg};border-bottom:1px solid ${c.border};padding:0.65rem 1.5rem;text-align:center;font-size:0.88rem;color:${c.text};display:flex;align-items:center;justify-content:center;gap:0.8rem;flex-wrap:wrap;`;
-            banner.innerHTML = `<span>${ann.icon || '📢'} <strong>${ann.title}</strong> — ${ann.body}</span><button onclick="dismissAnnouncement(${ann.id})" style="background:transparent;border:1px solid ${c.border};color:${c.text};padding:0.2rem 0.7rem;border-radius:6px;cursor:pointer;font-size:0.78rem;font-family:'DM Sans',sans-serif;">Kapat ✕</button>`;
-            const offlineBanner = document.getElementById('offlineBanner');
-            if (offlineBanner) offlineBanner.after(banner);
-        } catch(e) { console.warn('Announcement error:', e); }
-    }
+                .limit(10);
+            if (r.error || !r.data || !r.data.length) return;
+            var dismissed = [];
+            try { dismissed = JSON.parse(localStorage.getItem('dismissed_announcements')||'[]'); } catch(e){}
+            // String karşılaştırması - number/string uyumsuzluğunu önler
+            var dismissedStr = dismissed.map(function(d){ return String(d); });
+            var visible = r.data.filter(function(a){ return !dismissedStr.includes(String(a.id)); });
+            if (!visible.length) return;
+            _showAnnModal(visible[0]);
+        } catch(e) { console.warn('Ann check failed:', e); }
+    };
 
-    function dismissAnnouncement(id) {
-        const dismissed = JSON.parse(localStorage.getItem('dismissed_announcements') || '[]');
-        dismissed.push(id);
-        localStorage.setItem('dismissed_announcements', JSON.stringify(dismissed));
-        const el = document.getElementById('announcementBanner');
-        if (el) el.remove();
-    }
-    </script>
+    // loadAnnouncements = checkAnnouncements (eski çağrılar için alias)
+    window.loadAnnouncements = window.checkAnnouncements;
 
-    <!-- ===== DUYURU SİSTEMİ - INLINE ===== -->
-    <script>
-    (function() {
-        // Duyuru fonksiyonları
-        function _showAnnModal(ann) {
-            if (document.getElementById('annModal')) return;
-            var icons = { info: 'ℹ️', success: '✅', warning: '⚠️', update: '🚀' };
-            var themes = {
-                info:    { accent: '#00d4ff', glow: 'rgba(0,212,255,0.3)',    badge: '#00d4ff', badgeText: '#000', grad: 'rgba(0,212,255,0.1)' },
-                success: { accent: '#10b981', glow: 'rgba(16,185,129,0.3)',   badge: '#10b981', badgeText: '#000', grad: 'rgba(16,185,129,0.1)' },
-                warning: { accent: '#f59e0b', glow: 'rgba(245,158,11,0.3)',   badge: '#f59e0b', badgeText: '#000', grad: 'rgba(245,158,11,0.1)' },
-                update:  { accent: '#8b5cf6', glow: 'rgba(139,92,246,0.3)',   badge: '#8b5cf6', badgeText: '#fff', grad: 'rgba(139,92,246,0.1)' }
-            };
-            var t = themes[ann.type] || themes.update;
-            var icon = icons[ann.type] || '📢';
-            var typeLabels = { info: 'BİLGİ', success: 'BAŞARILI', warning: 'UYARI', update: 'GÜNCELLEME' };
-            var prioLabel = ann.priority === 'critical' ? '🔴 ACİL' : ann.priority === 'high' ? '🟠 ÖNEMLİ' : '';
-            var dateStr = '';
-            try { dateStr = new Date(ann.created_at).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'}); } catch(e) {}
+    function _showAnnModal(ann) {
+        if (document.getElementById('annModal')) return;
+        var icons = { info:'ℹ️', success:'✅', warning:'⚠️', update:'🚀' };
+        var themes = {
+            info:    { accent:'#00d4ff', glow:'rgba(0,212,255,0.3)',    badge:'#00d4ff', badgeText:'#000', grad:'rgba(0,212,255,0.1)' },
+            success: { accent:'#10b981', glow:'rgba(16,185,129,0.3)',   badge:'#10b981', badgeText:'#000', grad:'rgba(16,185,129,0.1)' },
+            warning: { accent:'#f59e0b', glow:'rgba(245,158,11,0.3)',   badge:'#f59e0b', badgeText:'#000', grad:'rgba(245,158,11,0.1)' },
+            update:  { accent:'#8b5cf6', glow:'rgba(139,92,246,0.3)',   badge:'#8b5cf6', badgeText:'#fff', grad:'rgba(139,92,246,0.1)' }
+        };
+        var t = themes[ann.type] || themes.update;
+        var icon = icons[ann.type] || '📢';
+        var labels = { info:'BİLGİ', success:'BAŞARILI', warning:'UYARI', update:'GÜNCELLEME' };
+        var prio = ann.priority === 'critical' ? '🔴 ACİL' : ann.priority === 'high' ? '🟠 ÖNEMLİ' : '';
+        var dateStr = '';
+        try { dateStr = new Date(ann.created_at).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'}); } catch(e){}
 
-            var style = document.createElement('style');
-            style.textContent = '@keyframes annFadeIn{from{opacity:0}to{opacity:1}} @keyframes annSlideUp{from{transform:scale(0.88) translateY(30px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}';
-            document.head.appendChild(style);
+        var style = document.createElement('style');
+        style.textContent = '@keyframes annFadeIn{from{opacity:0}to{opacity:1}} @keyframes annSlideUp{from{transform:scale(0.88) translateY(30px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}';
+        document.head.appendChild(style);
 
-            var overlay = document.createElement('div');
-            overlay.id = 'annModal';
-            overlay.style.cssText = 'position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;padding:1rem;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);animation:annFadeIn 0.3s ease;';
+        var overlay = document.createElement('div');
+        overlay.id = 'annModal';
+        overlay.style.cssText = 'position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;padding:1rem;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);animation:annFadeIn 0.3s ease;';
+        overlay.innerHTML = '<div style="background:#0f1420;border:1px solid '+t.accent+'55;border-radius:22px;width:100%;max-width:460px;overflow:hidden;box-shadow:0 0 80px '+t.glow+',0 25px 60px rgba(0,0,0,0.7);animation:annSlideUp 0.4s cubic-bezier(0.175,0.885,0.32,1.275);">'
+            +'<div style="height:4px;background:linear-gradient(90deg,'+t.accent+','+t.accent+'66);"></div>'
+            +'<div style="padding:1.8rem;">'
+            +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.3rem;">'
+            +'<div style="display:flex;align-items:center;gap:0.5rem;">'
+            +'<span style="background:'+t.badge+';color:'+t.badgeText+';font-size:0.65rem;font-weight:800;letter-spacing:1.5px;padding:3px 10px;border-radius:20px;font-family:DM Sans,sans-serif;">'+(labels[ann.type]||'DUYURU')+'</span>'
+            +(prio ? '<span style="font-size:0.75rem;font-weight:700;color:'+t.accent+';">'+prio+'</span>' : '')
+            +'</div>'
+            +'<button id="annCloseBtn" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#8892a4;cursor:pointer;width:32px;height:32px;font-size:1rem;display:flex;align-items:center;justify-content:center;line-height:1;">✕</button>'
+            +'</div>'
+            +'<div style="display:flex;align-items:flex-start;gap:1rem;margin-bottom:1.1rem;">'
+            +'<div style="width:52px;height:52px;border-radius:14px;background:'+t.grad+';border:1px solid '+t.accent+'33;display:flex;align-items:center;justify-content:center;font-size:1.7rem;flex-shrink:0;">'+icon+'</div>'
+            +'<div style="flex:1;">'
+            +'<h3 style="color:#fff;font-size:1.05rem;font-weight:700;margin:0 0 4px;font-family:DM Sans,sans-serif;line-height:1.3;">'+(ann.title||'')+'</h3>'
+            +(dateStr ? '<div style="color:#6b7280;font-size:0.75rem;font-family:DM Sans,sans-serif;">'+dateStr+'</div>' : '')
+            +'</div></div>'
+            +(ann.content ? '<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-left:3px solid '+t.accent+';border-radius:10px;padding:0.9rem 1rem;color:#c0c8d8;font-size:0.88rem;line-height:1.6;font-family:DM Sans,sans-serif;margin-bottom:1.3rem;">'+ann.content+'</div>' : '<div style="margin-bottom:1rem;"></div>')
+            +'<button id="annOkBtn" style="width:100%;padding:0.8rem;background:linear-gradient(135deg,'+t.accent+','+t.accent+'aa);border:none;border-radius:12px;color:'+t.badgeText+';font-size:0.9rem;font-weight:700;font-family:DM Sans,sans-serif;cursor:pointer;box-shadow:0 4px 20px '+t.glow+';">Anladım ✓</button>'
+            +'</div></div>';
 
-            overlay.innerHTML = '<div style="background:#0f1420;border:1px solid '+t.accent+'55;border-radius:22px;width:100%;max-width:460px;overflow:hidden;box-shadow:0 0 80px '+t.glow+',0 25px 60px rgba(0,0,0,0.7);animation:annSlideUp 0.4s cubic-bezier(0.175,0.885,0.32,1.275);">'
-                + '<div style="height:4px;background:linear-gradient(90deg,'+t.accent+','+t.accent+'66);"></div>'
-                + '<div style="padding:1.8rem;">'
-                + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.3rem;">'
-                + '<div style="display:flex;align-items:center;gap:0.5rem;">'
-                + '<span style="background:'+t.badge+';color:'+t.badgeText+';font-size:0.65rem;font-weight:800;letter-spacing:1.5px;padding:3px 10px;border-radius:20px;font-family:DM Sans,sans-serif;">'+(typeLabels[ann.type]||'DUYURU')+'</span>'
-                + (prioLabel ? '<span style="font-size:0.75rem;font-weight:700;color:'+t.accent+';">'+prioLabel+'</span>' : '')
-                + '</div>'
-                + '<button id="annCloseBtn" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#8892a4;cursor:pointer;width:32px;height:32px;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s;line-height:1;">✕</button>'
-                + '</div>'
-                + '<div style="display:flex;align-items:flex-start;gap:1rem;margin-bottom:1.1rem;">'
-                + '<div style="width:52px;height:52px;border-radius:14px;background:'+t.grad+';border:1px solid '+t.accent+'33;display:flex;align-items:center;justify-content:center;font-size:1.7rem;flex-shrink:0;">'+icon+'</div>'
-                + '<div style="flex:1;">'
-                + '<h3 style="color:#fff;font-size:1.05rem;font-weight:700;margin:0 0 4px;font-family:DM Sans,sans-serif;line-height:1.3;">'+(ann.title||'')+'</h3>'
-                + (dateStr ? '<div style="color:#6b7280;font-size:0.75rem;font-family:DM Sans,sans-serif;">'+dateStr+'</div>' : '')
-                + '</div></div>'
-                + (ann.content ? '<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-left:3px solid '+t.accent+';border-radius:10px;padding:0.9rem 1rem;color:#c0c8d8;font-size:0.88rem;line-height:1.6;font-family:DM Sans,sans-serif;margin-bottom:1.3rem;">'+ann.content+'</div>' : '<div style="margin-bottom:1rem;"></div>')
-                + '<button id="annOkBtn" style="width:100%;padding:0.8rem;background:linear-gradient(135deg,'+t.accent+','+t.accent+'aa);border:none;border-radius:12px;color:'+t.badgeText+';font-size:0.9rem;font-weight:700;font-family:DM Sans,sans-serif;cursor:pointer;box-shadow:0 4px 20px '+t.glow+';transition:opacity 0.2s;">Anladım ✓</button>'
-                + '</div></div>';
+        document.body.appendChild(overlay);
 
-            document.body.appendChild(overlay);
-
-            function close() {
-                var dismissed = [];
-                try { dismissed = JSON.parse(localStorage.getItem('dismissed_announcements')||'[]'); } catch(e) {}
-                if (!dismissed.map(function(d){return String(d);}).includes(String(ann.id))) {
-                    dismissed.push(String(ann.id));
-                    localStorage.setItem('dismissed_announcements', JSON.stringify(dismissed));
-                }
-                overlay.style.transition = 'opacity 0.3s';
-                overlay.style.opacity = '0';
-                setTimeout(function(){ if(overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 300);
+        function close() {
+            var dismissed = [];
+            try { dismissed = JSON.parse(localStorage.getItem('dismissed_announcements')||'[]'); } catch(e){}
+            if (!dismissed.map(function(d){return String(d);}).includes(String(ann.id))) {
+                dismissed.push(String(ann.id));
+                localStorage.setItem('dismissed_announcements', JSON.stringify(dismissed));
             }
-
-            document.getElementById('annCloseBtn').onclick = close;
-            document.getElementById('annOkBtn').onclick = close;
-            overlay.addEventListener('click', function(e){ if(e.target===overlay) close(); });
+            overlay.style.transition = 'opacity 0.3s';
+            overlay.style.opacity = '0';
+            setTimeout(function(){ if(overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 300);
         }
 
-        // Global fonksiyonları tanımla
-        window.showAnnouncementModal = _showAnnModal;
-        window.dismissAnnouncement = function(id) {
-            var el = document.getElementById('annModal');
-            if (el) {
-                var dismissed = [];
-                try { dismissed = JSON.parse(localStorage.getItem('dismissed_announcements')||'[]'); } catch(e) {}
-                if (!dismissed.map(function(d){return String(d);}).includes(String(id))) {
-                    dismissed.push(String(id));
-                    localStorage.setItem('dismissed_announcements', JSON.stringify(dismissed));
-                }
-                el.style.transition = 'opacity 0.3s';
-                el.style.opacity = '0';
-                setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, 300);
-            }
-        };
+        document.getElementById('annCloseBtn').onclick = close;
+        document.getElementById('annOkBtn').onclick = close;
+        overlay.addEventListener('click', function(e){ if(e.target===overlay) close(); });
+    }
 
-        window.checkAnnouncements = async function() {
-            if (!window.supabaseClient) return;
-            try {
-                var result = await window.supabaseClient
-                    .from('announcements')
-                    .select('*')
-                    .order('created_at', {ascending: false})
-                    .limit(10);
-                
-                if (result.error || !result.data || result.data.length === 0) return;
-                
-                var dismissed = [];
-                try { dismissed = JSON.parse(localStorage.getItem('dismissed_announcements')||'[]'); } catch(e) {}
-                var dismissedStr = dismissed.map(function(d){ return String(d); });
-                var visible = result.data.filter(function(a){ return !dismissedStr.includes(String(a.id)); });
-                
-                if (visible.length === 0) return;
-                _showAnnModal(visible[0]);
-            } catch(e) { console.warn('Ann check failed:', e); }
-        };
-
-        // Sayfa yüklenince otomatik çalıştır
-        window.addEventListener('load', function() {
-            setTimeout(window.checkAnnouncements, 3000);
-        });
-    })();
+    window.dismissAnnouncement = function(id) {
+        var el = document.getElementById('annModal');
+        if (el) {
+            el.style.transition = 'opacity 0.3s';
+            el.style.opacity = '0';
+            setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, 300);
+        }
+        var dismissed = [];
+        try { dismissed = JSON.parse(localStorage.getItem('dismissed_announcements')||'[]'); } catch(e){}
+        if (!dismissed.map(function(d){return String(d);}).includes(String(id))) {
+            dismissed.push(String(id));
+            localStorage.setItem('dismissed_announcements', JSON.stringify(dismissed));
+        }
+    };
     </script>
-
 </body>
 </html>
