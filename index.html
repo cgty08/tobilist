@@ -481,6 +481,7 @@
                                 <div class="dropdown-item" onclick="switchSection('settings'); closeUserDropdown()">⚙️ Ayarlar</div>
                                 <div class="dropdown-item" onclick="switchSection('achievements'); closeUserDropdown()">🏆 Başarımlar</div>
                                 <div class="dropdown-divider"></div>
+                                <div class="dropdown-item" id="adminPanelLink" onclick="window.open('admin.html','_blank'); closeUserDropdown()" style="display:none;">🛡️ Admin Panel</div>
                                 <div class="dropdown-item danger" onclick="handleLogout()">🚪 Çıkış Yap</div>
                             </div>
                         </div>
@@ -792,16 +793,43 @@
 
                 <!-- DISCOVER -->
                 <div id="discoverSection" class="section">
-                    <div class="page-header">
-                        <h2 class="page-title">🔍 Keşfet</h2>
-                        <p class="page-sub" id="discoverStats">Anime, manga ve webtoon dünyasını keşfet</p>
+                    <!-- Keşfet Hero -->
+                    <div class="discover-hero">
+                        <div class="discover-hero-bg"></div>
+                        <div class="discover-hero-content">
+                            <div class="discover-hero-left">
+                                <div class="discover-hero-badge">🔥 500+ İçerik</div>
+                                <h1 class="discover-hero-title">Keşfet</h1>
+                                <p class="discover-hero-sub">Anime, manga ve webtoon dünyasını keşfet. Favori serini bul.</p>
+                            </div>
+                            <div class="discover-hero-search">
+                                <div class="discover-search-box-new">
+                                    <span class="dsn-icon">🔍</span>
+                                    <input type="text" id="discoverSearch" placeholder="Anime, manga veya webtoon ara..." oninput="onDiscoverSearch()">
+                                </div>
+                                <span id="discoverStats" class="discover-stat-text">İçerik yükleniyor...</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="discover-tabs">
-                        <button class="discover-tab active" onclick="filterDiscoverType('all', this)">Tümü</button>
-                        <button class="discover-tab" onclick="filterDiscoverType('anime', this)">🎬 Anime</button>
-                        <button class="discover-tab" onclick="filterDiscoverType('manga', this)">📖 Manga</button>
-                        <button class="discover-tab" onclick="filterDiscoverType('webtoon', this)">📱 Webtoon</button>
+
+                    <!-- Filtre Çubuğu -->
+                    <div class="discover-filter-bar">
+                        <div class="discover-type-tabs">
+                            <button class="discover-tab active" onclick="filterDiscoverType('all', this)">✨ Tümü</button>
+                            <button class="discover-tab" onclick="filterDiscoverType('anime', this)">🎬 Anime</button>
+                            <button class="discover-tab" onclick="filterDiscoverType('manga', this)">📖 Manga</button>
+                            <button class="discover-tab" onclick="filterDiscoverType('webtoon', this)">📱 Webtoon</button>
+                        </div>
+                        <div class="discover-sort-wrap">
+                            <select id="discoverSort" onchange="discoverPage=1; renderDiscoverGrid()">
+                                <option value="rating">⭐ Puana Göre</option>
+                                <option value="name">🔤 İsme Göre</option>
+                                <option value="year">📅 Yıla Göre</option>
+                            </select>
+                        </div>
                     </div>
+
+                    <!-- Tür Filtreleri -->
                     <div class="genre-filters">
                         <button class="genre-tag active" onclick="filterByGenre('all', this)">Tümü</button>
                         <button class="genre-tag" onclick="filterByGenre('action', this)">⚔️ Aksiyon</button>
@@ -816,17 +844,7 @@
                         <button class="genre-tag" onclick="filterByGenre('psychological', this)">🧠 Psikolojik</button>
                         <button class="genre-tag" onclick="filterByGenre('sports', this)">⚽ Spor</button>
                     </div>
-                    <div class="discover-search-bar">
-                        <div class="discover-search-box">
-                            <span class="dsb-icon">🔍</span>
-                            <input type="text" id="discoverSearch" placeholder="Ara..." oninput="onDiscoverSearch()">
-                        </div>
-                        <select id="discoverSort" onchange="discoverPage=1; renderDiscoverGrid()">
-                            <option value="rating">Puana Göre</option>
-                            <option value="name">İsme Göre</option>
-                            <option value="year">Yıla Göre</option>
-                        </select>
-                    </div>
+
                     <div class="discover-grid" id="discoverGrid"></div>
                 </div>
 

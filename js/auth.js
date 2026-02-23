@@ -121,6 +121,7 @@ async function loginSuccess(user) {
     updateUIForLoggedIn();
     if (typeof initializeApp === 'function') initializeApp();
     hideLoadingScreen();
+    setTimeout(function() { if (typeof checkAnnouncements === 'function') checkAnnouncements(); }, 2500);
 }
 
 function guestMode() {
@@ -130,6 +131,7 @@ function guestMode() {
     updateUIForGuest();
     if (typeof initializeApp === 'function') initializeApp();
     hideLoadingScreen();
+    setTimeout(function() { if (typeof checkAnnouncements === 'function') checkAnnouncements(); }, 2500);
 }
 
 // ===== LOADING =====
@@ -466,6 +468,13 @@ function updateUIForLoggedIn() {
     if (continueBlock) continueBlock.style.display = 'block';
 
     updateHeaderUser();
+
+    // Admin linki - sadece admin emaili için
+    const adminEmails = ['admin@tobilist.com', 'cgty08@gmail.com'];
+    const adminLink = document.getElementById('adminPanelLink');
+    if (adminLink && currentUser && adminEmails.includes(currentUser.email)) {
+        adminLink.style.display = 'block';
+    }
 
     const bannerActions = document.getElementById('bannerActions');
     if (bannerActions) {

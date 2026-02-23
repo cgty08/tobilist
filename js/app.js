@@ -101,7 +101,7 @@ function showLoadingPlaceholders() {
 }
 
 // ===== BÖLÜM GEÇİŞİ =====
-function switchSection(section) {
+function switchSection(section, pushHistory = true) {
     currentSection = section;
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
@@ -120,12 +120,22 @@ function switchSection(section) {
         case 'achievements': if (!isGuest) renderAchievements(); break;
         case 'ai':           if (!isGuest) renderAISection(); break;
         case 'library':      if (!isGuest) filterItems(); break;
-        case 'detail':       break; // handled by openDetailPage
+        case 'detail':       break;
+    }
+
+    if (pushHistory && section !== 'detail') {
+        history.pushState({ section }, '', '#' + section);
     }
 
     closeUserDropdown();
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+// Tarayici geri/ileri butonlari
+window.addEventListener('popstate', function(e) {
+    const section = (e.state && e.state.section) ? e.state.section : 'home';
+    switchSection(section, false);
+});
 
 // ===== ANA SAYFA =====
 function renderHomePage() {
@@ -1028,7 +1038,11 @@ function loadSimilarContent(item) {
 }
 
 function goBackFromDetail() {
-    switchSection('home');
+    if (window.history.length > 1) {
+        window.history.back();
+    } else {
+        switchSection('discover');
+    }
 }
 
 function _esc(str) {
