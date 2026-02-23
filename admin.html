@@ -387,13 +387,13 @@
     <!-- ===== DASHBOARD ===== -->
     <div class="page active" id="page-dashboard">
         <div class="stat-grid" id="dashStatGrid">
-            <div class="stat-card c-blue"><div class="stat-icon">👥</div><div class="stat-label">Toplam Kullanıcı</div><div class="stat-value" id="s-total-users">—</div><div class="stat-change up" id="s-users-change">Yükleniyor…</div></div>
+            <div class="stat-card c-blue"><div class="stat-icon">👥</div><div class="stat-label">Toplam Kayıtlı</div><div class="stat-value" id="s-total-users">—</div><div class="stat-change up" id="s-users-change">Yükleniyor…</div></div>
             <div class="stat-card online-card"><div class="stat-icon">🟢</div><div class="stat-label">Şu An Online</div><div class="stat-value" id="s-online">—</div><div class="stat-change">Son 15 dakikada aktif</div><div class="online-users-list" id="dashOnlineList"></div></div>
             <div class="stat-card c-green"><div class="stat-icon">👤</div><div class="stat-label">Aktif (7 gün)</div><div class="stat-value" id="s-active">—</div><div class="stat-change">Son haftada giriş yapan</div></div>
-            <div class="stat-card c-pink"><div class="stat-icon">🎬</div><div class="stat-label">Toplam Giriş</div><div class="stat-value" id="s-entries">—</div><div class="stat-change">Kullanıcı eklemeleri</div></div>
-            <div class="stat-card c-purple"><div class="stat-icon">⭐</div><div class="stat-label">Dağıtılan XP</div><div class="stat-value" id="s-xp">—</div><div class="stat-change">Tüm zamanlar</div></div>
-            <div class="stat-card c-yellow"><div class="stat-icon">✅</div><div class="stat-label">Tamamlanan</div><div class="stat-value" id="s-completed">—</div><div class="stat-change">Seri bitirenler</div></div>
-            <div class="stat-card c-orange"><div class="stat-icon">💬</div><div class="stat-label">Toplam Yorum</div><div class="stat-value" id="s-reviews">—</div><div class="stat-change">Yorum gönderileri</div></div>
+            <div class="stat-card c-pink"><div class="stat-icon">🎬</div><div class="stat-label">Toplam İçerik Girişi</div><div class="stat-value" id="s-entries">—</div><div class="stat-change">Tüm kullanıcıların toplamı</div></div>
+            <div class="stat-card c-purple"><div class="stat-icon">⭐</div><div class="stat-label">Toplam XP</div><div class="stat-value" id="s-xp">—</div><div class="stat-change">Tüm kullanıcıların kazandığı</div></div>
+            <div class="stat-card c-yellow"><div class="stat-icon">✅</div><div class="stat-label">Toplam Tamamlanan</div><div class="stat-value" id="s-completed">—</div><div class="stat-change">Tüm kullanıcıların bitirdiği</div></div>
+            <div class="stat-card c-orange"><div class="stat-icon">💬</div><div class="stat-label">Toplam Yorum</div><div class="stat-value" id="s-reviews">—</div><div class="stat-change">Platforma yazılan yorumlar</div></div>
             <div class="stat-card c-red"><div class="stat-icon">🚫</div><div class="stat-label">Banlı Hesap</div><div class="stat-value" id="s-banned">—</div><div class="stat-change">Aktif ban</div></div>
         </div>
         <div class="chart-grid-2">
@@ -430,7 +430,10 @@
             <div class="chart-card"><h3>⚡ XP Dağılımı</h3><p>Kullanıcı XP seviyeleri</p><canvas id="chartXP" height="200"></canvas></div>
         </div>
         <div class="table-card">
-            <div class="table-header"><h3>🏆 XP'ye Göre Top Kullanıcılar</h3></div>
+            <div class="table-header">
+                <h3>🏆 XP Liderlik Tablosu <span style="font-size:.75rem;font-weight:400;color:var(--text2);">— Tüm Kayıtlı Kullanıcılar</span></h3>
+                <span style="font-size:.78rem;color:var(--green);display:flex;align-items:center;gap:.4rem;"><span style="width:6px;height:6px;background:var(--green);border-radius:50%;display:inline-block;"></span>Gerçek zamanlı sıralama</span>
+            </div>
             <table><thead><tr><th>#</th><th>Kullanıcı</th><th>XP</th><th>Level</th><th>Giriş</th><th>Streak</th><th>Tamamlanan</th></tr></thead>
             <tbody id="topUsersBody"><tr class="loading-td"><td colspan="7"><span class="spinner"></span>Yükleniyor…</td></tr></tbody></table>
         </div>
@@ -469,13 +472,33 @@
             <div class="stat-card online-card"><div class="stat-icon">🟢</div><div class="stat-label">Şu An Online</div><div class="stat-value" id="o-online">—</div><div class="stat-change">Son 15 dakika</div></div>
             <div class="stat-card c-blue"><div class="stat-icon">👤</div><div class="stat-label">Son 1 saat</div><div class="stat-value" id="o-hour">—</div><div class="stat-change">aktif kullanıcı</div></div>
             <div class="stat-card c-green"><div class="stat-icon">📅</div><div class="stat-label">Bugün aktif</div><div class="stat-value" id="o-today">—</div><div class="stat-change">kullanıcı</div></div>
+            <div class="stat-card c-purple"><div class="stat-icon">👥</div><div class="stat-label">Toplam Kayıtlı</div><div class="stat-value" id="o-total">—</div><div class="stat-change">tüm üyeler</div></div>
         </div>
-        <div class="table-card">
-            <div class="table-header"><h3>🟢 Online Kullanıcılar <span style="font-size:.75rem;font-weight:400;color:var(--text2);">(Son 15 dakika)</span></h3>
+        <!-- Online Kullanıcılar -->
+        <div class="table-card" style="margin-bottom:1.5rem;">
+            <div class="table-header">
+                <h3>🟢 Online Kullanıcılar <span style="font-size:.75rem;font-weight:400;color:var(--text2);">(Son 15 dakika)</span></h3>
                 <button class="tbl-btn" onclick="loadOnline()">🔄 Yenile</button>
             </div>
             <table><thead><tr><th>Kullanıcı</th><th>Son Aktivite</th><th>Level</th><th>Giriş Sayısı</th><th>Durum</th></tr></thead>
             <tbody id="onlineBody"><tr class="loading-td"><td colspan="5"><span class="spinner"></span>Yükleniyor…</td></tr></tbody></table>
+        </div>
+        <!-- TÜM Üyeler Tablosu -->
+        <div class="table-card">
+            <div class="table-header">
+                <h3>👥 Tüm Kayıtlı Üyeler <span style="font-size:.75rem;font-weight:400;color:var(--text2);">— Son aktiviteye göre sıralı</span></h3>
+                <div class="table-actions">
+                    <input class="search-inp" type="text" id="allMembersSearch" placeholder="🔍 Üye ara…" oninput="filterAllMembers()">
+                    <select class="fi" style="width:auto;padding:.38rem .8rem;" id="allMembersSort" onchange="renderAllMembers()">
+                        <option value="activity">Son Aktivite</option>
+                        <option value="xp">XP'ye Göre</option>
+                        <option value="entries">İçerik Sayısına Göre</option>
+                    </select>
+                </div>
+            </div>
+            <table><thead><tr><th>Kullanıcı</th><th>Son Giriş</th><th>Level / XP</th><th>İçerik</th><th>Streak</th><th>Durum</th></tr></thead>
+            <tbody id="allMembersBody"><tr class="loading-td"><td colspan="6"><span class="spinner"></span>Yükleniyor…</td></tr></tbody></table>
+            <div class="pagination"><div class="pag-info" id="allMembersPageInfo">—</div><div class="pag-btns" id="allMembersPageBtns"></div></div>
         </div>
     </div>
 
@@ -1093,17 +1116,40 @@ async function loadAnalytics() {
     const xpK=Object.keys(xpBuckets);
     drawBar('chartXP', xpK, xpK.map(k=>xpBuckets[k]), ['#8b5cf6']);
 
-    // Top users
-    const sorted=rows.map(r=>r.data).filter(Boolean).sort((a,b)=>(b?.xp?.total||0)-(a?.xp?.total||0)).slice(0,10);
-    document.getElementById('topUsersBody').innerHTML = sorted.map((d,i)=>`<tr>
-        <td><strong ${i<3?`style="color:${['#fbbf24','#94a3b8','#cd7c4a'][i]}"`:''}>#${i+1}</strong></td>
-        <td><div class="user-cell"><div class="user-av">${d?.social?.avatar||'👤'}</div><div><div class="user-name">${esc(d?.social?.name||'Kullanıcı')}</div><div class="user-email">${esc(d?.social?.email||'')}</div></div></div></td>
-        <td><strong style="color:var(--yellow)">${(d?.xp?.total||0).toLocaleString()}</strong></td>
-        <td><span class="badge bg-purple">Lv.${d?.xp?.level||1}</span></td>
-        <td>${d?.items?.length||0}</td>
-        <td>🔥 ${d?.streak?.count||0}</td>
-        <td>${d?.items?.filter(i=>i.status==='completed').length||0}</td>
-    </tr>`).join('');
+    // Top users — TÜM kayıtlı kullanıcılar, XP'ye göre sıralı (online olma şartı yok)
+    const allSorted = rows
+        .map(r => r.data)
+        .filter(Boolean)
+        .filter(d => (d?.xp?.total || 0) > 0 || (d?.items?.length || 0) > 0) // en az 1 işlem yapmış
+        .sort((a, b) => (b?.xp?.total || 0) - (a?.xp?.total || 0));
+
+    document.getElementById('topUsersBody').innerHTML = allSorted.length === 0
+        ? '<tr><td colspan="7"><div class="empty-state"><div class="ei">🏆</div><h3>Henüz kullanıcı yok</h3></div></td></tr>'
+        : allSorted.map((d, i) => {
+            const medals = ['🥇','🥈','🥉'];
+            const rankDisplay = i < 3
+                ? `<strong style="font-size:1.1rem;">${medals[i]}</strong>`
+                : `<strong ${i < 10 ? 'style="color:var(--yellow)"' : ''}>#${i + 1}</strong>`;
+            const completedN = d?.items?.filter(i => i.status === 'completed').length || 0;
+            const avgRating  = d?.items?.filter(i => i.rating).length
+                ? (d.items.filter(i => i.rating).reduce((s, i) => s + i.rating, 0) / d.items.filter(i => i.rating).length).toFixed(1)
+                : '—';
+            return `<tr>
+                <td style="text-align:center;">${rankDisplay}</td>
+                <td><div class="user-cell">
+                    <div class="user-av">${d?.social?.avatar || '👤'}</div>
+                    <div>
+                        <div class="user-name">${esc(d?.social?.name || 'Kullanıcı')}</div>
+                        <div class="user-email" style="font-size:.7rem;color:var(--text3);">⭐ Ort: ${avgRating} · ${esc(d?.social?.email || '')}</div>
+                    </div>
+                </div></td>
+                <td><strong style="color:var(--yellow);font-size:1rem;">${(d?.xp?.total || 0).toLocaleString('tr-TR')}</strong> <span style="font-size:.7rem;color:var(--text2);">XP</span></td>
+                <td><span class="badge bg-purple">Lv.${d?.xp?.level || 1}</span></td>
+                <td><span style="font-weight:600;">${d?.items?.length || 0}</span></td>
+                <td>🔥 <strong>${d?.streak?.count || 0}</strong> <span style="font-size:.7rem;color:var(--text2);">gün</span></td>
+                <td><span style="color:var(--green);font-weight:600;">${completedN}</span></td>
+            </tr>`;
+        }).join('');
 }
 
 // ===== USERS =====
@@ -1271,35 +1317,111 @@ function closeEntriesModal(e) {
 }
 
 // ===== ONLINE PAGE =====
+let _allMembersData = [];
+let _allMembersPage = 1;
+
 async function loadOnline() {
     document.getElementById('onlineBody').innerHTML='<tr class="loading-td"><td colspan="5"><span class="spinner"></span>Yükleniyor…</td></tr>';
+    document.getElementById('allMembersBody').innerHTML='<tr class="loading-td"><td colspan="6"><span class="spinner"></span>Yükleniyor…</td></tr>';
+
     const { data } = await sb.from('user_data').select('user_id,data,updated_at').order('updated_at',{ascending:false});
     const now15  = new Date(Date.now()-15*60*1000).toISOString();
     const now1h  = new Date(Date.now()-60*60*1000).toISOString();
     const today  = new Date(); today.setHours(0,0,0,0);
-    const users = data||[];
-    const online = users.filter(u=>u.updated_at>now15&&!u.data?.banned);
-    const hour1  = users.filter(u=>u.updated_at>now1h&&!u.data?.banned);
-    const todayA = users.filter(u=>new Date(u.updated_at)>=today&&!u.data?.banned);
+    const users  = data || [];
+
+    const online  = users.filter(u => u.updated_at > now15 && !u.data?.banned);
+    const hour1   = users.filter(u => u.updated_at > now1h && !u.data?.banned);
+    const todayA  = users.filter(u => new Date(u.updated_at) >= today && !u.data?.banned);
+
     document.getElementById('o-online').textContent = online.length;
     document.getElementById('o-hour').textContent   = hour1.length;
     document.getElementById('o-today').textContent  = todayA.length;
+    document.getElementById('o-total').textContent  = users.length;
     document.getElementById('onlineBadge').textContent = online.length;
     document.getElementById('sideOnlineCount').textContent = `${online.length} kullanıcı online`;
 
-    const tbody=document.getElementById('onlineBody');
-    if (!online.length){tbody.innerHTML='<tr><td colspan="5"><div class="empty-state"><div class="ei">😴</div><h3>Şu an kimse online değil</h3><p>Son 15 dakikada aktif kullanıcı yok</p></div></td></tr>';return;}
-    tbody.innerHTML=online.map(u=>{
-        const d=u.data;
+    // Online tablosu
+    const tbody = document.getElementById('onlineBody');
+    if (!online.length) {
+        tbody.innerHTML='<tr><td colspan="5"><div class="empty-state"><div class="ei">😴</div><h3>Şu an kimse online değil</h3><p>Son 15 dakikada aktif kullanıcı yok</p></div></td></tr>';
+    } else {
+        tbody.innerHTML = online.map(u => {
+            const d = u.data;
+            return `<tr>
+                <td><div class="user-cell">
+                    <div class="user-av" style="position:relative;">${d?.social?.avatar||'👤'}<div style="position:absolute;bottom:0;right:0;width:9px;height:9px;background:var(--green);border-radius:50%;border:2px solid var(--card);animation:pulse 2s infinite;"></div></div>
+                    <div><div class="user-name">${esc(d?.social?.name||'Kullanıcı')}</div><div class="user-email">${esc(d?.social?.email||'')}</div></div>
+                </div></td>
+                <td style="color:var(--green);font-size:.82rem;">🟢 ${fmtRelative(u.updated_at)}</td>
+                <td><span class="badge bg-purple">Lv.${d?.xp?.level||1}</span></td>
+                <td>${d?.items?.length||0}</td>
+                <td><span class="badge bg-green">Online</span></td>
+            </tr>`;
+        }).join('');
+    }
+
+    // Tüm üyeler tablosu
+    _allMembersData = users;
+    _allMembersPage = 1;
+    renderAllMembers();
+}
+
+function filterAllMembers() { _allMembersPage = 1; renderAllMembers(); }
+
+function renderAllMembers() {
+    const q      = (document.getElementById('allMembersSearch')?.value || '').toLowerCase();
+    const sortBy = document.getElementById('allMembersSort')?.value || 'activity';
+    const now15  = new Date(Date.now()-15*60*1000).toISOString();
+
+    let filtered = _allMembersData;
+    if (q) filtered = filtered.filter(u =>
+        (u.data?.social?.name || '').toLowerCase().includes(q) ||
+        (u.data?.social?.email || '').toLowerCase().includes(q)
+    );
+
+    if (sortBy === 'xp')     filtered = [...filtered].sort((a,b) => (b.data?.xp?.total||0)-(a.data?.xp?.total||0));
+    if (sortBy === 'entries') filtered = [...filtered].sort((a,b) => (b.data?.items?.length||0)-(a.data?.items?.length||0));
+    // default: activity (zaten updated_at desc geldi)
+
+    const total = filtered.length;
+    const pages = Math.ceil(total / PER_PAGE) || 1;
+    if (_allMembersPage > pages) _allMembersPage = 1;
+    const slice = filtered.slice((_allMembersPage-1)*PER_PAGE, _allMembersPage*PER_PAGE);
+
+    document.getElementById('allMembersPageInfo').textContent = `${total} üye • Sayfa ${_allMembersPage}/${pages}`;
+    renderPag('allMembersPageBtns', pages, _allMembersPage, p => { _allMembersPage = p; renderAllMembers(); });
+
+    const tbody = document.getElementById('allMembersBody');
+    if (!slice.length) {
+        tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="ei">👤</div><h3>Üye bulunamadı</h3></div></td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = slice.map(u => {
+        const d = u.data;
+        const isOnline  = u.updated_at > now15;
+        const isBanned  = d?.banned;
+        const name      = d?.social?.name || 'Kullanıcı';
+        const completed = d?.items?.filter(i => i.status === 'completed').length || 0;
+        const statusBadge = isBanned
+            ? '<span class="badge bg-red">🚫 Banlı</span>'
+            : isOnline
+                ? '<span class="badge bg-green">🟢 Online</span>'
+                : '<span class="badge bg-blue">✅ Kayıtlı</span>';
         return `<tr>
             <td><div class="user-cell">
-                <div class="user-av" style="position:relative;">${d?.social?.avatar||'👤'}<div style="position:absolute;bottom:0;right:0;width:9px;height:9px;background:var(--green);border-radius:50%;border:2px solid var(--card);animation:pulse 2s infinite;"></div></div>
-                <div><div class="user-name">${esc(d?.social?.name||'Kullanıcı')}</div><div class="user-email">${esc(d?.social?.email||'')}</div></div>
+                <div class="user-av" style="position:relative;">${d?.social?.avatar||'👤'}${isOnline&&!isBanned?'<div style="position:absolute;bottom:0;right:0;width:8px;height:8px;background:var(--green);border-radius:50%;border:2px solid var(--card);animation:pulse 2s infinite;"></div>':''}</div>
+                <div>
+                    <div class="user-name">${esc(name)}</div>
+                    <div class="user-email">${esc(d?.social?.email||'')} <span class="mono" style="font-size:.68rem;color:var(--text3);">${u.user_id.substring(0,8)}…</span></div>
+                </div>
             </div></td>
-            <td style="color:var(--green);font-size:.82rem;">🟢 ${fmtRelative(u.updated_at)}</td>
-            <td><span class="badge bg-purple">Lv.${d?.xp?.level||1}</span></td>
-            <td>${d?.items?.length||0}</td>
-            <td><span class="badge bg-green">Online</span></td>
+            <td style="color:var(--text2);font-size:.82rem;">${fmtRelative(u.updated_at)}</td>
+            <td><span class="badge bg-purple">Lv.${d?.xp?.level||1}</span> <strong style="color:var(--yellow);font-size:.82rem;">${(d?.xp?.total||0).toLocaleString('tr-TR')}</strong> XP</td>
+            <td><span style="font-weight:600;">${d?.items?.length||0}</span> <span style="font-size:.72rem;color:var(--text2);">(${completed}✓)</span></td>
+            <td>🔥 ${d?.streak?.count||0}</td>
+            <td>${statusBadge}</td>
         </tr>`;
     }).join('');
 }
