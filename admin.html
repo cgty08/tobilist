@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,17 +16,17 @@
             --text:#e2e8f0; --text2:#8892a4; --text3:#4b5563;
             --accent:#ff3366; --accent2:#00d4ff; --accent3:#7c3aed;
             --green:#10b981; --yellow:#f59e0b; --red:#ef4444;
+            --orange:#f97316;
             --sidebar-w:260px;
         }
         *{margin:0;padding:0;box-sizing:border-box;}
         body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;}
 
-        /* ---- LOGIN ---- */
+        /* LOGIN */
         #loginScreen{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:var(--bg);}
         #loginScreen::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(255,51,102,.15),transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(124,58,237,.12),transparent 50%);pointer-events:none;}
         .login-box{position:relative;z-index:1;background:var(--card);border:1px solid var(--border2);border-radius:20px;padding:2.5rem;width:100%;max-width:400px;box-shadow:0 40px 100px rgba(0,0,0,.6);}
         .login-logo{display:flex;align-items:center;gap:.6rem;margin-bottom:.3rem;}
-        .tobi-mask-svg{width:40px;height:40px;}
         .login-logo-text{font-family:'Bebas Neue',cursive;font-size:2rem;letter-spacing:4px;background:linear-gradient(135deg,#ff3366,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
         .login-sub{color:var(--text2);font-size:.85rem;margin-bottom:2rem;}
         .login-sub span{background:rgba(255,51,102,.15);color:var(--accent);padding:2px 8px;border-radius:4px;font-size:.78rem;font-weight:700;letter-spacing:1px;}
@@ -39,19 +39,21 @@
         .login-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(255,51,102,.45);}
         .login-btn:disabled{opacity:.7;transform:none;cursor:not-allowed;}
 
-        /* ---- SIDEBAR ---- */
-        #sidebar{width:var(--sidebar-w);min-height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;}
+        /* SIDEBAR */
+        #sidebar{width:var(--sidebar-w);min-height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:100;overflow-y:auto;}
         .sb-logo{padding:1.3rem 1.5rem;border-bottom:1px solid var(--border);}
         .sb-logo-row{display:flex;align-items:center;gap:.5rem;}
         .sb-logo-text{font-family:'Bebas Neue',cursive;font-size:1.35rem;letter-spacing:3px;background:linear-gradient(135deg,#ff3366,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
         .sb-sub{font-size:.68rem;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-top:1px;}
         .sb-section{padding:.9rem 1.5rem .35rem;font-size:.68rem;font-weight:700;letter-spacing:2px;color:var(--text3);text-transform:uppercase;}
-        .sb-nav{flex:1;overflow-y:auto;padding:.4rem 0;}
+        .sb-nav{flex:1;padding:.4rem 0;}
         .nav-item{display:flex;align-items:center;gap:.75rem;padding:.72rem 1.5rem;cursor:pointer;color:var(--text2);font-size:.87rem;font-weight:500;transition:all .2s;border-left:3px solid transparent;}
         .nav-item:hover{background:rgba(255,255,255,.04);color:var(--text);}
         .nav-item.active{background:rgba(255,51,102,.08);color:var(--accent);border-left-color:var(--accent);}
         .nav-icon{font-size:1.05rem;width:20px;text-align:center;}
         .nav-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:20px;min-width:20px;text-align:center;}
+        .nav-badge.green{background:var(--green);}
+        .nav-badge.yellow{background:var(--yellow);color:#000;}
         .sb-footer{padding:1rem 1.5rem;border-top:1px solid var(--border);}
         .admin-info{display:flex;align-items:center;gap:.7rem;margin-bottom:.8rem;}
         .admin-av{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent3));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;}
@@ -60,7 +62,12 @@
         .logout-btn{width:100%;padding:.5rem;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:8px;color:var(--red);font-size:.82rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
         .logout-btn:hover{background:rgba(239,68,68,.15);}
 
-        /* ---- MAIN ---- */
+        /* ONLINE INDICATOR IN SIDEBAR */
+        .online-pill{display:flex;align-items:center;gap:.5rem;padding:.5rem 1.5rem;margin:.3rem 0;font-size:.78rem;color:var(--green);}
+        .online-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;flex-shrink:0;}
+        @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+
+        /* MAIN */
         #mainContent{margin-left:var(--sidebar-w);flex:1;min-height:100vh;display:none;}
         .top-bar{background:var(--bg2);border-bottom:1px solid var(--border);padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
         .page-title-bar h1{font-size:1.3rem;font-weight:700;}
@@ -68,16 +75,15 @@
         .top-actions{display:flex;align-items:center;gap:.8rem;}
         .live-badge{display:flex;align-items:center;gap:.5rem;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);padding:.35rem .8rem;border-radius:20px;font-size:.78rem;color:var(--green);font-weight:600;}
         .live-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
-        @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
         .refresh-btn{padding:.42rem .9rem;background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:8px;color:var(--text2);font-size:.82rem;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;}
         .refresh-btn:hover{background:rgba(255,255,255,.08);color:var(--text);}
 
-        /* ---- PAGES ---- */
+        /* PAGES */
         .page{padding:2rem;display:none;}
         .page.active{display:block;}
 
-        /* ---- STAT CARDS ---- */
-        .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:1rem;margin-bottom:2rem;}
+        /* STAT CARDS */
+        .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:2rem;}
         .stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.4rem;position:relative;overflow:hidden;transition:all .25s;}
         .stat-card:hover{border-color:var(--border2);transform:translateY(-2px);}
         .stat-card::before{content:'';position:absolute;top:0;right:0;width:80px;height:80px;border-radius:50%;opacity:.08;transform:translate(20px,-20px);}
@@ -86,25 +92,38 @@
         .stat-card.c-purple::before{background:var(--accent3);}
         .stat-card.c-green::before{background:var(--green);}
         .stat-card.c-yellow::before{background:var(--yellow);}
+        .stat-card.c-orange::before{background:var(--orange);}
+        .stat-card.c-red::before{background:var(--red);}
         .stat-icon{font-size:1.5rem;margin-bottom:.8rem;}
-        .stat-label{font-size:.75rem;color:var(--text2);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:.3rem;}
+        .stat-label{font-size:.72rem;color:var(--text2);font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:.3rem;}
         .stat-value{font-size:2rem;font-weight:900;line-height:1;margin-bottom:.4rem;}
         .stat-card.c-blue .stat-value{color:var(--accent2);}
         .stat-card.c-pink .stat-value{color:var(--accent);}
         .stat-card.c-purple .stat-value{color:var(--accent3);}
         .stat-card.c-green .stat-value{color:var(--green);}
         .stat-card.c-yellow .stat-value{color:var(--yellow);}
+        .stat-card.c-orange .stat-value{color:var(--orange);}
+        .stat-card.c-red .stat-value{color:var(--red);}
         .stat-change{font-size:.75rem;color:var(--text2);}
         .stat-change.up{color:var(--green);}
+        .stat-change.down{color:var(--red);}
 
-        /* ---- CHARTS ---- */
+        /* ONLINE CARD */
+        .online-card{background:linear-gradient(135deg,rgba(16,185,129,0.12),rgba(16,185,129,0.04));border:1px solid rgba(16,185,129,0.25);}
+        .online-card .stat-value{color:var(--green);}
+        .online-users-list{margin-top:.6rem;}
+        .online-user-row{display:flex;align-items:center;gap:.4rem;font-size:.72rem;color:var(--text2);padding:.15rem 0;}
+        .online-user-dot{width:6px;height:6px;background:var(--green);border-radius:50%;flex-shrink:0;}
+
+        /* CHARTS */
         .chart-grid-2{display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;margin-bottom:2rem;}
         .chart-grid-eq{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem;}
+        .chart-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem;margin-bottom:2rem;}
         .chart-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.5rem;}
         .chart-card h3{font-size:1rem;font-weight:700;margin-bottom:.4rem;}
         .chart-card p{font-size:.78rem;color:var(--text2);margin-bottom:1.2rem;}
 
-        /* ---- TABLE ---- */
+        /* TABLE */
         .table-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:1.5rem;}
         .table-header{padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;}
         .table-header h3{font-size:1rem;font-weight:700;}
@@ -129,8 +148,9 @@
         .bg-blue{background:rgba(0,212,255,.12);color:var(--accent2);border:1px solid rgba(0,212,255,.25);}
         .bg-yellow{background:rgba(245,158,11,.12);color:var(--yellow);border:1px solid rgba(245,158,11,.25);}
         .bg-purple{background:rgba(124,58,237,.12);color:#a78bfa;border:1px solid rgba(124,58,237,.25);}
-        .act-btns{display:flex;gap:.4rem;}
-        .act-btn{padding:.28rem .6rem;border-radius:6px;font-size:.75rem;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;transition:all .2s;border:1px solid transparent;}
+        .bg-orange{background:rgba(249,115,22,.12);color:var(--orange);border:1px solid rgba(249,115,22,.25);}
+        .act-btns{display:flex;gap:.4rem;flex-wrap:wrap;}
+        .act-btn{padding:.28rem .65rem;border-radius:6px;font-size:.75rem;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;transition:all .2s;border:1px solid transparent;}
         .btn-view{background:rgba(0,212,255,.1);color:var(--accent2);border-color:rgba(0,212,255,.2);}
         .btn-view:hover{background:rgba(0,212,255,.2);}
         .btn-ban{background:rgba(239,68,68,.1);color:var(--red);border-color:rgba(239,68,68,.2);}
@@ -139,15 +159,19 @@
         .btn-unban:hover{background:rgba(16,185,129,.2);}
         .btn-del{background:rgba(239,68,68,.1);color:var(--red);border-color:rgba(239,68,68,.2);}
         .btn-del:hover{background:rgba(239,68,68,.2);}
+        .btn-warn{background:rgba(245,158,11,.1);color:var(--yellow);border-color:rgba(245,158,11,.2);}
+        .btn-warn:hover{background:rgba(245,158,11,.2);}
+        .btn-entries{background:rgba(124,58,237,.1);color:#a78bfa;border-color:rgba(124,58,237,.2);}
+        .btn-entries:hover{background:rgba(124,58,237,.2);}
 
-        /* ---- PAGINATION ---- */
+        /* PAGINATION */
         .pagination{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;border-top:1px solid var(--border);}
         .pag-info{font-size:.8rem;color:var(--text2);}
         .pag-btns{display:flex;gap:.4rem;}
-        .pag-btn{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:6px;border:1px solid var(--border);cursor:pointer;font-size:.82rem;color:var(--text2);background:transparent;font-family:'DM Sans',sans-serif;transition:all .2s;}
+        .pag-btn{min-width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:6px;border:1px solid var(--border);cursor:pointer;font-size:.82rem;color:var(--text2);background:transparent;font-family:'DM Sans',sans-serif;transition:all .2s;padding:0 6px;}
         .pag-btn:hover,.pag-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
 
-        /* ---- FORMS ---- */
+        /* FORMS */
         .form-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.5rem;margin-bottom:1.5rem;}
         .form-card h3{font-size:1rem;font-weight:700;margin-bottom:1.2rem;}
         .fg{margin-bottom:1rem;}
@@ -160,7 +184,7 @@
         .submit-btn{padding:.75rem 1.5rem;background:linear-gradient(135deg,var(--accent),#ff5580);border:none;border-radius:10px;color:#fff;font-size:.88rem;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .25s;box-shadow:0 4px 20px rgba(255,51,102,.25);}
         .submit-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(255,51,102,.4);}
 
-        /* ---- SETTINGS ---- */
+        /* SETTINGS */
         .settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
         .settings-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.5rem;}
         .settings-card h3{font-size:1rem;font-weight:700;margin-bottom:1.2rem;padding-bottom:.8rem;border-bottom:1px solid var(--border);}
@@ -173,17 +197,17 @@
         .toggle.on{background:rgba(16,185,129,.2);border-color:rgba(16,185,129,.4);}
         .toggle.on::after{background:var(--green);left:22px;}
 
-        /* ---- ACTIVITY ---- */
-        .act-item{display:flex;align-items:flex-start;gap:1rem;padding:1rem;border-bottom:1px solid var(--border);}
+        /* ACTIVITY LOG */
+        .act-item{display:flex;align-items:flex-start;gap:1rem;padding:1rem 1.5rem;border-bottom:1px solid var(--border);}
         .act-item:last-child{border-bottom:none;}
         .act-dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex-shrink:0;}
         .act-text{font-size:.87rem;line-height:1.5;}
         .act-time{font-size:.75rem;color:var(--text2);margin-top:2px;}
 
-        /* ---- MODAL ---- */
+        /* MODALS */
         .modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:9000;display:none;align-items:center;justify-content:center;padding:1rem;}
         .modal-ov.open{display:flex;}
-        .modal-box{background:var(--card);border:1px solid var(--border2);border-radius:16px;padding:2rem;width:100%;max-width:480px;box-shadow:0 40px 100px rgba(0,0,0,.5);}
+        .modal-box{background:var(--card);border:1px solid var(--border2);border-radius:16px;padding:2rem;width:100%;max-width:480px;box-shadow:0 40px 100px rgba(0,0,0,.5);max-height:90vh;overflow-y:auto;}
         .modal-box h3{font-size:1.1rem;font-weight:700;margin-bottom:1.2rem;}
         .modal-actions{display:flex;gap:.7rem;justify-content:flex-end;margin-top:1.5rem;}
         .btn-cancel{padding:.65rem 1.2rem;background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:8px;color:var(--text2);font-size:.85rem;font-family:'DM Sans',sans-serif;cursor:pointer;}
@@ -192,12 +216,12 @@
         .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1rem;}
         .detail-item label{color:var(--text2);display:block;font-size:.75rem;margin-bottom:2px;}
 
-        /* ---- LOADING ---- */
+        /* LOADING */
         .loading-td td{text-align:center;padding:3rem;color:var(--text2);}
         .spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:.5rem;}
         @keyframes spin{to{transform:rotate(360deg)}}
 
-        /* ---- TOAST ---- */
+        /* TOAST */
         #toast{position:fixed;bottom:2rem;right:2rem;z-index:99999;display:flex;flex-direction:column;gap:.5rem;}
         .toast{background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:.8rem 1.2rem;font-size:.87rem;display:flex;align-items:center;gap:.6rem;box-shadow:0 10px 40px rgba(0,0,0,.4);animation:slideIn .3s ease;min-width:240px;}
         .toast.success{border-left:3px solid var(--green);}
@@ -210,138 +234,94 @@
         .empty-state h3{font-size:1.1rem;color:var(--text);margin-bottom:.5rem;}
         .mono{font-family:'JetBrains Mono',monospace;font-size:.82rem;}
 
-        @media(max-width:1024px){.chart-grid-2,.chart-grid-eq,.settings-grid{grid-template-columns:1fr;}}
-        @media(max-width:768px){#sidebar{transform:translateX(-100%);}#mainContent{margin-left:0;}.form-row{grid-template-columns:1fr;}}
-    
-        /* ===== BAN MODAL ===== */
-        .ban-modal-overlay {
-            position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);
-            z-index:9999;display:flex;align-items:center;justify-content:center;
-            opacity:0;pointer-events:none;transition:opacity .25s;
-        }
-        .ban-modal-overlay.open { opacity:1;pointer-events:all; }
-        .ban-modal {
-            background:#111318;border:1px solid rgba(239,68,68,0.25);
-            border-radius:20px;padding:2rem;width:100%;max-width:480px;
-            box-shadow:0 25px 80px rgba(0,0,0,0.6),0 0 0 1px rgba(239,68,68,0.1);
-            transform:scale(0.95) translateY(20px);transition:transform .25s;
-            position:relative;
-        }
-        .ban-modal-overlay.open .ban-modal { transform:scale(1) translateY(0); }
-        .ban-modal-header {
-            display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;
-        }
-        .ban-modal-title {
-            font-size:1.3rem;font-weight:900;color:#ef4444;
-            display:flex;align-items:center;gap:0.5rem;
-        }
-        .ban-modal-close {
-            width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);
-            background:rgba(255,255,255,0.05);color:var(--text2);cursor:pointer;
-            font-size:1rem;display:flex;align-items:center;justify-content:center;
-            transition:all .2s;
-        }
-        .ban-modal-close:hover { background:rgba(239,68,68,0.2);color:#ef4444;border-color:rgba(239,68,68,0.4); }
-        .ban-user-card {
-            display:flex;align-items:center;gap:1rem;
-            background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);
-            border-radius:12px;padding:1rem;margin-bottom:1.5rem;
-        }
-        .ban-user-av {
-            width:46px;height:46px;border-radius:50%;
-            background:linear-gradient(135deg,#ef4444,#7c3aed);
-            display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;
-        }
-        .ban-user-name { font-weight:700;font-size:1rem;color:var(--text1); }
-        .ban-user-sub  { font-size:0.78rem;color:var(--text2);margin-top:0.1rem; }
-        .ban-field { margin-bottom:1.2rem; }
-        .ban-field label {
-            display:block;font-size:0.75rem;font-weight:700;letter-spacing:1px;
-            text-transform:uppercase;color:var(--text2);margin-bottom:0.5rem;
-        }
-        .ban-field select,
-        .ban-field textarea {
-            width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
-            border-radius:10px;padding:0.75rem 1rem;color:var(--text1);font-family:'DM Sans',sans-serif;
-            font-size:0.9rem;transition:border-color .2s;resize:none;
-        }
-        .ban-field select:focus,
-        .ban-field textarea:focus { outline:none;border-color:rgba(239,68,68,0.5); }
-        .ban-reason-chips { display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.7rem; }
-        .ban-chip {
-            background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
-            border-radius:20px;padding:0.25rem 0.7rem;font-size:0.78rem;color:var(--text2);
-            cursor:pointer;transition:all .2s;
-        }
-        .ban-chip:hover,.ban-chip.active {
-            background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.4);color:#ef4444;
-        }
-        .ban-modal-actions { display:flex;gap:0.8rem;margin-top:1.5rem; }
-        .btn-ban-confirm {
-            flex:1;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;
-            border:none;border-radius:10px;padding:0.85rem;font-size:0.95rem;font-weight:700;
-            cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;
-        }
-        .btn-ban-confirm:hover { transform:translateY(-1px);box-shadow:0 8px 25px rgba(239,68,68,0.4); }
-        .btn-ban-cancel {
-            flex:1;background:rgba(255,255,255,0.05);color:var(--text1);
-            border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:0.85rem;
-            font-size:0.95rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;
-        }
-        .btn-ban-cancel:hover { background:rgba(255,255,255,0.09); }
-        .ban-duration-row { display:grid;grid-template-columns:1fr 1fr;gap:0.8rem; }
+        /* PROGRESS BAR */
+        .mini-bar{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-top:.4rem;}
+        .mini-bar-fill{height:100%;border-radius:3px;transition:width .6s;}
 
-        </style>
+        /* USER DETAIL TAB */
+        .detail-tabs{display:flex;gap:.3rem;margin-bottom:1.2rem;border-bottom:1px solid var(--border);padding-bottom:.8rem;}
+        .detail-tab{padding:.35rem .8rem;border-radius:6px;font-size:.8rem;font-weight:600;cursor:pointer;color:var(--text2);background:transparent;border:none;font-family:'DM Sans',sans-serif;transition:all .2s;}
+        .detail-tab.active{background:rgba(255,51,102,.12);color:var(--accent);}
+        .detail-tab-pane{display:none;}
+        .detail-tab-pane.active{display:block;}
+
+        /* BAN MODAL */
+        .ban-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;}
+        .ban-modal-overlay.open{opacity:1;pointer-events:all;}
+        .ban-modal{background:#111318;border:1px solid rgba(239,68,68,0.25);border-radius:20px;padding:2rem;width:100%;max-width:480px;box-shadow:0 25px 80px rgba(0,0,0,0.6);transform:scale(0.95) translateY(20px);transition:transform .25s;position:relative;}
+        .ban-modal-overlay.open .ban-modal{transform:scale(1) translateY(0);}
+        .ban-modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;}
+        .ban-modal-title{font-size:1.3rem;font-weight:900;color:#ef4444;display:flex;align-items:center;gap:0.5rem;}
+        .ban-modal-close{width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:var(--text2);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+        .ban-modal-close:hover{background:rgba(239,68,68,0.2);color:#ef4444;}
+        .ban-user-card{display:flex;align-items:center;gap:1rem;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);border-radius:12px;padding:1rem;margin-bottom:1.5rem;}
+        .ban-user-av{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#ef4444,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;}
+        .ban-field{margin-bottom:1.2rem;}
+        .ban-field label{display:block;font-size:0.75rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text2);margin-bottom:0.5rem;}
+        .ban-field select,.ban-field textarea{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:0.75rem 1rem;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.9rem;transition:border-color .2s;resize:none;}
+        .ban-field select:focus,.ban-field textarea:focus{outline:none;border-color:rgba(239,68,68,0.5);}
+        .ban-reason-chips{display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.7rem;}
+        .ban-chip{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:0.25rem 0.7rem;font-size:0.78rem;color:var(--text2);cursor:pointer;transition:all .2s;}
+        .ban-chip:hover,.ban-chip.active{background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.4);color:#ef4444;}
+        .ban-modal-actions{display:flex;gap:0.8rem;margin-top:1.5rem;}
+        .btn-ban-confirm{flex:1;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;border:none;border-radius:10px;padding:0.85rem;font-size:0.95rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+        .btn-ban-confirm:hover{transform:translateY(-1px);box-shadow:0 8px 25px rgba(239,68,68,0.4);}
+        .btn-ban-cancel{flex:1;background:rgba(255,255,255,0.05);color:var(--text);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:0.85rem;font-size:0.95rem;font-weight:600;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+        .btn-ban-cancel:hover{background:rgba(255,255,255,0.09);}
+
+        /* WARN MODAL */
+        .warn-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;}
+        .warn-modal-overlay.open{opacity:1;pointer-events:all;}
+        .warn-modal{background:#111318;border:1px solid rgba(245,158,11,0.25);border-radius:20px;padding:2rem;width:100%;max-width:440px;box-shadow:0 25px 80px rgba(0,0,0,0.6);transform:scale(0.95);transition:transform .25s;}
+        .warn-modal-overlay.open .warn-modal{transform:scale(1);}
+
+        /* USER ENTRIES MODAL */
+        .entries-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;padding:1rem;}
+        .entries-modal-overlay.open{opacity:1;pointer-events:all;}
+        .entries-modal{background:var(--card);border:1px solid var(--border2);border-radius:20px;padding:0;width:100%;max-width:700px;max-height:85vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 25px 80px rgba(0,0,0,0.6);transform:scale(0.95);transition:transform .25s;}
+        .entries-modal-overlay.open .entries-modal{transform:scale(1);}
+        .entries-modal-head{padding:1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+        .entries-modal-body{overflow-y:auto;flex:1;}
+        .entries-item{display:flex;align-items:center;gap:1rem;padding:.8rem 1.5rem;border-bottom:1px solid var(--border);}
+        .entries-item:last-child{border-bottom:none;}
+        .entries-cover{width:36px;height:36px;border-radius:8px;background:var(--bg3);object-fit:cover;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.2rem;}
+
+        /* RESTRICTIONS */
+        .restrict-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;}
+        .restrict-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.2rem;}
+        .restrict-card h4{font-size:.85rem;font-weight:700;margin-bottom:.8rem;display:flex;align-items:center;gap:.4rem;}
+        .restrict-row{display:flex;align-items:center;justify-content:space-between;padding:.4rem 0;font-size:.83rem;border-bottom:1px solid var(--border);}
+        .restrict-row:last-child{border-bottom:none;}
+
+        @media(max-width:1200px){.chart-grid-3{grid-template-columns:1fr 1fr;}}
+        @media(max-width:1024px){.chart-grid-2,.chart-grid-eq,.settings-grid,.restrict-grid{grid-template-columns:1fr;}}
+        @media(max-width:768px){#sidebar{transform:translateX(-100%);}#mainContent{margin-left:0;}.form-row{grid-template-columns:1fr;}}
+    </style>
 </head>
 <body>
 
-<!-- ========== LOGIN ========== -->
+<!-- LOGIN -->
 <div id="loginScreen">
     <div class="login-box">
         <div class="login-logo">
-            <!-- Tobi Mask SVG (Naruto-style orange mask) -->
-            <svg class="tobi-mask-svg" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
                 <ellipse cx="20" cy="21" rx="17" ry="16" fill="#E8630A"/>
-                <ellipse cx="20" cy="21" rx="17" ry="16" fill="url(#mg)"/>
-                <!-- Swirl pattern -->
                 <path d="M20 13 Q24 13 26 17 Q28 21 24 23 Q20 25 18 22 Q16 19 18 17 Q19 15 20 14" stroke="#fff" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.6"/>
-                <!-- Eye hole -->
                 <ellipse cx="24" cy="18" rx="4" ry="4.5" fill="#1a0a00"/>
-                <ellipse cx="24" cy="18" rx="4" ry="4.5" fill="url(#eg)" opacity="0.7"/>
-                <!-- Eye shine -->
                 <circle cx="25.5" cy="16.5" r="1.2" fill="rgba(255,255,255,0.5)"/>
-                <!-- Mask outline -->
                 <ellipse cx="20" cy="21" rx="17" ry="16" stroke="#c45500" stroke-width="1.5" fill="none"/>
-                <!-- Chin detail -->
-                <path d="M10 30 Q20 37 30 30" stroke="#c45500" stroke-width="1" fill="none" opacity="0.5"/>
-                <defs>
-                    <radialGradient id="mg" cx="35%" cy="30%">
-                        <stop offset="0%" stop-color="#ff8c00" stop-opacity="0.6"/>
-                        <stop offset="100%" stop-color="#E8630A" stop-opacity="0"/>
-                    </radialGradient>
-                    <radialGradient id="eg" cx="50%" cy="50%">
-                        <stop offset="0%" stop-color="#ff3300" stop-opacity="0.4"/>
-                        <stop offset="100%" stop-color="#000" stop-opacity="0"/>
-                    </radialGradient>
-                </defs>
             </svg>
             <span class="login-logo-text">TobiList</span>
         </div>
         <p class="login-sub">Admin Panel — <span>RESTRICTED ACCESS</span></p>
-        <div class="lf">
-            <label>Email Address</label>
-            <input type="email" id="adminEmail" placeholder="admin@tobilist.com" autocomplete="email">
-        </div>
-        <div class="lf">
-            <label>Password</label>
-            <input type="password" id="adminPassword" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')adminLogin()">
-        </div>
+        <div class="lf"><label>Email Adresi</label><input type="email" id="adminEmail" placeholder="admin@tobilist.com" autocomplete="email"></div>
+        <div class="lf"><label>Şifre</label><input type="password" id="adminPassword" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')adminLogin()"></div>
         <div id="loginErr" class="login-err"></div>
-        <button class="login-btn" id="loginBtn" onclick="adminLogin()">Sign In as Admin →</button>
+        <button class="login-btn" id="loginBtn" onclick="adminLogin()">Admin Olarak Giriş Yap →</button>
     </div>
 </div>
 
-<!-- ========== SIDEBAR ========== -->
+<!-- SIDEBAR -->
 <nav id="sidebar">
     <div class="sb-logo">
         <div class="sb-logo-row">
@@ -350,220 +330,338 @@
                 <path d="M20 13 Q24 13 26 17 Q28 21 24 23 Q20 25 18 22 Q16 19 18 17 Q19 15 20 14" stroke="#fff" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.6"/>
                 <ellipse cx="24" cy="18" rx="4" ry="4.5" fill="#1a0a00"/>
                 <circle cx="25.5" cy="16.5" r="1.2" fill="rgba(255,255,255,0.5)"/>
-                <ellipse cx="20" cy="21" rx="17" ry="16" stroke="#c45500" stroke-width="1.5" fill="none"/>
             </svg>
             <div class="sb-logo-text">TobiList</div>
         </div>
         <div class="sb-sub">Admin Dashboard</div>
     </div>
+
+    <div class="online-pill">
+        <div class="online-dot"></div>
+        <span id="sideOnlineCount">0 kullanıcı online</span>
+    </div>
+
     <div class="sb-nav">
-        <div class="sb-section">Overview</div>
+        <div class="sb-section">Genel Bakış</div>
         <div class="nav-item active" onclick="showPage('dashboard')"><span class="nav-icon">📊</span> Dashboard</div>
-        <div class="nav-item" onclick="showPage('analytics')"><span class="nav-icon">📈</span> Analytics</div>
-        <div class="sb-section">Users</div>
-        <div class="nav-item" onclick="showPage('users')"><span class="nav-icon">👥</span> All Users <span class="nav-badge" id="userCountBadge">0</span></div>
-        <div class="nav-item" onclick="showPage('bans')"><span class="nav-icon">🚫</span> Banned Users</div>
-        <div class="sb-section">Content</div>
-        <div class="nav-item" onclick="showPage('content')"><span class="nav-icon">🎬</span> Content Entries</div>
-        <div class="nav-item" onclick="showPage('announcements')"><span class="nav-icon">📢</span> Announcements</div>
-        <div class="sb-section">System</div>
-        <div class="nav-item" onclick="showPage('logs')"><span class="nav-icon">📋</span> Activity Log</div>
-        <div class="nav-item" onclick="showPage('settings')"><span class="nav-icon">⚙️</span> Settings</div>
+        <div class="nav-item" onclick="showPage('analytics')"><span class="nav-icon">📈</span> Analitik</div>
+
+        <div class="sb-section">Kullanıcılar</div>
+        <div class="nav-item" onclick="showPage('users')"><span class="nav-icon">👥</span> Tüm Kullanıcılar <span class="nav-badge" id="userCountBadge">0</span></div>
+        <div class="nav-item" onclick="showPage('online')"><span class="nav-icon">🟢</span> Online Kullanıcılar <span class="nav-badge green" id="onlineBadge">0</span></div>
+        <div class="nav-item" onclick="showPage('bans')"><span class="nav-icon">🚫</span> Banlı Kullanıcılar <span class="nav-badge" id="banCountBadge" style="background:var(--red);display:none;">0</span></div>
+
+        <div class="sb-section">İçerik</div>
+        <div class="nav-item" onclick="showPage('content')"><span class="nav-icon">🎬</span> İçerik Listesi</div>
+        <div class="nav-item" onclick="showPage('reviews')"><span class="nav-icon">💬</span> Yorumlar</div>
+        <div class="nav-item" onclick="showPage('announcements')"><span class="nav-icon">📢</span> Duyurular</div>
+
+        <div class="sb-section">Sistem</div>
+        <div class="nav-item" onclick="showPage('restrictions')"><span class="nav-icon">🛡️</span> Kısıtlamalar</div>
+        <div class="nav-item" onclick="showPage('logs')"><span class="nav-icon">📋</span> Aktivite Log</div>
+        <div class="nav-item" onclick="showPage('settings')"><span class="nav-icon">⚙️</span> Ayarlar</div>
     </div>
     <div class="sb-footer">
         <div class="admin-info">
             <div class="admin-av">👑</div>
             <div><div class="admin-name" id="adminNameEl">Admin</div><div class="admin-role">Super Admin</div></div>
         </div>
-        <button class="logout-btn" onclick="adminLogout()">🚪 Sign Out</button>
+        <button class="logout-btn" onclick="adminLogout()">🚪 Çıkış Yap</button>
     </div>
 </nav>
 
-<!-- ========== MAIN ========== -->
+<!-- MAIN -->
 <div id="mainContent">
     <div class="top-bar">
         <div class="page-title-bar">
             <h1 id="pageTitle">Dashboard</h1>
-            <p id="pageSub">TobiList platform overview</p>
+            <p id="pageSub">TobiList platform genel bakışı</p>
         </div>
         <div class="top-actions">
-            <div class="live-badge"><div class="live-dot"></div><span>Live</span></div>
-            <button class="refresh-btn" onclick="refreshCurrent()">🔄 Refresh</button>
+            <div class="live-badge"><div class="live-dot"></div><span>Canlı</span></div>
+            <button class="refresh-btn" onclick="refreshCurrent()">🔄 Yenile</button>
             <span id="lastUpdated" style="font-size:.75rem;color:var(--text3);"></span>
         </div>
     </div>
 
-    <!-- DASHBOARD -->
+    <!-- ===== DASHBOARD ===== -->
     <div class="page active" id="page-dashboard">
-        <div class="stat-grid">
-            <div class="stat-card c-blue"><div class="stat-icon">👥</div><div class="stat-label">Total Users</div><div class="stat-value" id="s-total-users">—</div><div class="stat-change up" id="s-users-change">Loading…</div></div>
-            <div class="stat-card c-green"><div class="stat-icon">🟢</div><div class="stat-label">Active (7d)</div><div class="stat-value" id="s-active">—</div><div class="stat-change">Recent activity</div></div>
-            <div class="stat-card c-pink"><div class="stat-icon">🎬</div><div class="stat-label">Total Entries</div><div class="stat-value" id="s-entries">—</div><div class="stat-change">User additions</div></div>
-            <div class="stat-card c-purple"><div class="stat-icon">⭐</div><div class="stat-label">XP Distributed</div><div class="stat-value" id="s-xp">—</div><div class="stat-change">All time</div></div>
-            <div class="stat-card c-yellow"><div class="stat-icon">✅</div><div class="stat-label">Completed</div><div class="stat-value" id="s-completed">—</div><div class="stat-change">Entries</div></div>
+        <div class="stat-grid" id="dashStatGrid">
+            <div class="stat-card c-blue"><div class="stat-icon">👥</div><div class="stat-label">Toplam Kullanıcı</div><div class="stat-value" id="s-total-users">—</div><div class="stat-change up" id="s-users-change">Yükleniyor…</div></div>
+            <div class="stat-card online-card"><div class="stat-icon">🟢</div><div class="stat-label">Şu An Online</div><div class="stat-value" id="s-online">—</div><div class="stat-change">Son 15 dakikada aktif</div><div class="online-users-list" id="dashOnlineList"></div></div>
+            <div class="stat-card c-green"><div class="stat-icon">👤</div><div class="stat-label">Aktif (7 gün)</div><div class="stat-value" id="s-active">—</div><div class="stat-change">Son haftada giriş yapan</div></div>
+            <div class="stat-card c-pink"><div class="stat-icon">🎬</div><div class="stat-label">Toplam Giriş</div><div class="stat-value" id="s-entries">—</div><div class="stat-change">Kullanıcı eklemeleri</div></div>
+            <div class="stat-card c-purple"><div class="stat-icon">⭐</div><div class="stat-label">Dağıtılan XP</div><div class="stat-value" id="s-xp">—</div><div class="stat-change">Tüm zamanlar</div></div>
+            <div class="stat-card c-yellow"><div class="stat-icon">✅</div><div class="stat-label">Tamamlanan</div><div class="stat-value" id="s-completed">—</div><div class="stat-change">Seri bitirenler</div></div>
+            <div class="stat-card c-orange"><div class="stat-icon">💬</div><div class="stat-label">Toplam Yorum</div><div class="stat-value" id="s-reviews">—</div><div class="stat-change">Yorum gönderileri</div></div>
+            <div class="stat-card c-red"><div class="stat-icon">🚫</div><div class="stat-label">Banlı Hesap</div><div class="stat-value" id="s-banned">—</div><div class="stat-change">Aktif ban</div></div>
         </div>
         <div class="chart-grid-2">
-            <div class="chart-card">
-                <h3>User Activity</h3><p>Daily activity (last 7 days)</p>
-                <canvas id="chartUsers" height="200"></canvas>
-            </div>
-            <div class="chart-card">
-                <h3>Content Types</h3><p>Breakdown by category</p>
-                <canvas id="chartContent" height="200"></canvas>
-            </div>
-        </div>
-        <div class="table-card">
-            <div class="table-header"><h3>🆕 Recently Active Users</h3><button class="tbl-btn" onclick="showPage('users')">View All →</button></div>
-            <table><thead><tr><th>User</th><th>Last Active</th><th>Entries</th><th>Status</th></tr></thead>
-            <tbody id="recentUsersBody"><tr class="loading-td"><td colspan="4"><span class="spinner"></span>Loading…</td></tr></tbody></table>
-        </div>
-    </div>
-
-    <!-- ANALYTICS -->
-    <div class="page" id="page-analytics">
-        <div class="stat-grid">
-            <div class="stat-card c-pink"><div class="stat-icon">🔥</div><div class="stat-label">Avg. Streak</div><div class="stat-value" id="a-streak">—</div><div class="stat-change">days/user</div></div>
-            <div class="stat-card c-blue"><div class="stat-icon">📊</div><div class="stat-label">Avg. List Size</div><div class="stat-value" id="a-list">—</div><div class="stat-change">entries/user</div></div>
-            <div class="stat-card c-green"><div class="stat-icon">⭐</div><div class="stat-label">Avg. Rating</div><div class="stat-value" id="a-rating">—</div><div class="stat-change">out of 5</div></div>
-            <div class="stat-card c-purple"><div class="stat-icon">🏆</div><div class="stat-label">Avg. Level</div><div class="stat-value" id="a-level">—</div><div class="stat-change">per user</div></div>
+            <div class="chart-card"><h3>📈 Kullanıcı Aktivitesi</h3><p>Son 14 günlük günlük aktivite</p><canvas id="chartUsers" height="180"></canvas></div>
+            <div class="chart-card"><h3>🎯 İçerik Türleri</h3><p>Kategori dağılımı</p><canvas id="chartContent" height="180"></canvas></div>
         </div>
         <div class="chart-grid-eq">
-            <div class="chart-card"><h3>Genre Distribution</h3><p>Most popular genres</p><canvas id="chartGenre" height="260"></canvas></div>
-            <div class="chart-card"><h3>Watch Status</h3><p>Overall status breakdown</p><canvas id="chartStatus" height="260"></canvas></div>
+            <div class="chart-card"><h3>📊 İzleme Durumu</h3><p>Genel durum dağılımı</p><canvas id="chartStatus" height="180"></canvas></div>
+            <div class="chart-card"><h3>🏆 Level Dağılımı</h3><p>Kullanıcı level seviyeleri</p><canvas id="chartLevels" height="180"></canvas></div>
         </div>
         <div class="table-card">
-            <div class="table-header"><h3>🏆 Top Users by XP</h3></div>
-            <table><thead><tr><th>#</th><th>User</th><th>XP</th><th>Level</th><th>Entries</th><th>Streak</th></tr></thead>
-            <tbody id="topUsersBody"><tr class="loading-td"><td colspan="6"><span class="spinner"></span>Loading…</td></tr></tbody></table>
+            <div class="table-header"><h3>🕐 Son Aktif Kullanıcılar</h3><button class="tbl-btn" onclick="showPage('users')">Tümünü Gör →</button></div>
+            <table><thead><tr><th>Kullanıcı</th><th>Son Aktivite</th><th>Giriş</th><th>XP</th><th>Durum</th></tr></thead>
+            <tbody id="recentUsersBody"><tr class="loading-td"><td colspan="5"><span class="spinner"></span>Yükleniyor…</td></tr></tbody></table>
         </div>
     </div>
 
-    <!-- USERS -->
+    <!-- ===== ANALYTICS ===== -->
+    <div class="page" id="page-analytics">
+        <div class="stat-grid">
+            <div class="stat-card c-pink"><div class="stat-icon">🔥</div><div class="stat-label">Ort. Streak</div><div class="stat-value" id="a-streak">—</div><div class="stat-change">gün/kullanıcı</div></div>
+            <div class="stat-card c-blue"><div class="stat-icon">📊</div><div class="stat-label">Ort. Liste Boyutu</div><div class="stat-value" id="a-list">—</div><div class="stat-change">giriş/kullanıcı</div></div>
+            <div class="stat-card c-green"><div class="stat-icon">⭐</div><div class="stat-label">Ort. Puan</div><div class="stat-value" id="a-rating">—</div><div class="stat-change">10 üzerinden</div></div>
+            <div class="stat-card c-purple"><div class="stat-icon">🏆</div><div class="stat-label">Ort. Level</div><div class="stat-value" id="a-level">—</div><div class="stat-change">kullanıcı başına</div></div>
+            <div class="stat-card c-yellow"><div class="stat-icon">📋</div><div class="stat-label">Tamamlama Oranı</div><div class="stat-value" id="a-complete-rate">—</div><div class="stat-change">% tamamlandı</div></div>
+            <div class="stat-card c-orange"><div class="stat-icon">🌟</div><div class="stat-label">En Uzun Streak</div><div class="stat-value" id="a-longest-streak">—</div><div class="stat-change">gün</div></div>
+        </div>
+        <div class="chart-grid-eq">
+            <div class="chart-card"><h3>🎭 Tür Dağılımı</h3><p>En popüler türler</p><canvas id="chartGenre" height="260"></canvas></div>
+            <div class="chart-card"><h3>👀 İzleme Durumu</h3><p>Genel durum breakdown</p><canvas id="chartStatus2" height="260"></canvas></div>
+        </div>
+        <div class="chart-grid-eq">
+            <div class="chart-card"><h3>📅 Aylık Kayıt</h3><p>Son 6 aydaki yeni kayıtlar</p><canvas id="chartMonthly" height="200"></canvas></div>
+            <div class="chart-card"><h3>⚡ XP Dağılımı</h3><p>Kullanıcı XP seviyeleri</p><canvas id="chartXP" height="200"></canvas></div>
+        </div>
+        <div class="table-card">
+            <div class="table-header"><h3>🏆 XP'ye Göre Top Kullanıcılar</h3></div>
+            <table><thead><tr><th>#</th><th>Kullanıcı</th><th>XP</th><th>Level</th><th>Giriş</th><th>Streak</th><th>Tamamlanan</th></tr></thead>
+            <tbody id="topUsersBody"><tr class="loading-td"><td colspan="7"><span class="spinner"></span>Yükleniyor…</td></tr></tbody></table>
+        </div>
+    </div>
+
+    <!-- ===== USERS ===== -->
     <div class="page" id="page-users">
         <div class="table-card">
             <div class="table-header">
-                <h3>👥 All Users</h3>
+                <h3>👥 Tüm Kullanıcılar</h3>
                 <div class="table-actions">
-                    <input class="search-inp" type="text" id="userSearch" placeholder="🔍 Search users…" oninput="filterUsers()">
-                    <select class="fi" style="width:auto;padding:.38rem .8rem;" id="userSort" onchange="loadUsers()">
-                        <option value="newest">Newest First</option>
-                        <option value="oldest">Oldest First</option>
-                        <option value="xp">By XP</option>
+                    <input class="search-inp" type="text" id="userSearch" placeholder="🔍 Kullanıcı ara…" oninput="filterUsers()">
+                    <select class="fi" style="width:auto;padding:.38rem .8rem;" id="userStatusF" onchange="filterUsers()">
+                        <option value="all">Tüm Durumlar</option>
+                        <option value="active">✅ Aktif</option>
+                        <option value="banned">🚫 Banlı</option>
                     </select>
-                    <button class="tbl-btn" onclick="exportCSV()">📥 Export CSV</button>
+                    <select class="fi" style="width:auto;padding:.38rem .8rem;" id="userSort" onchange="renderUsers()">
+                        <option value="newest">En Yeni</option>
+                        <option value="oldest">En Eski</option>
+                        <option value="xp">XP'ye Göre</option>
+                        <option value="entries">Giriş Sayısına Göre</option>
+                    </select>
+                    <button class="tbl-btn" onclick="exportCSV()">📥 CSV İndir</button>
                 </div>
             </div>
-            <table><thead><tr><th>User</th><th>Email</th><th>Joined</th><th>XP</th><th>Entries</th><th>Status</th><th>Actions</th></tr></thead>
-            <tbody id="usersBody"><tr class="loading-td"><td colspan="7"><span class="spinner"></span>Loading…</td></tr></tbody></table>
+            <table><thead><tr><th>Kullanıcı</th><th>E-posta</th><th>Katılım</th><th>XP / Level</th><th>Giriş</th><th>Streak</th><th>Durum</th><th>İşlemler</th></tr></thead>
+            <tbody id="usersBody"><tr class="loading-td"><td colspan="8"><span class="spinner"></span>Yükleniyor…</td></tr></tbody></table>
             <div class="pagination"><div class="pag-info" id="usersPageInfo">—</div><div class="pag-btns" id="usersPageBtns"></div></div>
         </div>
     </div>
 
-    <!-- BANS -->
-    <div class="page" id="page-bans">
+    <!-- ===== ONLINE ===== -->
+    <div class="page" id="page-online">
+        <div class="stat-grid">
+            <div class="stat-card online-card"><div class="stat-icon">🟢</div><div class="stat-label">Şu An Online</div><div class="stat-value" id="o-online">—</div><div class="stat-change">Son 15 dakika</div></div>
+            <div class="stat-card c-blue"><div class="stat-icon">👤</div><div class="stat-label">Son 1 saat</div><div class="stat-value" id="o-hour">—</div><div class="stat-change">aktif kullanıcı</div></div>
+            <div class="stat-card c-green"><div class="stat-icon">📅</div><div class="stat-label">Bugün aktif</div><div class="stat-value" id="o-today">—</div><div class="stat-change">kullanıcı</div></div>
+        </div>
         <div class="table-card">
-            <div class="table-header"><h3>🚫 Banned Users</h3></div>
-            <table><thead><tr><th>User</th><th>Banned</th><th>Reason</th><th>Actions</th></tr></thead>
-            <tbody id="bansBody"><tr class="loading-td"><td colspan="4"><span class="spinner"></span>Loading…</td></tr></tbody></table>
+            <div class="table-header"><h3>🟢 Online Kullanıcılar <span style="font-size:.75rem;font-weight:400;color:var(--text2);">(Son 15 dakika)</span></h3>
+                <button class="tbl-btn" onclick="loadOnline()">🔄 Yenile</button>
+            </div>
+            <table><thead><tr><th>Kullanıcı</th><th>Son Aktivite</th><th>Level</th><th>Giriş Sayısı</th><th>Durum</th></tr></thead>
+            <tbody id="onlineBody"><tr class="loading-td"><td colspan="5"><span class="spinner"></span>Yükleniyor…</td></tr></tbody></table>
         </div>
     </div>
 
-    <!-- CONTENT -->
+    <!-- ===== BANS ===== -->
+    <div class="page" id="page-bans">
+        <div class="table-card">
+            <div class="table-header">
+                <h3>🚫 Banlı Kullanıcılar</h3>
+                <div class="table-actions">
+                    <input class="search-inp" type="text" id="banSearch" placeholder="🔍 Ara…" oninput="filterBans()">
+                </div>
+            </div>
+            <table><thead><tr><th>Kullanıcı</th><th>Banlanma Tarihi</th><th>Sebep</th><th>Süre</th><th>İşlemler</th></tr></thead>
+            <tbody id="bansBody"><tr class="loading-td"><td colspan="5"><span class="spinner"></span>Yükleniyor…</td></tr></tbody></table>
+        </div>
+    </div>
+
+    <!-- ===== CONTENT ===== -->
     <div class="page" id="page-content">
         <div class="table-card">
             <div class="table-header">
-                <h3>🎬 Content Entries</h3>
+                <h3>🎬 İçerik Listesi</h3>
                 <div class="table-actions">
-                    <input class="search-inp" type="text" id="contentSearch" placeholder="🔍 Search…" oninput="filterContent()">
+                    <input class="search-inp" type="text" id="contentSearch" placeholder="🔍 İçerik ara…" oninput="filterContent()">
                     <select class="fi" style="width:auto;padding:.38rem .8rem;" id="contentTypeF" onchange="loadContent()">
-                        <option value="all">All Types</option>
+                        <option value="all">Tüm Türler</option>
                         <option value="anime">Anime</option>
                         <option value="manga">Manga</option>
                         <option value="webtoon">Webtoon</option>
                     </select>
+                    <select class="fi" style="width:auto;padding:.38rem .8rem;" id="contentStatusF" onchange="filterContent()">
+                        <option value="all">Tüm Durumlar</option>
+                        <option value="watching">İzleniyor</option>
+                        <option value="completed">Tamamlandı</option>
+                        <option value="plantowatch">Planlandı</option>
+                        <option value="dropped">Bırakıldı</option>
+                    </select>
                 </div>
             </div>
-            <table><thead><tr><th>Title</th><th>Type</th><th>User</th><th>Status</th><th>Rating</th><th>Added</th></tr></thead>
-            <tbody id="contentBody"><tr class="loading-td"><td colspan="6"><span class="spinner"></span>Loading…</td></tr></tbody></table>
+            <table><thead><tr><th>Başlık</th><th>Tür</th><th>Kullanıcı</th><th>Durum</th><th>Puan</th><th>Eklenme</th></tr></thead>
+            <tbody id="contentBody"><tr class="loading-td"><td colspan="6"><span class="spinner"></span>Yükleniyor…</td></tr></tbody></table>
             <div class="pagination"><div class="pag-info" id="contentPageInfo">—</div><div class="pag-btns" id="contentPageBtns"></div></div>
         </div>
     </div>
 
-    <!-- ANNOUNCEMENTS -->
-    <div class="page" id="page-announcements">
-        <div class="form-card">
-            <h3>📢 Send New Announcement</h3>
-            <div class="form-row">
-                <div class="fg"><label>Title</label><input type="text" class="fi" id="annTitle" placeholder="Announcement title…"></div>
-                <div class="fg"><label>Type</label>
-                    <select class="fs" id="annType">
-                        <option value="info">ℹ️ Info</option>
-                        <option value="success">✅ Success</option>
-                        <option value="warning">⚠️ Warning</option>
-                        <option value="update">🚀 Update</option>
+    <!-- ===== REVIEWS ===== -->
+    <div class="page" id="page-reviews">
+        <div class="table-card">
+            <div class="table-header">
+                <h3>💬 Kullanıcı Yorumları</h3>
+                <div class="table-actions">
+                    <input class="search-inp" type="text" id="reviewSearch" placeholder="🔍 Yorum ara…" oninput="filterReviews()">
+                    <select class="fi" style="width:auto;padding:.38rem .8rem;" id="reviewSort" onchange="loadReviews()">
+                        <option value="newest">En Yeni</option>
+                        <option value="oldest">En Eski</option>
+                        <option value="rating_high">En Yüksek Puan</option>
+                        <option value="rating_low">En Düşük Puan</option>
                     </select>
                 </div>
             </div>
-            <div class="fg"><label>Message</label><textarea class="fta" id="annContent" placeholder="Write your announcement…"></textarea></div>
-            <div class="form-row">
-                <div class="fg"><label>Target</label>
-                    <select class="fs" id="annTarget"><option value="all">All Users</option><option value="registered">Registered Only</option></select>
-                </div>
-                <div class="fg"><label>Priority</label>
-                    <select class="fs" id="annPriority"><option value="normal">Normal</option><option value="high">High</option><option value="critical">Critical</option></select>
-                </div>
-            </div>
-            <button class="submit-btn" onclick="sendAnnouncement()">📢 Publish Announcement</button>
-        </div>
-        <div class="table-card">
-            <div class="table-header"><h3>📜 Announcement History</h3></div>
-            <table><thead><tr><th>Title</th><th>Type</th><th>Date</th><th>Actions</th></tr></thead>
-            <tbody id="annBody"><tr class="loading-td"><td colspan="4"><span class="spinner"></span>Loading…</td></tr></tbody></table>
+            <table><thead><tr><th>Kullanıcı</th><th>İçerik</th><th>Puan</th><th>Yorum</th><th>Tarih</th><th>İşlem</th></tr></thead>
+            <tbody id="reviewsBody"><tr class="loading-td"><td colspan="6"><span class="spinner"></span>Yükleniyor…</td></tr></tbody></table>
+            <div class="pagination"><div class="pag-info" id="reviewsPageInfo">—</div><div class="pag-btns" id="reviewsPageBtns"></div></div>
         </div>
     </div>
 
-    <!-- LOGS -->
+    <!-- ===== ANNOUNCEMENTS ===== -->
+    <div class="page" id="page-announcements">
+        <div class="form-card">
+            <h3>📢 Yeni Duyuru Gönder</h3>
+            <div class="form-row">
+                <div class="fg"><label>Başlık</label><input type="text" class="fi" id="annTitle" placeholder="Duyuru başlığı…"></div>
+                <div class="fg"><label>Tür</label>
+                    <select class="fs" id="annType">
+                        <option value="info">ℹ️ Bilgi</option>
+                        <option value="success">✅ Başarı</option>
+                        <option value="warning">⚠️ Uyarı</option>
+                        <option value="update">🚀 Güncelleme</option>
+                    </select>
+                </div>
+            </div>
+            <div class="fg"><label>Mesaj</label><textarea class="fta" id="annContent" placeholder="Duyuru mesajını yaz…"></textarea></div>
+            <div class="form-row">
+                <div class="fg"><label>Hedef</label>
+                    <select class="fs" id="annTarget"><option value="all">Tüm Kullanıcılar</option><option value="registered">Sadece Kayıtlılar</option></select>
+                </div>
+                <div class="fg"><label>Öncelik</label>
+                    <select class="fs" id="annPriority"><option value="normal">Normal</option><option value="high">Yüksek</option><option value="critical">Kritik</option></select>
+                </div>
+            </div>
+            <button class="submit-btn" onclick="sendAnnouncement()">📢 Duyuruyu Yayınla</button>
+        </div>
+        <div class="table-card">
+            <div class="table-header"><h3>📜 Duyuru Geçmişi</h3></div>
+            <table><thead><tr><th>Başlık</th><th>Tür</th><th>Tarih</th><th>İşlem</th></tr></thead>
+            <tbody id="annBody"><tr class="loading-td"><td colspan="4"><span class="spinner"></span>Yükleniyor…</td></tr></tbody></table>
+        </div>
+    </div>
+
+    <!-- ===== RESTRICTIONS ===== -->
+    <div class="page" id="page-restrictions">
+        <div style="margin-bottom:1.5rem;">
+            <h2 style="font-size:1.3rem;font-weight:700;margin-bottom:.3rem;">🛡️ Platform Kısıtlamaları</h2>
+            <p style="color:var(--text2);font-size:.85rem;">Gerçek zamanlı platform kontrolleri. Değişiklikler anında uygulanır.</p>
+        </div>
+        <div class="restrict-grid">
+            <div class="restrict-card">
+                <h4>👤 Kullanıcı Kısıtlamaları</h4>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Yeni Kayıt</div><div style="font-size:.72rem;color:var(--text2);">Yeni hesap oluşturma</div></div><div class="toggle on" id="rt-registration" onclick="toggleRestriction(this,'registration')"></div></div>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Misafir Erişimi</div><div style="font-size:.72rem;color:var(--text2);">Giriş yapmadan gezme</div></div><div class="toggle on" id="rt-guest" onclick="toggleRestriction(this,'guest')"></div></div>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Profil Düzenleme</div><div style="font-size:.72rem;color:var(--text2);">Kullanıcı profil güncellemeleri</div></div><div class="toggle on" id="rt-profile-edit" onclick="toggleRestriction(this,'profile-edit')"></div></div>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Şifre Değiştirme</div><div style="font-size:.72rem;color:var(--text2);">Hesap şifresi güncellemeleri</div></div><div class="toggle on" id="rt-password-change" onclick="toggleRestriction(this,'password-change')"></div></div>
+            </div>
+            <div class="restrict-card">
+                <h4>🎬 İçerik Kısıtlamaları</h4>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">İçerik Ekleme</div><div style="font-size:.72rem;color:var(--text2);">Listeye yeni öge ekleme</div></div><div class="toggle on" id="rt-add-content" onclick="toggleRestriction(this,'add-content')"></div></div>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Yorum Yazma</div><div style="font-size:.72rem;color:var(--text2);">Kullanıcı yorumları</div></div><div class="toggle on" id="rt-reviews" onclick="toggleRestriction(this,'reviews')"></div></div>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Puan Verme</div><div style="font-size:.72rem;color:var(--text2);">İçerik puanlama</div></div><div class="toggle on" id="rt-rating" onclick="toggleRestriction(this,'rating')"></div></div>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">İçerik Silme</div><div style="font-size:.72rem;color:var(--text2);">Kullanıcı kendi içeriklerini silme</div></div><div class="toggle on" id="rt-delete-content" onclick="toggleRestriction(this,'delete-content')"></div></div>
+            </div>
+            <div class="restrict-card">
+                <h4>⚙️ Sistem Ayarları</h4>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Bakım Modu</div><div style="font-size:.72rem;color:var(--text2);">Siteyi geçici olarak kapat</div></div><div class="toggle" id="rt-maintenance" onclick="toggleRestriction(this,'maintenance')"></div></div>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">AI Önerileri</div><div style="font-size:.72rem;color:var(--text2);">AI bölümünü etkinleştir</div></div><div class="toggle on" id="rt-ai" onclick="toggleRestriction(this,'ai')"></div></div>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Liderlik Tablosu</div><div style="font-size:.72rem;color:var(--text2);">Kullanıcı sıralamaları</div></div><div class="toggle on" id="rt-leaderboard" onclick="toggleRestriction(this,'leaderboard')"></div></div>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Keşfet Bölümü</div><div style="font-size:.72rem;color:var(--text2);">Anime/manga keşfet sayfası</div></div><div class="toggle on" id="rt-discover" onclick="toggleRestriction(this,'discover')"></div></div>
+            </div>
+            <div class="restrict-card">
+                <h4>🔔 Bildirim Kontrolleri</h4>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Sistem Duyuruları</div><div style="font-size:.72rem;color:var(--text2);">Admin duyurularını göster</div></div><div class="toggle on" id="rt-announcements" onclick="toggleRestriction(this,'announcements')"></div></div>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Streak Uyarıları</div><div style="font-size:.72rem;color:var(--text2);">Streak kaybı bildirimleri</div></div><div class="toggle on" id="rt-streak-notif" onclick="toggleRestriction(this,'streak-notif')"></div></div>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">XP Bildirimleri</div><div style="font-size:.72rem;color:var(--text2);">XP kazanım bildirimleri</div></div><div class="toggle on" id="rt-xp-notif" onclick="toggleRestriction(this,'xp-notif')"></div></div>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Level Atlama Modalı</div><div style="font-size:.72rem;color:var(--text2);">Level atlama popup'ı</div></div><div class="toggle on" id="rt-levelup-modal" onclick="toggleRestriction(this,'levelup-modal')"></div></div>
+            </div>
+        </div>
+        <div class="form-card" style="margin-top:1rem;">
+            <h3>⚠️ Kısıtlama Mesajı</h3>
+            <p style="font-size:.83rem;color:var(--text2);margin-bottom:1rem;">Bakım modu aktifken kullanıcılara gösterilecek mesaj.</p>
+            <div class="fg"><label>Bakım Mesajı</label><textarea class="fta" id="maintenanceMsg" placeholder="Sistem bakımda, lütfen daha sonra tekrar deneyin…" style="min-height:80px;"></textarea></div>
+            <button class="submit-btn" onclick="saveMaintenanceMsg()" style="padding:.6rem 1.2rem;font-size:.85rem;">💾 Kaydet</button>
+        </div>
+    </div>
+
+    <!-- ===== LOGS ===== -->
     <div class="page" id="page-logs">
         <div class="table-card">
-            <div class="table-header"><h3>📋 Activity Log</h3>
+            <div class="table-header"><h3>📋 Aktivite Logu</h3>
                 <div class="table-actions">
                     <select class="fi" style="width:auto;padding:.38rem .8rem;" id="logFilter" onchange="loadLogs()">
-                        <option value="all">All Events</option>
-                        <option value="recent">Last 24h</option>
+                        <option value="all">Tüm Olaylar</option>
+                        <option value="recent">Son 24 Saat</option>
+                        <option value="bans">Sadece Banlar</option>
                     </select>
+                    <button class="tbl-btn" onclick="exportLogs()">📥 Log İndir</button>
                 </div>
             </div>
             <div id="logList" style="max-height:600px;overflow-y:auto;"></div>
         </div>
     </div>
 
-    <!-- SETTINGS -->
+    <!-- ===== SETTINGS ===== -->
     <div class="page" id="page-settings">
         <div class="settings-grid">
             <div class="settings-card">
-                <h3>🔧 Site Features</h3>
-                <div class="toggle-row"><div><div class="tl-text">Open Registration</div><div class="tl-desc">Allow new user signups</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-                <div class="toggle-row"><div><div class="tl-text">Maintenance Mode</div><div class="tl-desc">Temporarily disable site</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
-                <div class="toggle-row"><div><div class="tl-text">Guest Browsing</div><div class="tl-desc">Allow non-registered users</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-                <div class="toggle-row"><div><div class="tl-text">AI Recommendations</div><div class="tl-desc">Enable AI section</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-            </div>
-            <div class="settings-card">
-                <h3>🔔 Notifications</h3>
-                <div class="toggle-row"><div><div class="tl-text">Email Notifications</div><div class="tl-desc">Send welcome / reset emails</div></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
-                <div class="toggle-row"><div><div class="tl-text">Push Notifications</div><div class="tl-desc">Browser push alerts</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-                <div class="toggle-row"><div><div class="tl-text">Streak Warnings</div><div class="tl-desc">Alert before streak loss</div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
-            </div>
-            <div class="settings-card">
-                <h3>🛡️ Security</h3>
-                <div class="fg"><label>New Admin Password</label><input type="password" class="fi" id="newPw" placeholder="New password…"></div>
-                <div class="fg"><label>Confirm Password</label><input type="password" class="fi" id="confirmPw" placeholder="Confirm…"></div>
-                <button class="submit-btn" style="padding:.6rem 1.2rem;font-size:.85rem;" onclick="changePassword()">Update Password</button>
-            </div>
-            <div class="settings-card">
-                <h3>📡 Supabase Status</h3>
+                <h3>📡 Supabase Durumu</h3>
                 <div class="fg"><label>Project URL</label><input type="text" class="fi mono" id="supaUrlEl" readonly></div>
-                <div class="fg"><label>Connection</label><div id="supaStatus" class="badge bg-yellow" style="display:inline-flex;">⏳ Checking…</div></div>
-                <div class="fg" style="margin-top:1rem;"><label>Quick Stats</label><div id="supaStats" style="font-size:.83rem;color:var(--text2);line-height:1.9;">—</div></div>
+                <div class="fg"><label>Bağlantı</label><div id="supaStatus" class="badge bg-yellow" style="display:inline-flex;">⏳ Kontrol ediliyor…</div></div>
+                <div class="fg" style="margin-top:1rem;"><label>Hızlı İstatistikler</label><div id="supaStats" style="font-size:.83rem;color:var(--text2);line-height:2;">—</div></div>
+            </div>
+            <div class="settings-card">
+                <h3>🔒 Güvenlik</h3>
+                <div class="fg"><label>Yeni Admin Şifresi</label><input type="password" class="fi" id="newPw" placeholder="Yeni şifre…"></div>
+                <div class="fg"><label>Şifre Tekrar</label><input type="password" class="fi" id="confirmPw" placeholder="Tekrar gir…"></div>
+                <button class="submit-btn" style="padding:.6rem 1.2rem;font-size:.85rem;" onclick="changePassword()">Şifreyi Güncelle</button>
+            </div>
+            <div class="settings-card">
+                <h3>📊 Veritabanı Yönetimi</h3>
+                <div style="display:flex;flex-direction:column;gap:.8rem;margin-top:.5rem;">
+                    <button class="tbl-btn" style="width:100%;padding:.7rem;text-align:left;" onclick="exportAllData()">📥 Tüm Kullanıcı Verilerini İndir (JSON)</button>
+                    <button class="tbl-btn" style="width:100%;padding:.7rem;text-align:left;" onclick="exportCSV()">📥 Kullanıcı Listesi İndir (CSV)</button>
+                    <button class="tbl-btn" style="width:100%;padding:.7rem;text-align:left;" onclick="loadDashboard()">🔄 Dashboard Verilerini Yenile</button>
+                </div>
+            </div>
+            <div class="settings-card">
+                <h3>ℹ️ Platform Bilgisi</h3>
+                <div style="font-size:.83rem;color:var(--text2);line-height:2.2;" id="platformInfoEl">Yükleniyor…</div>
             </div>
         </div>
     </div>
@@ -572,21 +670,118 @@
 <!-- CONFIRM MODAL -->
 <div class="modal-ov" id="confirmModal">
     <div class="modal-box">
-        <h3 id="confirmTitle">Are you sure?</h3>
+        <h3 id="confirmTitle">Emin misin?</h3>
         <p id="confirmText" style="color:var(--text2);font-size:.87rem;line-height:1.6;"></p>
         <div class="modal-actions">
-            <button class="btn-cancel" onclick="closeConfirm()">Cancel</button>
-            <button class="btn-confirm" id="confirmBtn">Confirm</button>
+            <button class="btn-cancel" onclick="closeModal('confirmModal')">İptal</button>
+            <button class="btn-confirm" id="confirmBtn">Onayla</button>
         </div>
     </div>
 </div>
 
 <!-- USER DETAIL MODAL -->
 <div class="modal-ov" id="userModal">
-    <div class="modal-box" style="max-width:560px;">
-        <h3>👤 User Details</h3>
+    <div class="modal-box" style="max-width:600px;">
+        <h3>👤 Kullanıcı Detayları</h3>
         <div id="userModalContent" style="margin-top:1rem;"></div>
-        <div class="modal-actions"><button class="btn-cancel" onclick="closeModal('userModal')">Close</button></div>
+        <div class="modal-actions"><button class="btn-cancel" onclick="closeModal('userModal')">Kapat</button></div>
+    </div>
+</div>
+
+<!-- BAN MODAL -->
+<div class="ban-modal-overlay" id="banModalOverlay" onclick="closeBanModal(event)">
+    <div class="ban-modal">
+        <div class="ban-modal-header">
+            <div class="ban-modal-title">🚫 Kullanıcıyı Banla</div>
+            <button class="ban-modal-close" onclick="closeBanModal()">✕</button>
+        </div>
+        <div class="ban-user-card">
+            <div class="ban-user-av">👤</div>
+            <div><div style="font-weight:700;font-size:1rem;" id="banTargetName">Kullanıcı</div><div style="font-size:.78rem;color:var(--text2);margin-top:.1rem;" id="banTargetId">—</div></div>
+        </div>
+        <div class="ban-field">
+            <label>⚡ Hızlı Sebep</label>
+            <div class="ban-reason-chips">
+                <span class="ban-chip" onclick="selectChip(this,'Spam / Reklam')">🔁 Spam</span>
+                <span class="ban-chip" onclick="selectChip(this,'Uygunsuz içerik')">🔞 Uygunsuz</span>
+                <span class="ban-chip" onclick="selectChip(this,'Hakaret / Küfür')">🤬 Hakaret</span>
+                <span class="ban-chip" onclick="selectChip(this,'Sahte hesap')">🎭 Sahte Hesap</span>
+                <span class="ban-chip" onclick="selectChip(this,'Kural ihlali')">⚠️ Kural İhlali</span>
+                <span class="ban-chip" onclick="selectChip(this,'Bot/Script aktivitesi')">🤖 Bot</span>
+            </div>
+        </div>
+        <div class="ban-field">
+            <label>📝 Ban Sebebi</label>
+            <textarea id="banReasonInput" rows="3" placeholder="Ban sebebini açıklayın..."></textarea>
+        </div>
+        <div class="ban-field">
+            <label>⏱️ Ban Süresi</label>
+            <select id="banDuration">
+                <option value="permanent">♾️ Kalıcı Ban</option>
+                <option value="1">📅 1 Gün</option>
+                <option value="3">📅 3 Gün</option>
+                <option value="7">📅 7 Gün</option>
+                <option value="30">📅 30 Gün</option>
+                <option value="90">📅 90 Gün</option>
+            </select>
+        </div>
+        <div class="ban-modal-actions">
+            <button class="btn-ban-cancel" onclick="closeBanModal()">İptal</button>
+            <button class="btn-ban-confirm" onclick="executeBan()">🚫 Banla</button>
+        </div>
+    </div>
+</div>
+
+<!-- WARN MODAL -->
+<div class="warn-modal-overlay" id="warnModalOverlay" onclick="closeWarnModal(event)">
+    <div class="warn-modal">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;">
+            <div style="font-size:1.2rem;font-weight:800;color:var(--yellow);">⚠️ Uyarı Gönder</div>
+            <button class="ban-modal-close" onclick="closeWarnModal()" style="border-color:rgba(245,158,11,0.3);">✕</button>
+        </div>
+        <div class="ban-user-card" style="background:rgba(245,158,11,0.06);border-color:rgba(245,158,11,0.15);">
+            <div class="ban-user-av" style="background:linear-gradient(135deg,var(--yellow),var(--orange));">👤</div>
+            <div><div style="font-weight:700;font-size:1rem;" id="warnTargetName">Kullanıcı</div><div style="font-size:.78rem;color:var(--text2);" id="warnTargetId">—</div></div>
+        </div>
+        <div class="ban-field">
+            <label>⚡ Uyarı Türü</label>
+            <div class="ban-reason-chips">
+                <span class="ban-chip" onclick="selectWarnChip(this,'Kural ihlali uyarısı')" style="border-color:rgba(245,158,11,0.2);">⚠️ Kural İhlali</span>
+                <span class="ban-chip" onclick="selectWarnChip(this,'Uygunsuz davranış')" style="border-color:rgba(245,158,11,0.2);">😤 Uygunsuz</span>
+                <span class="ban-chip" onclick="selectWarnChip(this,'Spam aktivitesi')" style="border-color:rgba(245,158,11,0.2);">🔁 Spam</span>
+                <span class="ban-chip" onclick="selectWarnChip(this,'Son uyarı — ban gelebilir')" style="border-color:rgba(239,68,68,0.3);">🚨 Son Uyarı</span>
+            </div>
+        </div>
+        <div class="ban-field">
+            <label>📝 Uyarı Mesajı</label>
+            <textarea id="warnMessage" rows="3" placeholder="Kullanıcıya gösterilecek mesaj..."></textarea>
+        </div>
+        <div style="display:flex;gap:.8rem;margin-top:1rem;">
+            <button class="btn-ban-cancel" onclick="closeWarnModal()" style="flex:1;">İptal</button>
+            <button style="flex:1;background:linear-gradient(135deg,var(--yellow),var(--orange));color:#000;border:none;border-radius:10px;padding:.85rem;font-size:.95rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="executeWarn()">⚠️ Uyarı Gönder</button>
+        </div>
+    </div>
+</div>
+
+<!-- USER ENTRIES MODAL -->
+<div class="entries-modal-overlay" id="entriesModalOverlay" onclick="closeEntriesModal(event)">
+    <div class="entries-modal">
+        <div class="entries-modal-head">
+            <div>
+                <div style="font-weight:700;font-size:1.1rem;" id="entriesModalTitle">Kullanıcı Girişleri</div>
+                <div style="font-size:.78rem;color:var(--text2);margin-top:2px;" id="entriesModalSub">—</div>
+            </div>
+            <button class="ban-modal-close" onclick="closeEntriesModal()">✕</button>
+        </div>
+        <div style="padding:.8rem 1.5rem;border-bottom:1px solid var(--border);display:flex;gap:.5rem;flex-wrap:wrap;">
+            <button class="tbl-btn active" id="entTabAll" onclick="filterEntries('all')">Tümü</button>
+            <button class="tbl-btn" id="entTabAnime" onclick="filterEntries('anime')">🎬 Anime</button>
+            <button class="tbl-btn" id="entTabManga" onclick="filterEntries('manga')">📚 Manga</button>
+            <button class="tbl-btn" id="entTabWebtoon" onclick="filterEntries('webtoon')">🌐 Webtoon</button>
+        </div>
+        <div class="entries-modal-body" id="entriesModalBody">
+            <div style="text-align:center;padding:3rem;color:var(--text2);">Yükleniyor…</div>
+        </div>
     </div>
 </div>
 
@@ -596,15 +791,15 @@
 // ===== CONFIG =====
 const SUPABASE_URL  = 'https://qhfjpuwduuxzojurngte.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoZmpwdXdkdXV4em9qdXJuZ3RlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2NzU1MTksImV4cCI6MjA4NzI1MTUxOX0.lgtxEwGFW07P1vY9Soid2s_sM47jODk_nsUECznHSFA';
-// ⬇ Add YOUR Supabase-registered email here
-const ADMIN_EMAILS  = ['list086@gmail.com'];
+const ADMIN_EMAILS  = ['list086@gmail.com','cgty08@gmail.com','admin@tobilist.com'];
 
 let sb, currentAdmin = null, curPage = 'dashboard';
-let allUsers = [], allContent = [];
-let usersPage = 1, contentPage = 1;
-const PER_PAGE = 20;
-
-// chart instances
+let allUsers = [], allBans = [], allContent = [], allReviews = [];
+let usersPage = 1, contentPage = 1, reviewsPage = 1;
+let _banUid = null, _banName = null;
+let _warnUid = null, _warnName = null;
+let _entriesAll = [], _entriesFiltered = [];
+const PER_PAGE = 25;
 const charts = {};
 
 // ===== BOOT =====
@@ -630,32 +825,30 @@ function boot() {
     document.getElementById('supaUrlEl').value = SUPABASE_URL;
     checkSupabase();
     loadDashboard();
+    // Auto-refresh online every 30s
+    setInterval(updateOnlineCount, 30000);
 }
 
 // ===== LOGIN =====
 async function adminLogin() {
     const email = document.getElementById('adminEmail').value.trim();
     const pw    = document.getElementById('adminPassword').value;
-    const errEl = document.getElementById('loginErr');
-    errEl.style.display = 'none';
-
-    if (!email || !pw) { showErr('Email and password required.'); return; }
-    if (!isAdmin(email)) { showErr('This account does not have admin access.'); return; }
-
+    document.getElementById('loginErr').style.display = 'none';
+    if (!email || !pw) { showErr('Email ve şifre gerekli.'); return; }
+    if (!isAdmin(email)) { showErr('Bu hesabın admin yetkisi yok.'); return; }
     const btn = document.getElementById('loginBtn');
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>Signing in…';
-
+    btn.innerHTML = '<span class="spinner"></span>Giriş yapılıyor…';
     try {
         const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
         if (error) throw error;
-        if (!data?.user || !isAdmin(data.user.email)) throw new Error('Not an admin account.');
+        if (!isAdmin(data.user.email)) throw new Error('Admin hesabı değil.');
         currentAdmin = data.user;
         boot();
     } catch(e) {
         btn.disabled = false;
-        btn.textContent = 'Sign In as Admin →';
-        showErr(e.message || 'Login failed.');
+        btn.textContent = 'Admin Olarak Giriş Yap →';
+        showErr(e.message || 'Giriş başarısız.');
     }
 }
 
@@ -665,103 +858,172 @@ function showErr(msg) {
     el.style.display = 'block';
 }
 
-async function adminLogout() {
-    await sb.auth.signOut();
-    location.reload();
-}
+async function adminLogout() { await sb.auth.signOut(); location.reload(); }
 
 // ===== NAVIGATION =====
 const PAGE_META = {
-    dashboard:     ['Dashboard',         'Platform overview'],
-    analytics:     ['Analytics',         'In-depth insights'],
-    users:         ['All Users',         'Manage registered accounts'],
-    bans:          ['Banned Users',      'Manage banned accounts'],
-    content:       ['Content Entries',   'All user-added items'],
-    announcements: ['Announcements',     'Broadcast to users'],
-    logs:          ['Activity Log',      'System event history'],
-    settings:      ['Settings',          'Site configuration'],
+    dashboard:    ['Dashboard',                'Platform genel bakışı'],
+    analytics:    ['Analitik',                 'Derinlemesine içgörüler'],
+    users:        ['Tüm Kullanıcılar',         'Kayıtlı hesapları yönet'],
+    online:       ['Online Kullanıcılar',      'Şu an aktif olanlar'],
+    bans:         ['Banlı Kullanıcılar',       'Banlı hesapları yönet'],
+    content:      ['İçerik Listesi',           'Kullanıcıların eklediği tüm içerik'],
+    reviews:      ['Yorumlar',                 'Kullanıcı yorumları'],
+    announcements:['Duyurular',                'Kullanıcılara duyuru gönder'],
+    restrictions: ['Kısıtlamalar',             'Platform kısıtlamalarını yönet'],
+    logs:         ['Aktivite Logu',            'Sistem olay geçmişi'],
+    settings:     ['Ayarlar',                  'Site yapılandırması'],
 };
 
 function showPage(page) {
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.textContent.trim().toLowerCase().includes(page) || (n.getAttribute('onclick')||'').includes(`'${page}'`)));
+    document.querySelectorAll('.nav-item').forEach(n => {
+        const oc = n.getAttribute('onclick') || '';
+        n.classList.toggle('active', oc.includes(`'${page}'`));
+    });
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById('page-' + page)?.classList.add('active');
     curPage = page;
-
     const [title, sub] = PAGE_META[page] || ['—',''];
     document.getElementById('pageTitle').textContent = title;
-    document.getElementById('pageSub').textContent   = sub;
-    document.getElementById('lastUpdated').textContent = 'Updated: ' + new Date().toLocaleTimeString('en-US');
-
+    document.getElementById('pageSub').textContent = sub;
+    document.getElementById('lastUpdated').textContent = 'Güncellendi: ' + new Date().toLocaleTimeString('tr-TR');
     const loaders = {
         dashboard: loadDashboard, analytics: loadAnalytics,
-        users: loadUsers, bans: loadBans, content: loadContent,
-        announcements: loadAnnouncements, logs: loadLogs, settings: ()=>{}
+        users: loadUsers, online: loadOnline, bans: loadBans,
+        content: loadContent, reviews: loadReviews,
+        announcements: loadAnnouncements, logs: loadLogs,
+        restrictions: ()=>{}, settings: loadSettings,
     };
     loaders[page]?.();
 }
 
 function refreshCurrent() { showPage(curPage); }
 
+// ===== ONLINE COUNT =====
+async function updateOnlineCount() {
+    const { data } = await sb.from('user_data').select('user_id,data,updated_at').order('updated_at',{ascending:false});
+    const now15 = new Date(Date.now() - 15*60*1000).toISOString();
+    const online = (data||[]).filter(u => u.updated_at > now15 && !u.data?.banned);
+    const count = online.length;
+    document.getElementById('sideOnlineCount').textContent = `${count} kullanıcı online`;
+    document.getElementById('onlineBadge').textContent = count;
+    if (document.getElementById('s-online')) {
+        document.getElementById('s-online').textContent = count;
+    }
+    // Mini list in dashboard
+    const listEl = document.getElementById('dashOnlineList');
+    if (listEl) {
+        listEl.innerHTML = online.slice(0,3).map(u => `
+            <div class="online-user-row">
+                <div class="online-user-dot"></div>
+                <span>${esc(u.data?.social?.name || 'Kullanıcı')}</span>
+            </div>`).join('') + (count > 3 ? `<div class="online-user-row" style="color:var(--green);font-size:.7rem;">+${count-3} kişi daha…</div>` : '');
+    }
+    return { data, online };
+}
+
 // ===== DASHBOARD =====
 async function loadDashboard() {
-    const { data: rows, error } = await sb.from('user_data')
-        .select('user_id,data,updated_at')
-        .order('updated_at', { ascending: false });
-
-    if (error) { toast('Load error: ' + error.message, 'error'); return; }
+    const { data: rows, error } = await sb.from('user_data').select('user_id,data,updated_at').order('updated_at',{ascending:false});
+    if (error) { toast('Yükleme hatası: ' + error.message, 'error'); return; }
     const users = rows || [];
 
-    document.getElementById('s-total-users').textContent = users.length;
+    // Stats
+    const ago7  = new Date(Date.now() - 7*864e5).toISOString();
+    const now15 = new Date(Date.now() - 15*60*1000).toISOString();
+    const banned = users.filter(u => u.data?.banned);
+    const active7 = users.filter(u => u.updated_at > ago7 && !u.data?.banned);
+    const online15 = users.filter(u => u.updated_at > now15 && !u.data?.banned);
+
+    document.getElementById('s-total-users').textContent  = users.length;
+    document.getElementById('s-active').textContent       = active7.length;
+    document.getElementById('s-online').textContent       = online15.length;
+    document.getElementById('s-banned').textContent       = banned.length;
     document.getElementById('userCountBadge').textContent = users.length;
-    document.getElementById('s-users-change').textContent = `⬆ ${users.length} total registered`;
+    document.getElementById('onlineBadge').textContent    = online15.length;
+    document.getElementById('sideOnlineCount').textContent = `${online15.length} kullanıcı online`;
 
-    const ago7 = new Date(Date.now() - 7*864e5).toISOString();
-    document.getElementById('s-active').textContent = users.filter(u => u.updated_at > ago7).length;
+    const banBadge = document.getElementById('banCountBadge');
+    banBadge.textContent = banned.length;
+    banBadge.style.display = banned.length > 0 ? '' : 'none';
 
-    let entries = 0, xpTotal = 0, completed = 0, anime = 0, manga = 0, webtoon = 0;
+    document.getElementById('s-users-change').textContent = `⬆ ${active7.length} bu hafta aktif`;
+
+    // Online mini list
+    const listEl = document.getElementById('dashOnlineList');
+    if (listEl) {
+        listEl.innerHTML = online15.slice(0,3).map(u => `
+            <div class="online-user-row">
+                <div class="online-user-dot"></div>
+                <span>${esc(u.data?.social?.name||'Kullanıcı')}</span>
+            </div>`).join('') + (online15.length > 3 ? `<div class="online-user-row" style="color:var(--green);font-size:.7rem;">+${online15.length-3} kişi daha…</div>` : '');
+    }
+
+    let entries=0, xpTotal=0, completed=0;
+    let anime=0, manga=0, webtoon=0;
+    let statusCounts={watching:0,completed:0,plantowatch:0,onhold:0,dropped:0};
+    let levelBuckets=[0,0,0,0,0]; // 1-5, 6-10, 11-20, 21-30, 31+
+
     users.forEach(u => {
         const d = u.data;
         if (d?.items) {
-            entries  += d.items.length;
-            completed+= d.items.filter(i=>i.status==='completed').length;
-            anime    += d.items.filter(i=>i.type==='anime').length;
-            manga    += d.items.filter(i=>i.type==='manga').length;
-            webtoon  += d.items.filter(i=>i.type==='webtoon').length;
+            entries   += d.items.length;
+            completed += d.items.filter(i=>i.status==='completed').length;
+            anime     += d.items.filter(i=>i.type==='anime').length;
+            manga     += d.items.filter(i=>i.type==='manga').length;
+            webtoon   += d.items.filter(i=>i.type==='webtoon').length;
+            d.items.forEach(i => { if (i.status && statusCounts[i.status]!==undefined) statusCounts[i.status]++; });
         }
         if (d?.xp?.total) xpTotal += d.xp.total;
+        const lv = d?.xp?.level || 1;
+        if (lv<=5) levelBuckets[0]++;
+        else if (lv<=10) levelBuckets[1]++;
+        else if (lv<=20) levelBuckets[2]++;
+        else if (lv<=30) levelBuckets[3]++;
+        else levelBuckets[4]++;
     });
 
-    document.getElementById('s-entries').textContent   = entries;
-    document.getElementById('s-xp').textContent        = xpTotal.toLocaleString('en-US');
-    document.getElementById('s-completed').textContent = completed;
+    document.getElementById('s-entries').textContent   = entries.toLocaleString();
+    document.getElementById('s-xp').textContent        = xpTotal.toLocaleString();
+    document.getElementById('s-completed').textContent = completed.toLocaleString();
+
+    // Reviews count
+    try {
+        const { count: revCount } = await sb.from('reviews').select('*',{count:'exact',head:true});
+        document.getElementById('s-reviews').textContent = (revCount||0).toLocaleString();
+    } catch(e) { document.getElementById('s-reviews').textContent = '—'; }
 
     // Charts
-    drawLineChart('chartUsers', buildDailyActivity(users));
+    drawLineChart('chartUsers', buildDailyActivity(users, 14));
     drawDonut('chartContent', ['Anime','Manga','Webtoon'], [anime,manga,webtoon], ['#ff3366','#00d4ff','#7c3aed']);
+    drawDonut('chartStatus', ['İzleniyor','Tamamlandı','Planlandı','Beklemede','Bırakıldı'],
+        [statusCounts.watching,statusCounts.completed,statusCounts.plantowatch,statusCounts.onhold,statusCounts.dropped],
+        ['#00d4ff','#10b981','#7c3aed','#f59e0b','#ef4444']);
+    drawBar('chartLevels', ['Lv.1-5','Lv.6-10','Lv.11-20','Lv.21-30','Lv.31+'], levelBuckets, ['#ff3366','#f97316','#f59e0b','#10b981','#a855f7']);
 
     // Recent table
     const tbody = document.getElementById('recentUsersBody');
-    const recent = users.slice(0, 8);
-    if (!recent.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--text2);">No users yet</td></tr>'; return; }
-    tbody.innerHTML = recent.map(u => {
-        const d = u.data;
-        const name = d?.social?.name || u.user_id.substring(0,8)+'…';
+    tbody.innerHTML = users.slice(0,8).map(u => {
+        const d=u.data, isOnline = u.updated_at > now15;
         return `<tr>
-            <td><div class="user-cell"><div class="user-av">${d?.social?.avatar||'👤'}</div>
-            <div><div class="user-name">${name}</div><div class="user-email mono">${u.user_id.substring(0,14)}…</div></div></div></td>
-            <td style="color:var(--text2);font-size:.82rem;">${fmtDate(u.updated_at)}</td>
+            <td><div class="user-cell">
+                <div class="user-av" style="position:relative;">${d?.social?.avatar||'👤'}${isOnline?'<div style="position:absolute;bottom:0;right:0;width:9px;height:9px;background:var(--green);border-radius:50%;border:2px solid var(--card);"></div>':''}
+                </div>
+                <div><div class="user-name">${esc(d?.social?.name||'Kullanıcı')}</div><div class="user-email">${esc(d?.social?.email||'')}</div></div>
+            </div></td>
+            <td style="color:var(--text2);font-size:.82rem;">${fmtRelative(u.updated_at)}</td>
             <td>${d?.items?.length||0}</td>
-            <td>${d?.banned?'<span class="badge bg-red">🚫 Banned</span>':'<span class="badge bg-green">✅ Active</span>'}</td>
+            <td><strong style="color:var(--yellow);">${(d?.xp?.total||0).toLocaleString()}</strong> <span class="badge bg-purple" style="font-size:.68rem;">Lv.${d?.xp?.level||1}</span></td>
+            <td>${d?.banned?'<span class="badge bg-red">🚫 Banlı</span>':isOnline?'<span class="badge bg-green">🟢 Online</span>':'<span class="badge bg-blue">✅ Aktif</span>'}</td>
         </tr>`;
-    }).join('');
+    }).join('') || '<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--text2);">Henüz kullanıcı yok</td></tr>';
 }
 
-function buildDailyActivity(users) {
+function buildDailyActivity(users, days=14) {
     const labels=[], data=[];
-    for (let i=6;i>=0;i--) {
+    for (let i=days-1;i>=0;i--) {
         const d = new Date(Date.now()-i*864e5);
-        labels.push(d.toLocaleDateString('en-US',{weekday:'short'}));
+        labels.push(d.toLocaleDateString('tr-TR',{weekday:'short',day:'numeric'}));
         const ds = d.toISOString().split('T')[0];
         data.push(users.filter(u=>u.updated_at?.startsWith(ds)).length);
     }
@@ -770,359 +1032,640 @@ function buildDailyActivity(users) {
 
 // ===== ANALYTICS =====
 async function loadAnalytics() {
-    const { data: rows } = await sb.from('user_data').select('data');
+    const { data: rows } = await sb.from('user_data').select('data,updated_at');
     if (!rows) return;
 
     let streakSum=0, listSum=0, ratingSum=0, ratingN=0, levelSum=0;
+    let totalEntries=0, totalCompleted=0, longestStreak=0;
     const genres={}, statuses={};
+    const monthCounts={};
+    const xpBuckets={'0-99':0,'100-499':0,'500-999':0,'1k-4.9k':0,'5k+':0};
 
     rows.forEach(r => {
         const d=r.data;
-        if (d?.streak?.count) streakSum+=d.streak.count;
-        if (d?.items) {
-            listSum+=d.items.length;
+        if (!d) return;
+        if (d.streak?.count) { streakSum+=d.streak.count; if(d.streak.count>longestStreak) longestStreak=d.streak.count; }
+        if (d.items) {
+            listSum+=d.items.length; totalEntries+=d.items.length;
+            totalCompleted += d.items.filter(i=>i.status==='completed').length;
             d.items.forEach(i => {
                 if (i.rating){ ratingSum+=i.rating; ratingN++; }
                 if (i.genre) genres[i.genre]=(genres[i.genre]||0)+1;
                 if (i.status) statuses[i.status]=(statuses[i.status]||0)+1;
+                if (i.addedDate) {
+                    const m=i.addedDate.substring(0,7);
+                    monthCounts[m]=(monthCounts[m]||0)+1;
+                }
             });
         }
-        if (d?.xp?.level) levelSum+=d.xp.level;
+        if (d.xp?.level) levelSum+=d.xp.level;
+        const xp = d.xp?.total||0;
+        if (xp<100) xpBuckets['0-99']++;
+        else if (xp<500) xpBuckets['100-499']++;
+        else if (xp<1000) xpBuckets['500-999']++;
+        else if (xp<5000) xpBuckets['1k-4.9k']++;
+        else xpBuckets['5k+']++;
+        // Monthly registrations (by updated_at as proxy)
+        if (r.updated_at) {
+            const m=r.updated_at.substring(0,7);
+        }
     });
 
-    const n = rows.length||1;
+    const n=rows.length||1;
     document.getElementById('a-streak').textContent = (streakSum/n).toFixed(1);
     document.getElementById('a-list').textContent   = (listSum/n).toFixed(1);
     document.getElementById('a-rating').textContent = ratingN?(ratingSum/ratingN).toFixed(1):'0';
     document.getElementById('a-level').textContent  = (levelSum/n).toFixed(1);
+    document.getElementById('a-complete-rate').textContent = totalEntries ? Math.round((totalCompleted/totalEntries)*100)+'%' : '0%';
+    document.getElementById('a-longest-streak').textContent = longestStreak;
 
-    const gL = Object.keys(genres).slice(0,8);
+    const gL=Object.keys(genres).sort((a,b)=>genres[b]-genres[a]).slice(0,10);
     drawBar('chartGenre', gL, gL.map(g=>genres[g]));
+    const sMap={watching:'▶ İzleniyor',completed:'✅ Tamamlandı',plantowatch:'📋 Planlı',onhold:'⏸ Beklemede',dropped:'❌ Bırakıldı'};
+    const sL=Object.keys(statuses);
+    drawDonut('chartStatus2', sL.map(k=>sMap[k]||k), sL.map(k=>statuses[k]), ['#00d4ff','#10b981','#7c3aed','#f59e0b','#ef4444']);
 
-    const sMap = {watching:'▶ Watching',completed:'✅ Completed',plantowatch:'📋 Plan',onhold:'⏸ On Hold',dropped:'❌ Dropped'};
-    const sL = Object.keys(statuses);
-    drawDonut('chartStatus', sL.map(k=>sMap[k]||k), sL.map(k=>statuses[k]), ['#00d4ff','#10b981','#7c3aed','#f59e0b','#ef4444']);
+    // Monthly
+    const months=Object.keys(monthCounts).sort().slice(-6);
+    drawBar('chartMonthly', months, months.map(m=>monthCounts[m]), ['#ff3366','#f97316','#f59e0b','#10b981','#00d4ff','#a855f7']);
+
+    // XP distribution
+    const xpK=Object.keys(xpBuckets);
+    drawBar('chartXP', xpK, xpK.map(k=>xpBuckets[k]), ['#8b5cf6']);
 
     // Top users
-    const sorted = rows.map(r=>r.data).sort((a,b)=>(b?.xp?.total||0)-(a?.xp?.total||0)).slice(0,10);
+    const sorted=rows.map(r=>r.data).filter(Boolean).sort((a,b)=>(b?.xp?.total||0)-(a?.xp?.total||0)).slice(0,10);
     document.getElementById('topUsersBody').innerHTML = sorted.map((d,i)=>`<tr>
-        <td><strong>#${i+1}</strong></td>
-        <td><div class="user-cell"><div class="user-av">${d?.social?.avatar||'👤'}</div><div class="user-name">${d?.social?.name||'User'}</div></div></td>
+        <td><strong ${i<3?`style="color:${['#fbbf24','#94a3b8','#cd7c4a'][i]}"`:''}>#${i+1}</strong></td>
+        <td><div class="user-cell"><div class="user-av">${d?.social?.avatar||'👤'}</div><div><div class="user-name">${esc(d?.social?.name||'Kullanıcı')}</div><div class="user-email">${esc(d?.social?.email||'')}</div></div></div></td>
         <td><strong style="color:var(--yellow)">${(d?.xp?.total||0).toLocaleString()}</strong></td>
         <td><span class="badge bg-purple">Lv.${d?.xp?.level||1}</span></td>
         <td>${d?.items?.length||0}</td>
-        <td>🔥${d?.streak?.count||0}</td>
+        <td>🔥 ${d?.streak?.count||0}</td>
+        <td>${d?.items?.filter(i=>i.status==='completed').length||0}</td>
     </tr>`).join('');
 }
 
 // ===== USERS =====
 async function loadUsers() {
-    document.getElementById('usersBody').innerHTML = '<tr class="loading-td"><td colspan="7"><span class="spinner"></span>Loading…</td></tr>';
+    document.getElementById('usersBody').innerHTML = '<tr class="loading-td"><td colspan="8"><span class="spinner"></span>Yükleniyor…</td></tr>';
     const { data, error } = await sb.from('user_data').select('user_id,data,updated_at').order('updated_at',{ascending:false});
-    if (error) { toast('Error: '+error.message,'error'); return; }
+    if (error) { toast('Hata: '+error.message,'error'); return; }
     allUsers = data||[];
     usersPage=1;
     renderUsers();
 }
 
 function renderUsers() {
-    const q = (document.getElementById('userSearch')?.value||'').toLowerCase();
-    let filtered = allUsers;
-    if (q) filtered = filtered.filter(u => {
+    const q=(document.getElementById('userSearch')?.value||'').toLowerCase();
+    const statusF=document.getElementById('userStatusF')?.value||'all';
+    const sortBy=document.getElementById('userSort')?.value||'newest';
+
+    let filtered=allUsers;
+    if (q) filtered=filtered.filter(u=>{
         const n=(u.data?.social?.name||'').toLowerCase();
         const e=(u.data?.social?.email||'').toLowerCase();
         return n.includes(q)||e.includes(q)||u.user_id.includes(q);
     });
+    if (statusF==='active')  filtered=filtered.filter(u=>!u.data?.banned);
+    if (statusF==='banned')  filtered=filtered.filter(u=>u.data?.banned);
+
+    if (sortBy==='oldest')  filtered=[...filtered].sort((a,b)=>a.updated_at>b.updated_at?1:-1);
+    if (sortBy==='xp')      filtered=[...filtered].sort((a,b)=>(b.data?.xp?.total||0)-(a.data?.xp?.total||0));
+    if (sortBy==='entries') filtered=[...filtered].sort((a,b)=>(b.data?.items?.length||0)-(a.data?.items?.length||0));
 
     const total=filtered.length, pages=Math.ceil(total/PER_PAGE)||1;
+    if (usersPage>pages) usersPage=1;
     const slice=filtered.slice((usersPage-1)*PER_PAGE, usersPage*PER_PAGE);
-
-    document.getElementById('usersPageInfo').textContent = `${total} users • Page ${usersPage}/${pages}`;
+    document.getElementById('usersPageInfo').textContent=`${total} kullanıcı • Sayfa ${usersPage}/${pages}`;
     renderPag('usersPageBtns', pages, usersPage, p=>{ usersPage=p; renderUsers(); });
 
-    const tbody = document.getElementById('usersBody');
-    if (!slice.length) { tbody.innerHTML='<tr><td colspan="7"><div class="empty-state"><div class="ei">👤</div><h3>No users found</h3></div></td></tr>'; return; }
-    tbody.innerHTML = slice.map(u => {
+    const now15 = new Date(Date.now()-15*60*1000).toISOString();
+    const tbody=document.getElementById('usersBody');
+    if (!slice.length){tbody.innerHTML='<tr><td colspan="8"><div class="empty-state"><div class="ei">👤</div><h3>Kullanıcı bulunamadı</h3></div></td></tr>';return;}
+    tbody.innerHTML=slice.map(u=>{
         const d=u.data, banned=d?.banned;
-        const name=d?.social?.name||'User';
+        const name=d?.social?.name||'Kullanıcı';
+        const isOnline = u.updated_at > now15;
+        const completedCount = d?.items?.filter(i=>i.status==='completed').length||0;
         return `<tr>
-            <td><div class="user-cell"><div class="user-av">${d?.social?.avatar||'👤'}</div>
-            <div><div class="user-name">${esc(name)}</div><div class="user-email mono">${u.user_id.substring(0,12)}…</div></div></div></td>
+            <td><div class="user-cell">
+                <div class="user-av" style="position:relative;">${d?.social?.avatar||'👤'}${isOnline&&!banned?'<div style="position:absolute;bottom:0;right:0;width:8px;height:8px;background:var(--green);border-radius:50%;border:2px solid var(--card);"></div>':''}
+                </div>
+                <div><div class="user-name">${esc(name)}</div><div class="user-email mono">${u.user_id.substring(0,12)}…</div></div>
+            </div></td>
             <td style="color:var(--text2);font-size:.82rem;">${esc(d?.social?.email||'—')}</td>
             <td style="color:var(--text2);font-size:.82rem;">${fmtDate(u.updated_at)}</td>
-            <td><strong style="color:var(--yellow)">${(d?.xp?.total||0).toLocaleString()}</strong></td>
-            <td>${d?.items?.length||0}</td>
-            <td>${banned?'<span class="badge bg-red">🚫 Banned</span>':'<span class="badge bg-green">✅ Active</span>'}</td>
+            <td><strong style="color:var(--yellow);">${(d?.xp?.total||0).toLocaleString()}</strong> <span class="badge bg-purple" style="font-size:.65rem;">Lv.${d?.xp?.level||1}</span></td>
+            <td><span style="font-weight:600;">${d?.items?.length||0}</span> <span style="font-size:.75rem;color:var(--text2);">(${completedCount}✓)</span></td>
+            <td>🔥 ${d?.streak?.count||0}</td>
+            <td>${banned?'<span class="badge bg-red">🚫 Banlı</span>':isOnline?'<span class="badge bg-green">🟢 Online</span>':'<span class="badge bg-blue">✅ Aktif</span>'}</td>
             <td><div class="act-btns">
-                <button class="act-btn btn-view" onclick='viewUser(${JSON.stringify({uid:u.user_id,data:u.data})})'>👁 View</button>
+                <button class="act-btn btn-view" onclick='viewUser(${JSON.stringify({uid:u.user_id,data:u.data})})'>👁</button>
+                <button class="act-btn btn-entries" onclick='openUserEntries(${JSON.stringify({uid:u.user_id,data:u.data})})'>📋</button>
+                <button class="act-btn btn-warn" onclick="openWarnModal('${u.user_id}','${esc(name)}')">⚠️</button>
                 ${banned
-                    ? `<button class="act-btn btn-unban" onclick="setBan('${u.user_id}',false,'${esc(name)}')">✅ Unban</button>`
-                    : `<button class="act-btn btn-ban"   onclick="confirmBan('${u.user_id}','${esc(name)}')">🚫 Ban</button>`}
+                    ?`<button class="act-btn btn-unban" onclick="setBan('${u.user_id}',false,'${esc(name)}')">✅</button>`
+                    :`<button class="act-btn btn-ban" onclick="confirmBan('${u.user_id}','${esc(name)}')">🚫</button>`}
             </div></td>
         </tr>`;
     }).join('');
 }
 
-function filterUsers() { usersPage=1; renderUsers(); }
+function filterUsers(){usersPage=1;renderUsers();}
 
 function viewUser(u) {
     const d=u.data;
-    document.getElementById('userModalContent').innerHTML = `
-        <div class="detail-grid">
-            <div class="detail-item"><label>Username</label><strong>${esc(d?.social?.name||'—')}</strong></div>
-            <div class="detail-item"><label>Email</label><strong style="font-size:.82rem;">${esc(d?.social?.email||'—')}</strong></div>
-            <div class="detail-item"><label>Level</label><strong>Lv.${d?.xp?.level||1}</strong></div>
-            <div class="detail-item"><label>Total XP</label><strong style="color:var(--yellow)">${(d?.xp?.total||0).toLocaleString()}</strong></div>
-            <div class="detail-item"><label>Entries</label><strong>${d?.items?.length||0}</strong></div>
-            <div class="detail-item"><label>Completed</label><strong>${d?.items?.filter(i=>i.status==='completed').length||0}</strong></div>
-            <div class="detail-item"><label>Streak</label><strong>🔥 ${d?.streak?.count||0} days</strong></div>
-            <div class="detail-item"><label>Achievements</label><strong>🏆 ${d?.achievements?.length||0}</strong></div>
+    const completedCount = d?.items?.filter(i=>i.status==='completed').length||0;
+    const watchingCount  = d?.items?.filter(i=>i.status==='watching').length||0;
+    const droppedCount   = d?.items?.filter(i=>i.status==='dropped').length||0;
+    const plannedCount   = d?.items?.filter(i=>i.status==='plantowatch').length||0;
+    const avgRating      = d?.items?.filter(i=>i.rating).length ? (d.items.filter(i=>i.rating).reduce((s,i)=>s+i.rating,0)/d.items.filter(i=>i.rating).length).toFixed(1) : '—';
+
+    document.getElementById('userModalContent').innerHTML=`
+        <div class="detail-tabs">
+            <button class="detail-tab active" onclick="switchDetailTab('info')">📊 Bilgiler</button>
+            <button class="detail-tab" onclick="switchDetailTab('items')">📋 İstatistikler</button>
+            <button class="detail-tab" onclick="switchDetailTab('raw')">🔧 Ham Veri</button>
         </div>
-        <div><label class="fg" style="display:block;margin-bottom:.3rem;">User ID</label>
-        <div class="mono" style="background:var(--bg3);padding:.5rem .8rem;border-radius:6px;font-size:.78rem;word-break:break-all;">${u.uid}</div></div>`;
+        <div class="detail-tab-pane active" id="dtab-info">
+            <div class="detail-grid">
+                <div class="detail-item"><label>Kullanıcı Adı</label><strong>${esc(d?.social?.name||'—')}</strong></div>
+                <div class="detail-item"><label>E-posta</label><strong style="font-size:.82rem;">${esc(d?.social?.email||'—')}</strong></div>
+                <div class="detail-item"><label>Level</label><strong>Lv.${d?.xp?.level||1}</strong></div>
+                <div class="detail-item"><label>Toplam XP</label><strong style="color:var(--yellow)">${(d?.xp?.total||0).toLocaleString()}</strong></div>
+                <div class="detail-item"><label>Streak</label><strong>🔥 ${d?.streak?.count||0} gün</strong></div>
+                <div class="detail-item"><label>En Uzun Streak</label><strong>${d?.streak?.longest||0} gün</strong></div>
+                <div class="detail-item"><label>Başarımlar</label><strong>🏆 ${d?.achievements?.length||0}</strong></div>
+                <div class="detail-item"><label>Durum</label><strong>${d?.banned?'🚫 Banlı':'✅ Aktif'}</strong></div>
+            </div>
+            ${d?.ban_reason?`<div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:.8rem;margin-top:.5rem;font-size:.83rem;color:var(--red);">Ban Sebebi: ${esc(d.ban_reason)}</div>`:''}
+            <div style="margin-top:.8rem;"><label style="font-size:.75rem;color:var(--text2);display:block;margin-bottom:.3rem;">User ID</label>
+            <div class="mono" style="background:var(--bg3);padding:.5rem .8rem;border-radius:6px;font-size:.75rem;word-break:break-all;">${u.uid}</div></div>
+        </div>
+        <div class="detail-tab-pane" id="dtab-items">
+            <div class="detail-grid">
+                <div class="detail-item"><label>Toplam Giriş</label><strong>${d?.items?.length||0}</strong></div>
+                <div class="detail-item"><label>Tamamlanan</label><strong style="color:var(--green)">${completedCount}</strong></div>
+                <div class="detail-item"><label>İzleniyor</label><strong style="color:var(--accent2)">${watchingCount}</strong></div>
+                <div class="detail-item"><label>Planlanan</label><strong style="color:var(--accent3)">${plannedCount}</strong></div>
+                <div class="detail-item"><label>Bırakılan</label><strong style="color:var(--red)">${droppedCount}</strong></div>
+                <div class="detail-item"><label>Ort. Puan</label><strong>${avgRating} / 10</strong></div>
+                <div class="detail-item"><label>Anime</label><strong>${d?.items?.filter(i=>i.type==='anime').length||0}</strong></div>
+                <div class="detail-item"><label>Manga+Webtoon</label><strong>${d?.items?.filter(i=>i.type!=='anime').length||0}</strong></div>
+            </div>
+        </div>
+        <div class="detail-tab-pane" id="dtab-raw">
+            <pre style="background:var(--bg3);padding:1rem;border-radius:8px;font-size:.72rem;overflow:auto;max-height:300px;color:var(--text2);">${JSON.stringify({xp:d?.xp,streak:d?.streak,achievements:d?.achievements?.length+' adet',items:d?.items?.length+' adet'},null,2)}</pre>
+        </div>`;
     openModal('userModal');
 }
 
-// Ban modal state
-let _banUid = null;
-let _banName = null;
-
-function confirmBan(uid, name) {
-    _banUid = uid;
-    _banName = name;
-    document.getElementById('banTargetName').textContent = name;
-    document.getElementById('banTargetId').textContent = uid.substring(0,16) + '…';
-    document.getElementById('banReasonInput').value = '';
-    document.getElementById('banDuration').value = 'permanent';
-    document.querySelectorAll('.ban-chip').forEach(c => c.classList.remove('active'));
-    document.getElementById('banModalOverlay').classList.add('open');
+function switchDetailTab(tab) {
+    document.querySelectorAll('.detail-tab').forEach((t,i)=>t.classList.toggle('active',['info','items','raw'][i]===tab));
+    document.querySelectorAll('.detail-tab-pane').forEach(p=>p.classList.remove('active'));
+    document.getElementById('dtab-'+tab)?.classList.add('active');
 }
 
-function closeBanModal(e) {
-    if (e && e.target !== document.getElementById('banModalOverlay')) return;
-    document.getElementById('banModalOverlay').classList.remove('open');
+// ===== USER ENTRIES MODAL =====
+function openUserEntries(u) {
+    const d = u.data;
+    const name = d?.social?.name || 'Kullanıcı';
+    const items = d?.items || [];
+    _entriesAll = items;
+    document.getElementById('entriesModalTitle').textContent = `${name} — İçerik Listesi`;
+    document.getElementById('entriesModalSub').textContent = `${items.length} giriş · ${items.filter(i=>i.status==='completed').length} tamamlandı`;
+    filterEntries('all');
+    document.getElementById('entriesModalOverlay').classList.add('open');
 }
 
-function selectChip(el, reason) {
-    document.querySelectorAll('.ban-chip').forEach(c => c.classList.remove('active'));
-    el.classList.add('active');
-    document.getElementById('banReasonInput').value = reason;
-}
-
-async function executeBan() {
-    const reason = document.getElementById('banReasonInput').value.trim() || 'Kural ihlali';
-    const duration = document.getElementById('banDuration').value;
-    document.getElementById('banModalOverlay').classList.remove('open');
-    await setBan(_banUid, true, _banName, reason, duration);
-}
-
-async function setBan(uid, ban, name, reason='Kural ihlali', duration='permanent') {
-    const { data: row, error } = await sb.from('user_data').select('data').eq('user_id',uid).single();
-    if (error||!row) { toast('Kullanıcı bulunamadı','error'); return; }
-    const banExpiry = duration === 'permanent' ? null : new Date(Date.now() + parseInt(duration)*86400000).toISOString();
-    const newData = { ...row.data, banned: ban, ban_reason: ban ? reason : null, ban_expiry: ban ? banExpiry : null, ban_date: ban ? new Date().toISOString() : null };
-    const { error: e2 } = await sb.from('user_data')
-        .update({ data: newData, updated_at: new Date().toISOString() })
-        .eq('user_id', uid);
-    if (e2) { toast('Güncelleme hatası: '+e2.message,'error'); return; }
-    toast(ban ? `🚫 ${name} banlandı` : `✅ ${name} ban kaldırıldı`, ban?'error':'success');
-    loadUsers();
-    if (!ban) loadBans();
-}
-
-function exportCSV() {
-    const rows=[['UserID','Name','Email','Level','XP','Entries','Streak','Status']];
-    allUsers.forEach(u=>{
-        const d=u.data;
-        rows.push([u.user_id, d?.social?.name||'', d?.social?.email||'', d?.xp?.level||1, d?.xp?.total||0, d?.items?.length||0, d?.streak?.count||0, d?.banned?'Banned':'Active']);
+function filterEntries(type) {
+    ['All','Anime','Manga','Webtoon'].forEach(t=>{
+        const el = document.getElementById('entTab'+t);
+        if (el) el.classList.toggle('active', type==='all'?t==='All':t.toLowerCase()===type);
     });
-    const blob = new Blob([rows.map(r=>r.join(',')).join('\n')],{type:'text/csv'});
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);
-    a.download='tobilist_users_'+new Date().toISOString().split('T')[0]+'.csv';
-    a.click();
-    toast('📥 CSV exported','success');
+    const items = type==='all' ? _entriesAll : _entriesAll.filter(i=>i.type===type);
+    _entriesFiltered = items;
+    const body = document.getElementById('entriesModalBody');
+    if (!items.length) { body.innerHTML='<div class="empty-state"><div class="ei">📋</div><h3>Bu kategoride giriş yok</h3></div>'; return; }
+    const sm={watching:'<span class="badge bg-blue" style="font-size:.65rem;">▶ İzleniyor</span>',completed:'<span class="badge bg-green" style="font-size:.65rem;">✅ Tamamlandı</span>',plantowatch:'<span class="badge bg-purple" style="font-size:.65rem;">📋 Planlı</span>',onhold:'<span class="badge bg-yellow" style="font-size:.65rem;">⏸ Beklemede</span>',dropped:'<span class="badge bg-red" style="font-size:.65rem;">❌ Bırakıldı</span>'};
+    const typeIcons={anime:'🎬',manga:'📚',webtoon:'🌐'};
+    body.innerHTML = items.map(i=>`
+        <div class="entries-item">
+            <div class="entries-cover">${typeIcons[i.type]||'📄'}</div>
+            <div style="flex:1;min-width:0;">
+                <div style="font-weight:600;font-size:.88rem;margin-bottom:.15rem;">${esc(i.name||'—')}</div>
+                <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
+                    ${sm[i.status]||''}
+                    ${i.rating?`<span style="font-size:.72rem;color:var(--yellow);">⭐ ${i.rating}/10</span>`:''}
+                    ${i.addedDate?`<span style="font-size:.72rem;color:var(--text2);">${fmtDate(i.addedDate)}</span>`:''}
+                </div>
+            </div>
+            <span class="badge ${i.type==='anime'?'bg-red':i.type==='manga'?'bg-blue':'bg-purple'}" style="font-size:.65rem;flex-shrink:0;">${i.type||'?'}</span>
+        </div>`).join('');
+}
+
+function closeEntriesModal(e) {
+    if (e && e.target !== document.getElementById('entriesModalOverlay')) return;
+    document.getElementById('entriesModalOverlay').classList.remove('open');
+}
+
+// ===== ONLINE PAGE =====
+async function loadOnline() {
+    document.getElementById('onlineBody').innerHTML='<tr class="loading-td"><td colspan="5"><span class="spinner"></span>Yükleniyor…</td></tr>';
+    const { data } = await sb.from('user_data').select('user_id,data,updated_at').order('updated_at',{ascending:false});
+    const now15  = new Date(Date.now()-15*60*1000).toISOString();
+    const now1h  = new Date(Date.now()-60*60*1000).toISOString();
+    const today  = new Date(); today.setHours(0,0,0,0);
+    const users = data||[];
+    const online = users.filter(u=>u.updated_at>now15&&!u.data?.banned);
+    const hour1  = users.filter(u=>u.updated_at>now1h&&!u.data?.banned);
+    const todayA = users.filter(u=>new Date(u.updated_at)>=today&&!u.data?.banned);
+    document.getElementById('o-online').textContent = online.length;
+    document.getElementById('o-hour').textContent   = hour1.length;
+    document.getElementById('o-today').textContent  = todayA.length;
+    document.getElementById('onlineBadge').textContent = online.length;
+    document.getElementById('sideOnlineCount').textContent = `${online.length} kullanıcı online`;
+
+    const tbody=document.getElementById('onlineBody');
+    if (!online.length){tbody.innerHTML='<tr><td colspan="5"><div class="empty-state"><div class="ei">😴</div><h3>Şu an kimse online değil</h3><p>Son 15 dakikada aktif kullanıcı yok</p></div></td></tr>';return;}
+    tbody.innerHTML=online.map(u=>{
+        const d=u.data;
+        return `<tr>
+            <td><div class="user-cell">
+                <div class="user-av" style="position:relative;">${d?.social?.avatar||'👤'}<div style="position:absolute;bottom:0;right:0;width:9px;height:9px;background:var(--green);border-radius:50%;border:2px solid var(--card);animation:pulse 2s infinite;"></div></div>
+                <div><div class="user-name">${esc(d?.social?.name||'Kullanıcı')}</div><div class="user-email">${esc(d?.social?.email||'')}</div></div>
+            </div></td>
+            <td style="color:var(--green);font-size:.82rem;">🟢 ${fmtRelative(u.updated_at)}</td>
+            <td><span class="badge bg-purple">Lv.${d?.xp?.level||1}</span></td>
+            <td>${d?.items?.length||0}</td>
+            <td><span class="badge bg-green">Online</span></td>
+        </tr>`;
+    }).join('');
 }
 
 // ===== BANS =====
+let allBanData = [];
 async function loadBans() {
     const { data } = await sb.from('user_data').select('user_id,data,updated_at');
-    const banned = (data||[]).filter(u=>u.data?.banned);
-    const tbody  = document.getElementById('bansBody');
-    if (!banned.length) {
-        tbody.innerHTML='<tr><td colspan="4"><div class="empty-state"><div class="ei">✅</div><h3>No banned users</h3><p>All users are in good standing.</p></div></td></tr>';
-        return;
-    }
-    tbody.innerHTML = banned.map(u=>{
-        const d=u.data, name=esc(d?.social?.name||'User');
+    allBanData = (data||[]).filter(u=>u.data?.banned);
+    document.getElementById('banCountBadge').textContent = allBanData.length;
+    document.getElementById('banCountBadge').style.display = allBanData.length>0?'':'none';
+    filterBans();
+}
+function filterBans() {
+    const q=(document.getElementById('banSearch')?.value||'').toLowerCase();
+    const filtered = q ? allBanData.filter(u=>(u.data?.social?.name||'').toLowerCase().includes(q)||(u.data?.social?.email||'').toLowerCase().includes(q)) : allBanData;
+    const tbody=document.getElementById('bansBody');
+    if (!filtered.length){tbody.innerHTML='<tr><td colspan="5"><div class="empty-state"><div class="ei">✅</div><h3>Banlı kullanıcı yok</h3><p>Tüm kullanıcılar aktif durumda.</p></div></td></tr>';return;}
+    tbody.innerHTML=filtered.map(u=>{
+        const d=u.data, name=esc(d?.social?.name||'Kullanıcı');
         const reason=d?.ban_reason||'Kural ihlali';
-        const expiry=d?.ban_expiry ? `<span style="color:var(--text2);font-size:0.8rem;">⏱ ${fmtDate(d.ban_expiry)}'e kadar</span>` : '<span class="badge bg-red">♾️ Kalıcı</span>';
+        const isPermanent = !d?.ban_expiry;
+        const expiry = isPermanent ? '<span class="badge bg-red">♾️ Kalıcı</span>' : `<span class="badge bg-yellow">⏱ ${fmtDate(d.ban_expiry)}'e kadar</span>`;
         return `<tr>
-        <td><div class="user-cell"><div class="user-av">🚫</div>
-        <div><div class="user-name">${name}</div><div class="user-email mono">${u.user_id.substring(0,12)}…</div></div></div></td>
-        <td style="color:var(--text2);">${fmtDate(u.updated_at)}</td>
-        <td><div style="display:flex;flex-direction:column;gap:0.25rem;"><span class="badge bg-red">${esc(reason)}</span>${expiry}</div></td>
-        <td><button class="act-btn btn-unban" onclick="setBan('${u.user_id}',false,'${name}')">✅ Banı Kaldır</button></td>
-    </tr>`;}).join('');
+            <td><div class="user-cell"><div class="user-av" style="background:linear-gradient(135deg,var(--red),#7c1010);">🚫</div>
+            <div><div class="user-name">${name}</div><div class="user-email">${esc(d?.social?.email||'')} — <span class="mono" style="font-size:.72rem;">${u.user_id.substring(0,10)}…</span></div></div></div></td>
+            <td style="color:var(--text2);font-size:.82rem;">${fmtDate(u.updated_at)}</td>
+            <td><span class="badge bg-red">${esc(reason)}</span></td>
+            <td>${expiry}</td>
+            <td><div class="act-btns">
+                <button class="act-btn btn-view" onclick='viewUser(${JSON.stringify({uid:u.user_id,data:u.data})})'>👁 Detay</button>
+                <button class="act-btn btn-unban" onclick="setBan('${u.user_id}',false,'${name}')">✅ Banı Kaldır</button>
+            </div></td>
+        </tr>`;
+    }).join('');
 }
 
 // ===== CONTENT =====
 async function loadContent() {
-    document.getElementById('contentBody').innerHTML='<tr class="loading-td"><td colspan="6"><span class="spinner"></span>Loading…</td></tr>';
+    document.getElementById('contentBody').innerHTML='<tr class="loading-td"><td colspan="6"><span class="spinner"></span>Yükleniyor…</td></tr>';
     const { data } = await sb.from('user_data').select('user_id,data');
-    const typeF = document.getElementById('contentTypeF')?.value||'all';
+    const typeF=document.getElementById('contentTypeF')?.value||'all';
     allContent=[];
     (data||[]).forEach(u=>{
         (u.data?.items||[]).forEach(item=>{
-            if (typeF==='all'||item.type===typeF)
-                allContent.push({...item, _uid:u.user_id, _uname:u.data?.social?.name||'User'});
+            if(typeF==='all'||item.type===typeF)
+                allContent.push({...item, _uid:u.user_id, _uname:u.data?.social?.name||'Kullanıcı', _email:u.data?.social?.email||''});
         });
     });
     contentPage=1;
-    renderContent();
+    filterContent();
 }
 
-function renderContent() {
+function filterContent() {
     const q=(document.getElementById('contentSearch')?.value||'').toLowerCase();
+    const statusF=document.getElementById('contentStatusF')?.value||'all';
     let filtered=allContent;
-    if (q) filtered=filtered.filter(i=>(i.name||'').toLowerCase().includes(q));
+    if (q) filtered=filtered.filter(i=>(i.name||'').toLowerCase().includes(q)||(i._uname||'').toLowerCase().includes(q));
+    if (statusF!=='all') filtered=filtered.filter(i=>i.status===statusF);
 
     const total=filtered.length, pages=Math.ceil(total/PER_PAGE)||1;
-    const slice=filtered.slice((contentPage-1)*PER_PAGE, contentPage*PER_PAGE);
+    if (contentPage>pages) contentPage=1;
+    const slice=filtered.slice((contentPage-1)*PER_PAGE,contentPage*PER_PAGE);
+    document.getElementById('contentPageInfo').textContent=`${total} giriş • Sayfa ${contentPage}/${pages}`;
+    renderPag('contentPageBtns', pages, contentPage, p=>{contentPage=p;filterContent();});
 
-    document.getElementById('contentPageInfo').textContent=`${total} entries`;
-    renderPag('contentPageBtns', pages, contentPage, p=>{ contentPage=p; renderContent(); });
-
-    const tb={'anime':'bg-red','manga':'bg-blue','webtoon':'bg-purple'};
-    const sm={watching:'<span class="badge bg-blue">▶ Watching</span>',completed:'<span class="badge bg-green">✅ Completed</span>',plantowatch:'<span class="badge bg-purple">📋 Plan</span>',onhold:'<span class="badge bg-yellow">⏸ Hold</span>',dropped:'<span class="badge bg-red">❌ Dropped</span>'};
-
+    const tb={anime:'bg-red',manga:'bg-blue',webtoon:'bg-purple'};
+    const sm={watching:'<span class="badge bg-blue">▶</span>',completed:'<span class="badge bg-green">✅</span>',plantowatch:'<span class="badge bg-purple">📋</span>',onhold:'<span class="badge bg-yellow">⏸</span>',dropped:'<span class="badge bg-red">❌</span>'};
     const tbody=document.getElementById('contentBody');
-    if (!slice.length){tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><div class="ei">🎬</div><h3>No content found</h3></div></td></tr>';return;}
+    if (!slice.length){tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><div class="ei">🎬</div><h3>İçerik bulunamadı</h3></div></td></tr>';return;}
     tbody.innerHTML=slice.map(i=>`<tr>
         <td><strong>${esc(i.name||'—')}</strong></td>
-        <td><span class="badge ${tb[i.type]||'bg-blue'}">${i.type}</span></td>
-        <td style="color:var(--text2);font-size:.82rem;">${esc(i._uname)}</td>
-        <td>${sm[i.status]||i.status}</td>
-        <td>${i.rating?'⭐'.repeat(Math.min(i.rating,5)):'—'}</td>
+        <td><span class="badge ${tb[i.type]||'bg-blue'}">${i.type||'?'}</span></td>
+        <td><div style="font-size:.83rem;"><div style="font-weight:600;">${esc(i._uname)}</div><div style="color:var(--text2);font-size:.75rem;">${esc(i._email)}</div></div></td>
+        <td>${sm[i.status]||i.status||'—'}</td>
+        <td>${i.rating?`<strong style="color:var(--yellow);">${i.rating}</strong><span style="color:var(--text2);font-size:.78rem;">/10</span>`:'—'}</td>
         <td style="color:var(--text2);font-size:.82rem;">${i.addedDate?fmtDate(i.addedDate):'—'}</td>
     </tr>`).join('');
 }
 
-function filterContent(){contentPage=1;renderContent();}
+// ===== REVIEWS =====
+async function loadReviews() {
+    document.getElementById('reviewsBody').innerHTML='<tr class="loading-td"><td colspan="6"><span class="spinner"></span>Yükleniyor…</td></tr>';
+    const sortBy=document.getElementById('reviewSort')?.value||'newest';
+    let query = sb.from('reviews').select('*');
+    if (sortBy==='newest')      query=query.order('updated_at',{ascending:false});
+    else if (sortBy==='oldest') query=query.order('updated_at',{ascending:true});
+    else if (sortBy==='rating_high') query=query.order('rating',{ascending:false});
+    else if (sortBy==='rating_low')  query=query.order('rating',{ascending:true});
+    const { data, error } = await query.limit(500);
+    if (error) { document.getElementById('reviewsBody').innerHTML=`<tr><td colspan="6"><div class="empty-state"><div class="ei">💬</div><h3>Yorumlar yüklenemedi</h3><p>${error.message}</p></div></td></tr>`; return; }
+    allReviews = data||[];
+    reviewsPage=1;
+    filterReviews();
+}
+
+function filterReviews() {
+    const q=(document.getElementById('reviewSearch')?.value||'').toLowerCase();
+    let filtered = q ? allReviews.filter(r=>(r.comment||'').toLowerCase().includes(q)||(r.username||'').toLowerCase().includes(q)||(r.content_name||'').toLowerCase().includes(q)) : allReviews;
+    const total=filtered.length, pages=Math.ceil(total/PER_PAGE)||1;
+    if (reviewsPage>pages) reviewsPage=1;
+    const slice=filtered.slice((reviewsPage-1)*PER_PAGE,reviewsPage*PER_PAGE);
+    document.getElementById('reviewsPageInfo').textContent=`${total} yorum • Sayfa ${reviewsPage}/${pages}`;
+    renderPag('reviewsPageBtns', pages, reviewsPage, p=>{reviewsPage=p;filterReviews();});
+    const tbody=document.getElementById('reviewsBody');
+    if (!slice.length){tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><div class="ei">💬</div><h3>Yorum bulunamadı</h3></div></td></tr>';return;}
+    tbody.innerHTML=slice.map(r=>`<tr>
+        <td><div class="user-cell"><div class="user-av">${(r.username||'?')[0].toUpperCase()}</div><div class="user-name">${esc(r.username||'Anonim')}</div></div></td>
+        <td style="max-width:150px;"><div style="font-size:.83rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(r.content_name||'—')}</div><div style="font-size:.72rem;color:var(--text2);">${r.content_type||''}</div></td>
+        <td>${r.rating?`<strong style="color:var(--yellow);">${r.rating}</strong>/10`:'—'}</td>
+        <td style="max-width:200px;"><div style="font-size:.83rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text2);">${esc(r.comment||'—')}</div></td>
+        <td style="color:var(--text2);font-size:.78rem;">${fmtRelative(r.updated_at)}</td>
+        <td><button class="act-btn btn-del" onclick="deleteReviewAdmin('${r.id}')">🗑</button></td>
+    </tr>`).join('');
+}
+
+async function deleteReviewAdmin(id) {
+    if (!confirm('Bu yorumu silmek istediğine emin misin?')) return;
+    const { error } = await sb.from('reviews').delete().eq('id', id);
+    if (error) { toast('Hata: '+error.message,'error'); return; }
+    toast('🗑 Yorum silindi','info');
+    loadReviews();
+}
+
+// ===== BAN ACTIONS =====
+function confirmBan(uid, name) {
+    _banUid=uid; _banName=name;
+    document.getElementById('banTargetName').textContent=name;
+    document.getElementById('banTargetId').textContent=uid.substring(0,16)+'…';
+    document.getElementById('banReasonInput').value='';
+    document.getElementById('banDuration').value='permanent';
+    document.querySelectorAll('.ban-chip').forEach(c=>c.classList.remove('active'));
+    document.getElementById('banModalOverlay').classList.add('open');
+}
+function closeBanModal(e) {
+    if (e && e.target!==document.getElementById('banModalOverlay')) return;
+    document.getElementById('banModalOverlay').classList.remove('open');
+}
+function selectChip(el, reason) {
+    document.querySelectorAll('.ban-chip').forEach(c=>c.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('banReasonInput').value=reason;
+}
+async function executeBan() {
+    const reason=document.getElementById('banReasonInput').value.trim()||'Kural ihlali';
+    const duration=document.getElementById('banDuration').value;
+    document.getElementById('banModalOverlay').classList.remove('open');
+    await setBan(_banUid, true, _banName, reason, duration);
+}
+async function setBan(uid, ban, name, reason='Kural ihlali', duration='permanent') {
+    const { data: row, error } = await sb.from('user_data').select('data').eq('user_id',uid).single();
+    if (error||!row) { toast('Kullanıcı bulunamadı','error'); return; }
+    const banExpiry = (ban && duration!=='permanent') ? new Date(Date.now()+parseInt(duration)*86400000).toISOString() : null;
+    const newData = {...row.data, banned:ban, ban_reason:ban?reason:null, ban_expiry:ban?banExpiry:null, ban_date:ban?new Date().toISOString():null};
+    const { error: e2 } = await sb.from('user_data').update({data:newData, updated_at:new Date().toISOString()}).eq('user_id',uid);
+    if (e2) { toast('Güncelleme hatası: '+e2.message,'error'); return; }
+    toast(ban?`🚫 ${name} banlandı`:`✅ ${name} banı kaldırıldı`, ban?'error':'success');
+    loadUsers(); loadBans();
+}
+
+// ===== WARN =====
+function openWarnModal(uid, name) {
+    _warnUid=uid; _warnName=name;
+    document.getElementById('warnTargetName').textContent=name;
+    document.getElementById('warnTargetId').textContent=uid.substring(0,16)+'…';
+    document.getElementById('warnMessage').value='';
+    document.querySelectorAll('#warnModalOverlay .ban-chip').forEach(c=>c.classList.remove('active'));
+    document.getElementById('warnModalOverlay').classList.add('open');
+}
+function closeWarnModal(e) {
+    if (e && e.target!==document.getElementById('warnModalOverlay')) return;
+    document.getElementById('warnModalOverlay').classList.remove('open');
+}
+function selectWarnChip(el, msg) {
+    document.querySelectorAll('#warnModalOverlay .ban-chip').forEach(c=>c.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('warnMessage').value=msg;
+}
+async function executeWarn() {
+    const msg=document.getElementById('warnMessage').value.trim();
+    if (!msg) { toast('Uyarı mesajı gerekli','error'); return; }
+    // Save warning in user data
+    const { data: row } = await sb.from('user_data').select('data').eq('user_id',_warnUid).single();
+    if (!row) { toast('Kullanıcı bulunamadı','error'); return; }
+    const warnings = (row.data?.warnings||[]);
+    warnings.push({ msg, date: new Date().toISOString(), admin: currentAdmin.email });
+    const newData = {...row.data, warnings};
+    await sb.from('user_data').update({data:newData}).eq('user_id',_warnUid);
+    document.getElementById('warnModalOverlay').classList.remove('open');
+    toast(`⚠️ ${_warnName} uyarıldı`, 'info');
+}
 
 // ===== ANNOUNCEMENTS =====
 async function loadAnnouncements() {
     const { data } = await sb.from('announcements').select('*').order('created_at',{ascending:false}).catch(()=>({data:[]}));
     const tbody=document.getElementById('annBody');
-    if (!data?.length){tbody.innerHTML='<tr><td colspan="4"><div class="empty-state"><div class="ei">📢</div><h3>No announcements yet</h3></div></td></tr>';return;}
-    const bm={'info':'bg-blue','success':'bg-green','warning':'bg-yellow','update':'bg-purple'};
+    if (!data?.length){tbody.innerHTML='<tr><td colspan="4"><div class="empty-state"><div class="ei">📢</div><h3>Henüz duyuru yok</h3></div></td></tr>';return;}
+    const bm={info:'bg-blue',success:'bg-green',warning:'bg-yellow',update:'bg-purple'};
     tbody.innerHTML=data.map(a=>`<tr>
         <td><strong>${esc(a.title)}</strong><div style="font-size:.78rem;color:var(--text2);margin-top:2px;">${esc((a.content||'').substring(0,60))}…</div></td>
         <td><span class="badge ${bm[a.type]||'bg-blue'}">${a.type}</span></td>
         <td style="color:var(--text2);font-size:.82rem;">${fmtDate(a.created_at)}</td>
-        <td><button class="act-btn btn-del" onclick="delAnn('${a.id}')">🗑 Delete</button></td>
+        <td><button class="act-btn btn-del" onclick="delAnn('${a.id}')">🗑 Sil</button></td>
     </tr>`).join('');
 }
-
 async function sendAnnouncement() {
-    const title   = document.getElementById('annTitle').value.trim();
-    const content = document.getElementById('annContent').value.trim();
-    const type    = document.getElementById('annType').value;
-    const target  = document.getElementById('annTarget').value;
-    const priority= document.getElementById('annPriority').value;
-    if (!title||!content){toast('Title and message required!','error');return;}
-
-    const { error } = await sb.from('announcements')
-        .insert({title,content,type,target,priority,created_by:currentAdmin.id})
-        .catch(e=>({error:e}));
-
-    if (error) {
-        toast('Note: Create "announcements" table in Supabase first (see README).','info');
-    } else {
-        toast('📢 Announcement published!','success');
-        document.getElementById('annTitle').value='';
-        document.getElementById('annContent').value='';
-        loadAnnouncements();
-    }
+    const title=document.getElementById('annTitle').value.trim();
+    const content=document.getElementById('annContent').value.trim();
+    const type=document.getElementById('annType').value;
+    const target=document.getElementById('annTarget').value;
+    const priority=document.getElementById('annPriority').value;
+    if(!title||!content){toast('Başlık ve mesaj gerekli!','error');return;}
+    const {error}=await sb.from('announcements').insert({title,content,type,target,priority,created_by:currentAdmin.id}).catch(e=>({error:e}));
+    if(error){toast('Duyuru gönderilemedi: '+error.message,'error');}
+    else{toast('📢 Duyuru yayınlandı!','success');document.getElementById('annTitle').value='';document.getElementById('annContent').value='';loadAnnouncements();}
 }
-
 async function delAnn(id) {
     await sb.from('announcements').delete().eq('id',id);
-    toast('🗑 Deleted','info');
+    toast('🗑 Duyuru silindi','info');
     loadAnnouncements();
+}
+
+// ===== RESTRICTIONS =====
+function toggleRestriction(el, key) {
+    el.classList.toggle('on');
+    const isOn = el.classList.contains('on');
+    // Store in localStorage (production: store in Supabase settings table)
+    const restrictions = JSON.parse(localStorage.getItem('tobilist_restrictions')||'{}');
+    restrictions[key] = isOn;
+    localStorage.setItem('tobilist_restrictions', JSON.stringify(restrictions));
+    toast(`${isOn?'✅':'❌'} ${key} ${isOn?'aktif':'devre dışı'}`, isOn?'success':'info');
+}
+function saveMaintenanceMsg() {
+    const msg = document.getElementById('maintenanceMsg').value;
+    localStorage.setItem('tobilist_maintenance_msg', msg);
+    toast('💾 Bakım mesajı kaydedildi','success');
 }
 
 // ===== LOGS =====
 async function loadLogs() {
-    const {data} = await sb.from('user_data').select('user_id,data,updated_at').order('updated_at',{ascending:false}).limit(150);
-    const el = document.getElementById('logList');
-    const filter = document.getElementById('logFilter')?.value;
-    let rows = data||[];
+    const {data}=await sb.from('user_data').select('user_id,data,updated_at').order('updated_at',{ascending:false}).limit(200);
+    const el=document.getElementById('logList');
+    const filter=document.getElementById('logFilter')?.value;
+    let rows=data||[];
     if (filter==='recent') {
-        const cutoff = new Date(Date.now()-864e5).toISOString();
-        rows = rows.filter(u=>u.updated_at>cutoff);
+        const cutoff=new Date(Date.now()-864e5).toISOString();
+        rows=rows.filter(u=>u.updated_at>cutoff);
     }
-    if (!rows.length){el.innerHTML='<div class="empty-state"><div class="ei">📋</div><h3>No logs</h3></div>';return;}
-    el.innerHTML = rows.map(u=>`<div class="act-item">
-        <div class="act-dot" style="background:var(--green)"></div>
-        <div><div class="act-text"><strong>${esc(u.data?.social?.name||'User')}</strong> — data saved</div>
-        <div class="act-time">${new Date(u.updated_at).toLocaleString('en-US')} · ${u.user_id.substring(0,8)}…</div></div>
+    if (filter==='bans') { rows=rows.filter(u=>u.data?.banned); }
+    if (!rows.length){el.innerHTML='<div class="empty-state"><div class="ei">📋</div><h3>Log bulunamadı</h3></div>';return;}
+
+    const dotColor = (u) => u.data?.banned?'var(--red)':u.data?.warnings?.length?'var(--yellow)':'var(--green)';
+    el.innerHTML=rows.map(u=>`<div class="act-item">
+        <div class="act-dot" style="background:${dotColor(u)}"></div>
+        <div>
+            <div class="act-text">
+                <strong>${esc(u.data?.social?.name||'Kullanıcı')}</strong>
+                ${u.data?.banned?'<span class="badge bg-red" style="font-size:.65rem;margin-left:.4rem;">🚫 Banlı</span>':''}
+                ${u.data?.warnings?.length?`<span class="badge bg-yellow" style="font-size:.65rem;margin-left:.4rem;">⚠️ ${u.data.warnings.length} uyarı</span>`:''}
+                — veri kaydedildi
+            </div>
+            <div class="act-time">${new Date(u.updated_at).toLocaleString('tr-TR')} · <span class="mono">${u.user_id.substring(0,8)}…</span> · ${u.data?.items?.length||0} giriş · Lv.${u.data?.xp?.level||1}</div>
+        </div>
     </div>`).join('');
 }
 
+function exportLogs() {
+    const el = document.getElementById('logList');
+    const txt = el.innerText;
+    const blob = new Blob([txt],{type:'text/plain'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='tobilist_logs.txt'; a.click();
+    toast('📥 Loglar indirildi','success');
+}
+
 // ===== SETTINGS =====
+async function loadSettings() {
+    const { data: rows } = await sb.from('user_data').select('user_id').order('updated_at',{ascending:false}).limit(1);
+    checkSupabase();
+
+    // Platform info
+    const { count: userCount } = await sb.from('user_data').select('*',{count:'exact',head:true});
+    let revCount = 0;
+    try { const r = await sb.from('reviews').select('*',{count:'exact',head:true}); revCount = r.count||0; } catch(e){}
+
+    document.getElementById('platformInfoEl').innerHTML = `
+        Toplam Kullanıcı: <strong>${userCount||0}</strong><br>
+        Toplam Yorum: <strong>${revCount}</strong><br>
+        Admin: <strong>${currentAdmin?.email}</strong><br>
+        Panel Versiyonu: <strong>v2.0</strong><br>
+        Son Güncelleme: <strong>${new Date().toLocaleString('tr-TR')}</strong>
+    `;
+}
+
 async function checkSupabase() {
     try {
-        const {error} = await sb.from('user_data').select('user_id').limit(1);
-        const el = document.getElementById('supaStatus');
-        if (error) { el.className='badge bg-yellow'; el.textContent='⚠️ Limited'; }
-        else        { el.className='badge bg-green';  el.textContent='✅ Connected'; }
-
-        const {count} = await sb.from('user_data').select('*',{count:'exact',head:true});
-        document.getElementById('supaStats').innerHTML = `Total rows: <strong>${count||0}</strong><br>URL: <span class="mono" style="font-size:.75rem;">${SUPABASE_URL.substring(0,40)}…</span>`;
-    } catch(e) {
-        document.getElementById('supaStatus').textContent='❌ Error';
+        const {error}=await sb.from('user_data').select('user_id').limit(1);
+        const el=document.getElementById('supaStatus');
+        if(error){el.className='badge bg-yellow';el.textContent='⚠️ Sınırlı';}
+        else{el.className='badge bg-green';el.textContent='✅ Bağlı';}
+        const {count}=await sb.from('user_data').select('*',{count:'exact',head:true});
+        document.getElementById('supaStats').innerHTML=`Toplam satır: <strong>${count||0}</strong><br>URL: <span class="mono" style="font-size:.73rem;">${SUPABASE_URL.substring(0,45)}…</span>`;
+    } catch(e){
+        const el=document.getElementById('supaStatus');
+        if(el){el.className='badge bg-red';el.textContent='❌ Hata';}
     }
 }
 
 function changePassword() {
     const p1=document.getElementById('newPw').value;
     const p2=document.getElementById('confirmPw').value;
-    if (!p1||!p2){toast('Fill both fields','error');return;}
-    if (p1!==p2){toast('Passwords do not match','error');return;}
+    if(!p1||!p2){toast('Her iki alanı da doldur','error');return;}
+    if(p1!==p2){toast('Şifreler uyuşmuyor','error');return;}
+    if(p1.length<6){toast('Şifre en az 6 karakter olmalı','error');return;}
     sb.auth.updateUser({password:p1}).then(({error})=>{
-        if (error) toast('Error: '+error.message,'error');
-        else { toast('✅ Password updated','success'); document.getElementById('newPw').value=''; document.getElementById('confirmPw').value=''; }
+        if(error) toast('Hata: '+error.message,'error');
+        else{toast('✅ Şifre güncellendi','success');document.getElementById('newPw').value='';document.getElementById('confirmPw').value='';}
     });
+}
+
+function exportCSV() {
+    const rows=[['UserID','İsim','Email','Level','XP','Giriş Sayısı','Streak','Durum']];
+    allUsers.forEach(u=>{
+        const d=u.data;
+        rows.push([u.user_id,d?.social?.name||'',d?.social?.email||'',d?.xp?.level||1,d?.xp?.total||0,d?.items?.length||0,d?.streak?.count||0,d?.banned?'Banlı':'Aktif']);
+    });
+    const blob=new Blob([rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n')],{type:'text/csv;charset=utf-8;'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='tobilist_users_'+new Date().toISOString().split('T')[0]+'.csv'; a.click();
+    toast('📥 CSV indirildi','success');
+}
+
+function exportAllData() {
+    const data = allUsers.map(u=>({id:u.user_id, name:u.data?.social?.name, email:u.data?.social?.email, level:u.data?.xp?.level, xp:u.data?.xp?.total, entries:u.data?.items?.length, streak:u.data?.streak?.count, banned:u.data?.banned||false}));
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='tobilist_data_'+new Date().toISOString().split('T')[0]+'.json'; a.click();
+    toast('📥 JSON indirildi','success');
 }
 
 // ===== CHARTS =====
-const CHART_DEFAULTS = { responsive:true, plugins:{legend:{labels:{color:'#8892a4',font:{size:11}}}}, scales:{x:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8892a4'}}, y:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8892a4'}}} };
-
+const CHART_DEF = {
+    responsive:true,
+    plugins:{legend:{labels:{color:'#8892a4',font:{size:11}}}},
+    scales:{x:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8892a4',maxTicksLimit:8}},y:{grid:{color:'rgba(255,255,255,.05)'},ticks:{color:'#8892a4'}}}
+};
 function drawLineChart(id, {labels,data}) {
-    if (charts[id]) charts[id].destroy();
-    charts[id] = new Chart(document.getElementById(id).getContext('2d'), {
+    if(charts[id]) charts[id].destroy();
+    charts[id]=new Chart(document.getElementById(id).getContext('2d'),{
         type:'line',
-        data:{ labels, datasets:[{label:'Active',data,borderColor:'#ff3366',backgroundColor:'rgba(255,51,102,.1)',tension:.4,fill:true,pointBackgroundColor:'#ff3366',pointRadius:4}] },
-        options:{...CHART_DEFAULTS, plugins:{legend:{display:false}}}
+        data:{labels,datasets:[{label:'Aktif',data,borderColor:'#ff3366',backgroundColor:'rgba(255,51,102,.1)',tension:.4,fill:true,pointBackgroundColor:'#ff3366',pointRadius:3}]},
+        options:{...CHART_DEF,plugins:{legend:{display:false}}}
     });
 }
-
 function drawDonut(id, labels, data, colors) {
-    if (charts[id]) charts[id].destroy();
-    charts[id] = new Chart(document.getElementById(id).getContext('2d'), {
+    if(charts[id]) charts[id].destroy();
+    charts[id]=new Chart(document.getElementById(id).getContext('2d'),{
         type:'doughnut',
         data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:0}]},
-        options:{responsive:true,cutout:'65%',plugins:{legend:{labels:{color:'#8892a4',padding:14,font:{size:11}}}}}
+        options:{responsive:true,cutout:'65%',plugins:{legend:{labels:{color:'#8892a4',padding:12,font:{size:11}}}}}
     });
 }
-
-function drawBar(id, labels, data) {
-    if (charts[id]) charts[id].destroy();
-    charts[id] = new Chart(document.getElementById(id).getContext('2d'), {
+function drawBar(id, labels, data, colors) {
+    const color = Array.isArray(colors) ? colors : (colors||'rgba(255,51,102,.7)');
+    if(charts[id]) charts[id].destroy();
+    charts[id]=new Chart(document.getElementById(id).getContext('2d'),{
         type:'bar',
-        data:{labels,datasets:[{data,backgroundColor:'rgba(255,51,102,.7)',borderRadius:6}]},
-        options:{...CHART_DEFAULTS,plugins:{legend:{display:false}}}
+        data:{labels,datasets:[{data,backgroundColor:Array.isArray(color)?color:labels.map(()=>color),borderRadius:6}]},
+        options:{...CHART_DEF,plugins:{legend:{display:false}}}
     });
 }
 
@@ -1140,11 +1683,15 @@ function closeConfirm(){closeModal('confirmModal');}
 // ===== PAGINATION =====
 function renderPag(id, pages, cur, onClick) {
     const el=document.getElementById(id);
-    if (!el||pages<=1){if(el)el.innerHTML='';return;}
-    el.innerHTML=Array.from({length:Math.min(pages,7)},(_,i)=>{
-        const p=i+1;
-        return `<button class="pag-btn${p===cur?' active':''}" onclick="(${onClick.toString()})(${p})">${p}</button>`;
-    }).join('');
+    if(!el||pages<=1){if(el)el.innerHTML='';return;}
+    let html='';
+    if (cur>1) html+=`<button class="pag-btn" onclick="(${onClick.toString()})(${cur-1})">‹</button>`;
+    const start=Math.max(1,cur-2), end=Math.min(pages,cur+2);
+    if(start>1) html+=`<button class="pag-btn" onclick="(${onClick.toString()})(1)">1</button>${start>2?'<span style="padding:0 4px;color:var(--text3);">…</span>':''}`;
+    for(let p=start;p<=end;p++) html+=`<button class="pag-btn${p===cur?' active':''}" onclick="(${onClick.toString()})(${p})">${p}</button>`;
+    if(end<pages) html+=`${end<pages-1?'<span style="padding:0 4px;color:var(--text3);">…</span>':''}<button class="pag-btn" onclick="(${onClick.toString()})(${pages})">${pages}</button>`;
+    if(cur<pages) html+=`<button class="pag-btn" onclick="(${onClick.toString()})(${cur+1})">›</button>`;
+    el.innerHTML=html;
 }
 
 // ===== TOAST =====
@@ -1158,62 +1705,18 @@ function toast(msg, type='info') {
 }
 
 // ===== UTILS =====
-function fmtDate(s){return s?new Date(s).toLocaleDateString('en-US'):'—';}
+function fmtDate(s){return s?new Date(s).toLocaleDateString('tr-TR',{day:'2-digit',month:'short',year:'numeric'}):'—';}
+function fmtRelative(s) {
+    if (!s) return '—';
+    const diff = Date.now() - new Date(s).getTime();
+    const m=Math.floor(diff/60000), h=Math.floor(diff/3600000), d=Math.floor(diff/86400000);
+    if (m<1) return 'az önce';
+    if (m<60) return `${m} dakika önce`;
+    if (h<24) return `${h} saat önce`;
+    if (d<7)  return `${d} gün önce`;
+    return fmtDate(s);
+}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 </script>
-
-    <!-- ===== BAN MODAL ===== -->
-    <div class="ban-modal-overlay" id="banModalOverlay" onclick="closeBanModal(event)">
-        <div class="ban-modal">
-            <div class="ban-modal-header">
-                <div class="ban-modal-title">🚫 Kullanıcıyı Banla</div>
-                <button class="ban-modal-close" onclick="closeBanModal()">✕</button>
-            </div>
-
-            <!-- User info -->
-            <div class="ban-user-card">
-                <div class="ban-user-av">👤</div>
-                <div>
-                    <div class="ban-user-name" id="banTargetName">Kullanıcı</div>
-                    <div class="ban-user-sub" id="banTargetId">—</div>
-                </div>
-            </div>
-
-            <!-- Quick reason chips -->
-            <div class="ban-field">
-                <label>⚡ Hızlı Sebep Seç</label>
-                <div class="ban-reason-chips">
-                    <span class="ban-chip" onclick="selectChip(this, 'Spam / Reklam')">🔁 Spam</span>
-                    <span class="ban-chip" onclick="selectChip(this, 'Uygunsuz içerik')">🔞 Uygunsuz İçerik</span>
-                    <span class="ban-chip" onclick="selectChip(this, 'Hakaret / Küfür')">🤬 Hakaret</span>
-                    <span class="ban-chip" onclick="selectChip(this, 'Sahte hesap')">🎭 Sahte Hesap</span>
-                    <span class="ban-chip" onclick="selectChip(this, 'Kural ihlali')">⚠️ Kural İhlali</span>
-                </div>
-            </div>
-
-            <!-- Custom reason -->
-            <div class="ban-field">
-                <label>📝 Ban Sebebi</label>
-                <textarea id="banReasonInput" rows="3" placeholder="Ban sebebini açıklayın..."></textarea>
-            </div>
-
-            <!-- Duration -->
-            <div class="ban-field">
-                <label>⏱️ Ban Süresi</label>
-                <select id="banDuration">
-                    <option value="permanent">♾️ Kalıcı Ban</option>
-                    <option value="7">📅 7 Gün</option>
-                    <option value="30">📅 30 Gün</option>
-                    <option value="90">📅 90 Gün</option>
-                </select>
-            </div>
-
-            <div class="ban-modal-actions">
-                <button class="btn-ban-cancel" onclick="closeBanModal()">İptal</button>
-                <button class="btn-ban-confirm" onclick="executeBan()">🚫 Banla</button>
-            </div>
-        </div>
-    </div>
-
 </body>
 </html>

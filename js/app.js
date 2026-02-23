@@ -1,6 +1,8 @@
 // APP.JS v5.1 - TobiList Ana Uygulama - Hatalar düzeltildi
 
 let currentSection = 'home';
+let previousSection = 'home';
+let discoverScrollPosition = 0;
 let deferredPrompt;
 let currentDiscoverType = 'all';
 let currentGenreFilter = 'all';
@@ -102,6 +104,7 @@ function showLoadingPlaceholders() {
 
 // ===== BÖLÜM GEÇİŞİ =====
 function switchSection(section, pushHistory = true) {
+    previousSection = currentSection;
     currentSection = section;
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
@@ -133,7 +136,40 @@ function switchSection(section, pushHistory = true) {
 
 // Tarayici geri/ileri butonlari
 window.addEventListener('popstate', function(e) {
-    const section = (e.state && e.state.section) ? e.state.section : 'home';
+    const state = e.state || {};
+    const section = state.section || 'home';
+
+    // Detail sayfasındayken geri gidiliyorsa
+    if (currentSection === 'detail') {
+        const fromSection = state.section || previousSection || 'discover';
+        const savedScrollY = state.discoverScrollY || discoverScrollPosition || 0;
+
+        currentSection = fromSection;
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        const sEl = document.getElementById(fromSection + 'Section');
+        if (sEl) sEl.classList.add('active');
+        const tabEl = document.querySelector('.nav-tab[data-section="' + fromSection + '"]');
+        if (tabEl) tabEl.classList.add('active');
+
+        if (fromSection === 'discover') {
+            renderDiscoverGrid();
+            setTimeout(() => window.scrollTo({ top: savedScrollY, behavior: 'instant' }), 80);
+        } else {
+            switch(fromSection) {
+                case 'home':         renderHomePage(); break;
+                case 'profile':      if (!isGuest) renderProfilePage(); break;
+                case 'calendar':     if (!isGuest) renderCalendar(); break;
+                case 'analytics':    if (!isGuest) renderAnalytics(); break;
+                case 'achievements': if (!isGuest) renderAchievements(); break;
+                case 'ai':           if (!isGuest) renderAISection(); break;
+                case 'library':      if (!isGuest) filterItems(); break;
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        return;
+    }
+
     switchSection(section, false);
 });
 
@@ -798,6 +834,20 @@ async function openDetailPage(itemJsonStr) {
 
     currentDetailItem = item;
 
+    // Keşfet'ten açıldıysa scroll pozisyonunu kaydet
+    if (currentSection === 'discover') {
+        discoverScrollPosition = window.scrollY || document.documentElement.scrollTop;
+    }
+    previousSection = currentSection;
+    currentSection = 'detail';
+
+    // History'ye push et
+    history.pushState(
+        { section: previousSection, discoverScrollY: discoverScrollPosition },
+        '',
+        '#detail-' + (item.id || '')
+    );
+
     // Detay section'ı göster
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
@@ -1038,10 +1088,34 @@ function loadSimilarContent(item) {
 }
 
 function goBackFromDetail() {
-    if (window.history.length > 1) {
-        window.history.back();
+    const fromSection = previousSection || 'discover';
+    const savedScrollY = discoverScrollPosition || 0;
+
+    currentSection = fromSection;
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+
+    const sEl = document.getElementById(fromSection + 'Section');
+    if (sEl) sEl.classList.add('active');
+    const tabEl = document.querySelector('.nav-tab[data-section="' + fromSection + '"]');
+    if (tabEl) tabEl.classList.add('active');
+
+    history.replaceState({ section: fromSection, discoverScrollY: savedScrollY }, '', '#' + fromSection);
+
+    if (fromSection === 'discover') {
+        renderDiscoverGrid();
+        setTimeout(() => window.scrollTo({ top: savedScrollY, behavior: 'instant' }), 80);
     } else {
-        switchSection('discover');
+        switch(fromSection) {
+            case 'home':         renderHomePage(); break;
+            case 'profile':      if (!isGuest) renderProfilePage(); break;
+            case 'calendar':     if (!isGuest) renderCalendar(); break;
+            case 'analytics':    if (!isGuest) renderAnalytics(); break;
+            case 'achievements': if (!isGuest) renderAchievements(); break;
+            case 'ai':           if (!isGuest) renderAISection(); break;
+            case 'library':      if (!isGuest) filterItems(); break;
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 }
 
