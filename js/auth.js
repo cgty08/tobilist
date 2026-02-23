@@ -472,8 +472,10 @@ function updateUIForLoggedIn() {
     // Admin linki - sadece admin emaili için
     const adminEmails = ['admin@tobilist.com', 'cgty08@gmail.com'];
     const adminLink = document.getElementById('adminPanelLink');
-    if (adminLink && currentUser && adminEmails.includes(currentUser.email)) {
-        adminLink.style.display = 'block';
+    const adminShortcut = document.getElementById('adminShortcutBtn');
+    if (currentUser && adminEmails.includes(currentUser.email)) {
+        if (adminLink) adminLink.style.display = 'block';
+        if (adminShortcut) adminShortcut.style.display = 'inline-flex';
     }
 
     const bannerActions = document.getElementById('bannerActions');

@@ -751,70 +751,87 @@ function renderAnalytics() {
 }
 
 // ===== CALENDAR =====
-const ANILIST_CALENDAR_GQL = `
-query ($page: Int, $perPage: Int) {
+// Bu haftanın Pazartesi başlangıcı ve Pazar bitişini hesapla
+function _getWeekBounds() {
+    const now   = new Date();
+    const day   = now.getDay(); // 0=Paz,1=Pzt...
+    // Pazartesi = gün 1; eğer Pazar ise geri 6 gün
+    const diffToMon = (day === 0) ? -6 : 1 - day;
+    const mon = new Date(now);
+    mon.setDate(now.getDate() + diffToMon);
+    mon.setHours(0, 0, 0, 0);
+    const sun = new Date(mon);
+    sun.setDate(mon.getDate() + 6);
+    sun.setHours(23, 59, 59, 999);
+    return {
+        start: Math.floor(mon.getTime() / 1000),
+        end:   Math.floor(sun.getTime() / 1000),
+        dates: Array.from({length:7}, (_,i) => {
+            const d = new Date(mon);
+            d.setDate(mon.getDate() + i);
+            return d;
+        })
+    };
+}
+
+const ANILIST_WEEK_GQL = `
+query ($page: Int, $perPage: Int, $start: Int, $end: Int) {
   Page(page: $page, perPage: $perPage) {
-    airingSchedules(notYetAired: false, sort: TIME_DESC) {
+    airingSchedules(
+      airingAt_greater: $start
+      airingAt_lesser: $end
+      sort: TIME
+    ) {
       id
       episode
       airingAt
       media {
         id
-        title { romaji english native }
+        title { romaji english }
         coverImage { medium color }
         averageScore
         popularity
         genres
-        status
         episodes
         format
-        season
-        seasonYear
-        nextAiringEpisode { episode timeUntilAiring }
       }
     }
   }
 }`;
 
 async function _fetchAniListCalendar() {
-    const cacheKey = 'cal_anilist_v2';
+    const week = _getWeekBounds();
+    const cacheKey = `cal_week_${week.start}`;
     const cached = APICache.get(cacheKey);
     if (cached) return cached;
 
     try {
-        // Birden fazla sayfa çekiyoruz - daha kapsamlı veri
-        const [r1, r2] = await Promise.all([
+        // 3 sayfa paralel çek - haftalık schedule çok büyük olabilir
+        const pages = await Promise.all([1, 2, 3].map(page =>
             fetch('https://graphql.anilist.co', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                body: JSON.stringify({ query: ANILIST_CALENDAR_GQL, variables: { page: 1, perPage: 50 } })
-            }),
-            fetch('https://graphql.anilist.co', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                body: JSON.stringify({ query: ANILIST_CALENDAR_GQL, variables: { page: 2, perPage: 50 } })
-            })
-        ]);
+                body: JSON.stringify({
+                    query: ANILIST_WEEK_GQL,
+                    variables: { page, perPage: 50, start: week.start, end: week.end }
+                })
+            }).then(r => r.json())
+        ));
 
-        const [j1, j2] = await Promise.all([r1.json(), r2.json()]);
-        const schedules = [
-            ...(j1?.data?.Page?.airingSchedules || []),
-            ...(j2?.data?.Page?.airingSchedules || [])
-        ];
+        const allSchedules = pages.flatMap(j => j?.data?.Page?.airingSchedules || []);
 
-        // Gün bazında grupla (0=Pazar...6=Cumartesi → biz Pzt-Pzr sırasına çevireceğiz)
+        // Gün bazında grupla — her anime için EN GÜNCEL bölümü tut
+        // JS getDay(): 0=Paz, 1=Pzt, ... 6=Cmt
         const byDay = { 0:[], 1:[], 2:[], 3:[], 4:[], 5:[], 6:[] };
-        const seen  = new Set();
+        const seenId = new Map(); // mediaId → {day, idx} ile mükerrer önleme
 
-        schedules.forEach(s => {
+        allSchedules.forEach(s => {
             const media = s.media;
             if (!media || !media.title) return;
-            const id   = media.id;
-            if (seen.has(id)) return;
-            seen.add(id);
+            const id  = media.id;
+            const day = new Date(s.airingAt * 1000).getDay();
 
-            const day = new Date(s.airingAt * 1000).getDay(); // 0=Sun
-            byDay[day].push({
+            const entry = {
                 id,
                 name:       media.title.romaji || media.title.english || '?',
                 nameEn:     media.title.english,
@@ -825,13 +842,25 @@ async function _fetchAniListCalendar() {
                 totalEps:   media.episodes,
                 cover:      media.coverImage?.medium,
                 color:      media.coverImage?.color,
-                format:     media.format,
-                status:     media.status,
-            });
+                airingAt:   s.airingAt,
+            };
+
+            if (seenId.has(id)) {
+                // Aynı anime bu hafta birden fazla bölüm yayınlıyorsa hepsini ekle
+                byDay[day].push(entry);
+            } else {
+                seenId.set(id, true);
+                byDay[day].push(entry);
+            }
         });
 
-        // Her gündeki listeyi popülariteye göre sırala
-        Object.values(byDay).forEach(arr => arr.sort((a, b) => b.popularity - a.popularity));
+        // Her gün: önce yayın saatine göre sırala, sonra popülariteye göre
+        Object.keys(byDay).forEach(d => {
+            byDay[d].sort((a, b) => {
+                if (a.airingAt !== b.airingAt) return a.airingAt - b.airingAt;
+                return b.popularity - a.popularity;
+            });
+        });
 
         APICache.set(cacheKey, byDay);
         return byDay;
@@ -845,10 +874,12 @@ async function renderCalendar() {
     const container = document.getElementById('weekdaysContainer');
     if (!container || !dataManager.data) return;
 
-    const dayNames = t('days'); // ['Pazartesi',...] or ['Monday',...]
-    // JS getDay(): 0=Sun,1=Mon...6=Sat → dayJS dizi sırası Pzt=1..Pzr=0
-    const dayJS = [1, 2, 3, 4, 5, 6, 0];
+    const week    = _getWeekBounds();
+    const dayNames = t('days'); // Pzt→Pzr veya Mon→Sun
+    // dayJS[idx]: idx=0 Pzt→JS 1, idx=6 Pzr→JS 0
+    const dayJS   = [1, 2, 3, 4, 5, 6, 0];
     const myNames = new Set(dataManager.data.items.map(i => (i.name || '').toLowerCase()));
+    const todayJS = new Date().getDay();
 
     container.innerHTML = `
         <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted);">
@@ -858,67 +889,74 @@ async function renderCalendar() {
 
     const byDay = await _fetchAniListCalendar();
 
-    if (!byDay) {
-        // Fallback: kütüphanedeki izleniyor içerikleri göster
-        const watching = dataManager.data.items.filter(i => i.status === 'watching');
-        container.innerHTML = dayNames.map((day, idx) => {
-            const items = watching.filter((_, i) => i % 7 === idx);
-            return `<div class="weekday">
-                <div class="weekday-name">${day}</div>
-                ${items.length
-                    ? items.map(i => `
-                        <div class="cal-item my-lib">
-                            <span class="cal-item-icon">${getTypeIcon(i.type)}</span>
-                            <span class="cal-item-name">${i.name || ''}</span>
-                        </div>`).join('')
-                    : '<div class="cal-empty">—</div>'}
-            </div>`;
-        }).join('');
+    _injectCalendarStyles();
 
-        // Fallback CSS
-        _injectCalendarStyles();
+    if (!byDay) {
+        container.innerHTML = `
+            <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted);">
+                <div style="font-size:2rem;margin-bottom:.5rem;">⚠️</div>
+                <div>Takvim yüklenemedi. Lütfen tekrar deneyin.</div>
+            </div>`;
         return;
     }
 
-    _injectCalendarStyles();
+    // Toplam bölüm sayısı — birkaç saniye içinde hiç veri gelmediyse uyar
+    const totalEntries = Object.values(byDay).reduce((s, a) => s + a.length, 0);
+    if (totalEntries === 0) {
+        container.innerHTML = `
+            <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted);">
+                <div style="font-size:2rem;margin-bottom:.5rem;">📭</div>
+                <div>Bu hafta için yayın verisi bulunamadı.</div>
+            </div>`;
+        return;
+    }
 
     container.innerHTML = dayNames.map((dayName, idx) => {
-        const jsDay  = dayJS[idx];
-        const animes = (byDay[jsDay] || []).slice(0, 10);
-        const isToday = (new Date().getDay() === jsDay);
+        const jsDay   = dayJS[idx];
+        const isToday = (todayJS === jsDay);
+        const dayDate = week.dates[idx];
+        const dateStr = dayDate.toLocaleDateString(_lang === 'tr' ? 'tr-TR' : 'en-GB', { day: 'numeric', month: 'short' });
+        const animes  = byDay[jsDay] || [];
+        const shown   = animes.slice(0, 12);
 
-        const rows = animes.length
-            ? animes.map(a => {
-                const inLib  = myNames.has(a.name.toLowerCase()) || (a.nameEn && myNames.has(a.nameEn.toLowerCase()));
-                const scoreColor = a.score >= 8 ? '#10b981' : a.score >= 6 ? '#f59e0b' : '#ef4444';
-                const accentColor = a.color || (inLib ? '#10b981' : '#ff3366');
+        const rows = shown.length
+            ? shown.map(a => {
+                const inLib      = myNames.has(a.name.toLowerCase()) || (a.nameEn && myNames.has((a.nameEn || '').toLowerCase()));
+                const scoreColor = !a.score ? '#8892a4' : a.score >= 8 ? '#10b981' : a.score >= 6 ? '#f59e0b' : '#ef4444';
+                const accentBorder = inLib ? '#10b981' : (a.color || 'rgba(255,255,255,.06)');
+                // Yayın saatini göster
+                const airTime = new Date(a.airingAt * 1000).toLocaleTimeString(_lang === 'tr' ? 'tr-TR' : 'en-GB', { hour: '2-digit', minute: '2-digit' });
 
-                return `<div class="cal-item${inLib ? ' my-lib' : ''}" 
-                    style="border-left:2px solid ${inLib ? '#10b981' : accentColor}22;"
-                    title="${(a.name || '')} — Ep.${a.episode}${a.totalEps ? '/' + a.totalEps : ''}">
+                return `<div class="cal-item${inLib ? ' my-lib' : ''}"
+                    style="border-left:3px solid ${inLib ? '#10b981' : accentBorder};"
+                    title="${(a.name||'').replace(/"/g,'&quot;')} — Bölüm ${a.episode}${a.totalEps ? '/' + a.totalEps : ''} • ${airTime}">
                     ${a.cover
                         ? `<img class="cal-cover" src="${a.cover}" alt="" loading="lazy" onerror="this.style.display='none'">`
                         : `<div class="cal-cover-fallback">🎬</div>`}
                     <div class="cal-item-info">
-                        <div class="cal-item-name" style="color:${inLib ? '#10b981' : 'inherit'};">
+                        <div class="cal-item-name" style="${inLib ? 'color:#10b981;' : ''}">
                             ${inLib ? '✅ ' : ''}${a.name}
                         </div>
                         <div class="cal-item-meta">
-                            <span class="cal-ep">Ep.${a.episode}${a.totalEps ? '/' + a.totalEps : ''}</span>
+                            <span class="cal-time">⏰ ${airTime}</span>
+                            <span class="cal-ep">Bl.${a.episode}${a.totalEps ? '/' + a.totalEps : ''}</span>
                             ${a.score ? `<span class="cal-score" style="color:${scoreColor};">★${a.score}</span>` : ''}
                             ${a.genres.length ? `<span class="cal-genre">${a.genres[0]}</span>` : ''}
                         </div>
                     </div>
                 </div>`;
             }).join('')
-            : `<div class="cal-empty">—</div>`;
+            : `<div class="cal-empty">Bu gün yayın yok</div>`;
 
         return `<div class="weekday${isToday ? ' today-col' : ''}">
-            <div class="weekday-name">${dayName}${isToday ? ' <span class="today-dot">●</span>' : ''}</div>
-            <div class="weekday-count">${animes.length} anime</div>
+            <div class="weekday-name">
+                ${dayName}${isToday ? ' <span class="today-dot">●</span>' : ''}
+            </div>
+            <div class="weekday-date">${dateStr}</div>
+            <div class="weekday-count">${animes.length ? animes.length + ' bölüm' : '—'}</div>
             ${rows}
-            ${(byDay[jsDay] || []).length > 10
-                ? `<div class="cal-more">+${(byDay[jsDay] || []).length - 10} daha…</div>`
+            ${animes.length > 12
+                ? `<div class="cal-more">+${animes.length - 12} bölüm daha…</div>`
                 : ''}
         </div>`;
     }).join('');
@@ -964,10 +1002,16 @@ function _injectCalendarStyles() {
             gap: .3rem;
         }
         .today-dot { color: #ff3366; font-size: .6rem; animation: pulse 2s infinite; }
-        .weekday-count {
-            font-size: .65rem;
+        .weekday-date {
+            font-size: .68rem;
             color: var(--text-muted, #4b5563);
-            margin-bottom: .5rem;
+            margin-bottom: .1rem;
+            font-weight: 500;
+        }
+        .weekday-count {
+            font-size: .62rem;
+            color: var(--text-muted, #4b5563);
+            margin-bottom: .55rem;
         }
         .cal-item {
             display: flex;
@@ -1016,7 +1060,8 @@ function _injectCalendarStyles() {
             margin-top: .1rem;
             flex-wrap: wrap;
         }
-        .cal-ep    { font-size: .62rem; color: var(--text-muted, #4b5563); }
+        .cal-ep    { font-size: .6rem; color: var(--text-muted, #4b5563); }
+        .cal-time  { font-size: .6rem; color: var(--accent-secondary, #00d4ff); font-weight: 600; }
         .cal-score { font-size: .62rem; font-weight: 700; }
         .cal-genre {
             font-size: .58rem;
@@ -1033,8 +1078,11 @@ function _injectCalendarStyles() {
 }
 
 async function syncCalendar() {
-    APICache.clear('cal_anilist_v2');
-    APICache.clear('cal_schedule'); // eski cache'i de temizle
+    // Bu haftanın cache key'ini temizle
+    const week = _getWeekBounds();
+    APICache.clear(`cal_week_${week.start}`);
+    APICache.clear('cal_anilist_v2'); // eski cache'leri de temizle
+    APICache.clear('cal_schedule');
     showNotification(_lang === 'en' ? 'Syncing calendar... 📡' : 'Takvim güncelleniyor... 📡', 'info');
     await renderCalendar();
     showNotification(t('calSynced'), 'success');
