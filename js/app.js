@@ -1,3 +1,17 @@
+// Library'den detay aç - item id ile
+function openDetailPageFromLibrary(itemId) {
+    if (!dataManager.data) return;
+    const item = dataManager.data.items.find(i => String(i.id) === String(itemId));
+    if (!item) return;
+    const itemJson = JSON.stringify({
+        id: item.id, name: item.name, type: item.type,
+        poster: item.poster, episodes: item.totalEpisodes,
+        chapters: item.totalEpisodes, rating: item.rating,
+        genres: item.genres || [], malId: item.malId
+    });
+    openDetailPage(itemJson.replace(/"/g, '&quot;'));
+}
+
 // APP.JS v5.1 - TobiList Ana Uygulama - Hatalar düzeltildi
 
 let currentSection = 'home';
@@ -154,7 +168,8 @@ function renderContinueWatching() {
 
     container.innerHTML = watching.map(item => {
         const pct = (item.totalEpisodes || 0) > 0 ? ((item.currentEpisode || 0) / item.totalEpisodes * 100).toFixed(0) : 0;
-        return '<div class="media-card">' +
+        const safeItemForDetail = itemJson.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        return '<div class="media-card" style="cursor:pointer" onclick="openDetailPage(\'' + safeItemForDetail + '\')">' +
             '<div class="media-poster">' +
                 (item.poster
                     ? '<img src="' + item.poster + '" alt="' + (item.name || '') + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +

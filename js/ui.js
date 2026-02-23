@@ -333,7 +333,7 @@ function renderLibraryGrid(items) {
         ).join('');
 
         return `<div class="item-card">
-            <div class="item-poster">
+            <div class="item-poster" style="cursor:pointer" onclick="openDetailPageFromLibrary('${item.id}')">
                 ${item.poster
                     ? `<img src="${item.poster}" alt="${(item.name||'').replace(/"/g,'&quot;')}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
                        <div class="media-poster-fallback" style="display:none">${getTypeIcon(item.type)}</div>`
