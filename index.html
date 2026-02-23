@@ -1361,5 +1361,118 @@
         if (el) el.remove();
     }
     </script>
+
+    <!-- ===== DUYURU SİSTEMİ - INLINE ===== -->
+    <script>
+    (function() {
+        // Duyuru fonksiyonları
+        function _showAnnModal(ann) {
+            if (document.getElementById('annModal')) return;
+            var icons = { info: 'ℹ️', success: '✅', warning: '⚠️', update: '🚀' };
+            var themes = {
+                info:    { accent: '#00d4ff', glow: 'rgba(0,212,255,0.3)',    badge: '#00d4ff', badgeText: '#000', grad: 'rgba(0,212,255,0.1)' },
+                success: { accent: '#10b981', glow: 'rgba(16,185,129,0.3)',   badge: '#10b981', badgeText: '#000', grad: 'rgba(16,185,129,0.1)' },
+                warning: { accent: '#f59e0b', glow: 'rgba(245,158,11,0.3)',   badge: '#f59e0b', badgeText: '#000', grad: 'rgba(245,158,11,0.1)' },
+                update:  { accent: '#8b5cf6', glow: 'rgba(139,92,246,0.3)',   badge: '#8b5cf6', badgeText: '#fff', grad: 'rgba(139,92,246,0.1)' }
+            };
+            var t = themes[ann.type] || themes.update;
+            var icon = icons[ann.type] || '📢';
+            var typeLabels = { info: 'BİLGİ', success: 'BAŞARILI', warning: 'UYARI', update: 'GÜNCELLEME' };
+            var prioLabel = ann.priority === 'critical' ? '🔴 ACİL' : ann.priority === 'high' ? '🟠 ÖNEMLİ' : '';
+            var dateStr = '';
+            try { dateStr = new Date(ann.created_at).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'}); } catch(e) {}
+
+            var style = document.createElement('style');
+            style.textContent = '@keyframes annFadeIn{from{opacity:0}to{opacity:1}} @keyframes annSlideUp{from{transform:scale(0.88) translateY(30px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}';
+            document.head.appendChild(style);
+
+            var overlay = document.createElement('div');
+            overlay.id = 'annModal';
+            overlay.style.cssText = 'position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;padding:1rem;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);animation:annFadeIn 0.3s ease;';
+
+            overlay.innerHTML = '<div style="background:#0f1420;border:1px solid '+t.accent+'55;border-radius:22px;width:100%;max-width:460px;overflow:hidden;box-shadow:0 0 80px '+t.glow+',0 25px 60px rgba(0,0,0,0.7);animation:annSlideUp 0.4s cubic-bezier(0.175,0.885,0.32,1.275);">'
+                + '<div style="height:4px;background:linear-gradient(90deg,'+t.accent+','+t.accent+'66);"></div>'
+                + '<div style="padding:1.8rem;">'
+                + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.3rem;">'
+                + '<div style="display:flex;align-items:center;gap:0.5rem;">'
+                + '<span style="background:'+t.badge+';color:'+t.badgeText+';font-size:0.65rem;font-weight:800;letter-spacing:1.5px;padding:3px 10px;border-radius:20px;font-family:DM Sans,sans-serif;">'+(typeLabels[ann.type]||'DUYURU')+'</span>'
+                + (prioLabel ? '<span style="font-size:0.75rem;font-weight:700;color:'+t.accent+';">'+prioLabel+'</span>' : '')
+                + '</div>'
+                + '<button id="annCloseBtn" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#8892a4;cursor:pointer;width:32px;height:32px;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s;line-height:1;">✕</button>'
+                + '</div>'
+                + '<div style="display:flex;align-items:flex-start;gap:1rem;margin-bottom:1.1rem;">'
+                + '<div style="width:52px;height:52px;border-radius:14px;background:'+t.grad+';border:1px solid '+t.accent+'33;display:flex;align-items:center;justify-content:center;font-size:1.7rem;flex-shrink:0;">'+icon+'</div>'
+                + '<div style="flex:1;">'
+                + '<h3 style="color:#fff;font-size:1.05rem;font-weight:700;margin:0 0 4px;font-family:DM Sans,sans-serif;line-height:1.3;">'+(ann.title||'')+'</h3>'
+                + (dateStr ? '<div style="color:#6b7280;font-size:0.75rem;font-family:DM Sans,sans-serif;">'+dateStr+'</div>' : '')
+                + '</div></div>'
+                + (ann.content ? '<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-left:3px solid '+t.accent+';border-radius:10px;padding:0.9rem 1rem;color:#c0c8d8;font-size:0.88rem;line-height:1.6;font-family:DM Sans,sans-serif;margin-bottom:1.3rem;">'+ann.content+'</div>' : '<div style="margin-bottom:1rem;"></div>')
+                + '<button id="annOkBtn" style="width:100%;padding:0.8rem;background:linear-gradient(135deg,'+t.accent+','+t.accent+'aa);border:none;border-radius:12px;color:'+t.badgeText+';font-size:0.9rem;font-weight:700;font-family:DM Sans,sans-serif;cursor:pointer;box-shadow:0 4px 20px '+t.glow+';transition:opacity 0.2s;">Anladım ✓</button>'
+                + '</div></div>';
+
+            document.body.appendChild(overlay);
+
+            function close() {
+                var dismissed = [];
+                try { dismissed = JSON.parse(localStorage.getItem('dismissed_announcements')||'[]'); } catch(e) {}
+                if (!dismissed.map(function(d){return String(d);}).includes(String(ann.id))) {
+                    dismissed.push(String(ann.id));
+                    localStorage.setItem('dismissed_announcements', JSON.stringify(dismissed));
+                }
+                overlay.style.transition = 'opacity 0.3s';
+                overlay.style.opacity = '0';
+                setTimeout(function(){ if(overlay.parentNode) overlay.parentNode.removeChild(overlay); }, 300);
+            }
+
+            document.getElementById('annCloseBtn').onclick = close;
+            document.getElementById('annOkBtn').onclick = close;
+            overlay.addEventListener('click', function(e){ if(e.target===overlay) close(); });
+        }
+
+        // Global fonksiyonları tanımla
+        window.showAnnouncementModal = _showAnnModal;
+        window.dismissAnnouncement = function(id) {
+            var el = document.getElementById('annModal');
+            if (el) {
+                var dismissed = [];
+                try { dismissed = JSON.parse(localStorage.getItem('dismissed_announcements')||'[]'); } catch(e) {}
+                if (!dismissed.map(function(d){return String(d);}).includes(String(id))) {
+                    dismissed.push(String(id));
+                    localStorage.setItem('dismissed_announcements', JSON.stringify(dismissed));
+                }
+                el.style.transition = 'opacity 0.3s';
+                el.style.opacity = '0';
+                setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, 300);
+            }
+        };
+
+        window.checkAnnouncements = async function() {
+            if (!window.supabaseClient) return;
+            try {
+                var result = await window.supabaseClient
+                    .from('announcements')
+                    .select('*')
+                    .order('created_at', {ascending: false})
+                    .limit(10);
+                
+                if (result.error || !result.data || result.data.length === 0) return;
+                
+                var dismissed = [];
+                try { dismissed = JSON.parse(localStorage.getItem('dismissed_announcements')||'[]'); } catch(e) {}
+                var dismissedStr = dismissed.map(function(d){ return String(d); });
+                var visible = result.data.filter(function(a){ return !dismissedStr.includes(String(a.id)); });
+                
+                if (visible.length === 0) return;
+                _showAnnModal(visible[0]);
+            } catch(e) { console.warn('Ann check failed:', e); }
+        };
+
+        // Sayfa yüklenince otomatik çalıştır
+        window.addEventListener('load', function() {
+            setTimeout(window.checkAnnouncements, 3000);
+        });
+    })();
+    </script>
+
 </body>
 </html>
