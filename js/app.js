@@ -117,6 +117,7 @@ function switchSection(section) {
         case 'achievements': if (!isGuest) renderAchievements(); break;
         case 'ai':           if (!isGuest) renderAISection(); break;
         case 'library':      if (!isGuest) filterItems(); break;
+        case 'detail':       break; // handled by openDetailPage
     }
 
     closeUserDropdown();
@@ -571,3 +572,285 @@ document.addEventListener('keydown', (e) => {
 });
 
 console.log('✅ App.js v5.1 loaded');
+// =====================================================
+// DETAY SAYFASI SİSTEMİ
+// =====================================================
+
+let currentDetailItem = null;
+
+// Ana açma fonksiyonu - kartlara onclick ile bağlı
+async function openDetailPage(itemJsonStr) {
+    let item;
+    try {
+        const decoded = (itemJsonStr || '').replace(/&quot;/g, '"');
+        item = JSON.parse(decoded);
+    } catch(e) { console.error('Detail parse error:', e); return; }
+
+    currentDetailItem = item;
+
+    // Detay section'ı göster
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    const detailSec = document.getElementById('detailSection');
+    if (detailSec) detailSec.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Temel bilgileri hemen doldur
+    _fillDetailBasic(item);
+
+    // Jikan'dan tam detay çek
+    _fetchFullDetail(item);
+
+    // Yorumları yükle
+    loadReviews(item.id);
+
+    // Kullanıcının mevcut puanını yükle
+    loadUserReview(item.id);
+
+    // Benzer içerikleri yükle
+    loadSimilarContent(item);
+}
+
+function _fillDetailBasic(item) {
+    const s = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '—'; };
+    const sh = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html || ''; };
+
+    // Poster
+    const posterEl = document.getElementById('dpPoster');
+    if (posterEl) { posterEl.src = item.poster || ''; posterEl.onerror = () => posterEl.style.display = 'none'; }
+
+    s('dpTitle', item.name);
+    s('dpYear', item.year);
+    s('dpScore', item.rating ? '⭐ ' + item.rating : '—');
+    s('dpEpisodes', item.episodes ? item.episodes + ' Bölüm' : item.chapters ? item.chapters + ' Bölüm' : '—');
+    s('dpSynopsis', item.synopsis || 'Açıklama yükleniyor...');
+    s('dpStatus', '—');
+    s('dpRank', '—');
+    s('dpMembers', '—');
+    s('dpStudio', '—');
+
+    // Type badge
+    const badge = document.getElementById('dpTypeBadge');
+    if (badge) { badge.textContent = (item.type || 'anime').toUpperCase(); badge.className = 'dp-type-badge ' + (item.type || 'anime'); }
+
+    // Genres
+    sh('dpGenres', (item.genres || []).map(g => `<span class="dp-genre-tag">${g}</span>`).join('') || '<span style="color:var(--text-muted)">Yükleniyor...</span>');
+
+    // Add button
+    const addBtn = document.getElementById('dpAddBtn');
+    if (addBtn) {
+        const inLib = !isGuest && dataManager.data?.items?.some(i => i.name?.toLowerCase() === item.name?.toLowerCase());
+        addBtn.textContent = inLib ? '✓ Listende' : '+ Listeye Ekle';
+        addBtn.className = 'dp-add-btn' + (inLib ? ' in-library' : '');
+        addBtn.onclick = () => {
+            if (isGuest) { openAuthModal('register'); return; }
+            quickAdd(item);
+            addBtn.textContent = '✓ Listende';
+            addBtn.className = 'dp-add-btn in-library';
+        };
+    }
+
+    // Back breadcrumb
+    const titleBc = document.getElementById('dpBreadcrumbTitle');
+    if (titleBc) titleBc.textContent = item.name || '';
+}
+
+async function _fetchFullDetail(item) {
+    if (!item.malId) return;
+    try {
+        const type = item.type === 'anime' ? 'anime' : 'manga';
+        const res = await fetch(`https://api.jikan.moe/v4/${type}/${item.malId}`);
+        if (!res.ok) return;
+        const { data: d } = await res.json();
+        if (!d) return;
+
+        const s = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
+
+        s('dpScore', d.score ? '⭐ ' + d.score.toFixed(1) : null);
+        s('dpEpisodes', d.episodes ? d.episodes + ' Bölüm' : d.chapters ? d.chapters + ' Bölüm' : null);
+        s('dpStatus', d.status || null);
+        s('dpRank', d.rank ? '#' + d.rank : null);
+        s('dpMembers', d.members ? d.members.toLocaleString('tr-TR') : null);
+        s('dpStudio', (d.studios?.[0]?.name) || (d.authors?.[0]?.name) || null);
+        s('dpSynopsis', d.synopsis || null);
+        s('dpYear', d.year || (d.aired?.from ? new Date(d.aired.from).getFullYear() : null));
+
+        if (d.genres || d.themes) {
+            const genres = [...(d.genres || []), ...(d.themes || [])].map(g => g.name);
+            const el = document.getElementById('dpGenres');
+            if (el) el.innerHTML = genres.map(g => `<span class="dp-genre-tag">${g}</span>`).join('');
+        }
+
+        // Background poster if available
+        if (d.images?.jpg?.large_image_url) {
+            const bg = document.getElementById('dpBannerBg');
+            if (bg) {
+                bg.style.backgroundImage = `url(${d.images.jpg.large_image_url})`;
+                bg.style.backgroundSize = 'cover';
+                bg.style.backgroundPosition = 'center top';
+            }
+        }
+    } catch(e) { /* ignore */ }
+}
+
+// ===== REVIEWS =====
+async function loadReviews(contentId) {
+    const container = document.getElementById('reviewsList');
+    if (!container) return;
+    container.innerHTML = '<div class="reviews-loading"><div class="mini-spinner"></div> Yorumlar yükleniyor...</div>';
+
+    if (!window.supabaseClient) { container.innerHTML = '<p style="color:var(--text-muted);text-align:center;">Yorumlar yüklenemedi.</p>'; return; }
+
+    const { data, error } = await window.supabaseClient
+        .from('reviews')
+        .select('*')
+        .eq('content_id', contentId)
+        .order('created_at', { ascending: false })
+        .limit(30);
+
+    if (error || !data?.length) {
+        container.innerHTML = '<div class="no-reviews"><div style="font-size:2.5rem;">💬</div><p>Henüz yorum yok. İlk yorumu sen yaz!</p></div>';
+        return;
+    }
+
+    // Avg score
+    const avg = (data.reduce((s, r) => s + r.rating, 0) / data.length).toFixed(1);
+    const avgEl = document.getElementById('dpUserScore');
+    if (avgEl) avgEl.textContent = avg + ' / 10';
+    const cntEl = document.getElementById('dpReviewCount');
+    if (cntEl) cntEl.textContent = data.length + ' yorum';
+
+    container.innerHTML = data.map(r => `
+        <div class="review-card">
+            <div class="review-header">
+                <div class="review-avatar">${(r.username || 'U')[0].toUpperCase()}</div>
+                <div class="review-meta">
+                    <div class="review-username">${_esc(r.username)}</div>
+                    <div class="review-date">${_fmtDate(r.created_at)}</div>
+                </div>
+                <div class="review-score-badge">${r.rating}<span>/10</span></div>
+                ${!isGuest && currentUser?.uid === r.user_id ? `<button class="review-delete-btn" onclick="deleteReview('${r.id}','${_esc(currentDetailItem?.id||'')}')">🗑️</button>` : ''}
+            </div>
+            ${r.comment ? `<p class="review-comment">${_esc(r.comment)}</p>` : ''}
+        </div>
+    `).join('');
+}
+
+async function loadUserReview(contentId) {
+    if (isGuest || !window.supabaseClient) return;
+    const { data } = await window.supabaseClient
+        .from('reviews')
+        .select('*')
+        .eq('content_id', contentId)
+        .eq('user_id', currentUser.uid)
+        .single();
+
+    if (data) {
+        // Pre-fill form
+        setStarRating(data.rating);
+        const commentEl = document.getElementById('reviewComment');
+        if (commentEl) commentEl.value = data.comment || '';
+        const submitBtn = document.getElementById('reviewSubmitBtn');
+        if (submitBtn) submitBtn.textContent = '✏️ Yorumu Güncelle';
+    } else {
+        setStarRating(0);
+    }
+}
+
+let selectedRating = 0;
+function setStarRating(rating) {
+    selectedRating = rating;
+    document.querySelectorAll('.star-btn').forEach((btn, i) => {
+        btn.classList.toggle('active', i < rating);
+    });
+    const ratingText = document.getElementById('ratingText');
+    if (ratingText) ratingText.textContent = rating > 0 ? rating + ' / 10' : 'Puan seç';
+}
+
+async function submitReview() {
+    if (isGuest) { openAuthModal('register'); return; }
+    if (!selectedRating) { showNotification('Lütfen bir puan seç!', 'error'); return; }
+    if (!currentDetailItem) return;
+
+    const comment = document.getElementById('reviewComment')?.value?.trim() || '';
+    const username = dataManager.data?.social?.name || currentUser?.displayName || 'Anonim';
+
+    const { error } = await window.supabaseClient
+        .from('reviews')
+        .upsert({
+            content_id:   currentDetailItem.id,
+            content_name: currentDetailItem.name,
+            content_type: currentDetailItem.type,
+            user_id:      currentUser.uid,
+            username,
+            rating:       selectedRating,
+            comment,
+            updated_at:   new Date().toISOString()
+        }, { onConflict: 'content_id,user_id' });
+
+    if (error) { showNotification('Yorum gönderilemedi: ' + error.message, 'error'); return; }
+    showNotification('✅ Yorumun kaydedildi!', 'success');
+    loadReviews(currentDetailItem.id);
+}
+
+async function deleteReview(reviewId, contentId) {
+    if (!window.supabaseClient) return;
+    const { error } = await window.supabaseClient.from('reviews').delete().eq('id', reviewId);
+    if (!error) { showNotification('Yorum silindi.', 'info'); loadReviews(contentId); }
+}
+
+// ===== SIMILAR CONTENT =====
+function loadSimilarContent(item) {
+    const container = document.getElementById('similarGrid');
+    if (!container) return;
+
+    const genres = item.genres || [];
+    const type = item.type;
+
+    // Find similar from allContent
+    let similar = allContent.filter(c =>
+        c.id !== item.id &&
+        c.type === type &&
+        c.name !== item.name &&
+        (genres.length === 0 || c.genres?.some(g => genres.includes(g)))
+    ).slice(0, 8);
+
+    if (similar.length < 4) {
+        similar = allContent.filter(c => c.type === type && c.id !== item.id).slice(0, 8);
+    }
+
+    if (!similar.length) {
+        container.innerHTML = '<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;">Benzer içerik bulunamadı.</p>';
+        return;
+    }
+
+    renderMediaRow('similarGrid', similar);
+}
+
+function goBackFromDetail() {
+    switchSection('home');
+}
+
+function _esc(str) {
+    return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function _fmtDate(iso) {
+    if (!iso) return '';
+    return new Date(iso).toLocaleDateString('tr-TR', { day:'numeric', month:'short', year:'numeric' });
+}
+
+// Star hover effects
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.star-btn').forEach((btn, idx) => {
+        btn.addEventListener('mouseenter', () => {
+            document.querySelectorAll('.star-btn').forEach((b, i) => {
+                b.style.color = i <= idx ? '#f59e0b' : '';
+            });
+        });
+        btn.addEventListener('mouseleave', () => {
+            document.querySelectorAll('.star-btn').forEach((b, i) => {
+                b.style.color = i < selectedRating ? '#f59e0b' : '';
+            });
+        });
+    });
+});

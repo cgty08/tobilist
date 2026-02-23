@@ -976,6 +976,110 @@
                 </div>
 
                 <!-- SETTINGS -->
+
+                <!-- ===== DETAY SAYFASI ===== -->
+                <div id="detailSection" class="section">
+                    <!-- Breadcrumb -->
+                    <div class="dp-breadcrumb">
+                        <span onclick="goBackFromDetail()" style="cursor:pointer;color:var(--text-muted);">🏠 Ana Sayfa</span>
+                        <span style="color:var(--text-muted);"> / </span>
+                        <span id="dpBreadcrumbTitle" style="color:var(--text1);">İçerik</span>
+                    </div>
+
+                    <!-- Banner -->
+                    <div class="dp-banner" id="dpBannerBg">
+                        <div class="dp-banner-overlay"></div>
+                        <div class="dp-banner-content">
+                            <img id="dpPoster" src="" alt="" class="dp-poster">
+                            <div class="dp-header-info">
+                                <span id="dpTypeBadge" class="dp-type-badge anime">ANİME</span>
+                                <h1 id="dpTitle" class="dp-title">—</h1>
+                                <div class="dp-stats-row">
+                                    <div class="dp-stat">⭐ <span id="dpScore">—</span></div>
+                                    <div class="dp-stat">📅 <span id="dpYear">—</span></div>
+                                    <div class="dp-stat">🎬 <span id="dpEpisodes">—</span></div>
+                                    <div class="dp-stat">📊 <span id="dpStatus">—</span></div>
+                                </div>
+                                <div id="dpGenres" class="dp-genres-row"></div>
+                                <div class="dp-action-row">
+                                    <button id="dpAddBtn" class="dp-add-btn">+ Listeye Ekle</button>
+                                    <button class="dp-back-btn" onclick="goBackFromDetail()">← Geri</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main grid -->
+                    <div class="dp-body">
+                        <!-- Sol: Özet + Yorumlar -->
+                        <div class="dp-main-col">
+                            <!-- Özet -->
+                            <div class="dp-card">
+                                <h3 class="dp-card-title">📖 Özet</h3>
+                                <p id="dpSynopsis" class="dp-synopsis">Yükleniyor...</p>
+                            </div>
+
+                            <!-- Yorum Yaz -->
+                            <div class="dp-card" id="reviewFormCard">
+                                <h3 class="dp-card-title">✏️ Puan & Yorum</h3>
+                                <div class="review-form">
+                                    <div class="star-row">
+                                        <div class="stars-container">
+                                            <button class="star-btn" onclick="setStarRating(1)">★</button>
+                                            <button class="star-btn" onclick="setStarRating(2)">★</button>
+                                            <button class="star-btn" onclick="setStarRating(3)">★</button>
+                                            <button class="star-btn" onclick="setStarRating(4)">★</button>
+                                            <button class="star-btn" onclick="setStarRating(5)">★</button>
+                                            <button class="star-btn" onclick="setStarRating(6)">★</button>
+                                            <button class="star-btn" onclick="setStarRating(7)">★</button>
+                                            <button class="star-btn" onclick="setStarRating(8)">★</button>
+                                            <button class="star-btn" onclick="setStarRating(9)">★</button>
+                                            <button class="star-btn" onclick="setStarRating(10)">★</button>
+                                        </div>
+                                        <span id="ratingText" class="rating-text">Puan seç</span>
+                                    </div>
+                                    <textarea id="reviewComment" class="review-textarea" placeholder="Düşüncelerini yaz (isteğe bağlı)..." rows="3"></textarea>
+                                    <button id="reviewSubmitBtn" class="review-submit-btn" onclick="submitReview()">💬 Yorumu Gönder</button>
+                                </div>
+                            </div>
+
+                            <!-- Yorumlar -->
+                            <div class="dp-card">
+                                <div class="dp-card-header">
+                                    <h3 class="dp-card-title">💬 Yorumlar</h3>
+                                    <div class="review-summary">
+                                        <span id="dpUserScore" class="review-avg">—</span>
+                                        <span id="dpReviewCount" style="color:var(--text-muted);font-size:0.8rem;">0 yorum</span>
+                                    </div>
+                                </div>
+                                <div id="reviewsList"></div>
+                            </div>
+                        </div>
+
+                        <!-- Sağ: Detaylar -->
+                        <div class="dp-side-col">
+                            <div class="dp-card dp-info-card">
+                                <h3 class="dp-card-title">ℹ️ Bilgiler</h3>
+                                <div class="dp-info-list">
+                                    <div class="dp-info-row"><span class="dp-info-label">Tür</span><span id="dpTypeSide">—</span></div>
+                                    <div class="dp-info-row"><span class="dp-info-label">Sıralama</span><span id="dpRank">—</span></div>
+                                    <div class="dp-info-row"><span class="dp-info-label">Üye</span><span id="dpMembers">—</span></div>
+                                    <div class="dp-info-row"><span class="dp-info-label">Stüdyo</span><span id="dpStudio">—</span></div>
+                                    <div class="dp-info-row"><span class="dp-info-label">Durum</span><span id="dpStatusSide">—</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Benzer İçerikler -->
+                    <div class="home-section-block" style="margin-top:2rem;">
+                        <div class="section-header-row">
+                            <h3 class="sh-title">🎯 Benzer İçerikler</h3>
+                        </div>
+                        <div class="media-row" id="similarGrid"></div>
+                    </div>
+                </div>
+
                 <div id="settingsSection" class="section">
                     <div class="page-header"><h2 class="page-title">⚙️ Ayarlar</h2></div>
                     <div class="settings-grid">
