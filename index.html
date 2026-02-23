@@ -452,7 +452,6 @@
                         </div>
                     </div>
                     <div class="header-actions">
-                        <button id="adminHeaderBtn" onclick="window.open('admin.html','_blank')" style="display:none;padding:0.4rem 0.9rem;background:linear-gradient(135deg,#ff3366,#c0392b);border:none;border-radius:8px;color:white;font-size:0.8rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:0.3px;transition:all 0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">🛡️ Admin</button>
                         <div class="stats-badge" id="streakBadge" style="display:none;">🔥 <strong id="streakDays">0</strong> gün</div>
                         <div class="stats-badge" id="totalBadge" style="display:none;">📚 <strong id="totalCount">0</strong></div>
                         <select class="language-selector" id="languageSelect" onchange="changeLanguage()">
@@ -885,48 +884,63 @@
                     <div class="profile-header-card">
                         <div class="profile-cover" id="profileCoverBg"></div>
                         <div class="profile-main">
-                            <div class="profile-avatar-large" id="profileAvatarLarge" onclick="editProfile()" title="Profili düzenle">👤</div>
-                            <div>
+                            <div class="profile-avatar-wrap">
+                                <div class="profile-avatar-large" id="profileAvatarLarge" onclick="editProfile()" title="Fotoğraf değiştir">👤</div>
+                                <button class="avatar-cam-btn" onclick="editProfile()" title="Fotoğraf yükle">＋</button>
+                            </div>
+                            <div class="profile-info">
                                 <h2 class="profile-username" id="profileUsername">Kullanıcı</h2>
                                 <p class="profile-email-display" id="profileEmailDisplay"></p>
                                 <p class="profile-bio-text" id="profileBioText">Anime, manga ve webtoon takipçisi</p>
                                 <div class="profile-badges">
-                                    <span class="profile-badge level-badge-sm">🏆 Lv. <span id="profileLvBadge">1</span></span>
-                                    <span class="profile-badge streak-badge">🔥 <span id="profileStreakBadge">0</span> gün</span>
+                                    <span class="profile-badge level-badge-sm">Lv.<span id="profileLvBadge">1</span></span>
+                                    <span class="profile-badge streak-badge"><span id="profileStreakBadge">0</span> gün serisi</span>
                                 </div>
-                                <div style="display:flex;gap:0.8rem;margin-top:1rem;flex-wrap:wrap;">
-                                    <button class="btn btn-secondary" onclick="editProfile()">✏️ Düzenle</button>
-                                    <button class="btn btn-ghost" onclick="shareProfile()">📤 Paylaş</button>
+                                <div style="display:flex;gap:0.6rem;margin-top:0.9rem;flex-wrap:wrap;">
+                                    <button class="btn btn-secondary" onclick="editProfile()">Profili Düzenle</button>
+                                    <button class="btn btn-ghost" onclick="shareProfile()">Paylaş</button>
                                 </div>
                             </div>
                         </div>
                     </div>
+
                     <div class="profile-stats-grid">
-                        <div class="profile-stat-card"><div class="psc-icon">🎬</div><div class="psc-val" id="profileTotalAnime">0</div><div class="psc-label">Anime</div></div>
-                        <div class="profile-stat-card"><div class="psc-icon">📖</div><div class="psc-val" id="profileTotalManga">0</div><div class="psc-label">Manga</div></div>
-                        <div class="profile-stat-card"><div class="psc-icon">📱</div><div class="psc-val" id="profileTotalWebtoon">0</div><div class="psc-label">Webtoon</div></div>
-                        <div class="profile-stat-card"><div class="psc-icon">✅</div><div class="psc-val" id="profileCompletedTotal">0</div><div class="psc-label">Tamamlanan</div></div>
-                        <div class="profile-stat-card"><div class="psc-icon">⭐</div><div class="psc-val" id="profileXPTotal">0</div><div class="psc-label">Toplam XP</div></div>
-                        <div class="profile-stat-card"><div class="psc-icon">🔥</div><div class="psc-val" id="profileStreakVal">0</div><div class="psc-label">En Uzun Streak</div></div>
+                        <div class="profile-stat-card"><div class="psc-val" id="profileTotalAnime">0</div><div class="psc-label">Anime</div></div>
+                        <div class="profile-stat-card"><div class="psc-val" id="profileTotalManga">0</div><div class="psc-label">Manga</div></div>
+                        <div class="profile-stat-card"><div class="psc-val" id="profileTotalWebtoon">0</div><div class="psc-label">Webtoon</div></div>
+                        <div class="profile-stat-card"><div class="psc-val" id="profileCompletedTotal">0</div><div class="psc-label">Tamamlanan</div></div>
+                        <div class="profile-stat-card"><div class="psc-val" id="profileXPTotal">0</div><div class="psc-label">Toplam XP</div></div>
+                        <div class="profile-stat-card"><div class="psc-val" id="profileStreakVal">0</div><div class="psc-label">En Uzun Seri</div></div>
                     </div>
+
+                    <div class="profile-section-block" style="margin-bottom:1.2rem;">
+                        <div class="psb-title">İzleme Durumu</div>
+                        <div id="profileStatusBars"></div>
+                    </div>
+
                     <div class="profile-two-col">
                         <div class="profile-section-block">
-                            <h3 class="psb-title">📋 Son Aktiviteler</h3>
+                            <div class="psb-title">Son Aktiviteler</div>
                             <div class="activity-list" id="activityList"></div>
                         </div>
-                        <div class="profile-section-block">
-                            <h3 class="psb-title">💖 Favori Türler</h3>
-                            <div class="favorite-genres" id="favoriteGenres"></div>
-                            <h3 class="psb-title" style="margin-top:1.5rem;">🏆 Son Başarımlar</h3>
-                            <div class="recent-achievements" id="recentAchievements"></div>
+                        <div>
+                            <div class="profile-section-block" style="margin-bottom:1rem;">
+                                <div class="psb-title">Favori Türler</div>
+                                <div id="favoriteGenres"></div>
+                            </div>
+                            <div class="profile-section-block">
+                                <div class="psb-title">Son Başarımlar</div>
+                                <div class="recent-achievements" id="recentAchievements"></div>
+                            </div>
                         </div>
                     </div>
+
                     <div class="profile-section-block">
-                        <h3 class="psb-title">📤 Paylaş & Dışa Aktar</h3>
+                        <div class="psb-title">Dışa Aktar</div>
                         <div class="share-btns">
-                            <button class="share-btn twitter" onclick="shareToTwitter()">🐦 Twitter</button>
-                            <button class="share-btn copy" onclick="copyProfileLink()">🔗 Link Kopyala</button>
-                            <button class="share-btn export" onclick="exportData('json')">📥 JSON İndir</button>
+                            <button class="share-btn twitter" onclick="shareToTwitter()">Twitter'da Paylaş</button>
+                            <button class="share-btn copy" onclick="copyProfileLink()">Linki Kopyala</button>
+                            <button class="share-btn export" onclick="exportData('json')">JSON İndir</button>
                         </div>
                     </div>
                 </div>
@@ -1213,55 +1227,76 @@
 
         <!-- Edit Profile Modal -->
         <div id="editProfileModal" class="modal" style="display:none;">
-            <div class="modal-content">
+            <div class="modal-content" style="max-width:500px;">
                 <div class="modal-top">
-                    <h2 class="modal-title">✏️ Profili Düzenle</h2>
+                    <h2 class="modal-title">Profili Düzenle</h2>
                     <button class="modal-close" onclick="closeEditProfile()">✕</button>
                 </div>
                 <form id="editProfileForm" onsubmit="saveProfile(event)">
-                    <div class="form-group">
-                        <label>Kullanıcı Adı</label>
-                        <input type="text" id="editUsername" required maxlength="30">
+
+                    <!-- FOTOĞRAF YÜKLEME -->
+                    <div class="avatar-upload-zone">
+                        <div class="avatar-preview-wrap">
+                            <div id="avatarPreview" class="avatar-preview-el">👤</div>
+                        </div>
+                        <div class="avatar-upload-info">
+                            <button type="button" class="btn-upload-photo" onclick="triggerAvatarUpload()">
+                                Fotoğraf Yükle
+                            </button>
+                            <button type="button" class="btn-remove-photo" onclick="removeAvatarPhoto()">Kaldır</button>
+                            <p style="font-size:0.72rem;color:var(--text-muted);margin-top:0.3rem;">JPG, PNG, WEBP · max 3MB</p>
+                        </div>
+                        <input type="file" id="avatarFileInput" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">
                     </div>
+
+                    <!-- VEYA EMOJİ -->
                     <div class="form-group">
-                        <label>Bio</label>
-                        <textarea id="editBio" rows="3" placeholder="Kendinizi tanıtın..." maxlength="200"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Avatar Seç</label>
+                        <label style="font-size:0.75rem;color:var(--text-muted);letter-spacing:0.3px;">Veya emoji seç</label>
                         <div class="avatar-selector">
                             <button type="button" class="avatar-option" onclick="selectAvatar('👤')">👤</button>
-                            <button type="button" class="avatar-option" onclick="selectAvatar('😊')">😊</button>
+                            <button type="button" class="avatar-option" onclick="selectAvatar('😎')">😎</button>
                             <button type="button" class="avatar-option" onclick="selectAvatar('🎮')">🎮</button>
                             <button type="button" class="avatar-option" onclick="selectAvatar('🎬')">🎬</button>
                             <button type="button" class="avatar-option" onclick="selectAvatar('📺')">📺</button>
                             <button type="button" class="avatar-option" onclick="selectAvatar('🌟')">🌟</button>
                             <button type="button" class="avatar-option" onclick="selectAvatar('⚡')">⚡</button>
                             <button type="button" class="avatar-option" onclick="selectAvatar('🔥')">🔥</button>
-                            <button type="button" class="avatar-option" onclick="selectAvatar('💫')">💫</button>
-                            <button type="button" class="avatar-option" onclick="selectAvatar('🎯')">🎯</button>
                             <button type="button" class="avatar-option" onclick="selectAvatar('🐉')">🐉</button>
                             <button type="button" class="avatar-option" onclick="selectAvatar('⚔️')">⚔️</button>
                             <button type="button" class="avatar-option" onclick="selectAvatar('🌙')">🌙</button>
                             <button type="button" class="avatar-option" onclick="selectAvatar('🦊')">🦊</button>
                             <button type="button" class="avatar-option" onclick="selectAvatar('🌸')">🌸</button>
+                            <button type="button" class="avatar-option" onclick="selectAvatar('🐺')">🐺</button>
+                            <button type="button" class="avatar-option" onclick="selectAvatar('🦅')">🦅</button>
+                            <button type="button" class="avatar-option" onclick="selectAvatar('🎭')">🎭</button>
                         </div>
                         <input type="hidden" id="selectedAvatar" value="👤">
                     </div>
+
                     <div class="form-group">
-                        <label>Kapak Rengi</label>
+                        <label>Kullanıcı Adı</label>
+                        <input type="text" id="editUsername" required maxlength="30" placeholder="Adın...">
+                    </div>
+                    <div class="form-group">
+                        <label>Bio</label>
+                        <textarea id="editBio" rows="2" placeholder="Kendinizi tanıtın..." maxlength="200"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label style="font-size:0.75rem;color:var(--text-muted);letter-spacing:0.3px;">Kapak rengi</label>
                         <div class="cover-colors">
                             <div class="cc-opt" style="background:linear-gradient(135deg,#ff3366,#7c3aed)" onclick="selectCoverColor('gradient1')" data-color="gradient1"></div>
                             <div class="cc-opt" style="background:linear-gradient(135deg,#00d4ff,#0ea5e9)" onclick="selectCoverColor('gradient2')" data-color="gradient2"></div>
                             <div class="cc-opt" style="background:linear-gradient(135deg,#10b981,#059669)" onclick="selectCoverColor('gradient3')" data-color="gradient3"></div>
                             <div class="cc-opt" style="background:linear-gradient(135deg,#f59e0b,#ef4444)" onclick="selectCoverColor('gradient4')" data-color="gradient4"></div>
                             <div class="cc-opt" style="background:linear-gradient(135deg,#8b5cf6,#ec4899)" onclick="selectCoverColor('gradient5')" data-color="gradient5"></div>
+                            <div class="cc-opt" style="background:linear-gradient(135deg,#f97316,#fbbf24)" onclick="selectCoverColor('gradient6')" data-color="gradient6"></div>
+                            <div class="cc-opt" style="background:linear-gradient(135deg,#06b6d4,#6366f1)" onclick="selectCoverColor('gradient7')" data-color="gradient7"></div>
                         </div>
                         <input type="hidden" id="selectedCoverColor" value="gradient1">
                     </div>
                     <div class="modal-actions">
                         <button type="button" class="btn btn-secondary" onclick="closeEditProfile()">İptal</button>
-                        <button type="submit" class="btn btn-primary">💾 Kaydet</button>
+                        <button type="submit" class="btn btn-primary">Kaydet</button>
                     </div>
                 </form>
             </div>

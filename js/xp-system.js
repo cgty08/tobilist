@@ -57,7 +57,7 @@ const ACHIEVEMENTS = [
     { id: 'harsh_critic',     icon: '😤', title: 'Acımasız Kritik', desc: 'Bir içeriğe 1/10 ver',                 xp: 30,   rarity: 'uncommon',  check: (d) => d.items.filter(i=>i.rating===1).length >= 1 },
     // Çeşitlilik
     { id: 'all_types',        icon: '🌈', title: 'Çok Yönlü',      desc: 'Anime, manga ve webtoon ekle',         xp: 80,   rarity: 'uncommon',  check: (d) => { const t=new Set(d.items.map(i=>i.type)); return t.has('anime')&&t.has('manga')&&t.has('webtoon'); } },
-    { id: 'all_status',       icon: '🎭', title: 'Her Statüden',    desc: 'Tüm durum kategorilerini kullan',      xp: 60,   rarity: 'uncommon',  check: (d) => { const s=new Set(d.items.map(i=>i.status)); return s.has('watching')&&s.has('completed')&&s.has('planned')&&s.has('dropped'); } },
+    { id: 'all_status',       icon: '🎭', title: 'Her Statüden',    desc: 'Tüm durum kategorilerini kullan',      xp: 60,   rarity: 'uncommon',  check: (d) => { const s=new Set(d.items.map(i=>i.status)); return s.has('watching')&&s.has('completed')&&s.has('plantowatch')&&s.has('dropped'); } },
     // Streak
     { id: 'three_streak',     icon: '🔥', title: 'Alev Aldı',       desc: '3 gün üst üste giriş yap',            xp: 30,   rarity: 'common',    check: (d) => d.streak.count >= 3 },
     { id: 'week_streak',      icon: '🔥', title: 'Sadık Takipçi',   desc: '7 gün üst üste giriş yap',            xp: 100,  rarity: 'uncommon',  check: (d) => d.streak.count >= 7 },
@@ -72,7 +72,7 @@ const ACHIEVEMENTS = [
     { id: 'level50',          icon: '🦄', title: 'Ölümsüz',         desc: "Seviye 50'ye ulaş",                   xp: 0,    rarity: 'legendary', check: (d) => d.xp.level >= 50 },
     // Özel
     { id: 'dropped_low',      icon: '🗑️', title: 'Seçici',          desc: '5 seri bırak',                        xp: 40,   rarity: 'common',    check: (d) => d.items.filter(i=>i.status==='dropped').length >= 5 },
-    { id: 'planner',          icon: '📅', title: 'Planlayıcı',      desc: '10 içerik planla',                    xp: 50,   rarity: 'common',    check: (d) => d.items.filter(i=>i.status==='planned').length >= 10 },
+    { id: 'planner',          icon: '📅', title: 'Planlayıcı',      desc: '10 içerik planla',                    xp: 50,   rarity: 'common',    check: (d) => d.items.filter(i=>i.status==='plantowatch').length >= 10 },
     { id: 'early_bird',       icon: '🌅', title: 'Erken Kuş',       desc: 'Sabah 6-9 arası giriş yap',           xp: 25,   rarity: 'uncommon',  check: () => { const h=new Date().getHours(); return h>=6&&h<9; } },
     { id: 'night_owl',        icon: '🦉', title: 'Gece Kuşu',       desc: 'Gece yarısı 00-04 arası giriş yap',  xp: 25,   rarity: 'uncommon',  check: () => { const h=new Date().getHours(); return h>=0&&h<4; } },
 ];

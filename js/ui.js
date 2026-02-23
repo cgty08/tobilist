@@ -398,18 +398,39 @@ function deleteItem(id) {
 }
 
 // ===== PROFILE =====
+
+// Avatar'ı bir element'e uygula (fotoğraf varsa fotoğraf, yoksa emoji)
+function _applyAvatar(elId, social) {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    if (social && social.avatarUrl) {
+        el.style.backgroundImage = 'url(' + social.avatarUrl + ')';
+        el.style.backgroundSize = 'cover';
+        el.style.backgroundPosition = 'center';
+        el.textContent = '';
+        el.classList.add('has-photo');
+    } else {
+        el.style.backgroundImage = '';
+        el.style.backgroundSize = '';
+        el.style.backgroundPosition = '';
+        el.classList.remove('has-photo');
+        el.textContent = (social && social.avatar) ? social.avatar : '👤';
+    }
+}
+
 function renderProfilePage() {
     if (!dataManager.data || !currentUser) return;
     const d = dataManager.data;
     const set = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
 
-    set('profileUsername', d.social.name || currentUser.displayName || t('profileTitle'));
+    set('profileUsername', d.social.name || 'Kullanıcı');
     set('profileEmailDisplay', currentUser.email || '');
-    set('profileBioText', d.social.bio || t('bioDefault'));
+    set('profileBioText', d.social.bio || 'Anime, manga ve webtoon takipçisi');
 
-    const avatar = document.getElementById('profileAvatarLarge');
-    if (avatar) avatar.textContent = d.social.avatar || '👤';
+    // Avatar — fotoğraf veya emoji
+    _applyAvatar('profileAvatarLarge', d.social);
 
+    // Kapak
     const cover = document.getElementById('profileCoverBg');
     if (cover) {
         const covers = {
@@ -417,7 +438,9 @@ function renderProfilePage() {
             gradient2: 'linear-gradient(135deg,#00d4ff,#0ea5e9)',
             gradient3: 'linear-gradient(135deg,#10b981,#059669)',
             gradient4: 'linear-gradient(135deg,#f59e0b,#ef4444)',
-            gradient5: 'linear-gradient(135deg,#8b5cf6,#ec4899)'
+            gradient5: 'linear-gradient(135deg,#8b5cf6,#ec4899)',
+            gradient6: 'linear-gradient(135deg,#f97316,#fbbf24)',
+            gradient7: 'linear-gradient(135deg,#06b6d4,#6366f1)',
         };
         cover.style.background = covers[d.social.cover || 'gradient1'];
     }
@@ -425,51 +448,115 @@ function renderProfilePage() {
     updateStats();
     xpSystem.updateUI();
 
-    // Recent activity
+    const items = d.items || [];
+
+    // İzleme durumu özeti
+    const watching   = items.filter(i => i.status === 'watching').length;
+    const completed  = items.filter(i => i.status === 'completed').length;
+    const planned    = items.filter(i => i.status === 'plantowatch').length;
+    const dropped    = items.filter(i => i.status === 'dropped').length;
+    const rated      = items.filter(i => i.rating);
+    const avgRating  = rated.length ? (rated.reduce((s, i) => s + i.rating, 0) / rated.length).toFixed(1) : '—';
+
+    set('profileTotalAnime',    items.filter(i => i.type === 'anime').length);
+    set('profileTotalManga',    items.filter(i => i.type === 'manga').length);
+    set('profileTotalWebtoon',  items.filter(i => i.type === 'webtoon').length);
+    set('profileCompletedTotal', completed);
+    set('profileStreakVal',     d.streak?.longest || d.streak?.count || 0);
+    set('profileXPTotal',      d.xp?.total || 0);
+
+    // Durum çubukları
+    const statusBar = document.getElementById('profileStatusBars');
+    if (statusBar) {
+        const total = items.length || 1;
+        const bars = [
+            { label: t('watching_stat'),    count: watching,  color: '#00d4ff' },
+            { label: t('completed_stat'),   count: completed, color: '#10b981' },
+            { label: t('plantowatch_stat'), count: planned,   color: '#a78bfa' },
+            { label: _lang === 'en' ? 'Dropped' : 'Bırakıldı', count: dropped, color: '#f87171' },
+        ];
+        statusBar.innerHTML = bars.map(b => `
+            <div class="status-bar-row">
+                <span class="status-bar-label">${b.label}</span>
+                <div class="status-bar-track">
+                    <div class="status-bar-fill" style="width:${Math.round(b.count/total*100)}%;background:${b.color};"></div>
+                </div>
+                <span class="status-bar-count">${b.count}</span>
+            </div>`).join('') + `
+            <div class="status-bar-row" style="margin-top:0.6rem;border-top:1px solid var(--border);padding-top:0.6rem;">
+                <span class="status-bar-label" style="color:var(--text-muted)">Ort. Puan</span>
+                <div class="status-bar-track">
+                    <div class="status-bar-fill" style="width:${rated.length ? Math.round(parseFloat(avgRating)/5*100) : 0}%;background:#fbbf24;"></div>
+                </div>
+                <span class="status-bar-count" style="color:#fbbf24;">${avgRating}</span>
+            </div>`;
+    }
+
+    // Son aktiviteler
     const actList = document.getElementById('activityList');
     if (actList) {
-        const recent = d.items.slice(0, 5);
+        const recent = [...items].reverse().slice(0, 6);
+        const sColors = { watching:'#00d4ff', completed:'#10b981', plantowatch:'#a78bfa', onhold:'#fbbf24', dropped:'#f87171' };
+        const sLabels = {
+            watching:    t('watching_stat'),
+            completed:   t('completed_stat'),
+            plantowatch: t('plantowatch_stat'),
+            onhold:      t('onhold_stat'),
+            dropped:     _lang === 'en' ? 'Dropped' : 'Bırakıldı'
+        };
         if (recent.length === 0) {
-            actList.innerHTML = `<div style="color:var(--text-muted);font-size:0.9rem;padding:0.5rem;">${t('noActivity')}</div>`;
+            actList.innerHTML = '<div style="color:var(--text-muted);font-size:0.88rem;padding:0.8rem 0;">' + t('noActivity') + '</div>';
         } else {
-            actList.innerHTML = recent.map(i =>
-                `<div class="activity-item">
+            actList.innerHTML = recent.map(i => `
+                <div class="activity-item">
                     <div class="activity-icon">${getTypeIcon(i.type)}</div>
-                    <div><strong>${i.name || ''}</strong>
-                    <div class="activity-time">${_lang === 'en' ? 'Added' : 'Eklendi'}</div></div>
-                </div>`
-            ).join('');
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-weight:600;font-size:0.85rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${i.name || '—'}</div>
+                        <div style="display:flex;gap:0.5rem;align-items:center;margin-top:0.1rem;">
+                            <span style="font-size:0.72rem;color:${sColors[i.status] || 'var(--text-muted)'}">● ${sLabels[i.status] || ''}</span>
+                            ${i.rating ? '<span style="font-size:0.72rem;color:#fbbf24;">★ ' + i.rating + '</span>' : ''}
+                        </div>
+                    </div>
+                </div>`).join('');
         }
     }
 
-    // Favorite genres
+    // Favori türler — bar chart
     const genres = {};
-    d.items.forEach(i => { if (i.genre) genres[i.genre] = (genres[i.genre] || 0) + 1; });
+    items.forEach(i => { if (i.genre) genres[i.genre] = (genres[i.genre] || 0) + 1; });
     const favGenres = document.getElementById('favoriteGenres');
     if (favGenres) {
         const sorted = Object.entries(genres).sort((a, b) => b[1] - a[1]).slice(0, 5);
+        const max = sorted[0]?.[1] || 1;
         favGenres.innerHTML = sorted.length > 0
-            ? sorted.map(([g, c]) => `<span class="genre-chip">${g} (${c})</span>`).join('')
-            : `<div style="color:var(--text-muted);font-size:0.9rem;">${t('noGenres')}</div>`;
+            ? sorted.map(([g, c]) => `
+                <div style="margin-bottom:0.55rem;">
+                    <div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:0.18rem;">
+                        <span>${g}</span><span style="color:var(--text-muted)">${c}</span>
+                    </div>
+                    <div style="height:3px;background:var(--border);border-radius:2px;overflow:hidden;">
+                        <div style="width:${Math.round(c/max*100)}%;height:100%;background:linear-gradient(90deg,#ff3366,#00d4ff);border-radius:2px;"></div>
+                    </div>
+                </div>`).join('')
+            : '<span style="color:var(--text-muted);font-size:0.88rem;">' + t('noGenres') + '</span>';
     }
 
-    // Recent achievements
+    // Son başarımlar
     const recentAch = document.getElementById('recentAchievements');
     if (recentAch) {
-        const unlocked = ACHIEVEMENTS.filter(a => d.achievements.includes(a.id)).slice(0, 3);
+        const achList = typeof ACHIEVEMENTS !== 'undefined' ? ACHIEVEMENTS : [];
+        const unlocked = achList.filter(a => (d.achievements || []).includes(a.id)).slice(-4).reverse();
         recentAch.innerHTML = unlocked.length > 0
-            ? unlocked.map(a =>
-                `<div class="ach-mini">
+            ? unlocked.map(a => `
+                <div class="ach-mini">
                     <span class="ach-mini-icon">${a.icon}</span>
-                    <span class="ach-mini-name">${a.title}</span>
-                    <span class="ach-mini-xp">+${a.xp} XP</span>
+                    <div style="flex:1;min-width:0;">
+                        <div class="ach-mini-name">${a.title}</div>
+                    </div>
+                    ${a.xp > 0 ? '<span class="ach-mini-xp">+' + a.xp + ' XP</span>' : ''}
                 </div>`).join('')
-            : `<div style="color:var(--text-muted);font-size:0.9rem;">${t('noAchievements')}</div>`;
+            : '<div style="color:var(--text-muted);font-size:0.88rem;">' + t('noAchievements') + '</div>';
     }
-
-    // Profile streaks
-    set('profileStreakVal', d.streak?.longest || d.streak?.count || 0);
-    set('profileXPTotal', d.xp?.total || 0);
 }
 
 // ===== EDIT PROFILE =====
@@ -479,18 +566,16 @@ function editProfile() {
     const modal = document.getElementById('editProfileModal');
     if (!modal) return;
 
-    const eu = document.getElementById('editUsername');
-    const eb = document.getElementById('editBio');
-    const sa = document.getElementById('selectedAvatar');
-    const sc = document.getElementById('selectedCoverColor');
+    document.getElementById('editUsername').value = d.name || '';
+    document.getElementById('editBio').value = d.bio || '';
+    document.getElementById('selectedAvatar').value = d.avatar || '👤';
+    document.getElementById('selectedCoverColor').value = d.cover || 'gradient1';
 
-    if (eu) eu.value = d.name || '';
-    if (eb) eb.value = d.bio || '';
-    if (sa) sa.value = d.avatar || '👤';
-    if (sc) sc.value = d.cover || 'gradient1';
+    // Önizlemeyi güncelle
+    _applyAvatar('avatarPreview', d);
 
     document.querySelectorAll('.avatar-option').forEach(btn =>
-        btn.classList.toggle('selected', btn.textContent === (d.avatar || '👤'))
+        btn.classList.toggle('selected', btn.textContent.trim() === (d.avatar || '👤'))
     );
     document.querySelectorAll('.cc-opt').forEach(opt =>
         opt.classList.toggle('selected', opt.dataset.color === (d.cover || 'gradient1'))
@@ -509,37 +594,86 @@ function saveProfile(event) {
     event.preventDefault();
     if (!dataManager.data) return;
 
-    const eu = document.getElementById('editUsername');
-    const eb = document.getElementById('editBio');
-    const sa = document.getElementById('selectedAvatar');
-    const sc = document.getElementById('selectedCoverColor');
+    dataManager.data.social.name   = document.getElementById('editUsername').value.trim();
+    dataManager.data.social.bio    = document.getElementById('editBio').value.trim();
+    dataManager.data.social.avatar = document.getElementById('selectedAvatar').value;
+    dataManager.data.social.cover  = document.getElementById('selectedCoverColor').value;
+    // avatarUrl modal içinde doğrudan set edildi, dokunmuyoruz
 
-    dataManager.data.social.name   = eu ? eu.value.trim() : '';
-    dataManager.data.social.bio    = eb ? eb.value.trim() : '';
-    dataManager.data.social.avatar = sa ? sa.value : '👤';
-    dataManager.data.social.cover  = sc ? sc.value : 'gradient1';
-
-    dataManager.saveAll(); // FIX: saves to both localStorage + Supabase
+    dataManager.saveAll();
     closeEditProfile();
     renderProfilePage();
     updateHeaderUser();
-    showNotification(t('profileUpdated'), 'success');
+    showNotification('Profil güncellendi ✓', 'success');
 }
 
 function selectAvatar(emoji) {
-    const sa = document.getElementById('selectedAvatar');
-    if (sa) sa.value = emoji;
+    document.getElementById('selectedAvatar').value = emoji;
     document.querySelectorAll('.avatar-option').forEach(btn =>
-        btn.classList.toggle('selected', btn.textContent === emoji)
+        btn.classList.toggle('selected', btn.textContent.trim() === emoji)
     );
+    // Emoji seçilince fotoğrafı kaldır
+    if (dataManager.data) dataManager.data.social.avatarUrl = null;
+    _applyAvatar('avatarPreview', { avatar: emoji, avatarUrl: null });
 }
 
 function selectCoverColor(color) {
-    const sc = document.getElementById('selectedCoverColor');
-    if (sc) sc.value = color;
+    document.getElementById('selectedCoverColor').value = color;
     document.querySelectorAll('.cc-opt').forEach(opt =>
         opt.classList.toggle('selected', opt.dataset.color === color)
     );
+}
+
+// ===== FOTOĞRAF YÜKLEME =====
+function triggerAvatarUpload() {
+    document.getElementById('avatarFileInput')?.click();
+}
+
+function handleAvatarUpload(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+        showNotification('Lütfen bir görsel dosyası seçin', 'error');
+        return;
+    }
+    if (file.size > 3 * 1024 * 1024) {
+        showNotification("Görsel 3MB'den küçük olmalı", 'error');
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+            // 300x300 max, JPEG 0.85 kalite
+            const canvas = document.createElement('canvas');
+            const max = 300;
+            const ratio = Math.min(max / img.width, max / img.height);
+            canvas.width  = Math.round(img.width  * ratio);
+            canvas.height = Math.round(img.height * ratio);
+            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+
+            // Önizle
+            _applyAvatar('avatarPreview', { avatarUrl: dataUrl });
+
+            // Kaydet (saveProfile'da da korunacak)
+            if (dataManager.data) dataManager.data.social.avatarUrl = dataUrl;
+
+            // Emoji seçimini temizle
+            document.querySelectorAll('.avatar-option').forEach(b => b.classList.remove('selected'));
+            showNotification('Fotoğraf yüklendi ✓', 'success');
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+    event.target.value = '';
+}
+
+function removeAvatarPhoto() {
+    if (dataManager.data) dataManager.data.social.avatarUrl = null;
+    const emoji = document.getElementById('selectedAvatar')?.value || '👤';
+    _applyAvatar('avatarPreview', { avatar: emoji, avatarUrl: null });
+    showNotification('Fotoğraf kaldırıldı', 'info');
 }
 
 // ===== ACHIEVEMENTS =====
@@ -715,12 +849,20 @@ function renderAISection() {
     generateAIRecommendations();
 }
 
+let _aiRetryCount = 0;
 function generateAIRecommendations() {
     if (!allContent || allContent.length === 0) {
+        if (_aiRetryCount >= 5) {
+            _aiRetryCount = 0;
+            showNotification(_lang==='en'?'Could not load content. Please refresh.':'İçerik yüklenemedi. Sayfayı yenileyin.', 'error');
+            return;
+        }
+        _aiRetryCount++;
         showNotification(_lang==='en'?'Loading content, please wait...':'İçerikler yükleniyor, lütfen bekleyin...', 'info');
         setTimeout(generateAIRecommendations, 3000);
         return;
     }
+    _aiRetryCount = 0;
 
     const myItems = dataManager.data?.items || [];
     const myNames = myItems.map(i => (i.name || '').toLowerCase());

@@ -203,6 +203,12 @@ function renderContinueWatching() {
 
     container.innerHTML = watching.map(item => {
         const pct = (item.totalEpisodes || 0) > 0 ? ((item.currentEpisode || 0) / item.totalEpisodes * 100).toFixed(0) : 0;
+        const itemJson = JSON.stringify({
+            id: item.id, name: item.name, type: item.type,
+            poster: item.poster, episodes: item.totalEpisodes,
+            rating: item.rating, genres: item.genres || [], malId: item.malId
+        });
+        const safeItem = itemJson.replace(/'/g, "\\'").replace(/"/g, '&quot;');
         return '<div class="media-card" style="cursor:pointer" onclick="openDetailPage(\'' + safeItem + '\')">' +
             '<div class="media-poster">' +
                 (item.poster
@@ -607,8 +613,8 @@ function openDetailPageFromLibrary(itemId) {
     if (!item) return;
     const itemJson = JSON.stringify({
         id: item.id, name: item.name, type: item.type,
-        poster: item.poster, episodes: item.totalEpisodes,
-        chapters: item.totalEpisodes, rating: item.rating,
+        poster: item.poster, episodes: item.type === 'anime' ? item.totalEpisodes : null,
+        chapters: item.type !== 'anime' ? item.totalEpisodes : null, rating: item.rating,
         genres: item.genres || [], malId: item.malId
     });
     openDetailPage(itemJson.replace(/"/g, '&quot;'));

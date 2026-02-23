@@ -470,17 +470,10 @@ function updateUIForLoggedIn() {
     updateHeaderUser();
 
     // Admin linki - sadece admin emaili için
-    const adminEmails = ['admin@tobilist.com', 'cgty08@gmail.com', 'list086@gmail.com'];
+    const adminEmails = ['admin@tobilist.com', 'cgty08@gmail.com'];
     const adminLink = document.getElementById('adminPanelLink');
     if (adminLink && currentUser && adminEmails.includes(currentUser.email)) {
         adminLink.style.display = 'block';
-    }
-    // Admin header butonu
-    const adminHeaderBtn = document.getElementById('adminHeaderBtn');
-    if (adminHeaderBtn && currentUser && adminEmails.includes(currentUser.email)) {
-        adminHeaderBtn.style.display = 'inline-block';
-    } else if (adminHeaderBtn) {
-        adminHeaderBtn.style.display = 'none';
     }
 
     const bannerActions = document.getElementById('bannerActions');
@@ -499,7 +492,6 @@ function updateUIForGuest() {
     hide('levelBadge');
     hide('streakBadge');
     hide('totalBadge');
-    hide('adminHeaderBtn');
     show('guestAppBanner', 'flex');
 
     const guestCTA = document.getElementById('guestCTA');
@@ -517,12 +509,24 @@ function updateUIForGuest() {
 
 function updateHeaderUser() {
     if (!currentUser) return;
-    const username = dataManager.data?.social?.name || currentUser.displayName || 'Kullanıcı';
-    const avatar = dataManager.data?.social?.avatar || '👤';
+    const social   = dataManager.data?.social || {};
+    const username = social.name || currentUser.displayName || 'Kullanıcı';
     const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-    setEl('headerAvatar', avatar);
+
+    // Avatar: fotoğraf varsa fotoğraf, yoksa emoji — hem header hem dropdown
+    ['headerAvatar', 'dropdownAvatar'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (social.avatarUrl) {
+            el.style.cssText = 'background-image:url(' + social.avatarUrl + ');background-size:cover;background-position:center;width:100%;height:100%;border-radius:50%;display:block;';
+            el.textContent = '';
+        } else {
+            el.style.cssText = '';
+            el.textContent = social.avatar || '👤';
+        }
+    });
+
     setEl('headerUsername', username);
-    setEl('dropdownAvatar', avatar);
     setEl('dropdownName', username);
     setEl('dropdownEmail', currentUser.email || '');
 }
