@@ -469,8 +469,7 @@ function updateUIForLoggedIn() {
 
     updateHeaderUser();
 
-    // Admin linki - sadece admin emaili için
-    const adminEmails = ['admin@tobilist.com', 'cgty08@gmail.com'];
+    const adminEmails = ['list086@gmail.com'];
     const adminLink = document.getElementById('adminPanelLink');
     const adminShortcut = document.getElementById('adminShortcutBtn');
     if (currentUser && adminEmails.includes(currentUser.email)) {
