@@ -121,8 +121,6 @@ async function loginSuccess(user) {
     updateUIForLoggedIn();
     if (typeof initializeApp === 'function') initializeApp();
     hideLoadingScreen();
-    // Duyuruları kontrol et (2sn sonra, Supabase hazır olsun)
-    setTimeout(() => { if (typeof checkAnnouncements === 'function') checkAnnouncements(); }, 2500);
 }
 
 function guestMode() {
@@ -132,7 +130,6 @@ function guestMode() {
     updateUIForGuest();
     if (typeof initializeApp === 'function') initializeApp();
     hideLoadingScreen();
-    setTimeout(() => { if (typeof checkAnnouncements === 'function') checkAnnouncements(); }, 2500);
 }
 
 // ===== LOADING =====
@@ -369,24 +366,54 @@ async function handleForgotPassword() {
 
 // ===== LOGOUT =====
 async function handleLogout() {
-    if (!confirm('Çıkış yapmak istediğinize emin misiniz?')) return;
+    if (document.getElementById('logoutConfirmBox')) return;
 
-    try {
-        if (window.supabaseClient) {
-            await window.supabaseClient.auth.signOut();
-        }
-    } catch(e) {
-        console.warn('Logout error:', e);
+    var box = document.createElement('div');
+    box.id = 'logoutConfirmBox';
+    box.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);z-index:999999;background:#141824;border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:1.4rem 1.6rem;width:320px;box-shadow:0 20px 60px rgba(0,0,0,0.6),0 0 0 1px rgba(255,51,102,0.15);font-family:DM Sans,sans-serif;opacity:0;transition:all 0.3s cubic-bezier(0.175,0.885,0.32,1.275);';
+
+    box.innerHTML = '<div style="display:flex;align-items:center;gap:0.7rem;margin-bottom:1rem;">'
+        + '<div style="width:36px;height:36px;background:rgba(255,51,102,0.12);border:1px solid rgba(255,51,102,0.25);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">&#128075;</div>'
+        + '<div>'
+        + '<div style="color:#fff;font-weight:700;font-size:0.95rem;">&#199;&#305;k&#305;&#351; Yap</div>'
+        + '<div style="color:#8892a4;font-size:0.78rem;margin-top:1px;">Hesab&#305;ndan &#231;&#305;kmak istiyor musun?</div>'
+        + '</div></div>'
+        + '<div style="display:flex;gap:0.6rem;">'
+        + '<button id="logoutCancelBtn" style="flex:1;padding:0.6rem;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#a0a8b9;font-size:0.85rem;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;">&#304;ptal</button>'
+        + '<button id="logoutConfirmBtn" style="flex:1;padding:0.6rem;background:linear-gradient(135deg,#ff3366,#ff5580);border:none;border-radius:10px;color:#fff;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:DM Sans,sans-serif;box-shadow:0 4px 15px rgba(255,51,102,0.35);">&#199;&#305;k&#305;&#351; Yap</button>'
+        + '</div>';
+
+    document.body.appendChild(box);
+    setTimeout(function() { box.style.opacity = '1'; box.style.transform = 'translateX(-50%) translateY(0)'; }, 10);
+
+    function closeBox() {
+        box.style.opacity = '0';
+        setTimeout(function() { if (box.parentNode) box.parentNode.removeChild(box); }, 250);
     }
 
-    currentUser = null;
-    isGuest = true;
-    dataManager.data = dataManager.defaultData();
-    dataManager.currentUserId = null;
-    updateUIForGuest();
-    switchSection('home');
-    showNotification('Çıkış yapıldı. Görüşürüz! 👋', 'info');
+    document.getElementById('logoutCancelBtn').onclick = closeBox;
+
+    document.getElementById('logoutConfirmBtn').onclick = async function() {
+        closeBox();
+        try {
+            if (window.supabaseClient) await window.supabaseClient.auth.signOut();
+        } catch(e) { console.warn('Logout error:', e); }
+        currentUser = null;
+        isGuest = true;
+        dataManager.data = dataManager.defaultData();
+        dataManager.currentUserId = null;
+        updateUIForGuest();
+        switchSection('home');
+        showNotification('&#199;&#305;k&#305;&#351; yap&#305;ld&#305;. G&#246;r&#252;&#351;&#252;r&#252;z! &#128075;', 'info');
+    };
+
+    setTimeout(function() {
+        document.addEventListener('click', function handler(e) {
+            if (!box.contains(e.target)) { closeBox(); document.removeEventListener('click', handler); }
+        });
+    }, 100);
 }
+
 
 // ===== DELETE ACCOUNT =====
 async function deleteAccount() {
