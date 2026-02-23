@@ -35,6 +35,9 @@ function initializeApp() {
         changeLanguage();
     }
 
+    // Duyuruları kontrol et
+    setTimeout(() => { if (typeof checkAnnouncements === 'function') checkAnnouncements(); }, 2000);
+
     const hour = new Date().getHours();
     const greet = hour < 6 ? 'Gece yarısı 🌙' : hour < 12 ? 'Günaydın ☀️' : hour < 18 ? 'İyi günler 🌤️' : 'İyi akşamlar 🌙';
     const gEl = document.getElementById('bannerGreeting');
@@ -565,104 +568,182 @@ function openDetailPageFromLibrary(itemId) {
     openDetailPage(itemJson.replace(/"/g, '&quot;'));
 }
 
+
+
 // =====================================================
-// DUYURU SİSTEMİ
+// DUYURU SİSTEMİ v2 - Güçlü & Güzel
 // =====================================================
 async function checkAnnouncements() {
-    if (!window.supabaseClient) return;
+    if (!window.supabaseClient) {
+        console.warn('Supabase yok, duyuru kontrol edilemiyor');
+        return;
+    }
     try {
         const { data, error } = await window.supabaseClient
             .from('announcements')
             .select('*')
             .order('created_at', { ascending: false })
-            .limit(5);
+            .limit(10);
 
-        if (error || !data || data.length === 0) return;
+        if (error) { console.warn('Duyuru hatası:', error.message); return; }
+        if (!data || data.length === 0) return;
 
-        const dismissed = JSON.parse(localStorage.getItem('dismissed_announcements') || '[]');
-        const visible = data.filter(a => !dismissed.includes(a.id));
+        // String karşılaştırması (BIGSERIAL number vs stored string sorunu)
+        let dismissed = [];
+        try { dismissed = JSON.parse(localStorage.getItem('dismissed_announcements') || '[]'); } catch(e) {}
+        const dismissedStr = dismissed.map(d => String(d));
+
+        const visible = data.filter(a => !dismissedStr.includes(String(a.id)));
         if (visible.length === 0) return;
 
-        const ann = visible[0]; // En son duyuruyu göster
-        showAnnouncementBanner(ann);
+        showAnnouncementModal(visible[0]);
     } catch(e) { console.warn('Announcement check failed:', e); }
 }
 
-function showAnnouncementBanner(ann) {
-    if (document.getElementById('announcementBanner')) return;
+function showAnnouncementModal(ann) {
+    if (document.getElementById('annModal')) return;
 
     const icons = { info: 'ℹ️', success: '✅', warning: '⚠️', update: '🚀' };
-    const colors = {
-        info:    { bg: 'rgba(0,212,255,0.12)',    border: 'rgba(0,212,255,0.35)',    text: '#00d4ff' },
-        success: { bg: 'rgba(16,185,129,0.12)',   border: 'rgba(16,185,129,0.35)',   text: '#10b981' },
-        warning: { bg: 'rgba(245,158,11,0.15)',   border: 'rgba(245,158,11,0.35)',   text: '#f59e0b' },
-        update:  { bg: 'rgba(139,92,246,0.12)',   border: 'rgba(139,92,246,0.35)',   text: '#8b5cf6' }
+    const themes = {
+        info:    { grad: 'linear-gradient(135deg,#00d4ff22,#00d4ff08)', accent: '#00d4ff', glow: 'rgba(0,212,255,0.3)', badge: '#00d4ff', badgeText: '#000' },
+        success: { grad: 'linear-gradient(135deg,#10b98122,#10b98108)', accent: '#10b981', glow: 'rgba(16,185,129,0.3)', badge: '#10b981', badgeText: '#000' },
+        warning: { grad: 'linear-gradient(135deg,#f59e0b22,#f59e0b08)', accent: '#f59e0b', glow: 'rgba(245,158,11,0.3)', badge: '#f59e0b', badgeText: '#000' },
+        update:  { grad: 'linear-gradient(135deg,#8b5cf622,#8b5cf608)', accent: '#8b5cf6', glow: 'rgba(139,92,246,0.3)', badge: '#8b5cf6', badgeText: '#fff' }
     };
-    const c = colors[ann.type] || colors.info;
+    const t = themes[ann.type] || themes.info;
     const icon = icons[ann.type] || 'ℹ️';
+    const typeLabels = { info: 'BİLGİ', success: 'BAŞARILI', warning: 'UYARI', update: 'GÜNCELLEME' };
+    const prioLabel = ann.priority === 'critical' ? '🔴 ACİL' : ann.priority === 'high' ? '🟠 ÖNEMLİ' : null;
 
-    const banner = document.createElement('div');
-    banner.id = 'announcementBanner';
-    banner.innerHTML = `
-        <div style="
-            position:fixed;top:0;left:0;right:0;z-index:99999;
-            background:${c.bg};
-            border-bottom:2px solid ${c.border};
-            backdrop-filter:blur(12px);
-            -webkit-backdrop-filter:blur(12px);
+    const overlay = document.createElement('div');
+    overlay.id = 'annModal';
+    overlay.style.cssText = `
+        position:fixed;inset:0;z-index:999999;
+        display:flex;align-items:center;justify-content:center;
+        padding:1rem;
+        background:rgba(0,0,0,0.7);
+        backdrop-filter:blur(6px);
+        -webkit-backdrop-filter:blur(6px);
+        animation:annFadeIn 0.3s ease;
+    `;
+
+    overlay.innerHTML = `
+        <div id="annBox" style="
+            background:#0f1420;
+            border:1px solid ${t.accent}44;
+            border-radius:20px;
             padding:0;
-            animation: annSlideDown 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
-            box-shadow:0 4px 30px ${c.border};
-        " id="annBannerInner">
-            <div style="max-width:900px;margin:0 auto;padding:0.75rem 1.2rem;display:flex;align-items:center;gap:0.8rem;flex-wrap:wrap;">
-                <span style="font-size:1.3rem;flex-shrink:0;">${icon}</span>
-                <div style="flex:1;min-width:0;">
-                    <div style="font-weight:700;color:${c.text};font-size:0.93rem;font-family:'DM Sans',sans-serif;letter-spacing:0.3px;">
-                        ${ann.title || ''}
+            width:100%;
+            max-width:460px;
+            overflow:hidden;
+            box-shadow:0 0 60px ${t.glow}, 0 20px 60px rgba(0,0,0,0.6);
+            animation:annSlideUp 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+            position:relative;
+        ">
+            <!-- Renkli üst şerit -->
+            <div style="height:4px;background:linear-gradient(90deg,${t.accent},${t.accent}88);"></div>
+
+            <!-- İçerik -->
+            <div style="padding:1.8rem 1.8rem 1.5rem;">
+                <!-- Badge + Kapat -->
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;">
+                    <div style="display:flex;align-items:center;gap:0.5rem;">
+                        <span style="
+                            background:${t.badge};color:${t.badgeText};
+                            font-size:0.68rem;font-weight:800;letter-spacing:1.5px;
+                            padding:3px 10px;border-radius:20px;
+                            font-family:'DM Sans',sans-serif;
+                        ">${typeLabels[ann.type] || 'DUYURU'}</span>
+                        ${prioLabel ? `<span style="font-size:0.75rem;font-weight:700;color:${t.accent};">${prioLabel}</span>` : ''}
                     </div>
-                    ${ann.content ? `<div style="color:rgba(255,255,255,0.75);font-size:0.83rem;margin-top:2px;line-height:1.4;">${ann.content}</div>` : ''}
+                    <button onclick="dismissAnnouncement('${ann.id}')" style="
+                        background:rgba(255,255,255,0.07);
+                        border:1px solid rgba(255,255,255,0.12);
+                        border-radius:8px;color:#8892a4;
+                        cursor:pointer;width:30px;height:30px;
+                        display:flex;align-items:center;justify-content:center;
+                        font-size:0.85rem;transition:all 0.2s;
+                    " onmouseover="this.style.background='rgba(239,68,68,0.15)';this.style.color='#ef4444'"
+                       onmouseout="this.style.background='rgba(255,255,255,0.07)';this.style.color='#8892a4'">✕</button>
                 </div>
-                ${ann.priority === 'critical' ? `<span style="background:${c.text};color:#000;font-size:0.7rem;font-weight:800;padding:2px 8px;border-radius:20px;letter-spacing:1px;flex-shrink:0;">ACİL</span>` : ''}
-                <button onclick="dismissAnnouncement('${ann.id}')" style="
-                    background:rgba(255,255,255,0.08);
-                    border:1px solid rgba(255,255,255,0.15);
-                    border-radius:6px;
-                    color:rgba(255,255,255,0.6);
-                    cursor:pointer;
-                    padding:4px 10px;
-                    font-size:0.78rem;
+
+                <!-- İkon + Başlık -->
+                <div style="display:flex;align-items:flex-start;gap:1rem;margin-bottom:1rem;">
+                    <div style="
+                        width:48px;height:48px;border-radius:14px;
+                        background:${t.grad};
+                        border:1px solid ${t.accent}33;
+                        display:flex;align-items:center;justify-content:center;
+                        font-size:1.6rem;flex-shrink:0;
+                    ">${icon}</div>
+                    <div style="flex:1;min-width:0;">
+                        <h3 style="
+                            color:#fff;font-size:1.05rem;font-weight:700;
+                            margin:0 0 0.3rem;line-height:1.3;
+                            font-family:'DM Sans',sans-serif;
+                        ">${ann.title || ''}</h3>
+                        <div style="
+                            color:#8892a4;font-size:0.75rem;
+                            font-family:'DM Sans',sans-serif;
+                        ">${new Date(ann.created_at).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'})}</div>
+                    </div>
+                </div>
+
+                <!-- Mesaj -->
+                ${ann.content ? `
+                <div style="
+                    background:rgba(255,255,255,0.04);
+                    border:1px solid rgba(255,255,255,0.08);
+                    border-left:3px solid ${t.accent};
+                    border-radius:10px;
+                    padding:0.9rem 1rem;
+                    color:#c0c8d8;
+                    font-size:0.88rem;
+                    line-height:1.6;
                     font-family:'DM Sans',sans-serif;
-                    flex-shrink:0;
+                    margin-bottom:1.3rem;
+                ">${ann.content}</div>` : '<div style="margin-bottom:1.3rem;"></div>'}
+
+                <!-- Buton -->
+                <button onclick="dismissAnnouncement('${ann.id}')" style="
+                    width:100%;padding:0.75rem;
+                    background:linear-gradient(135deg,${t.accent},${t.accent}cc);
+                    border:none;border-radius:10px;
+                    color:${t.badgeText};font-size:0.9rem;font-weight:700;
+                    font-family:'DM Sans',sans-serif;cursor:pointer;
                     transition:all 0.2s;
-                " onmouseover="this.style.background='rgba(255,255,255,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">✕ Kapat</button>
+                    box-shadow:0 4px 20px ${t.glow};
+                " onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+                    Anladım ✓
+                </button>
             </div>
         </div>
         <style>
-            @keyframes annSlideDown {
-                from { transform: translateY(-100%); opacity: 0; }
-                to { transform: translateY(0); opacity: 1; }
-            }
+            @keyframes annFadeIn { from{opacity:0} to{opacity:1} }
+            @keyframes annSlideUp { from{transform:scale(0.9) translateY(20px);opacity:0} to{transform:scale(1) translateY(0);opacity:1} }
         </style>
     `;
-    document.body.prepend(banner);
 
-    // Auto-dismiss after 15 seconds (unless critical)
-    if (ann.priority !== 'critical') {
-        setTimeout(() => dismissAnnouncement(ann.id), 15000);
-    }
+    // Backdrop tıklamasıyla kapat
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) dismissAnnouncement(String(ann.id));
+    });
+
+    document.body.appendChild(overlay);
 }
 
 function dismissAnnouncement(id) {
-    const dismissed = JSON.parse(localStorage.getItem('dismissed_announcements') || '[]');
-    if (!dismissed.includes(id)) {
-        dismissed.push(id);
+    let dismissed = [];
+    try { dismissed = JSON.parse(localStorage.getItem('dismissed_announcements') || '[]'); } catch(e) {}
+    const idStr = String(id);
+    if (!dismissed.map(d=>String(d)).includes(idStr)) {
+        dismissed.push(idStr);
         localStorage.setItem('dismissed_announcements', JSON.stringify(dismissed));
     }
-    const el = document.getElementById('announcementBanner');
+    const el = document.getElementById('annModal');
     if (el) {
         el.style.transition = 'all 0.3s ease';
         el.style.opacity = '0';
-        el.style.transform = 'translateY(-100%)';
         setTimeout(() => el.remove(), 300);
     }
 }

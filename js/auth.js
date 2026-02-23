@@ -121,7 +121,8 @@ async function loginSuccess(user) {
     updateUIForLoggedIn();
     if (typeof initializeApp === 'function') initializeApp();
     hideLoadingScreen();
-    setTimeout(() => { if (typeof checkAnnouncements === 'function') checkAnnouncements(); }, 2000);
+    // Duyuruları kontrol et (2sn sonra, Supabase hazır olsun)
+    setTimeout(() => { if (typeof checkAnnouncements === 'function') checkAnnouncements(); }, 2500);
 }
 
 function guestMode() {
@@ -131,7 +132,7 @@ function guestMode() {
     updateUIForGuest();
     if (typeof initializeApp === 'function') initializeApp();
     hideLoadingScreen();
-    setTimeout(() => { if (typeof checkAnnouncements === 'function') checkAnnouncements(); }, 2000);
+    setTimeout(() => { if (typeof checkAnnouncements === 'function') checkAnnouncements(); }, 2500);
 }
 
 // ===== LOADING =====
