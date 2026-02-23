@@ -121,6 +121,7 @@ async function loginSuccess(user) {
     updateUIForLoggedIn();
     if (typeof initializeApp === 'function') initializeApp();
     hideLoadingScreen();
+    setTimeout(() => { if (typeof checkAnnouncements === 'function') checkAnnouncements(); }, 2000);
 }
 
 function guestMode() {
@@ -130,6 +131,7 @@ function guestMode() {
     updateUIForGuest();
     if (typeof initializeApp === 'function') initializeApp();
     hideLoadingScreen();
+    setTimeout(() => { if (typeof checkAnnouncements === 'function') checkAnnouncements(); }, 2000);
 }
 
 // ===== LOADING =====

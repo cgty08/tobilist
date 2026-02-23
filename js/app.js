@@ -1,17 +1,3 @@
-// Library'den detay aç - item id ile
-function openDetailPageFromLibrary(itemId) {
-    if (!dataManager.data) return;
-    const item = dataManager.data.items.find(i => String(i.id) === String(itemId));
-    if (!item) return;
-    const itemJson = JSON.stringify({
-        id: item.id, name: item.name, type: item.type,
-        poster: item.poster, episodes: item.totalEpisodes,
-        chapters: item.totalEpisodes, rating: item.rating,
-        genres: item.genres || [], malId: item.malId
-    });
-    openDetailPage(itemJson.replace(/"/g, '&quot;'));
-}
-
 // APP.JS v5.1 - TobiList Ana Uygulama - Hatalar düzeltildi
 
 let currentSection = 'home';
@@ -168,8 +154,7 @@ function renderContinueWatching() {
 
     container.innerHTML = watching.map(item => {
         const pct = (item.totalEpisodes || 0) > 0 ? ((item.currentEpisode || 0) / item.totalEpisodes * 100).toFixed(0) : 0;
-        const safeItemForDetail = itemJson.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-        return '<div class="media-card" style="cursor:pointer" onclick="openDetailPage(\'' + safeItemForDetail + '\')">' +
+        return '<div class="media-card" style="cursor:pointer" onclick="openDetailPage(\'' + safeItem + '\')">' +
             '<div class="media-poster">' +
                 (item.poster
                     ? '<img src="' + item.poster + '" alt="' + (item.name || '') + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
@@ -220,7 +205,7 @@ function renderMediaRow(containerId, items) {
             ? '<button class="add-to-list-btn" onclick="openAuthModal(\'register\')">🔐 Kayıt ol & ekle</button>'
             : '<button class="add-to-list-btn' + (inLibrary ? ' in-library' : '') + '" onclick="event.stopPropagation();quickAddFromJson(\'' + safeItem + '\')">' + (inLibrary ? '✓ Listende' : '+ Ekle') + '</button>';
 
-        return '<div class="media-card">' +
+        return '<div class="media-card" style="cursor:pointer" onclick="openDetailPage(\'' + safeItem + '\')">' +
             '<div class="media-poster">' +
                 (item.poster
                     ? '<img src="' + item.poster + '" alt="' + (item.name || '') + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
@@ -308,7 +293,7 @@ function renderDiscoverGrid() {
             ? '<button class="add-to-list-btn" onclick="openAuthModal(\'register\')">🔐 Kayıt ol & ekle</button>'
             : '<button class="add-to-list-btn' + (inLibrary ? ' in-library' : '') + '" onclick="event.stopPropagation();quickAddFromJson(\'' + safeItem + '\')">' + (inLibrary ? '✓ Listende' : '+ Ekle') + '</button>';
 
-        return '<div class="media-card">' +
+        return '<div class="media-card" style="cursor:pointer" onclick="openDetailPage(\'' + safeItem + '\')">' +
             '<div class="media-poster">' +
                 (item.poster
                     ? '<img src="' + item.poster + '" alt="' + (item.name || '') + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
@@ -563,6 +548,125 @@ function setupNetworkListeners() {
 }
 
 // ===== MODAL KAPAT (dışına tıklayınca) =====
+
+// =====================================================
+// LIBRARY'DEN DETAY SAYFASI
+// =====================================================
+function openDetailPageFromLibrary(itemId) {
+    if (!dataManager.data) return;
+    const item = dataManager.data.items.find(i => String(i.id) === String(itemId));
+    if (!item) return;
+    const itemJson = JSON.stringify({
+        id: item.id, name: item.name, type: item.type,
+        poster: item.poster, episodes: item.totalEpisodes,
+        chapters: item.totalEpisodes, rating: item.rating,
+        genres: item.genres || [], malId: item.malId
+    });
+    openDetailPage(itemJson.replace(/"/g, '&quot;'));
+}
+
+// =====================================================
+// DUYURU SİSTEMİ
+// =====================================================
+async function checkAnnouncements() {
+    if (!window.supabaseClient) return;
+    try {
+        const { data, error } = await window.supabaseClient
+            .from('announcements')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(5);
+
+        if (error || !data || data.length === 0) return;
+
+        const dismissed = JSON.parse(localStorage.getItem('dismissed_announcements') || '[]');
+        const visible = data.filter(a => !dismissed.includes(a.id));
+        if (visible.length === 0) return;
+
+        const ann = visible[0]; // En son duyuruyu göster
+        showAnnouncementBanner(ann);
+    } catch(e) { console.warn('Announcement check failed:', e); }
+}
+
+function showAnnouncementBanner(ann) {
+    if (document.getElementById('announcementBanner')) return;
+
+    const icons = { info: 'ℹ️', success: '✅', warning: '⚠️', update: '🚀' };
+    const colors = {
+        info:    { bg: 'rgba(0,212,255,0.12)',    border: 'rgba(0,212,255,0.35)',    text: '#00d4ff' },
+        success: { bg: 'rgba(16,185,129,0.12)',   border: 'rgba(16,185,129,0.35)',   text: '#10b981' },
+        warning: { bg: 'rgba(245,158,11,0.15)',   border: 'rgba(245,158,11,0.35)',   text: '#f59e0b' },
+        update:  { bg: 'rgba(139,92,246,0.12)',   border: 'rgba(139,92,246,0.35)',   text: '#8b5cf6' }
+    };
+    const c = colors[ann.type] || colors.info;
+    const icon = icons[ann.type] || 'ℹ️';
+
+    const banner = document.createElement('div');
+    banner.id = 'announcementBanner';
+    banner.innerHTML = `
+        <div style="
+            position:fixed;top:0;left:0;right:0;z-index:99999;
+            background:${c.bg};
+            border-bottom:2px solid ${c.border};
+            backdrop-filter:blur(12px);
+            -webkit-backdrop-filter:blur(12px);
+            padding:0;
+            animation: annSlideDown 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+            box-shadow:0 4px 30px ${c.border};
+        " id="annBannerInner">
+            <div style="max-width:900px;margin:0 auto;padding:0.75rem 1.2rem;display:flex;align-items:center;gap:0.8rem;flex-wrap:wrap;">
+                <span style="font-size:1.3rem;flex-shrink:0;">${icon}</span>
+                <div style="flex:1;min-width:0;">
+                    <div style="font-weight:700;color:${c.text};font-size:0.93rem;font-family:'DM Sans',sans-serif;letter-spacing:0.3px;">
+                        ${ann.title || ''}
+                    </div>
+                    ${ann.content ? `<div style="color:rgba(255,255,255,0.75);font-size:0.83rem;margin-top:2px;line-height:1.4;">${ann.content}</div>` : ''}
+                </div>
+                ${ann.priority === 'critical' ? `<span style="background:${c.text};color:#000;font-size:0.7rem;font-weight:800;padding:2px 8px;border-radius:20px;letter-spacing:1px;flex-shrink:0;">ACİL</span>` : ''}
+                <button onclick="dismissAnnouncement('${ann.id}')" style="
+                    background:rgba(255,255,255,0.08);
+                    border:1px solid rgba(255,255,255,0.15);
+                    border-radius:6px;
+                    color:rgba(255,255,255,0.6);
+                    cursor:pointer;
+                    padding:4px 10px;
+                    font-size:0.78rem;
+                    font-family:'DM Sans',sans-serif;
+                    flex-shrink:0;
+                    transition:all 0.2s;
+                " onmouseover="this.style.background='rgba(255,255,255,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">✕ Kapat</button>
+            </div>
+        </div>
+        <style>
+            @keyframes annSlideDown {
+                from { transform: translateY(-100%); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+        </style>
+    `;
+    document.body.prepend(banner);
+
+    // Auto-dismiss after 15 seconds (unless critical)
+    if (ann.priority !== 'critical') {
+        setTimeout(() => dismissAnnouncement(ann.id), 15000);
+    }
+}
+
+function dismissAnnouncement(id) {
+    const dismissed = JSON.parse(localStorage.getItem('dismissed_announcements') || '[]');
+    if (!dismissed.includes(id)) {
+        dismissed.push(id);
+        localStorage.setItem('dismissed_announcements', JSON.stringify(dismissed));
+    }
+    const el = document.getElementById('announcementBanner');
+    if (el) {
+        el.style.transition = 'all 0.3s ease';
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(-100%)';
+        setTimeout(() => el.remove(), 300);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const addModal = document.getElementById('addModal');
     if (addModal) {
