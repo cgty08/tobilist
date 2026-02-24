@@ -479,7 +479,7 @@ function updateUIForLoggedIn() {
 
     const bannerActions = document.getElementById('bannerActions');
     if (bannerActions) {
-        bannerActions.innerHTML = '<button class="btn btn-primary btn-large" onclick="openAddModal()">✨ İçerik Ekle</button><button class="btn btn-ghost btn-large" onclick="switchSection(\'discover\')">🔍 Keşfet</button>';
+        bannerActions.innerHTML = '<button class="btn btn-primary btn-large" onclick="openAddModal()">' + (typeof _lang !== 'undefined' && _lang === 'en' ? '✨ Add Content' : '✨ İçerik Ekle') + '</button><button class="btn btn-ghost btn-large" onclick="switchSection(\'discover\')">🔍 ' + (typeof _lang !== 'undefined' && _lang === 'en' ? 'Discover' : 'Keşfet') + '</button>';
     }
 }
 
@@ -534,7 +534,7 @@ function updateHeaderUser() {
 
 function requireAuth(section) {
     if (isGuest || !currentUser) {
-        showNotification('Bu özelliği kullanmak için giriş yapın! 🔐', 'error');
+        showNotification(typeof _lang !== 'undefined' && _lang === 'en' ? 'Sign in to use this feature! 🔐' : 'Bu özelliği kullanmak için giriş yapın! 🔐', 'error');
         openAuthModal('login');
         return;
     }

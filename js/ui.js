@@ -6,6 +6,139 @@ const translations = {
         // NAV
         home: 'Ana Sayfa', library: 'Kütüphanem', discover: 'Keşfet',
         calendar: 'Takvim', analytics: 'Analitik', ai: 'AI Öneriler', achievements: 'Başarımlar',
+        // HEADER / AUTH
+        loginBtn: 'Giriş Yap', registerBtn: 'Kayıt Ol', logoutBtn: '🚪 Çıkış Yap',
+        guestBannerText: 'Misafir modundasınız —', guestBannerSave: 'Kayıt ol veya giriş yap',
+        guestBannerSub: ' ile listeni kaydet!',
+        // BANNER
+        bannerGreeting: 'Hoş geldiniz 👋',
+        bannerTitle: 'Anime Dünyanı', bannerTitleSpan: 'Takip Et & Keşfet',
+        bannerSub: '500+ anime, manga ve webtoon arasından seç. Listeni oluştur, puan ver, level atla.',
+        bannerAddBtn: '✨ İçerik Ekle', bannerDiscoverBtn: '🔍 Keşfet',
+        bannerRegisterBtn: '✨ Ücretsiz Kayıt Ol', bannerLoginBtn: 'Giriş Yap',
+        heroChipAI: '🤖 AI Öneriler', heroChipXP: '🏆 XP Sistemi',
+        heroChipCal: '📅 Yayın Takvimi', heroChipAnalytics: '📊 Analitik',
+        heroXPLabel: 'Toplam XP', streakDaysLabel: 'gün',
+        // PLATFORM STATS
+        liveUsersLabel: 'Kayıtlı Kullanıcı', liveTotalLabel: 'Toplam Takip',
+        liveCompletedLabel: 'Tamamlanan', liveXPLabel: 'XP Kazanıldı', liveContentLabel: 'İçerik',
+        // HOME SECTION TITLES
+        trendingMore: 'Tümünü Gör →', continueMore: 'Kütüphane →',
+        seasonMore: 'Hepsi →', highRatedMore: 'AI Önerileri →',
+        // QUICK STATS
+        watchingStatCard: 'İzliyorum', completedStatCard: 'Tamamlandı',
+        planToWatchStatCard: 'İzlenecek', onHoldStatCard: 'Beklemede',
+        avgRatingCard: 'Ort. Puan', streakCard: 'Streak',
+        // FEATURES
+        featuresTitle: 'Neden', featuresTitleSpan: 'TobiList?',
+        featuresSub: 'Anime takibini bir üst seviyeye taşıyan özellikler',
+        feat1Title: 'AI Öneri Motoru',
+        feat1Desc: 'İzleme alışkanlıklarını analiz ederek sana özel anime ve manga önerileri üretir.',
+        feat2Title: 'XP & Başarım Sistemi',
+        feat2Desc: 'Her eklediğinde, tamamladığında ve puan verdiğinde XP kazan. Seviyeleri geç, rozetler topla.',
+        feat3Title: 'Haftalık Yayın Takvimi',
+        feat3Desc: 'Hangi anime hangi gün yayında? Canlı takvimle takipte kal, listendekiler otomatik işaretlenir.',
+        feat4Title: 'Kişisel Analitik',
+        feat4Desc: 'Kaç anime izledin, ortalama puanın ne? Detaylı grafiklerle izleme alışkanlıklarını keşfet.',
+        feat5Title: 'Günlük Streak',
+        feat5Desc: "Her gün giriş yap, streak'ini kır! 7 gün üst üste girişe bonus XP.",
+        feat6Title: 'Import & Export',
+        feat6Desc: 'Verilerini JSON veya CSV olarak indir. Başka platformlardan listenizi kolayca aktar.',
+        // GUEST CTA
+        guestCTATitle: 'Anime listenizi kaydedin!',
+        guestCTASub: 'Ücretsiz hesap oluşturun, izlediklerinizi takip edin, puan verin ve kişisel istatistiklerinizi görün.',
+        guestCTARegister: '✨ Ücretsiz Kayıt Ol', guestCTALogin: 'Giriş Yap',
+        // DISCOVER
+        discoverBadge: '🔥 500+ İçerik',
+        discoverHeroTitle: 'Keşfet',
+        discoverHeroSub: 'Anime, manga ve webtoon dünyasını keşfet. Favori serini bul.',
+        discoverSearchPlaceholder: 'Anime, manga veya webtoon ara...',
+        discoverAllTab: '✨ Tümü', discoverAnimeTab: '🎬 Anime',
+        discoverMangaTab: '📖 Manga', discoverWebtoonTab: '📱 Webtoon',
+        // GENRE FILTERS
+        genreAll: 'Tümü', genreAction: '⚔️ Aksiyon', genreAdventure: '🗺️ Macera',
+        genreComedy: '😂 Komedi', genreDrama: '🎭 Drama', genreFantasy: '🔮 Fantastik',
+        genreRomance: '💕 Romantik', genreScifi: '🚀 Sci-Fi', genreHorror: '👻 Korku',
+        genreMystery: '🔍 Gizem', genrePsych: '🧠 Psikolojik', genreSports: '⚽ Spor',
+        // LIBRARY FILTERS
+        allTypesOpt: 'Tüm Tipler', allStatusesOpt: 'Tüm Durumlar',
+        statusWatching: '▶️ İzliyorum', statusCompleted: '✅ Tamamlandı',
+        statusOnHold: '⏸️ Beklemede', statusPlan: '📋 İzlenecek', statusDropped: '❌ Bırakıldı',
+        sortRecent: 'En Yeni', sortName: 'İsim (A-Z)', sortRating: 'Puan', sortProgress: 'İlerleme',
+        // COMMUNITY
+        commTitle: '🌍', commTitleSpan: 'Topluluk',
+        commSub: 'TobiList büyüyor — seninle büyüyor',
+        leaderboardTitle: '🏆 XP Liderler', leaderboardLoading: 'Yükleniyor...',
+        leaderboardProfileBtn: 'Profilini Gör →',
+        platformStatsTitle: '📈 Platform İstatistikleri',
+        commUsersLabel: '👥 Toplam Kullanıcı', commAnimeLabel: '🎬 Takip Edilen Anime',
+        commCompletedLabel: '✅ Tamamlanan', commXPLabel: '⭐ Toplam XP', commStreakLabel: '🔥 En Uzun Streak',
+        joinTitle: 'Topluluğa Katıl',
+        joinSub: 'Anime severlerin buluşma noktası. Listeni oluştur, başarımlar kazan ve topluluğun parçası ol.',
+        joinBtn: '✨ Ücretsiz Katıl', joinDiscoverBtn: '🔍 İçerikleri Keşfet',
+        joinBadgeFree: '🆓 Ücretsiz', joinBadgeSafe: '🔒 Güvenli', joinBadgeMobile: '📱 Mobil Uyumlu',
+        // FOOTER
+        footerSub: 'Anime, Manga & Webtoon Takip Platformu · Ücretsiz · 2025',
+        footerDiscover: 'Keşfet', footerRegister: 'Kayıt Ol', footerHome: 'Ana Sayfa',
+        // PROFILE
+        profileEditBtn: 'Profili Düzenle', profileShareBtn: 'Paylaş',
+        profileCompletedLabel: 'Tamamlanan', profileXPLabel: 'Toplam XP', profileStreakLabel: 'En Uzun Seri',
+        profileStatusTitle: 'İzleme Durumu', profileActivityTitle: 'Son Aktiviteler',
+        profileFavGenresTitle: 'Favori Türler', profileAchievementsTitle: 'Son Başarımlar',
+        profileExportTitle: 'Dışa Aktar',
+        profileTwitterBtn: "Twitter'da Paylaş", profileCopyBtn: 'Linki Kopyala', profileJSONBtn: 'JSON İndir',
+        profileStreakSuffix: 'gün serisi',
+        profileDropdownItem: '👤 Profilim', settingsDropdownItem: '⚙️ Ayarlar',
+        achievementsDropdownItem: '🏆 Başarımlar',
+        // CALENDAR
+        calendarSyncBtn: '🔄 Senkronize Et',
+        calNoAiring: 'Bu gün yayın yok',
+        calEpisodeCount: 'bölüm', calMoreEpisodes: 'bölüm daha…',
+        calNoData: 'Bu hafta için yayın verisi bulunamadı.',
+        calError: 'Takvim yüklenemedi. Lütfen tekrar deneyin.',
+        // DETAIL PAGE
+        dpBack: '🏠 Ana Sayfa', dpSynopsisTitle: '📖 Özet',
+        dpReviewTitle: '✏️ Puan & Yorum', dpCommentsTitle: '💬 Yorumlar',
+        dpInfoTitle: 'ℹ️ Bilgiler', dpSimilarTitle: '🎯 Benzer İçerikler',
+        dpTypeLabel: 'Tür', dpRankLabel: 'Sıralama', dpMembersLabel: 'Üye',
+        dpStudioLabel: 'Stüdyo', dpStatusLabel: 'Durum',
+        dpAddToList: '+ Listeye Ekle', dpInList: '✓ Listende', dpBackBtn: '← Geri',
+        dpRatingText: 'Puan seç', dpCommentPlaceholder: 'Düşüncelerini yaz (isteğe bağlı)...',
+        dpSubmitReview: '💬 Yorumu Gönder', dpUpdateReview: '✏️ Yorumu Güncelle',
+        dpSynopsisLoading: 'Açıklama yükleniyor...',
+        dpCommentsCount: 'yorum',
+        // SETTINGS
+        settingsThemeTitle: '🎨 Tema',
+        settingsDataTitle: '📤 Veri Yönetimi',
+        settingsDataSub: 'Verilerinizi dışa aktarın veya içe aktarın',
+        settingsNotifTitle: '🔔 Bildirimler',
+        settingsNotifLabel: 'Push bildirimleri etkinleştir',
+        settingsDangerTitle: '⚠️ Hesap İşlemleri',
+        settingsDangerSub: 'Bu işlemler geri alınamaz.',
+        settingsLogoutBtn: '🚪 Çıkış Yap', settingsDeleteBtn: '🗑️ Hesabı Sil',
+        themeDark: 'Karanlık', themeLight: 'Aydınlık', themeNeon: 'Neon', themePastel: 'Pastel',
+        // ADD MODAL
+        addModalTitle: '✨ Yeni İçerik Ekle',
+        addModalAPILabel: '🔍 Jikan API\'den Ara (opsiyonel)',
+        addModalAPIPlaceholder: 'Anime veya manga adı yazın...',
+        addModalNameLabel: 'İsim *', addModalNamePlaceholder: 'Anime / Manga adı',
+        addModalTypeLabel: 'Tip *', addModalPosterLabel: 'Poster URL (opsiyonel)',
+        addModalStatusLabel: 'Durum', addModalGenreLabel: 'Tür',
+        addModalGenrePlaceholder: 'Örn: Action', addModalEpLabel: 'Bölüm Sayısı',
+        addModalNotesLabel: 'Notlar', addModalNotesPlaceholder: 'Opsiyonel notlar...',
+        addModalSubmitBtn: '✅ Ekle',
+        // AI PAGE
+        aiWatchingLabel: 'İzleme Paterni', aiFavGenreLabel: 'Favori Tür',
+        aiAvgLabel: 'Ort. Puan', aiAccuracyLabel: 'AI Doğruluğu',
+        aiNewRecsBtn: '✨ Yeni Öneriler Al', aiRefreshBtn: '🔄 Yenile',
+        aiForYouTitle: '💎 Size Özel', aiSimilarTitle: '🎭 Beğendiklerinize Benzer',
+        // LOADING
+        loadingText: 'Yükleniyor...',
+        offlineBanner: '⚠️ İnternet bağlantınız yok — Offline modda çalışıyorsunuz',
+        installTitle: '📱 Uygulamayı Yükleyin', installSub: 'Cihazınıza ekleyin, offline kullanın!',
+        installBtn: 'Yükle', installDismiss: 'Daha Sonra',
+        // DROPDOWN
+        addBtn: '+ Ekle',
         // HOME
         trending: '🔥 Şu An Trend', continueWatching: '▶️ Devam Et',
         seasonal: '🌸 Bu Sezon Popüler', highRated: '💡 Yüksek Puanlı',
@@ -81,6 +214,139 @@ const translations = {
         // NAV
         home: 'Home', library: 'My Library', discover: 'Discover',
         calendar: 'Calendar', analytics: 'Analytics', ai: 'AI Recs', achievements: 'Achievements',
+        // HEADER / AUTH
+        loginBtn: 'Sign In', registerBtn: 'Sign Up', logoutBtn: '🚪 Sign Out',
+        guestBannerText: 'You are in guest mode —', guestBannerSave: 'Sign up or sign in',
+        guestBannerSub: ' to save your list!',
+        // BANNER
+        bannerGreeting: 'Welcome 👋',
+        bannerTitle: 'Your Anime World', bannerTitleSpan: 'Track & Discover',
+        bannerSub: 'Choose from 500+ anime, manga & webtoon. Build your list, rate, level up.',
+        bannerAddBtn: '✨ Add Content', bannerDiscoverBtn: '🔍 Discover',
+        bannerRegisterBtn: '✨ Sign Up Free', bannerLoginBtn: 'Sign In',
+        heroChipAI: '🤖 AI Recs', heroChipXP: '🏆 XP System',
+        heroChipCal: '📅 Airing Calendar', heroChipAnalytics: '📊 Analytics',
+        heroXPLabel: 'Total XP', streakDaysLabel: 'days',
+        // PLATFORM STATS
+        liveUsersLabel: 'Registered Users', liveTotalLabel: 'Total Tracking',
+        liveCompletedLabel: 'Completed', liveXPLabel: 'XP Earned', liveContentLabel: 'Content',
+        // HOME SECTION TITLES
+        trendingMore: 'See All →', continueMore: 'Library →',
+        seasonMore: 'All →', highRatedMore: 'AI Recs →',
+        // QUICK STATS
+        watchingStatCard: 'Watching', completedStatCard: 'Completed',
+        planToWatchStatCard: 'Plan to Watch', onHoldStatCard: 'On Hold',
+        avgRatingCard: 'Avg Rating', streakCard: 'Streak',
+        // FEATURES
+        featuresTitle: 'Why', featuresTitleSpan: 'TobiList?',
+        featuresSub: 'Features that take your anime tracking to the next level',
+        feat1Title: 'AI Recommendation Engine',
+        feat1Desc: 'Analyzes your watching habits to generate personalized anime and manga picks.',
+        feat2Title: 'XP & Achievement System',
+        feat2Desc: 'Earn XP every time you add, complete, or rate. Level up and collect badges.',
+        feat3Title: 'Weekly Airing Calendar',
+        feat3Desc: 'Which anime airs on which day? Stay on top with the live calendar, auto-marks your library.',
+        feat4Title: 'Personal Analytics',
+        feat4Desc: 'How many anime have you watched? Explore your habits with detailed charts.',
+        feat5Title: 'Daily Streak',
+        feat5Desc: 'Log in every day, keep your streak! Bonus XP for 7 consecutive days.',
+        feat6Title: 'Import & Export',
+        feat6Desc: 'Download your data as JSON or CSV. Easily import your list from other platforms.',
+        // GUEST CTA
+        guestCTATitle: 'Save your anime list!',
+        guestCTASub: 'Create a free account, track what you watch, rate titles, and see your personal stats.',
+        guestCTARegister: '✨ Sign Up Free', guestCTALogin: 'Sign In',
+        // DISCOVER
+        discoverBadge: '🔥 500+ Content',
+        discoverHeroTitle: 'Discover',
+        discoverHeroSub: 'Explore the world of anime, manga & webtoon. Find your next favorite.',
+        discoverSearchPlaceholder: 'Search anime, manga or webtoon...',
+        discoverAllTab: '✨ All', discoverAnimeTab: '🎬 Anime',
+        discoverMangaTab: '📖 Manga', discoverWebtoonTab: '📱 Webtoon',
+        // GENRE FILTERS
+        genreAll: 'All', genreAction: '⚔️ Action', genreAdventure: '🗺️ Adventure',
+        genreComedy: '😂 Comedy', genreDrama: '🎭 Drama', genreFantasy: '🔮 Fantasy',
+        genreRomance: '💕 Romance', genreScifi: '🚀 Sci-Fi', genreHorror: '👻 Horror',
+        genreMystery: '🔍 Mystery', genrePsych: '🧠 Psychological', genreSports: '⚽ Sports',
+        // LIBRARY FILTERS
+        allTypesOpt: 'All Types', allStatusesOpt: 'All Statuses',
+        statusWatching: '▶️ Watching', statusCompleted: '✅ Completed',
+        statusOnHold: '⏸️ On Hold', statusPlan: '📋 Plan to Watch', statusDropped: '❌ Dropped',
+        sortRecent: 'Newest', sortName: 'Name (A-Z)', sortRating: 'Rating', sortProgress: 'Progress',
+        // COMMUNITY
+        commTitle: '🌍', commTitleSpan: 'Community',
+        commSub: 'TobiList is growing — growing with you',
+        leaderboardTitle: '🏆 XP Leaders', leaderboardLoading: 'Loading...',
+        leaderboardProfileBtn: 'View Profile →',
+        platformStatsTitle: '📈 Platform Statistics',
+        commUsersLabel: '👥 Total Users', commAnimeLabel: '🎬 Anime Tracked',
+        commCompletedLabel: '✅ Completed', commXPLabel: '⭐ Total XP', commStreakLabel: '🔥 Longest Streak',
+        joinTitle: 'Join the Community',
+        joinSub: 'The meeting point of anime fans. Build your list, earn achievements and be part of the community.',
+        joinBtn: '✨ Join Free', joinDiscoverBtn: '🔍 Explore Content',
+        joinBadgeFree: '🆓 Free', joinBadgeSafe: '🔒 Secure', joinBadgeMobile: '📱 Mobile Friendly',
+        // FOOTER
+        footerSub: 'Anime, Manga & Webtoon Tracking Platform · Free · 2025',
+        footerDiscover: 'Discover', footerRegister: 'Sign Up', footerHome: 'Home',
+        // PROFILE
+        profileEditBtn: 'Edit Profile', profileShareBtn: 'Share',
+        profileCompletedLabel: 'Completed', profileXPLabel: 'Total XP', profileStreakLabel: 'Longest Streak',
+        profileStatusTitle: 'Watch Status', profileActivityTitle: 'Recent Activity',
+        profileFavGenresTitle: 'Favorite Genres', profileAchievementsTitle: 'Recent Achievements',
+        profileExportTitle: 'Export',
+        profileTwitterBtn: 'Share on Twitter', profileCopyBtn: 'Copy Link', profileJSONBtn: 'Download JSON',
+        profileStreakSuffix: 'day streak',
+        profileDropdownItem: '👤 My Profile', settingsDropdownItem: '⚙️ Settings',
+        achievementsDropdownItem: '🏆 Achievements',
+        // CALENDAR
+        calendarSyncBtn: '🔄 Sync',
+        calNoAiring: 'No airings today',
+        calEpisodeCount: 'episodes', calMoreEpisodes: 'more episodes…',
+        calNoData: 'No schedule data found for this week.',
+        calError: 'Failed to load calendar. Please try again.',
+        // DETAIL PAGE
+        dpBack: '🏠 Home', dpSynopsisTitle: '📖 Synopsis',
+        dpReviewTitle: '✏️ Rate & Review', dpCommentsTitle: '💬 Reviews',
+        dpInfoTitle: 'ℹ️ Info', dpSimilarTitle: '🎯 Similar Content',
+        dpTypeLabel: 'Type', dpRankLabel: 'Rank', dpMembersLabel: 'Members',
+        dpStudioLabel: 'Studio', dpStatusLabel: 'Status',
+        dpAddToList: '+ Add to List', dpInList: '✓ In Library', dpBackBtn: '← Back',
+        dpRatingText: 'Select rating', dpCommentPlaceholder: 'Write your thoughts (optional)...',
+        dpSubmitReview: '💬 Submit Review', dpUpdateReview: '✏️ Update Review',
+        dpSynopsisLoading: 'Loading description...',
+        dpCommentsCount: 'reviews',
+        // SETTINGS
+        settingsThemeTitle: '🎨 Theme',
+        settingsDataTitle: '📤 Data Management',
+        settingsDataSub: 'Export or import your data',
+        settingsNotifTitle: '🔔 Notifications',
+        settingsNotifLabel: 'Enable push notifications',
+        settingsDangerTitle: '⚠️ Account Actions',
+        settingsDangerSub: 'These actions cannot be undone.',
+        settingsLogoutBtn: '🚪 Sign Out', settingsDeleteBtn: '🗑️ Delete Account',
+        themeDark: 'Dark', themeLight: 'Light', themeNeon: 'Neon', themePastel: 'Pastel',
+        // ADD MODAL
+        addModalTitle: '✨ Add New Content',
+        addModalAPILabel: '🔍 Search via Jikan API (optional)',
+        addModalAPIPlaceholder: 'Type anime or manga title...',
+        addModalNameLabel: 'Title *', addModalNamePlaceholder: 'Anime / Manga title',
+        addModalTypeLabel: 'Type *', addModalPosterLabel: 'Poster URL (optional)',
+        addModalStatusLabel: 'Status', addModalGenreLabel: 'Genre',
+        addModalGenrePlaceholder: 'e.g. Action', addModalEpLabel: 'Episode Count',
+        addModalNotesLabel: 'Notes', addModalNotesPlaceholder: 'Optional notes...',
+        addModalSubmitBtn: '✅ Add',
+        // AI PAGE
+        aiWatchingLabel: 'Watching Pattern', aiFavGenreLabel: 'Fav. Genre',
+        aiAvgLabel: 'Avg. Rating', aiAccuracyLabel: 'AI Accuracy',
+        aiNewRecsBtn: '✨ Get New Recs', aiRefreshBtn: '🔄 Refresh',
+        aiForYouTitle: '💎 For You', aiSimilarTitle: '🎭 Similar to What You Love',
+        // LOADING
+        loadingText: 'Loading...',
+        offlineBanner: '⚠️ No internet connection — Working in offline mode',
+        installTitle: '📱 Install App', installSub: 'Add to your device, use offline!',
+        installBtn: 'Install', installDismiss: 'Later',
+        // DROPDOWN
+        addBtn: '+ Add',
         // HOME
         trending: '🔥 Trending Now', continueWatching: '▶️ Continue Watching',
         seasonal: '🌸 This Season', highRated: '💡 Highly Rated',
@@ -175,16 +441,111 @@ function changeLanguage() {
 }
 
 function applyLanguage() {
+    // Update html lang attribute
+    const htmlEl = document.getElementById('htmlRoot') || document.documentElement;
+    if (htmlEl) htmlEl.lang = _lang;
+
     // Nav tabs via data-i18n
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (translations[_lang]?.[key]) el.textContent = translations[_lang][key];
     });
 
-    // Dynamic page text
-    const set = (id, key) => { const e=document.getElementById(id); if(e&&t(key)) e.textContent=t(key); };
+    // data-i18n-placeholder support
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (translations[_lang]?.[key]) el.placeholder = translations[_lang][key];
+    });
 
-    // Stats badges
+    const set = (id, key) => { const e=document.getElementById(id); if(e) e.textContent=t(key); };
+    const setHTML = (id, html) => { const e=document.getElementById(id); if(e) e.innerHTML=html; };
+    const setAttr = (id, attr, key) => { const e=document.getElementById(id); if(e) e.setAttribute(attr, t(key)); };
+    const setAll = (sel, key) => { document.querySelectorAll(sel).forEach(e => e.textContent = t(key)); };
+
+    // ===== HEADER =====
+    const guestLoginBtns = document.querySelectorAll('#guestHeaderBtns button');
+    if (guestLoginBtns.length >= 2) {
+        guestLoginBtns[0].textContent = t('loginBtn');
+        guestLoginBtns[1].textContent = t('registerBtn');
+    }
+
+    // Streak badge days suffix
+    const streakDaysEl = document.getElementById('streakDays');
+    const streakBadgeEl = document.getElementById('streakBadge');
+    if (streakDaysEl && streakBadgeEl) {
+        const days = streakDaysEl.textContent;
+        streakBadgeEl.innerHTML = '🔥 <strong id="streakDays">' + days + '</strong> ' + t('streakDaysLabel');
+    }
+
+    // Guest app banner
+    const guestBanner = document.getElementById('guestAppBanner');
+    if (guestBanner) {
+        const bannerBtns = guestBanner.querySelectorAll('button');
+        if (bannerBtns.length >= 2) {
+            bannerBtns[0].textContent = t('registerBtn');
+            bannerBtns[1].textContent = t('loginBtn');
+        }
+    }
+
+    // ===== OFFLINE / INSTALL BANNERS =====
+    const offlineEl = document.getElementById('offlineBanner');
+    if (offlineEl) offlineEl.textContent = t('offlineBanner');
+    const installTitleEl = document.querySelector('.install-title');
+    if (installTitleEl) installTitleEl.textContent = t('installTitle');
+    const installSubEl = document.querySelector('#installBanner > div > div:last-child');
+    if (installSubEl) installSubEl.textContent = t('installSub');
+    const installBtn = document.querySelector('.btn-install');
+    if (installBtn) installBtn.textContent = t('installBtn');
+    const dismissBtn = document.querySelector('.btn-dismiss');
+    if (dismissBtn) dismissBtn.textContent = t('installDismiss');
+
+    // ===== LOADING =====
+    const loadingTextEl = document.querySelector('.loading-text');
+    if (loadingTextEl) loadingTextEl.textContent = t('loadingText');
+
+    // ===== HOME SECTION TITLES =====
+    const trendingTitleEl = document.querySelector('#trendingGrid')?.closest('.home-section-block')?.querySelector('.sh-title');
+    if (trendingTitleEl) trendingTitleEl.textContent = t('trending');
+    const continueTitleEl = document.querySelector('#continueWatchingGrid')?.closest('.home-section-block')?.querySelector('.sh-title');
+    if (continueTitleEl) continueTitleEl.textContent = t('continueWatching');
+    const seasonTitleEl = document.querySelector('#seasonPopularGrid')?.closest('.home-section-block')?.querySelector('.sh-title');
+    if (seasonTitleEl) seasonTitleEl.textContent = t('seasonal');
+    const highRatedEl = document.querySelector('#homeRecommendationsGrid')?.closest('.home-section-block')?.querySelector('.sh-title');
+    if (highRatedEl) highRatedEl.textContent = t('highRated');
+
+    // More buttons in home
+    const trendingMoreEl = document.querySelector('#trendingGrid')?.closest('.home-section-block')?.querySelector('.sh-more');
+    if (trendingMoreEl) trendingMoreEl.textContent = t('trendingMore');
+    const continueMoreEl = document.querySelector('#continueWatchingGrid')?.closest('.home-section-block')?.querySelector('.sh-more');
+    if (continueMoreEl) continueMoreEl.textContent = t('continueMore');
+    const seasonMoreEl = document.querySelector('#seasonPopularGrid')?.closest('.home-section-block')?.querySelector('.sh-more');
+    if (seasonMoreEl) seasonMoreEl.textContent = t('seasonMore');
+    const highRatedMoreEl = document.querySelector('#homeRecommendationsGrid')?.closest('.home-section-block')?.querySelector('.sh-more');
+    if (highRatedMoreEl) highRatedMoreEl.textContent = t('highRatedMore');
+
+    // Hero banner text
+    const bannerTitleEl = document.querySelector('.banner-title');
+    if (bannerTitleEl) bannerTitleEl.innerHTML = t('bannerTitle') + '<br><span class="gradient-text">' + t('bannerTitleSpan') + '</span>';
+    const bannerSubEl = document.querySelector('.banner-sub');
+    if (bannerSubEl) bannerSubEl.textContent = t('bannerSub');
+
+    // Hero chips
+    const chips = document.querySelectorAll('.hero-chip');
+    const chipKeys = ['heroChipAI', 'heroChipXP', 'heroChipCal', 'heroChipAnalytics'];
+    chips.forEach((chip, i) => { if (chipKeys[i]) chip.textContent = t(chipKeys[i]); });
+
+    // BSC labels (hero stat cards)
+    const bscLabels = document.querySelectorAll('.bsc .bsc-label');
+    if (bscLabels.length >= 4) {
+        bscLabels[3].textContent = t('heroXPLabel');
+    }
+
+    // Platform stats labels
+    const psbLabels = document.querySelectorAll('.psb-label');
+    const psbKeys = ['liveUsersLabel', 'liveTotalLabel', 'liveCompletedLabel', 'liveXPLabel', 'liveContentLabel'];
+    psbLabels.forEach((el, i) => { if (psbKeys[i]) el.textContent = t(psbKeys[i]); });
+
+    // Quick stats labels
     set('watchingStatLabel', 'watching_stat');
     set('completedStatLabel', 'completed_stat');
     set('planToWatchStatLabel', 'plantowatch_stat');
@@ -192,19 +553,353 @@ function applyLanguage() {
     set('avgRatingLabel', 'avgRating');
     set('streakBadgeLabel', 'streak');
 
-    // Discover search placeholder
-    const ds = document.getElementById('discoverSearch');
-    if (ds) ds.placeholder = t('searchAnime');
+    // Quick stats card labels (in homeSection)
+    const qsCards = document.querySelectorAll('.qs-card .qs-label');
+    const qsKeys = ['watchingStatCard', 'completedStatCard', 'planToWatchStatCard', 'onHoldStatCard', 'avgRatingCard', 'streakCard'];
+    qsCards.forEach((el, i) => { if (qsKeys[i]) el.textContent = t(qsKeys[i]); });
 
-    // Library search placeholder
+    // ===== FEATURES SECTION =====
+    const featTitleEl = document.querySelector('.features-title');
+    if (featTitleEl) featTitleEl.innerHTML = t('featuresTitle') + ' <span class="gradient-text">' + t('featuresTitleSpan') + '</span>';
+    const featSubEl = document.querySelector('.features-sub');
+    if (featSubEl) featSubEl.textContent = t('featuresSub');
+
+    const featCards = document.querySelectorAll('.feature-card');
+    const featData = [
+        ['feat1Title','feat1Desc'],['feat2Title','feat2Desc'],['feat3Title','feat3Desc'],
+        ['feat4Title','feat4Desc'],['feat5Title','feat5Desc'],['feat6Title','feat6Desc']
+    ];
+    featCards.forEach((card, i) => {
+        if (!featData[i]) return;
+        const titleEl = card.querySelector('.feature-title');
+        const descEl = card.querySelector('.feature-desc');
+        if (titleEl) titleEl.textContent = t(featData[i][0]);
+        if (descEl) descEl.textContent = t(featData[i][1]);
+    });
+
+    // ===== GUEST CTA =====
+    const guestCTA = document.getElementById('guestCTA');
+    if (guestCTA) {
+        const h3 = guestCTA.querySelector('h3');
+        const p = guestCTA.querySelector('p');
+        const btns = guestCTA.querySelectorAll('button');
+        if (h3) h3.textContent = t('guestCTATitle');
+        if (p) p.textContent = t('guestCTASub');
+        if (btns[0]) btns[0].textContent = t('guestCTARegister');
+        if (btns[1]) btns[1].textContent = t('guestCTALogin');
+    }
+
+    // Banner actions (dynamic, updated by auth)
+    const bannerActionsEl = document.getElementById('bannerActions');
+    if (bannerActionsEl && bannerActionsEl.innerHTML.trim() !== '') {
+        // Re-set based on current user state
+        if (typeof isGuest !== 'undefined') {
+            if (isGuest) {
+                bannerActionsEl.innerHTML = '<button class="btn btn-primary btn-large" onclick="openAuthModal(\'register\')">' + t('bannerRegisterBtn') + '</button><button class="btn btn-ghost btn-large" onclick="openAuthModal(\'login\')">' + t('bannerLoginBtn') + '</button>';
+            } else {
+                bannerActionsEl.innerHTML = '<button class="btn btn-primary btn-large" onclick="openAddModal()">' + t('bannerAddBtn') + '</button><button class="btn btn-ghost btn-large" onclick="switchSection(\'discover\')">' + t('bannerDiscoverBtn') + '</button>';
+            }
+        }
+    }
+
+    // ===== COMMUNITY =====
+    const commTitleEl = document.querySelector('.community-header .features-title');
+    if (commTitleEl) commTitleEl.innerHTML = t('commTitle') + ' <span class="gradient-text">' + t('commTitleSpan') + '</span>';
+    const commSubEl = document.querySelector('.community-header .features-sub');
+    if (commSubEl) commSubEl.textContent = t('commSub');
+
+    const lbTitleEl = document.querySelector('.leaderboard-card .cc-title');
+    if (lbTitleEl) lbTitleEl.textContent = t('leaderboardTitle');
+    const lbLoadingEl = document.querySelector('.lb-loading');
+    if (lbLoadingEl) lbLoadingEl.textContent = t('leaderboardLoading');
+    const lbProfileBtn = document.querySelector('.leaderboard-card .btn-secondary');
+    if (lbProfileBtn) lbProfileBtn.textContent = t('leaderboardProfileBtn');
+
+    const platStatsTitleEl = document.querySelector('.community-stats-card .cc-title');
+    if (platStatsTitleEl) platStatsTitleEl.textContent = t('platformStatsTitle');
+    const csiLabels = document.querySelectorAll('.csi-label');
+    const csiKeys = ['commUsersLabel','commAnimeLabel','commCompletedLabel','commXPLabel','commStreakLabel'];
+    csiLabels.forEach((el, i) => { if (csiKeys[i]) el.textContent = t(csiKeys[i]); });
+
+    const joinCard = document.querySelector('.join-card');
+    if (joinCard) {
+        const joinTitleEl = joinCard.querySelector('.cc-title');
+        const joinSubEl = joinCard.querySelector('p');
+        const joinBtns = joinCard.querySelectorAll('button');
+        const joinBadges = joinCard.querySelectorAll('.jb');
+        if (joinTitleEl) joinTitleEl.textContent = t('joinTitle');
+        if (joinSubEl) joinSubEl.textContent = t('joinSub');
+        if (joinBtns[0]) joinBtns[0].textContent = t('joinBtn');
+        if (joinBtns[1]) joinBtns[1].textContent = t('joinDiscoverBtn');
+        if (joinBadges[0]) joinBadges[0].textContent = t('joinBadgeFree');
+        if (joinBadges[1]) joinBadges[1].textContent = t('joinBadgeSafe');
+        if (joinBadges[2]) joinBadges[2].textContent = t('joinBadgeMobile');
+    }
+
+    // ===== FOOTER =====
+    const footerSubEl = document.querySelector('.site-footer > p');
+    if (footerSubEl) footerSubEl.textContent = t('footerSub');
+    const footerLinks = document.querySelectorAll('.footer-links span');
+    if (footerLinks.length >= 5) {
+        footerLinks[0].textContent = t('footerDiscover');
+        footerLinks[2].textContent = t('footerRegister');
+        footerLinks[4].textContent = t('footerHome');
+    }
+
+    // ===== DISCOVER =====
+    const ds = document.getElementById('discoverSearch');
+    if (ds) ds.placeholder = t('discoverSearchPlaceholder');
+    const discoverBadgeEl = document.querySelector('.discover-hero-badge');
+    if (discoverBadgeEl) discoverBadgeEl.textContent = t('discoverBadge');
+    const discoverHeroTitleEl = document.querySelector('.discover-hero-title');
+    if (discoverHeroTitleEl) discoverHeroTitleEl.textContent = t('discoverHeroTitle');
+    const discoverHeroSubEl = document.querySelector('.discover-hero-sub');
+    if (discoverHeroSubEl) discoverHeroSubEl.textContent = t('discoverHeroSub');
+
+    // Discover type tabs
+    const discoverTabs = document.querySelectorAll('.discover-tab');
+    const tabKeys = ['discoverAllTab','discoverAnimeTab','discoverMangaTab','discoverWebtoonTab'];
+    discoverTabs.forEach((tab, i) => { if (tabKeys[i]) tab.textContent = t(tabKeys[i]); });
+
+    // Sort dropdown
+    const discoverSortEl = document.getElementById('discoverSort');
+    if (discoverSortEl) {
+        const opts = discoverSortEl.options;
+        if (opts[0]) opts[0].text = '⭐ ' + t('byRatingSort');
+        if (opts[1]) opts[1].text = '🔤 ' + t('byNameSort');
+        if (opts[2]) opts[2].text = '📅 ' + t('byYearSort');
+    }
+
+    // Genre filter tags
+    const genreTags = document.querySelectorAll('.genre-tag');
+    const genreKeys = ['genreAll','genreAction','genreAdventure','genreComedy','genreDrama','genreFantasy','genreRomance','genreScifi','genreHorror','genreMystery','genrePsych','genreSports'];
+    genreTags.forEach((tag, i) => { if (genreKeys[i]) tag.textContent = t(genreKeys[i]); });
+
+    // ===== LIBRARY =====
     const ls = document.getElementById('searchInput');
     if (ls) ls.placeholder = t('searchPlaceholder');
 
-    // Section headers (if currently rendered)
-    const discoverStatEl = document.getElementById('discoverStats');
-    if (discoverStatEl && !discoverStatEl.textContent.includes(t('discoverSub'))) {
-        // re-render if on discover page
+    const libraryTitleEl = document.querySelector('#librarySection .page-title');
+    if (libraryTitleEl) libraryTitleEl.textContent = t('libraryTitle');
+
+    const typeFilterEl = document.getElementById('typeFilter');
+    if (typeFilterEl) {
+        const opts = typeFilterEl.options;
+        if (opts[0]) opts[0].text = t('allTypesOpt');
     }
+
+    const statusFilterEl = document.getElementById('statusFilter');
+    if (statusFilterEl) {
+        const opts = statusFilterEl.options;
+        if (opts[0]) opts[0].text = t('allStatusesOpt');
+        if (opts[1]) opts[1].text = t('statusWatching');
+        if (opts[2]) opts[2].text = t('statusCompleted');
+        if (opts[3]) opts[3].text = t('statusOnHold');
+        if (opts[4]) opts[4].text = t('statusPlan');
+        if (opts[5]) opts[5].text = t('statusDropped');
+    }
+
+    const sortByEl = document.getElementById('sortBy');
+    if (sortByEl) {
+        const opts = sortByEl.options;
+        if (opts[0]) opts[0].text = t('sortRecent');
+        if (opts[1]) opts[1].text = t('sortName');
+        if (opts[2]) opts[2].text = t('sortRating');
+        if (opts[3]) opts[3].text = t('sortProgress');
+    }
+
+    // ===== PROFILE =====
+    const profileEditBtn = document.querySelector('#profileSection .btn-secondary');
+    if (profileEditBtn && profileEditBtn.textContent.trim() !== t('profileEditBtn')) profileEditBtn.textContent = t('profileEditBtn');
+    const profileShareBtn = document.querySelector('#profileSection .btn-ghost');
+    if (profileShareBtn) profileShareBtn.textContent = t('profileShareBtn');
+
+    const profileStatCards = document.querySelectorAll('.profile-stat-card .psc-label');
+    const profileStatKeys = [null, null, null, 'profileCompletedLabel', 'profileXPLabel', 'profileStreakLabel'];
+    profileStatCards.forEach((el, i) => { if (profileStatKeys[i]) el.textContent = t(profileStatKeys[i]); });
+
+    const profileSectionBlocks = document.querySelectorAll('#profileSection .psb-title');
+    if (profileSectionBlocks[0]) profileSectionBlocks[0].textContent = t('profileStatusTitle');
+    if (profileSectionBlocks[1]) profileSectionBlocks[1].textContent = t('profileActivityTitle');
+    if (profileSectionBlocks[2]) profileSectionBlocks[2].textContent = t('profileFavGenresTitle');
+    if (profileSectionBlocks[3]) profileSectionBlocks[3].textContent = t('profileAchievementsTitle');
+    if (profileSectionBlocks[4]) profileSectionBlocks[4].textContent = t('profileExportTitle');
+
+    const profileExportBtns = document.querySelectorAll('.share-btn');
+    if (profileExportBtns[0]) profileExportBtns[0].textContent = t('profileTwitterBtn');
+    if (profileExportBtns[1]) profileExportBtns[1].textContent = t('profileCopyBtn');
+    if (profileExportBtns[2]) profileExportBtns[2].textContent = t('profileJSONBtn');
+
+    // Profile streak badge suffix
+    const profileStreakBadge = document.querySelector('.streak-badge');
+    if (profileStreakBadge) {
+        const val = document.getElementById('profileStreakBadge')?.textContent || '0';
+        profileStreakBadge.innerHTML = '<span id="profileStreakBadge">' + val + '</span> ' + t('profileStreakSuffix');
+    }
+
+    // Dropdown menu items
+    const dropdownItems = document.querySelectorAll('.user-dropdown .dropdown-item:not(.danger):not(#adminPanelLink)');
+    if (dropdownItems[0]) dropdownItems[0].textContent = t('profileDropdownItem');
+    if (dropdownItems[1]) dropdownItems[1].textContent = t('settingsDropdownItem');
+    if (dropdownItems[2]) dropdownItems[2].textContent = t('achievementsDropdownItem');
+    const logoutItem = document.querySelector('.dropdown-item.danger');
+    if (logoutItem) logoutItem.textContent = t('logoutBtn');
+
+    // ===== CALENDAR =====
+    const calTitleEl = document.querySelector('#calendarSection .page-title');
+    if (calTitleEl) calTitleEl.textContent = t('calendarTitle');
+    const calHeaderSpan = document.querySelector('.calendar-header-row > span');
+    if (calHeaderSpan) calHeaderSpan.textContent = t('weeklySchedule');
+    const calSyncBtn = document.querySelector('.calendar-header-row .btn-secondary');
+    if (calSyncBtn) calSyncBtn.textContent = t('calendarSyncBtn');
+
+    // ===== ANALYTICS =====
+    const analyticsTitleEl = document.querySelector('#analyticsSection .page-title');
+    if (analyticsTitleEl) analyticsTitleEl.textContent = t('analyticsTitle');
+
+    // ===== AI =====
+    const aiTitleEl = document.querySelector('.ai-title');
+    if (aiTitleEl) aiTitleEl.textContent = t('aiTitle');
+    const aiSubEl = document.querySelector('.ai-sub');
+    if (aiSubEl) aiSubEl.textContent = t('aiSub');
+
+    const aacLabels = document.querySelectorAll('.aac .aac-label');
+    const aacKeys = ['aiWatchingLabel', 'aiFavGenreLabel', 'aiAvgLabel', 'aiAccuracyLabel'];
+    aacLabels.forEach((el, i) => { if (aacKeys[i]) el.textContent = t(aacKeys[i]); });
+
+    const aiNewRecsBtnEl = document.querySelector('.ai-btn-row .btn-primary');
+    if (aiNewRecsBtnEl) aiNewRecsBtnEl.textContent = t('aiNewRecsBtn');
+    const aiRefreshBtnEl = document.querySelector('.ai-btn-row .btn-secondary');
+    if (aiRefreshBtnEl) aiRefreshBtnEl.textContent = t('aiRefreshBtn');
+
+    const aiSections = document.querySelectorAll('#aiSection .sh-title');
+    if (aiSections[0]) aiSections[0].textContent = t('aiForYouTitle');
+    if (aiSections[1]) aiSections[1].textContent = t('aiSimilarTitle');
+
+    // ===== ACHIEVEMENTS =====
+    const achTitleEl = document.querySelector('#achievementsSection .page-title');
+    if (achTitleEl) achTitleEl.textContent = t('achievementsTitle');
+    const achSubEl = document.querySelector('#achievementsSection .page-sub');
+    if (achSubEl) achSubEl.textContent = t('achievementsSub');
+
+    // ===== SETTINGS =====
+    const settingsTitleEl = document.querySelector('#settingsSection .page-title');
+    if (settingsTitleEl) settingsTitleEl.textContent = t('settingsTitle');
+
+    const chartTitles = document.querySelectorAll('#settingsSection .chart-title');
+    if (chartTitles[0]) chartTitles[0].textContent = t('settingsThemeTitle');
+    if (chartTitles[1]) chartTitles[1].textContent = t('settingsDataTitle');
+    if (chartTitles[2]) chartTitles[2].textContent = t('settingsNotifTitle');
+    if (chartTitles[3]) chartTitles[3].textContent = t('settingsDangerTitle');
+
+    const settingsDataSubEl = document.querySelector('#settingsSection .chart-container:nth-child(2) > p');
+    if (settingsDataSubEl) settingsDataSubEl.textContent = t('settingsDataSub');
+
+    const settingsNotifLabelEl = document.querySelector('.toggle-label > span');
+    if (settingsNotifLabelEl) settingsNotifLabelEl.textContent = t('settingsNotifLabel');
+
+    const settingsDangerSubEl = document.querySelector('.danger-zone > p');
+    if (settingsDangerSubEl) settingsDangerSubEl.textContent = t('settingsDangerSub');
+
+    const settingsLogoutBtn = document.querySelector('.btn-danger');
+    if (settingsLogoutBtn) settingsLogoutBtn.textContent = t('settingsLogoutBtn');
+    const settingsDeleteBtn = document.querySelector('.btn-danger-outline');
+    if (settingsDeleteBtn) settingsDeleteBtn.textContent = t('settingsDeleteBtn');
+
+    // Theme names
+    const themeNames = document.querySelectorAll('.theme-name');
+    const themeKeys = ['themeDark','themeLight','themeNeon','themePastel'];
+    themeNames.forEach((el, i) => { if (themeKeys[i]) el.textContent = t(themeKeys[i]); });
+
+    // Settings data buttons
+    const settingsDataBtns = document.querySelectorAll('#settingsSection .chart-container:nth-child(2) button');
+    if (settingsDataBtns[0]) settingsDataBtns[0].textContent = t('jsonDown');
+    if (settingsDataBtns[1]) settingsDataBtns[1].textContent = t('csvDown');
+    if (settingsDataBtns[2]) settingsDataBtns[2].textContent = t('importBtn');
+
+    // ===== ADD MODAL =====
+    const addModalTitleEl = document.querySelector('#addModal .modal-title');
+    if (addModalTitleEl) addModalTitleEl.textContent = t('addModalTitle');
+
+    const addFormGroups = document.querySelectorAll('#addForm .form-group label');
+    if (addFormGroups[0]) addFormGroups[0].textContent = t('addModalAPILabel');
+    const apiSearchEl = document.getElementById('apiSearch');
+    if (apiSearchEl) apiSearchEl.placeholder = t('addModalAPIPlaceholder');
+
+    // Add modal status select
+    const itemStatusEl = document.getElementById('itemStatus');
+    if (itemStatusEl) {
+        const opts = itemStatusEl.options;
+        if (opts[0]) opts[0].text = t('plantowatch');
+        if (opts[1]) opts[1].text = t('watching');
+        if (opts[2]) opts[2].text = t('completed');
+        if (opts[3]) opts[3].text = t('onhold');
+        if (opts[4]) opts[4].text = t('dropped');
+    }
+
+    // Add modal submit btn
+    const addSubmitBtn = document.querySelector('#addForm button[type="submit"]');
+    if (addSubmitBtn) addSubmitBtn.textContent = t('addModalSubmitBtn');
+    const addContentBtnEl = document.getElementById('addContentBtn');
+    if (addContentBtnEl) addContentBtnEl.textContent = t('addBtn');
+
+    // ===== DETAIL PAGE =====
+    const dpBackEl = document.querySelector('.dp-breadcrumb span:first-child');
+    if (dpBackEl) dpBackEl.textContent = t('dpBack');
+    const dpSynTitleEl = document.querySelector('#dpSynopsis')?.closest('.dp-card')?.querySelector('.dp-card-title');
+    if (dpSynTitleEl) dpSynTitleEl.textContent = t('dpSynopsisTitle');
+    const dpReviewTitleEl = document.querySelector('#reviewFormCard .dp-card-title');
+    if (dpReviewTitleEl) dpReviewTitleEl.textContent = t('dpReviewTitle');
+    const dpCommentsTitleEl = document.querySelector('#reviewsList')?.closest('.dp-card')?.querySelector('.dp-card-title');
+    if (dpCommentsTitleEl) dpCommentsTitleEl.textContent = t('dpCommentsTitle');
+    const dpInfoTitleEl = document.querySelector('.dp-info-card .dp-card-title');
+    if (dpInfoTitleEl) dpInfoTitleEl.textContent = t('dpInfoTitle');
+    const dpSimilarTitleEl = document.querySelector('#similarGrid')?.closest('.home-section-block')?.querySelector('.sh-title');
+    if (dpSimilarTitleEl) dpSimilarTitleEl.textContent = t('dpSimilarTitle');
+    const dpBackBtn = document.querySelector('.dp-back-btn');
+    if (dpBackBtn) dpBackBtn.textContent = t('dpBackBtn');
+
+    // Detail info labels
+    const dpInfoLabels = document.querySelectorAll('.dp-info-label');
+    const dpInfoKeys = ['dpTypeLabel','dpRankLabel','dpMembersLabel','dpStudioLabel','dpStatusLabel'];
+    dpInfoLabels.forEach((el, i) => { if (dpInfoKeys[i]) el.textContent = t(dpInfoKeys[i]); });
+
+    // Rating text (only if no rating selected)
+    const ratingTextEl = document.getElementById('ratingText');
+    if (ratingTextEl && (ratingTextEl.textContent === 'Puan seç' || ratingTextEl.textContent === 'Select rating')) {
+        ratingTextEl.textContent = t('dpRatingText');
+    }
+
+    // Review textarea placeholder
+    const reviewCommentEl = document.getElementById('reviewComment');
+    if (reviewCommentEl) reviewCommentEl.placeholder = t('dpCommentPlaceholder');
+
+    // Review submit button
+    const reviewSubmitBtn = document.getElementById('reviewSubmitBtn');
+    if (reviewSubmitBtn && (reviewSubmitBtn.textContent === '💬 Yorumu Gönder' || reviewSubmitBtn.textContent === '💬 Submit Review')) {
+        reviewSubmitBtn.textContent = t('dpSubmitReview');
+    }
+
+    // Synopsis loading text
+    const dpSynopsisEl = document.getElementById('dpSynopsis');
+    if (dpSynopsisEl && (dpSynopsisEl.textContent === 'Yükleniyor...' || dpSynopsisEl.textContent === 'Loading description...')) {
+        dpSynopsisEl.textContent = t('dpSynopsisLoading');
+    }
+
+    // Add to list button (if not in library)
+    const dpAddBtn = document.getElementById('dpAddBtn');
+    if (dpAddBtn && !dpAddBtn.classList.contains('in-library')) {
+        dpAddBtn.textContent = t('dpAddToList');
+    }
+
+    // Discover stats loading text
+    const discoverStatsEl = document.getElementById('discoverStats');
+    if (discoverStatsEl && discoverStatsEl.textContent === 'İçerik yükleniyor...' || discoverStatsEl?.textContent === 'Loading content...') {
+        discoverStatsEl.textContent = _lang === 'en' ? 'Loading content...' : 'İçerik yükleniyor...';
+    }
+
+    // Discover "No results"
+    // Add/update button labels already handled by renderDiscoverGrid/renderMediaRow
 
     // Refresh current section content if needed
     if (typeof currentSection !== 'undefined') {
@@ -484,7 +1179,7 @@ function renderProfilePage() {
                 <span class="status-bar-count">${b.count}</span>
             </div>`).join('') + `
             <div class="status-bar-row" style="margin-top:0.6rem;border-top:1px solid var(--border);padding-top:0.6rem;">
-                <span class="status-bar-label" style="color:var(--text-muted)">Ort. Puan</span>
+                <span class="status-bar-label" style="color:var(--text-muted)">${t('avgRating')}</span>
                 <div class="status-bar-track">
                     <div class="status-bar-fill" style="width:${rated.length ? Math.round(parseFloat(avgRating)/5*100) : 0}%;background:#fbbf24;"></div>
                 </div>
@@ -604,7 +1299,7 @@ function saveProfile(event) {
     closeEditProfile();
     renderProfilePage();
     updateHeaderUser();
-    showNotification('Profil güncellendi ✓', 'success');
+    showNotification(t('profileUpdated'), 'success');
 }
 
 function selectAvatar(emoji) {
@@ -633,11 +1328,11 @@ function handleAvatarUpload(event) {
     const file = event.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
-        showNotification('Lütfen bir görsel dosyası seçin', 'error');
+        showNotification(_lang === 'en' ? 'Please select an image file' : 'Lütfen bir görsel dosyası seçin', 'error');
         return;
     }
     if (file.size > 3 * 1024 * 1024) {
-        showNotification("Görsel 3MB'den küçük olmalı", 'error');
+        showNotification(_lang === 'en' ? "Image must be under 3MB" : "Görsel 3MB'den küçük olmalı", 'error');
         return;
     }
     const reader = new FileReader();
@@ -661,7 +1356,7 @@ function handleAvatarUpload(event) {
 
             // Emoji seçimini temizle
             document.querySelectorAll('.avatar-option').forEach(b => b.classList.remove('selected'));
-            showNotification('Fotoğraf yüklendi ✓', 'success');
+            showNotification(_lang === 'en' ? 'Photo uploaded ✓' : 'Fotoğraf yüklendi ✓', 'success');
         };
         img.src = e.target.result;
     };
@@ -673,7 +1368,7 @@ function removeAvatarPhoto() {
     if (dataManager.data) dataManager.data.social.avatarUrl = null;
     const emoji = document.getElementById('selectedAvatar')?.value || '👤';
     _applyAvatar('avatarPreview', { avatar: emoji, avatarUrl: null });
-    showNotification('Fotoğraf kaldırıldı', 'info');
+    showNotification(_lang === 'en' ? 'Photo removed' : 'Fotoğraf kaldırıldı', 'info');
 }
 
 // ===== ACHIEVEMENTS =====
@@ -895,7 +1590,7 @@ async function renderCalendar() {
         container.innerHTML = `
             <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted);">
                 <div style="font-size:2rem;margin-bottom:.5rem;">⚠️</div>
-                <div>Takvim yüklenemedi. Lütfen tekrar deneyin.</div>
+                <div>${t('calError')}</div>
             </div>`;
         return;
     }
@@ -906,7 +1601,7 @@ async function renderCalendar() {
         container.innerHTML = `
             <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted);">
                 <div style="font-size:2rem;margin-bottom:.5rem;">📭</div>
-                <div>Bu hafta için yayın verisi bulunamadı.</div>
+                <div>${t('calNoData')}</div>
             </div>`;
         return;
     }
@@ -929,7 +1624,7 @@ async function renderCalendar() {
 
                 return `<div class="cal-item${inLib ? ' my-lib' : ''}"
                     style="border-left:3px solid ${inLib ? '#10b981' : accentBorder};"
-                    title="${(a.name||'').replace(/"/g,'&quot;')} — Bölüm ${a.episode}${a.totalEps ? '/' + a.totalEps : ''} • ${airTime}">
+                    title="${(a.name||'').replace(/"/g,'&quot;')} — ${_lang === 'en' ? 'Episode' : 'Bölüm'} ${a.episode}${a.totalEps ? '/' + a.totalEps : ''} • ${airTime}">
                     ${a.cover
                         ? `<img class="cal-cover" src="${a.cover}" alt="" loading="lazy" onerror="this.style.display='none'">`
                         : `<div class="cal-cover-fallback">🎬</div>`}
@@ -946,17 +1641,17 @@ async function renderCalendar() {
                     </div>
                 </div>`;
             }).join('')
-            : `<div class="cal-empty">Bu gün yayın yok</div>`;
+            : `<div class="cal-empty">${t('calNoAiring')}</div>`;
 
         return `<div class="weekday${isToday ? ' today-col' : ''}">
             <div class="weekday-name">
                 ${dayName}${isToday ? ' <span class="today-dot">●</span>' : ''}
             </div>
             <div class="weekday-date">${dateStr}</div>
-            <div class="weekday-count">${animes.length ? animes.length + ' bölüm' : '—'}</div>
+            <div class="weekday-count">${animes.length ? animes.length + ' ' + t('calEpisodeCount') : '—'}</div>
             ${rows}
             ${animes.length > 12
-                ? `<div class="cal-more">+${animes.length - 12} bölüm daha…</div>`
+                ? `<div class="cal-more">+${animes.length - 12} ${t('calMoreEpisodes')}</div>`
                 : ''}
         </div>`;
     }).join('');
