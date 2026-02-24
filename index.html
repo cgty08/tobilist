@@ -1321,55 +1321,53 @@
 
     <!-- Home page live stats & leaderboard -->
     <script>
-    // Supabase'den canlı platform istatistiklerini çeker
+    // Supabase'den canlı platform istatistiklerini çeker (RPC ile — RLS bypass)
     async function loadHomeLiveStats() {
         try {
             if (!window.supabaseClient) return;
-            const { data } = await window.supabaseClient
-                .from('user_data')
-                .select('user_id,data');
-            if (!data) return;
+            const fmt = n => n >= 1000 ? (n/1000).toFixed(1)+'K' : n;
+            const setEl = (id, v) => { const e = document.getElementById(id); if(e) e.textContent = v; };
 
-            let users=data.length, entries=0, completed=0, xpTotal=0, longestStreak=0;
-            const topUsers=[];
-            data.forEach(row=>{
-                const d=row.data;
-                if(!d) return;
-                if(d.items){ entries+=d.items.length; completed+=d.items.filter(i=>i.status==='completed').length; }
-                if(d.xp?.total){ xpTotal+=d.xp.total; topUsers.push({name:d.social?.name||'Kullanıcı',avatar:d.social?.avatar||'👤',xp:d.xp.total,level:d.xp.level||1}); }
-                if(d.streak?.longest>longestStreak) longestStreak=d.streak.longest;
-            });
-            topUsers.sort((a,b)=>b.xp-a.xp);
+            // 1) Platform istatistikleri — get_platform_stats() RPC (herkese açık)
+            const { data: stats, error: statsErr } = await window.supabaseClient
+                .rpc('get_platform_stats');
 
-            // Platform stats bar
-            const fmt=n=>n>=1000?(n/1000).toFixed(1)+'K':n;
-            const s=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=fmt(v);};
-            s('liveUserCount',users); s('liveEntryCount',entries);
-            s('liveCompletedCount',completed); s('liveXPCount',xpTotal);
+            if (!statsErr && stats) {
+                setEl('liveUserCount',    fmt(stats.total_users    || 0));
+                setEl('liveEntryCount',   fmt(stats.total_entries  || 0));
+                setEl('liveCompletedCount',fmt(stats.total_completed|| 0));
+                setEl('liveXPCount',      fmt(stats.total_xp       || 0));
+                setEl('commTotalUsers',   fmt(stats.total_users    || 0));
+                setEl('commCompleted',    fmt(stats.total_completed|| 0));
+                const xe = document.getElementById('commXP');
+                if(xe) xe.textContent = fmt(stats.total_xp || 0) + ' XP';
+                const lse = document.getElementById('commLongestStreak');
+                if(lse) lse.textContent = (stats.longest_streak || 0) + (typeof _lang!=='undefined'&&_lang==='en'?' days':' gün');
+            }
 
-            // Community card stats
-            s('commTotalUsers',users); s('commCompleted',completed);
-            const ae=document.getElementById('commTotalAnime');
-            let anime=0; data.forEach(r=>{ anime+=(r.data?.items||[]).filter(i=>i.type==='anime').length; });
-            if(ae) ae.textContent=fmt(anime);
-            const xe=document.getElementById('commXP'); if(xe) xe.textContent=fmt(xpTotal)+' XP';
-            const lse=document.getElementById('commLongestStreak'); if(lse) lse.textContent=longestStreak+(typeof _lang!=='undefined'&&_lang==='en'?' days':' gün');
+            // 2) Leaderboard — public_leaderboard view (herkese açık, hassas veri yok)
+            const { data: leaders, error: lbErr } = await window.supabaseClient
+                .from('public_leaderboard')
+                .select('name,avatar,xp_total,level')
+                .order('xp_total', { ascending: false })
+                .limit(5);
 
-            // Leaderboard
-            const lb=document.getElementById('leaderboardList');
-            if(lb){
-                const top=topUsers.slice(0,5);
-                if(!top.length){ lb.innerHTML='<div class="lb-loading">Henüz kullanıcı yok</div>'; return; }
-                const rankClass=['gold','silver','bronze'];
-                lb.innerHTML=top.map((u,i)=>`
+            const lb = document.getElementById('leaderboardList');
+            if (lb) {
+                if (lbErr || !leaders || !leaders.length) {
+                    lb.innerHTML = '<div class="lb-loading">Henüz kullanıcı yok</div>';
+                    return;
+                }
+                const rankClass = ['gold','silver','bronze'];
+                lb.innerHTML = leaders.map((u, i) => `
                     <div class="lb-item">
                         <span class="lb-rank ${rankClass[i]||''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)}</span>
-                        <div class="lb-av">${u.avatar}</div>
-                        <span class="lb-name">${u.name}</span>
-                        <span class="lb-xp">⭐${fmt(u.xp)} XP</span>
+                        <div class="lb-av">${u.avatar||'👤'}</div>
+                        <span class="lb-name">${u.name||'Kullanıcı'}</span>
+                        <span class="lb-xp">⭐${fmt(u.xp_total||0)} XP</span>
                     </div>`).join('');
             }
-        } catch(e){ console.warn('Live stats error:',e); }
+        } catch(e) { console.warn('Live stats error:', e); }
     }
 
     // Sayfa yüklenince çalıştır, 60 saniyede bir yenile

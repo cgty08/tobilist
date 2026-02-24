@@ -924,7 +924,17 @@ function refreshCurrent() { showPage(curPage); }
 
 // ===== ONLINE COUNT =====
 async function updateOnlineCount() {
-    const { data } = await sb.from('user_data').select('user_id,data,updated_at').order('updated_at',{ascending:false});
+    // get_all_user_data RPC ile tüm kullanıcıları çek
+    let rawData = [];
+    try {
+        const rpcRes = await sb.rpc('get_all_user_data');
+        rawData = rpcRes.error
+            ? ((await sb.from('user_data').select('user_id,data,updated_at').order('updated_at',{ascending:false})).data || [])
+            : (rpcRes.data || []);
+    } catch(e) {
+        rawData = (await sb.from('user_data').select('user_id,data,updated_at').order('updated_at',{ascending:false})).data || [];
+    }
+    const data = rawData;
     const now15 = new Date(Date.now() - 15*60*1000).toISOString();
     const online = (data||[]).filter(u => u.updated_at > now15 && !u.data?.banned);
     const count = online.length;
@@ -947,7 +957,22 @@ async function updateOnlineCount() {
 
 // ===== DASHBOARD =====
 async function loadDashboard() {
-    const { data: rows, error } = await sb.from('user_data').select('user_id,data,updated_at').order('updated_at',{ascending:false});
+    // get_all_user_data RPC — SECURITY DEFINER, tüm kullanıcıları görür (RLS bypass)
+    let rows = [], error = null;
+    try {
+        const rpcRes = await sb.rpc('get_all_user_data');
+        if (rpcRes.error) {
+            // RPC yoksa doğrudan sorgu dene (service key ile çalışıyorsa)
+            const fallback = await sb.from('user_data').select('user_id,data,updated_at').order('updated_at',{ascending:false});
+            rows = fallback.data || [];
+            error = fallback.error;
+        } else {
+            rows = rpcRes.data || [];
+        }
+    } catch(e) {
+        const fallback = await sb.from('user_data').select('user_id,data,updated_at').order('updated_at',{ascending:false});
+        rows = fallback.data || [];
+    }
     if (error) { toast('Yükleme hatası: ' + error.message, 'error'); return; }
     const users = rows || [];
 
@@ -1055,8 +1080,17 @@ function buildDailyActivity(users, days=14) {
 
 // ===== ANALYTICS =====
 async function loadAnalytics() {
-    const { data: rows } = await sb.from('user_data').select('data,updated_at');
-    if (!rows) return;
+    // get_all_user_data RPC — SECURITY DEFINER, tüm kullanıcıları görür
+    let rows = [];
+    try {
+        const rpcRes = await sb.rpc('get_all_user_data');
+        rows = rpcRes.error
+            ? ((await sb.from('user_data').select('data,updated_at')).data || [])
+            : (rpcRes.data || []);
+    } catch(e) {
+        rows = (await sb.from('user_data').select('data,updated_at')).data || [];
+    }
+    if (!rows.length) return;
 
     let streakSum=0, listSum=0, ratingSum=0, ratingN=0, levelSum=0;
     let totalEntries=0, totalCompleted=0, longestStreak=0;
