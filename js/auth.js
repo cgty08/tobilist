@@ -514,18 +514,17 @@ function updateHeaderUser() {
     const username = social.name || currentUser.displayName || 'Kullanıcı';
     const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
 
-    // Avatar: fotoğraf varsa fotoğraf, yoksa emoji — hem header hem dropdown
-    ['headerAvatar', 'dropdownAvatar'].forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
+    // Avatar: sadece dropdown içindeki avatar alanını güncelle
+    const dropAv = document.getElementById('dropdownAvatar');
+    if (dropAv) {
         if (social.avatarUrl) {
-            el.style.cssText = 'background-image:url(' + social.avatarUrl + ');background-size:cover;background-position:center;width:100%;height:100%;border-radius:50%;display:block;';
-            el.textContent = '';
+            dropAv.style.cssText = 'background-image:url(' + social.avatarUrl + ');background-size:cover;background-position:center;width:40px;height:40px;border-radius:50%;flex-shrink:0;';
+            dropAv.textContent = '';
         } else {
-            el.style.cssText = '';
-            el.textContent = social.avatar || '👤';
+            dropAv.style.cssText = '';
+            dropAv.textContent = social.avatar || '👤';
         }
-    });
+    }
 
     setEl('headerUsername', username);
     setEl('dropdownName', username);

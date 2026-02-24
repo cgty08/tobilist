@@ -204,15 +204,17 @@ header {
 .header-avatar-el {
     width: 26px;
     height: 26px;
+    min-width: 26px;
     border-radius: 50%;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     flex-shrink: 0;
     background-size: cover;
     background-position: center;
     overflow: hidden;
+    line-height: 1;
 }
 .dropdown-arrow { font-size: 0.65rem; color: var(--text-muted); }
 
