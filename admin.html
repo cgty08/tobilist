@@ -1046,8 +1046,7 @@ async function loadDashboard() {
         const d=u.data, isOnline = u.updated_at > now15;
         return `<tr>
             <td><div class="user-cell">
-                <div class="user-av" style="position:relative;">${d?.social?.avatar||'👤'}${isOnline?'<div style="position:absolute;bottom:0;right:0;width:9px;height:9px;background:var(--green);border-radius:50%;border:2px solid var(--card);"></div>':''}
-                </div>
+                <div style="position:relative;">${avatarHtml(d,'32px')}${isOnline?'<div style="position:absolute;bottom:0;right:0;width:9px;height:9px;background:var(--green);border-radius:50%;border:2px solid var(--card);"></div>':''}</div>
                 <div><div class="user-name">${esc(d?.social?.name||'Kullanıcı')}</div><div class="user-email">${esc(d?.social?.email||'')}</div></div>
             </div></td>
             <td style="color:var(--text2);font-size:.82rem;">${fmtRelative(u.updated_at)}</td>
@@ -1153,7 +1152,7 @@ async function loadAnalytics() {
             return `<tr>
                 <td style="text-align:center;">${rankDisplay}</td>
                 <td><div class="user-cell">
-                    <div class="user-av">${d?.social?.avatar || '👤'}</div>
+                    ${avatarHtml(d,'32px')}
                     <div>
                         <div class="user-name">${esc(d?.social?.name || 'Kullanıcı')}</div>
                         <div class="user-email" style="font-size:.7rem;color:var(--text3);">⭐ Ort: ${avgRating} · ${esc(d?.social?.email || '')}</div>
@@ -1226,8 +1225,7 @@ function renderUsers() {
         const completedCount = d?.items?.filter(i=>i.status==='completed').length||0;
         return `<tr>
             <td><div class="user-cell">
-                <div class="user-av" style="position:relative;">${d?.social?.avatar||'👤'}${isOnline&&!banned?'<div style="position:absolute;bottom:0;right:0;width:8px;height:8px;background:var(--green);border-radius:50%;border:2px solid var(--card);"></div>':''}
-                </div>
+                <div style="position:relative;">${avatarHtml(d,'32px')}${isOnline&&!banned?'<div style="position:absolute;bottom:0;right:0;width:8px;height:8px;background:var(--green);border-radius:50%;border:2px solid var(--card);"></div>':''}</div>
                 <div><div class="user-name">${esc(name)}</div><div class="user-email mono">${u.user_id.substring(0,12)}…</div></div>
             </div></td>
             <td style="color:var(--text2);font-size:.82rem;">${esc(d?.social?.email||'—')}</td>
@@ -1385,7 +1383,7 @@ async function loadOnline() {
             const d = u.data;
             return `<tr>
                 <td><div class="user-cell">
-                    <div class="user-av" style="position:relative;">${d?.social?.avatar||'👤'}<div style="position:absolute;bottom:0;right:0;width:9px;height:9px;background:var(--green);border-radius:50%;border:2px solid var(--card);animation:pulse 2s infinite;"></div></div>
+                    <div style="position:relative;">${avatarHtml(d,'32px')}<div style="position:absolute;bottom:0;right:0;width:9px;height:9px;background:var(--green);border-radius:50%;border:2px solid var(--card);animation:pulse 2s infinite;"></div></div>
                     <div><div class="user-name">${esc(d?.social?.name||'Kullanıcı')}</div><div class="user-email">${esc(d?.social?.email||'')}</div></div>
                 </div></td>
                 <td style="color:var(--green);font-size:.82rem;">🟢 ${fmtRelative(u.updated_at)}</td>
@@ -1446,7 +1444,7 @@ function renderAllMembers() {
                 : '<span class="badge bg-blue">✅ Kayıtlı</span>';
         return `<tr>
             <td><div class="user-cell">
-                <div class="user-av" style="position:relative;">${d?.social?.avatar||'👤'}${isOnline&&!isBanned?'<div style="position:absolute;bottom:0;right:0;width:8px;height:8px;background:var(--green);border-radius:50%;border:2px solid var(--card);animation:pulse 2s infinite;"></div>':''}</div>
+                <div style="position:relative;">${avatarHtml(d,'32px')}${isOnline&&!isBanned?'<div style="position:absolute;bottom:0;right:0;width:8px;height:8px;background:var(--green);border-radius:50%;border:2px solid var(--card);animation:pulse 2s infinite;"></div>':''}</div>
                 <div>
                     <div class="user-name">${esc(name)}</div>
                     <div class="user-email">${esc(d?.social?.email||'')} <span class="mono" style="font-size:.68rem;color:var(--text3);">${u.user_id.substring(0,8)}…</span></div>
@@ -1874,6 +1872,15 @@ function fmtRelative(s) {
     return fmtDate(s);
 }
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function avatarHtml(d, size) {
+    size = size || '32px';
+    var url = d && d.social && d.social.avatarUrl;
+    var em = (d && d.social && d.social.avatar) || '👤';
+    if (url) {
+        return '<div style="width:'+size+';height:'+size+';border-radius:50%;background-image:url('+url+');background-size:cover;background-position:center;flex-shrink:0;display:inline-block;"></div>';
+    }
+    return '<div style="width:'+size+';height:'+size+';border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent3));display:inline-flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;">'+em+'</div>';
+}
 </script>
 </body>
 </html>
