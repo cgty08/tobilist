@@ -431,8 +431,7 @@ function quickAdd(item) {
 
     dataManager.data.items.unshift(newItem);
     dataManager.saveAll();
-    xpSystem.addXP(XP_REWARDS.addItem, (item.name || '') + ' eklendi');
-    checkAchievements();
+    checkAchievements(); // XP yok — sadece başarım kontrolü
     updateStats();
     showNotification('✅ ' + newItem.name + ' "İzlenecek" listesine eklendi!', 'success');
     renderDiscoverGrid();
@@ -488,8 +487,7 @@ function addItem(event) {
 
     dataManager.data.items.unshift(newItem);
     dataManager.saveAll();
-    xpSystem.addXP(XP_REWARDS.addItem, newItem.name + ' eklendi');
-    checkAchievements();
+    checkAchievements(); // XP yok — sadece başarım kontrolü
     updateStats();
     filterItems();
     closeModal();
@@ -1069,16 +1067,25 @@ async function submitReview() {
     if (error) { showNotification('Yorum gönderilemedi: ' + error.message, 'error'); return; }
     showNotification('✅ Yorumun kaydedildi!', 'success');
 
-    // XP: Yorum uzunluğuna göre ödül
-    const reviewXP = comment.length >= 200
-        ? XP_REWARDS.writeLongReview   // 40 XP - detaylı yorum
-        : XP_REWARDS.writeReview;      // 20 XP - kısa yorum
-    xpSystem.addXP(reviewXP, _lang === 'en'
-        ? (comment.length >= 200 ? 'Detailed review written! ✍️' : 'Review written!')
-        : (comment.length >= 200 ? 'Detaylı yorum yazıldı! ✍️' : 'Yorum yazıldı!'));
-
-    // Yorum sayacını güncelle (başarımlar için)
+    // XP: Yalnızca yeni yorum ise ver (güncelleme XP vermiyor — döngü önleme)
+    // reviewedItems: daha önce yorum yazılan content_id'leri tutar
     if (dataManager.data) {
+        const reviewedItems = dataManager.data.reviewedItems || [];
+        const contentKey = String(currentDetailItem.id);
+        const isNewReview = !reviewedItems.includes(contentKey);
+
+        if (isNewReview && comment.length >= 50) {
+            // İlk yorum — XP ver ve kaydet
+            const reviewXP = comment.length >= 200
+                ? XP_REWARDS.writeLongReview   // 100 XP - detaylı yorum
+                : XP_REWARDS.writeReview;      // 50 XP - kısa yorum
+            xpSystem.addXP(reviewXP, _lang === 'en'
+                ? (comment.length >= 200 ? 'Detailed review! ✍️' : 'Review written!')
+                : (comment.length >= 200 ? 'Detaylı yorum! ✍️' : 'Yorum yazıldı!'));
+            reviewedItems.push(contentKey);
+            dataManager.data.reviewedItems = reviewedItems;
+        }
+        // Sayaç her durumda güncellenir (başarımlar için)
         dataManager.data.reviewCount = (dataManager.data.reviewCount || 0) + 1;
         dataManager.saveAll();
     }

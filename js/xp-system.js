@@ -3,35 +3,31 @@
 // ===== XP ÖDÜLLERI =====
 // Tasarım prensibi: İçerik eklemek az ödül, kaliteli etkileşimler daha fazla ödül
 const XP_REWARDS = {
-    // Temel ekleme - çok az (spam önleme)
-    addItem:              5,   // Eskiden 10 - spam engellemek için düşürüldü
+    // Kütüphane işlemleri — XP YOK (döngü önleme)
+    addItem:              0,   // İçerik eklemek XP vermiyor
+    completeItem:         0,   // Tamamladım değiştirmek XP vermiyor
+    dropItem:             0,   // Bıraktım XP vermiyor
+    startWatching:        0,   // İzliyorum XP vermiyor
+    updateProgress:       0,   // Bölüm güncellemek XP vermiyor
 
-    // Durum değiştirme ödülleri
-    completeItem:        40,   // Bir seriyi bitirmek
-    dropItem:             2,   // Bırakmak çok az XP
-    startWatching:        3,   // İzlemeye başlamak
+    // Etkileşim ödülleri — gerçek emek gerektiren şeyler
+    writeReview:         50,   // Yorum yazmak (en az 50 karakter) — 1 içeriğe 1 kez
+    writeLongReview:    100,   // Detaylı yorum (en az 200 karakter) — 1 içeriğe 1 kez
+    rateItem:             0,   // Puan vermek tek başına XP vermiyor (reviewla birlikte olsun)
+    addNote:              0,   // Not eklemek XP vermiyor
 
-    // Etkileşim ödülleri - asıl XP buradan
-    writeReview:         20,   // Yorum yazmak (en az 50 karakter)
-    writeLongReview:     40,   // Detaylı yorum (en az 200 karakter)
-    rateItem:             8,   // Puan vermek
-    addNote:             10,   // Not eklemek (en az 30 karakter)
-    addToFavorite:        5,   // Favoriye eklemek
+    // Giriş & streak ödülleri — ana XP kaynağı
+    dailyLogin:          20,   // Günlük giriş
+    weekStreak:         150,   // 7 gün streak
+    monthStreak:        750,   // 30 gün streak
 
-    // Bölüm takibi
-    episodeMilestone25:  15,   // 25 bölüm izlemek
-    episodeMilestone50:  25,   // 50 bölüm
-    episodeMilestone100: 50,   // 100 bölüm
-    hundredEpisodes:     30,   // (geriye dönük uyumluluk)
-
-    // Giriş & streak ödülleri
-    dailyLogin:          15,   // Günlük giriş (eskiden 20)
-    weekStreak:         100,   // 7 gün streak
-    monthStreak:        500,   // 30 gün streak
-
-    // Özel aksiyonlar
-    firstOfType:         25,   // İlk anime/manga/webtoon ekleme
-    updateProgress:       2,   // İlerleme güncellemesi (küçük ödül)
+    // Bölüm takibi — kaldırıldı (döngü yapılabilir)
+    episodeMilestone25:   0,
+    episodeMilestone50:   0,
+    episodeMilestone100:  0,
+    hundredEpisodes:      0,
+    addToFavorite:        0,
+    firstOfType:          0,
 };
 
 // ===== LEVEL UNVAN SİSTEMİ =====
@@ -221,8 +217,8 @@ const RARITY_COLORS = {
 // ===== XP CLASS =====
 class XPSystem {
     constructor() {
-        this.xpPerLevel = 120;
-        this.xpMultiplier = 1.4;
+        this.xpPerLevel = 300;    // Eskiden 120 — çok daha yüksek baz
+        this.xpMultiplier = 1.6;  // Eskiden 1.4 — her level daha da zorlaşıyor
     }
 
     addXP(amount, reason = '', silent = false) {

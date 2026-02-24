@@ -1069,19 +1069,16 @@ function updateItem(id, field, value) {
     const oldValue = item[field];
     item[field] = value;
 
+    // Kütüphane işlemleri XP vermiyor — döngü önleme
     if (field === 'status' && value === 'completed' && oldValue !== 'completed') {
         if (item.totalEpisodes > 0) item.currentEpisode = item.totalEpisodes;
-        xpSystem.addXP(XP_REWARDS.completeItem, item.name + (_lang === 'en' ? ' completed! 🎉' : ' tamamlandı! 🎉'));
+        checkAchievements(); // XP yok, sadece başarım kontrolü
+    } else if (field === 'status') {
         checkAchievements();
-    } else if (field === 'status' && value === 'watching' && oldValue !== 'watching') {
-        xpSystem.addXP(XP_REWARDS.startWatching, _lang === 'en' ? 'Started watching' : 'İzlemeye başlandı');
-    } else if (field === 'rating' && value > 0 && oldValue !== value) {
-        xpSystem.addXP(XP_REWARDS.rateItem, _lang === 'en' ? 'Rated! ⭐' : 'Puan verildi ⭐');
-        checkAchievements();
-    } else if (field === 'notes' && value && value.length >= 30 && (!oldValue || oldValue.length < 30)) {
-        xpSystem.addXP(XP_REWARDS.addNote, _lang === 'en' ? 'Note added 📝' : 'Not eklendi 📝');
     }
-    dataManager.saveAll(); // FIX: ensure saves to Supabase
+    // rating, notes, watching değişiklikleri XP vermiyor
+
+    dataManager.saveAll();
     filterItems();
     updateStats();
 }
