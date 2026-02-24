@@ -1381,23 +1381,57 @@ function renderAchievements() {
     const container = document.getElementById('achievementsGrid');
     if (!container || !dataManager.data) return;
     const unlocked = dataManager.data.achievements;
-    // Dil yardımcısı - achievement title/desc için (string veya {tr,en} objesi)
     const _a = (obj) => (typeof obj === 'object' && obj !== null)
         ? (obj[_lang] || obj.tr || Object.values(obj)[0])
         : obj;
 
-    container.innerHTML = ACHIEVEMENTS.map(ach => {
-        const done = unlocked.includes(ach.id);
-        return `<div class="ach-card${done ? ' unlocked' : ''}" style="${!done ? 'opacity:.55;filter:grayscale(.5);' : ''}">
-            <div class="ach-icon${done ? ' unlocked-icon' : ''}">${ach.icon}</div>
-            <div class="ach-info">
-                <div class="ach-title">${_a(ach.title)}</div>
-                <div class="ach-desc">${_a(ach.desc)}</div>
-                ${ach.xp > 0 ? `<div class="ach-xp">+${ach.xp} XP</div>` : ''}
+    // Özet banner
+    const total    = ACHIEVEMENTS.length;
+    const doneCount = unlocked.length;
+    const pct      = Math.round((doneCount / total) * 100);
+    const totalXP  = ACHIEVEMENTS.filter(a => unlocked.includes(a.id)).reduce((s, a) => s + (a.xp || 0), 0);
+
+    // Başarımları sırala: önce kazanılanlar, sonra kilitliler
+    const sorted = [...ACHIEVEMENTS].sort((a, b) => {
+        const aD = unlocked.includes(a.id);
+        const bD = unlocked.includes(b.id);
+        if (aD && !bD) return -1;
+        if (!aD && bD) return 1;
+        return 0;
+    });
+
+    const rarityColor = { common: '#6b7280', uncommon: '#3b82f6', rare: '#8b5cf6', epic: '#ec4899', legendary: '#f59e0b' };
+
+    container.innerHTML = `
+        <!-- Özet Bar -->
+        <div style="grid-column:1/-1; background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:1.4rem 1.8rem; margin-bottom:.5rem;">
+            <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; margin-bottom:1rem;">
+                <div>
+                    <div style="font-size:1.1rem; font-weight:700; margin-bottom:.2rem;">🏆 ${_lang === 'en' ? 'Achievement Progress' : 'Başarım İlerlemesi'}</div>
+                    <div style="color:var(--text-secondary); font-size:.85rem;">${doneCount} / ${total} ${_lang === 'en' ? 'unlocked' : 'kazanıldı'} · +${totalXP} XP</div>
+                </div>
+                <div style="font-size:2rem; font-weight:800; background:linear-gradient(135deg,#f59e0b,#ff3366); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">%${pct}</div>
             </div>
-            <div class="ach-status ${done ? 'done' : 'locked'}">${done ? '✓' : '🔒'}</div>
-        </div>`;
-    }).join('');
+            <div style="height:8px; background:rgba(255,255,255,.07); border-radius:20px; overflow:hidden;">
+                <div style="height:100%; width:${pct}%; background:linear-gradient(90deg,#ff3366,#f59e0b); border-radius:20px; transition:width .6s ease;"></div>
+            </div>
+        </div>
+        ${sorted.map(ach => {
+            const done = unlocked.includes(ach.id);
+            const rCol = rarityColor[ach.rarity] || '#6b7280';
+            return `<div class="ach-card${done ? ' unlocked' : ''}" style="${!done ? 'opacity:.5;' : ''}">
+                <div class="ach-icon${done ? ' unlocked-icon' : ''}">${ach.icon}</div>
+                <div class="ach-info">
+                    <div class="ach-title">${_a(ach.title)}</div>
+                    <div class="ach-desc">${_a(ach.desc)}</div>
+                    <div style="display:flex;align-items:center;gap:.4rem;margin-top:.35rem;flex-wrap:wrap;">
+                        ${ach.xp > 0 ? `<div class="ach-xp">+${ach.xp} XP</div>` : ''}
+                        ${ach.rarity ? `<div style="font-size:.62rem;padding:1px 6px;border-radius:20px;background:rgba(255,255,255,.06);color:${rCol};font-weight:600;">${ach.rarity}</div>` : ''}
+                    </div>
+                </div>
+                <div class="ach-status ${done ? 'done' : 'locked'}">${done ? '✓' : '🔒'}</div>
+            </div>`;
+        }).join('')}`;
 }
 
 // ===== ANALYTICS =====
@@ -1578,12 +1612,33 @@ async function renderCalendar() {
     const container = document.getElementById('weekdaysContainer');
     if (!container || !dataManager.data) return;
 
-    const week    = _getWeekBounds();
-    const dayNames = t('days'); // Pzt→Pzr veya Mon→Sun
-    // dayJS[idx]: idx=0 Pzt→JS 1, idx=6 Pzr→JS 0
-    const dayJS   = [1, 2, 3, 4, 5, 6, 0];
-    const myNames = new Set(dataManager.data.items.map(i => (i.name || '').toLowerCase()));
-    const todayJS = new Date().getDay();
+    const week     = _getWeekBounds();
+    const dayNames = t('days');
+    const dayJS    = [1, 2, 3, 4, 5, 6, 0];
+    const myNames  = new Set(dataManager.data.items.map(i => (i.name || '').toLowerCase()));
+    const todayJS  = new Date().getDay();
+
+    // Legend ekle (bir kere)
+    const calSection = document.getElementById('calendarSection');
+    if (calSection && !calSection.querySelector('.cal-legend')) {
+        const legendEl = document.createElement('div');
+        legendEl.className = 'cal-legend';
+        legendEl.innerHTML = `
+            <div class="cal-legend-item">
+                <div class="cal-legend-dot" style="background:#10b981;border-radius:3px;width:10px;height:10px;flex-shrink:0;"></div>
+                <span>${_lang === 'en' ? 'In your library' : 'Kütüphanende var'}</span>
+            </div>
+            <div class="cal-legend-item">
+                <div class="cal-legend-dot" style="background:rgba(255,255,255,.18);border-radius:3px;width:10px;height:10px;flex-shrink:0;"></div>
+                <span>${_lang === 'en' ? 'Not added yet' : 'Henüz eklenmemiş'}</span>
+            </div>`;
+        container.parentElement.insertBefore(legendEl, container);
+    }
+
+    container.style.display = 'grid';
+    container.style.gridTemplateColumns = 'repeat(7, minmax(0, 1fr))';
+    container.style.gap = '0.7rem';
+    container.style.alignItems = 'start';
 
     container.innerHTML = `
         <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted);">
@@ -1592,7 +1647,6 @@ async function renderCalendar() {
         </div>`;
 
     const byDay = await _fetchAniListCalendar();
-
     _injectCalendarStyles();
 
     if (!byDay) {
@@ -1604,7 +1658,6 @@ async function renderCalendar() {
         return;
     }
 
-    // Toplam bölüm sayısı — birkaç saniye içinde hiç veri gelmediyse uyar
     const totalEntries = Object.values(byDay).reduce((s, a) => s + a.length, 0);
     if (totalEntries === 0) {
         container.innerHTML = `
@@ -1621,162 +1674,247 @@ async function renderCalendar() {
         const dayDate = week.dates[idx];
         const dateStr = dayDate.toLocaleDateString(_lang === 'tr' ? 'tr-TR' : 'en-GB', { day: 'numeric', month: 'short' });
         const animes  = byDay[jsDay] || [];
-        const shown   = animes.slice(0, 12);
+        const shown   = animes.slice(0, 15);
 
         const rows = shown.length
             ? shown.map(a => {
                 const inLib      = myNames.has(a.name.toLowerCase()) || (a.nameEn && myNames.has((a.nameEn || '').toLowerCase()));
                 const scoreColor = !a.score ? '#8892a4' : a.score >= 8 ? '#10b981' : a.score >= 6 ? '#f59e0b' : '#ef4444';
-                const accentBorder = inLib ? '#10b981' : (a.color || 'rgba(255,255,255,.06)');
-                // Yayın saatini göster
-                const airTime = new Date(a.airingAt * 1000).toLocaleTimeString(_lang === 'tr' ? 'tr-TR' : 'en-GB', { hour: '2-digit', minute: '2-digit' });
+                const borderCol  = inLib ? '#10b981' : (a.color || 'rgba(255,255,255,.08)');
+                const airTime    = new Date(a.airingAt * 1000).toLocaleTimeString(_lang === 'tr' ? 'tr-TR' : 'en-GB', { hour: '2-digit', minute: '2-digit' });
 
-                return `<div class="cal-item${inLib ? ' my-lib' : ''}"
-                    style="border-left:3px solid ${inLib ? '#10b981' : accentBorder};"
-                    title="${(a.name||'').replace(/"/g,'&quot;')} — ${_lang === 'en' ? 'Episode' : 'Bölüm'} ${a.episode}${a.totalEps ? '/' + a.totalEps : ''} • ${airTime}">
-                    ${a.cover
-                        ? `<img class="cal-cover" src="${a.cover}" alt="" loading="lazy" onerror="this.style.display='none'">`
-                        : `<div class="cal-cover-fallback">🎬</div>`}
+                return `<div class="cal-item${inLib ? ' my-lib' : ''}" style="border-left-color:${borderCol};" title="${(a.name||'').replace(/"/g,'&quot;')} — Bölüm ${a.episode}${a.totalEps ? '/'+a.totalEps : ''} • ${airTime}">
+                    ${a.cover ? `<img class="cal-cover" src="${a.cover}" alt="" loading="lazy" onerror="this.style.display='none'">` : '<div class="cal-cover-fallback">🎬</div>'}
                     <div class="cal-item-info">
-                        <div class="cal-item-name" style="${inLib ? 'color:#10b981;' : ''}">
-                            ${inLib ? '✅ ' : ''}${a.name}
-                        </div>
+                        <div class="cal-item-name${inLib ? ' in-lib' : ''}">${a.name}</div>
                         <div class="cal-item-meta">
-                            <span class="cal-time">⏰ ${airTime}</span>
-                            <span class="cal-ep">${_lang === 'en' ? 'Ep' : 'Bl'}.${a.episode}${a.totalEps ? '/' + a.totalEps : ''}</span>
+                            <span class="cal-time">${airTime}</span>
+                            <span class="cal-ep">Bl.${a.episode}${a.totalEps ? '/'+a.totalEps : ''}</span>
                             ${a.score ? `<span class="cal-score" style="color:${scoreColor};">★${a.score}</span>` : ''}
-                            ${a.genres.length ? `<span class="cal-genre">${a.genres[0]}</span>` : ''}
+                            ${inLib ? '<span class="cal-lib-dot"></span>' : ''}
                         </div>
                     </div>
                 </div>`;
             }).join('')
-            : `<div class="cal-empty">${t('calNoAiring')}</div>`;
+            : `<div class="cal-empty"><div class="cal-empty-icon">😴</div><div>${t('calNoAiring')}</div></div>`;
 
         return `<div class="weekday${isToday ? ' today-col' : ''}">
             <div class="weekday-name">
-                ${dayName}${isToday ? ' <span class="today-dot">●</span>' : ''}
+                ${dayName}
+                ${isToday ? `<span class="today-badge">${_lang === 'en' ? 'Today' : 'Bugün'}</span>` : ''}
             </div>
             <div class="weekday-date">${dateStr}</div>
-            <div class="weekday-count">${animes.length ? animes.length + ' ' + t('calEpisodeCount') : '—'}</div>
+            <div class="weekday-count-badge">📺 ${animes.length ? animes.length + ' ' + (_lang === 'en' ? 'ep' : 'bölüm') : '—'}</div>
             ${rows}
-            ${animes.length > 12
-                ? `<div class="cal-more">+${animes.length - 12} ${t('calMoreEpisodes')}</div>`
-                : ''}
+            ${animes.length > 15 ? `<div class="cal-more">+${animes.length - 15} ${_lang === 'en' ? 'more' : 'daha fazla'}</div>` : ''}
         </div>`;
     }).join('');
 }
 
 function _injectCalendarStyles() {
-    if (document.getElementById('calendarStylesV2')) return;
+    if (document.getElementById('calendarStylesV3')) return;
     const s = document.createElement('style');
-    s.id = 'calendarStylesV2';
+    s.id = 'calendarStylesV3';
     s.textContent = `
-        #weekdaysContainer {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 0.6rem;
-            align-items: start;
+        /* ===== TAKVİM CONTAINER ===== */
+        #calendarSection .calendar-container {
+            background: transparent;
+            border: none;
+            padding: 0;
         }
-        @media (max-width: 900px) {
-            #weekdaysContainer { grid-template-columns: repeat(4, 1fr); }
-        }
-        @media (max-width: 600px) {
-            #weekdaysContainer { grid-template-columns: repeat(2, 1fr); }
-        }
-        .weekday {
-            background: var(--bg-card, #141824);
-            border: 1px solid var(--border, rgba(255,255,255,.08));
-            border-radius: 14px;
-            padding: 0.7rem;
-            min-height: 120px;
-        }
+
+        /* Bugün vurgu */
         .today-col {
-            border-color: rgba(255,51,102,.45);
-            background: rgba(255,51,102,.04);
+            border-color: rgba(255,51,102,.5) !important;
+            background: rgba(255,51,102,.04) !important;
+            box-shadow: 0 0 0 1px rgba(255,51,102,.15);
         }
+        .today-col .weekday-name { color: #ff3366 !important; }
+
+        /* Gün başlığı */
         .weekday-name {
-            font-size: .78rem;
+            font-size: .73rem;
             font-weight: 800;
-            letter-spacing: .5px;
+            letter-spacing: .6px;
             text-transform: uppercase;
             color: var(--text-secondary, #8892a4);
-            margin-bottom: .2rem;
+            margin-bottom: .15rem;
             display: flex;
             align-items: center;
             gap: .3rem;
         }
-        .today-dot { color: #ff3366; font-size: .6rem; animation: pulse 2s infinite; }
+        .today-badge {
+            background: #ff3366;
+            color: white;
+            font-size: .5rem;
+            padding: 1px 5px;
+            border-radius: 20px;
+            letter-spacing: .3px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
         .weekday-date {
-            font-size: .68rem;
+            font-size: .65rem;
             color: var(--text-muted, #4b5563);
-            margin-bottom: .1rem;
+            margin-bottom: .3rem;
             font-weight: 500;
         }
-        .weekday-count {
-            font-size: .62rem;
-            color: var(--text-muted, #4b5563);
-            margin-bottom: .55rem;
+        .weekday-count-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: .6rem;
+            background: rgba(255,255,255,.06);
+            color: var(--text-secondary, #8892a4);
+            padding: 2px 7px;
+            border-radius: 20px;
+            margin-bottom: .5rem;
+            font-weight: 600;
         }
+
+        /* ===== TAKVİM İTEM ===== */
         .cal-item {
             display: flex;
             align-items: center;
             gap: .4rem;
-            padding: .3rem .35rem;
-            border-radius: 7px;
-            margin-bottom: .22rem;
+            padding: .32rem .38rem;
+            border-radius: 8px;
+            margin-bottom: .2rem;
             background: rgba(255,255,255,.03);
-            border-left: 2px solid rgba(255,255,255,.05);
-            transition: background .15s;
-            cursor: default;
+            border-left: 3px solid rgba(255,255,255,.06);
+            transition: background .15s, transform .1s;
+            cursor: pointer;
+            position: relative;
         }
-        .cal-item:hover { background: rgba(255,255,255,.07); }
-        .cal-item.my-lib { background: rgba(16,185,129,.07); }
+        .cal-item:hover {
+            background: rgba(255,255,255,.07);
+            transform: translateX(2px);
+        }
+        .cal-item.my-lib {
+            background: rgba(16,185,129,.07);
+        }
+        .cal-item.my-lib:hover {
+            background: rgba(16,185,129,.11);
+        }
+
+        /* Kapak görseli */
         .cal-cover {
-            width: 28px;
-            height: 38px;
-            border-radius: 4px;
+            width: 30px;
+            height: 40px;
+            border-radius: 5px;
             object-fit: cover;
             flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,.3);
         }
         .cal-cover-fallback {
-            width: 28px; height: 38px;
-            border-radius: 4px;
-            background: rgba(255,255,255,.05);
+            width: 30px; height: 40px;
+            border-radius: 5px;
+            background: rgba(255,255,255,.06);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: .9rem;
+            font-size: .85rem;
             flex-shrink: 0;
         }
+
+        /* İtem bilgi */
         .cal-item-info { flex: 1; min-width: 0; }
         .cal-item-name {
-            font-size: .72rem;
+            font-size: .7rem;
             font-weight: 600;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            line-height: 1.3;
+            line-height: 1.35;
+            color: var(--text1, #fff);
         }
+        .cal-item-name.in-lib { color: #10b981; }
+
         .cal-item-meta {
             display: flex;
             align-items: center;
-            gap: .3rem;
-            margin-top: .1rem;
-            flex-wrap: wrap;
+            gap: .25rem;
+            margin-top: .12rem;
+            flex-wrap: nowrap;
+            overflow: hidden;
         }
-        .cal-ep    { font-size: .6rem; color: var(--text-muted, #4b5563); }
-        .cal-time  { font-size: .6rem; color: var(--accent-secondary, #00d4ff); font-weight: 600; }
-        .cal-score { font-size: .62rem; font-weight: 700; }
-        .cal-genre {
+        .cal-time {
             font-size: .58rem;
-            background: rgba(255,255,255,.06);
-            padding: 1px 5px;
-            border-radius: 3px;
-            color: var(--text-secondary, #8892a4);
+            color: #00d4ff;
+            font-weight: 700;
+            white-space: nowrap;
         }
-        .cal-empty { font-size: .78rem; color: var(--text-muted, #4b5563); padding: .3rem 0; text-align: center; }
-        .cal-more  { font-size: .65rem; color: var(--accent-primary, #ff3366); text-align: center; padding: .2rem 0; opacity: .7; }
-        .cal-item-icon { font-size: .9rem; flex-shrink: 0; }
+        .cal-ep {
+            font-size: .57rem;
+            color: var(--text-muted, #4b5563);
+            white-space: nowrap;
+        }
+        .cal-score {
+            font-size: .58rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .cal-lib-dot {
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: #10b981;
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+
+        /* Boş gün */
+        .cal-empty {
+            text-align: center;
+            padding: 1.2rem .5rem;
+            color: var(--text-muted, #4b5563);
+            font-size: .72rem;
+        }
+        .cal-empty-icon { font-size: 1.4rem; margin-bottom: .3rem; opacity: .4; }
+
+        /* Daha fazla butonu */
+        .cal-more {
+            font-size: .62rem;
+            color: var(--accent-primary, #ff3366);
+            text-align: center;
+            padding: .3rem;
+            margin-top: .15rem;
+            opacity: .8;
+            cursor: pointer;
+            border-radius: 6px;
+            background: rgba(255,51,102,.05);
+            transition: background .15s;
+        }
+        .cal-more:hover { background: rgba(255,51,102,.1); }
+
+        /* Kütüphane göstergesi (üst) */
+        .cal-legend {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            margin-bottom: 1rem;
+            font-size: .75rem;
+            color: var(--text-secondary);
+        }
+        .cal-legend-item {
+            display: flex;
+            align-items: center;
+            gap: .35rem;
+        }
+        .cal-legend-dot {
+            width: 8px; height: 8px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 1100px) {
+            #weekdaysContainer { grid-template-columns: repeat(4, minmax(0,1fr)) !important; }
+        }
+        @media (max-width: 750px) {
+            #weekdaysContainer { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+        }
+        @media (max-width: 450px) {
+            #weekdaysContainer { grid-template-columns: 1fr !important; }
+        }
     `;
     document.head.appendChild(s);
 }
