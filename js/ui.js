@@ -1615,302 +1615,365 @@ async function renderCalendar() {
     const myNames  = new Set(dataManager.data.items.map(i => (i.name || '').toLowerCase()));
     const todayJS  = new Date().getDay();
 
-    // Legend ekle (bir kere)
+    // Legend
     const calSection = document.getElementById('calendarSection');
     if (calSection && !calSection.querySelector('.cal-legend')) {
         const legendEl = document.createElement('div');
         legendEl.className = 'cal-legend';
         legendEl.innerHTML = `
             <div class="cal-legend-item">
-                <div class="cal-legend-dot" style="background:#10b981;border-radius:3px;width:10px;height:10px;flex-shrink:0;"></div>
+                <span class="cal-legend-pip" style="background:#10b981;"></span>
                 <span>${_lang === 'en' ? 'In your library' : 'Kütüphanende var'}</span>
             </div>
             <div class="cal-legend-item">
-                <div class="cal-legend-dot" style="background:rgba(255,255,255,.18);border-radius:3px;width:10px;height:10px;flex-shrink:0;"></div>
+                <span class="cal-legend-pip" style="background:rgba(255,255,255,.18);"></span>
                 <span>${_lang === 'en' ? 'Not added yet' : 'Henüz eklenmemiş'}</span>
             </div>`;
         container.parentElement.insertBefore(legendEl, container);
     }
 
-    container.style.display = 'grid';
-    container.style.gridTemplateColumns = 'repeat(7, minmax(0, 1fr))';
-    container.style.gap = '0.7rem';
-    container.style.alignItems = 'start';
-
+    // Loading state
     container.innerHTML = `
-        <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted);">
-            <div style="font-size:2rem;margin-bottom:.5rem;">📡</div>
-            <div>${t('calLoading')}</div>
+        <div class="cal-full-loading">
+            <div class="cal-loading-spinner"></div>
+            <p>${t('calLoading')}</p>
         </div>`;
 
     const byDay = await _fetchAniListCalendar();
     _injectCalendarStyles();
 
     if (!byDay) {
-        container.innerHTML = `
-            <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted);">
-                <div style="font-size:2rem;margin-bottom:.5rem;">⚠️</div>
-                <div>${t('calError')}</div>
-            </div>`;
+        container.innerHTML = `<div class="cal-full-loading"><div style="font-size:2rem">⚠️</div><p>${t('calError')}</p></div>`;
         return;
     }
 
     const totalEntries = Object.values(byDay).reduce((s, a) => s + a.length, 0);
     if (totalEntries === 0) {
-        container.innerHTML = `
-            <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted);">
-                <div style="font-size:2rem;margin-bottom:.5rem;">📭</div>
-                <div>${t('calNoData')}</div>
-            </div>`;
+        container.innerHTML = `<div class="cal-full-loading"><div style="font-size:2rem">📭</div><p>${t('calNoData')}</p></div>`;
         return;
     }
 
-    container.innerHTML = dayNames.map((dayName, idx) => {
+    // Build the 7-column grid
+    container.innerHTML = '';
+    container.className = 'cal-grid';
+
+    dayNames.forEach((dayName, idx) => {
         const jsDay   = dayJS[idx];
         const isToday = (todayJS === jsDay);
         const dayDate = week.dates[idx];
         const dateStr = dayDate.toLocaleDateString(_lang === 'tr' ? 'tr-TR' : 'en-GB', { day: 'numeric', month: 'short' });
         const animes  = byDay[jsDay] || [];
-        const shown   = animes.slice(0, 15);
+        const shown   = animes.slice(0, 20);
 
-        const rows = shown.length
-            ? shown.map(a => {
+        const col = document.createElement('div');
+        col.className = 'cal-col' + (isToday ? ' cal-col--today' : '');
+
+        col.innerHTML = `
+            <div class="cal-col-header">
+                <div class="cal-col-header-top">
+                    <span class="cal-day-name">${dayName}</span>
+                    ${isToday ? `<span class="cal-today-badge">${_lang === 'en' ? 'Today' : 'Bugün'}</span>` : ''}
+                </div>
+                <div class="cal-col-header-bottom">
+                    <span class="cal-date-str">${dateStr}</span>
+                    <span class="cal-ep-count">${animes.length ? animes.length + ' ep' : '—'}</span>
+                </div>
+            </div>
+        `;
+
+        const itemsWrap = document.createElement('div');
+        itemsWrap.className = 'cal-items';
+
+        if (shown.length === 0) {
+            itemsWrap.innerHTML = `
+                <div class="cal-empty">
+                    <span class="cal-empty-icon">😴</span>
+                    <span>${t('calNoAiring')}</span>
+                </div>`;
+        } else {
+            shown.forEach(a => {
                 const inLib      = myNames.has(a.name.toLowerCase()) || (a.nameEn && myNames.has((a.nameEn || '').toLowerCase()));
                 const scoreColor = !a.score ? '#8892a4' : a.score >= 8 ? '#10b981' : a.score >= 6 ? '#f59e0b' : '#ef4444';
-                const borderCol  = inLib ? '#10b981' : (a.color || 'rgba(255,255,255,.08)');
                 const airTime    = new Date(a.airingAt * 1000).toLocaleTimeString(_lang === 'tr' ? 'tr-TR' : 'en-GB', { hour: '2-digit', minute: '2-digit' });
+                const accentColor = a.color || (inLib ? '#10b981' : 'rgba(255,255,255,0.08)');
 
-                return `<div class="cal-item${inLib ? ' my-lib' : ''}" style="border-left-color:${borderCol};" title="${(a.name||'').replace(/"/g,'&quot;')} — Bölüm ${a.episode}${a.totalEps ? '/'+a.totalEps : ''} • ${airTime}">
-                    ${a.cover ? `<img class="cal-cover" src="${a.cover}" alt="" loading="lazy" onerror="this.style.display='none'">` : '<div class="cal-cover-fallback">🎬</div>'}
-                    <div class="cal-item-info">
-                        <div class="cal-item-name${inLib ? ' in-lib' : ''}">${a.name}</div>
-                        <div class="cal-item-meta">
-                            <span class="cal-time">${airTime}</span>
-                            <span class="cal-ep">Bl.${a.episode}${a.totalEps ? '/'+a.totalEps : ''}</span>
-                            ${a.score ? `<span class="cal-score" style="color:${scoreColor};">★${a.score}</span>` : ''}
-                            ${inLib ? '<span class="cal-lib-dot"></span>' : ''}
-                        </div>
+                const itemObj = {
+                    id: 'al_' + a.id,
+                    name: a.name,
+                    type: 'anime',
+                    poster: a.cover,
+                    rating: a.score,
+                    genres: a.genres || [],
+                    episodes: a.totalEps,
+                    anilistId: a.id
+                };
+                const safeItem = JSON.stringify(itemObj).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+                const card = document.createElement('div');
+                card.className = 'cal-card' + (inLib ? ' cal-card--inlib' : '');
+                card.style.setProperty('--cal-accent', accentColor);
+                card.setAttribute('title', `${a.name} — Bölüm ${a.episode}${a.totalEps ? '/'+a.totalEps : ''} • ${airTime}`);
+                card.onclick = () => openDetailPage(safeItem);
+
+                card.innerHTML = `
+                    <div class="cal-card-accent-bar"></div>
+                    <div class="cal-card-cover-wrap">
+                        ${a.cover
+                            ? `<img class="cal-card-cover" src="${a.cover}" alt="" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\\'cal-card-cover-fb\\'>🎬</div>'">`
+                            : '<div class="cal-card-cover-fb">🎬</div>'
+                        }
+                        ${inLib ? '<div class="cal-card-lib-badge">✓</div>' : ''}
                     </div>
-                </div>`;
-            }).join('')
-            : `<div class="cal-empty"><div class="cal-empty-icon">😴</div><div>${t('calNoAiring')}</div></div>`;
+                    <div class="cal-card-body">
+                        <div class="cal-card-title">${a.name}</div>
+                        <div class="cal-card-meta">
+                            <span class="cal-card-time">⏰ ${airTime}</span>
+                            <span class="cal-card-ep">Bl.${a.episode}${a.totalEps ? '<span class="cal-card-ep-total">/' + a.totalEps + '</span>' : ''}</span>
+                            ${a.score ? `<span class="cal-card-score" style="color:${scoreColor}">★${a.score}</span>` : ''}
+                        </div>
+                        ${a.genres && a.genres.length ? `<div class="cal-card-genres">${a.genres.slice(0,2).map(g => `<span class="cal-card-genre">${g}</span>`).join('')}</div>` : ''}
+                    </div>
+                `;
+                itemsWrap.appendChild(card);
+            });
 
-        return `<div class="weekday${isToday ? ' today-col' : ''}">
-            <div class="weekday-name">
-                ${dayName}
-                ${isToday ? `<span class="today-badge">${_lang === 'en' ? 'Today' : 'Bugün'}</span>` : ''}
-            </div>
-            <div class="weekday-date">${dateStr}</div>
-            <div class="weekday-count-badge">📺 ${animes.length ? animes.length + ' ' + (_lang === 'en' ? 'ep' : 'bölüm') : '—'}</div>
-            ${rows}
-            ${animes.length > 15 ? `<div class="cal-more">+${animes.length - 15} ${_lang === 'en' ? 'more' : 'daha fazla'}</div>` : ''}
-        </div>`;
-    }).join('');
+            if (animes.length > 20) {
+                const more = document.createElement('div');
+                more.className = 'cal-more';
+                more.textContent = `+${animes.length - 20} ${_lang === 'en' ? 'more' : 'daha'}`;
+                itemsWrap.appendChild(more);
+            }
+        }
+
+        col.appendChild(itemsWrap);
+        container.appendChild(col);
+    });
 }
 
 function _injectCalendarStyles() {
-    if (document.getElementById('calendarStylesV3')) return;
+    if (document.getElementById('calendarStylesV4')) return;
     const s = document.createElement('style');
-    s.id = 'calendarStylesV3';
+    s.id = 'calendarStylesV4';
     s.textContent = `
-        /* ===== TAKVİM CONTAINER ===== */
-        #calendarSection .calendar-container {
-            background: transparent;
-            border: none;
-            padding: 0;
+        /* ============ CALENDAR GRID ============ */
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 0.75rem;
+            align-items: start;
         }
 
-        /* Bugün vurgu */
-        .today-col {
-            border-color: rgba(255,51,102,.5) !important;
-            background: rgba(255,51,102,.04) !important;
-            box-shadow: 0 0 0 1px rgba(255,51,102,.15);
-        }
-        .today-col .weekday-name { color: #ff3366 !important; }
-
-        /* Gün başlığı */
-        .weekday-name {
-            font-size: .73rem;
-            font-weight: 800;
-            letter-spacing: .6px;
-            text-transform: uppercase;
-            color: var(--text-secondary, #8892a4);
-            margin-bottom: .15rem;
+        /* ============ FULL-WIDTH STATES ============ */
+        .cal-full-loading {
+            grid-column: 1 / -1;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: .3rem;
-        }
-        .today-badge {
-            background: #ff3366;
-            color: white;
-            font-size: .5rem;
-            padding: 1px 5px;
-            border-radius: 20px;
-            letter-spacing: .3px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-        .weekday-date {
-            font-size: .65rem;
+            justify-content: center;
+            gap: 1rem;
+            padding: 4rem 1rem;
             color: var(--text-muted, #4b5563);
-            margin-bottom: .3rem;
-            font-weight: 500;
+            font-size: 0.9rem;
         }
-        .weekday-count-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-            font-size: .6rem;
-            background: rgba(255,255,255,.06);
-            color: var(--text-secondary, #8892a4);
-            padding: 2px 7px;
-            border-radius: 20px;
-            margin-bottom: .5rem;
-            font-weight: 600;
+        .cal-loading-spinner {
+            width: 36px; height: 36px;
+            border: 3px solid rgba(255,255,255,.08);
+            border-top-color: #ff3366;
+            border-radius: 50%;
+            animation: calSpin .8s linear infinite;
+        }
+        @keyframes calSpin { to { transform: rotate(360deg); } }
+
+        /* ============ COLUMN ============ */
+        .cal-col {
+            background: rgba(255,255,255,.025);
+            border: 1px solid rgba(255,255,255,.07);
+            border-radius: 14px;
+            overflow: hidden;
+            transition: border-color .2s;
+        }
+        .cal-col:hover { border-color: rgba(255,255,255,.12); }
+        .cal-col--today {
+            background: rgba(255,51,102,.04);
+            border-color: rgba(255,51,102,.35) !important;
+            box-shadow: 0 0 0 1px rgba(255,51,102,.12), 0 4px 24px rgba(255,51,102,.08);
         }
 
-        /* ===== TAKVİM İTEM ===== */
-        .cal-item {
+        /* ============ COLUMN HEADER ============ */
+        .cal-col-header {
+            padding: .65rem .75rem .5rem;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+            background: rgba(255,255,255,.02);
+        }
+        .cal-col--today .cal-col-header {
+            background: rgba(255,51,102,.06);
+            border-bottom-color: rgba(255,51,102,.15);
+        }
+        .cal-col-header-top {
             display: flex;
             align-items: center;
-            gap: .4rem;
-            padding: .32rem .38rem;
-            border-radius: 8px;
+            justify-content: space-between;
+            gap: .3rem;
             margin-bottom: .2rem;
-            background: rgba(255,255,255,.03);
-            border-left: 3px solid rgba(255,255,255,.06);
-            transition: background .15s, transform .1s;
-            cursor: pointer;
-            position: relative;
         }
-        .cal-item:hover {
-            background: rgba(255,255,255,.07);
-            transform: translateX(2px);
+        .cal-day-name {
+            font-size: .72rem;
+            font-weight: 800;
+            letter-spacing: .7px;
+            text-transform: uppercase;
+            color: var(--text-secondary, #8892a4);
         }
-        .cal-item.my-lib {
-            background: rgba(16,185,129,.07);
-        }
-        .cal-item.my-lib:hover {
-            background: rgba(16,185,129,.11);
-        }
-
-        /* Kapak görseli */
-        .cal-cover {
-            width: 30px;
-            height: 40px;
-            border-radius: 5px;
-            object-fit: cover;
+        .cal-col--today .cal-day-name { color: #ff3366; }
+        .cal-today-badge {
+            background: #ff3366;
+            color: #fff;
+            font-size: .48rem;
+            font-weight: 800;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            padding: 2px 6px;
+            border-radius: 20px;
+            line-height: 1.4;
             flex-shrink: 0;
-            box-shadow: 0 2px 6px rgba(0,0,0,.3);
         }
-        .cal-cover-fallback {
-            width: 30px; height: 40px;
-            border-radius: 5px;
+        .cal-col-header-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .cal-date-str { font-size: .62rem; color: var(--text-muted, #4b5563); font-weight: 500; }
+        .cal-ep-count {
+            font-size: .58rem;
+            font-weight: 700;
+            color: var(--text-muted, #4b5563);
+            background: rgba(255,255,255,.06);
+            padding: 1px 6px;
+            border-radius: 10px;
+        }
+        .cal-col--today .cal-ep-count { background: rgba(255,51,102,.15); color: #ff3366; }
+
+        /* ============ ITEMS WRAP ============ */
+        .cal-items { padding: .45rem .4rem; display: flex; flex-direction: column; gap: .3rem; }
+
+        /* ============ CARD ============ */
+        .cal-card {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            padding: .4rem .45rem .4rem 0;
+            border-radius: 10px;
+            background: rgba(255,255,255,.03);
+            border: 1px solid rgba(255,255,255,.06);
+            cursor: pointer;
+            transition: background .15s, transform .15s, border-color .15s, box-shadow .15s;
+            position: relative;
+            overflow: hidden;
+        }
+        .cal-card:hover {
+            background: rgba(255,255,255,.07);
+            transform: translateY(-1px) scale(1.01);
+            border-color: rgba(255,255,255,.13);
+            box-shadow: 0 4px 16px rgba(0,0,0,.25);
+        }
+        .cal-card--inlib { background: rgba(16,185,129,.06); border-color: rgba(16,185,129,.2); }
+        .cal-card--inlib:hover { background: rgba(16,185,129,.1); border-color: rgba(16,185,129,.35); }
+
+        .cal-card-accent-bar {
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: var(--cal-accent, rgba(255,255,255,.1));
+            flex-shrink: 0;
+        }
+        .cal-card-cover-wrap { position: relative; flex-shrink: 0; margin-left: 3px; }
+        .cal-card-cover {
+            width: 34px; height: 46px;
+            border-radius: 6px;
+            object-fit: cover;
+            display: block;
+            box-shadow: 0 2px 8px rgba(0,0,0,.35);
+        }
+        .cal-card-cover-fb {
+            width: 34px; height: 46px;
+            border-radius: 6px;
             background: rgba(255,255,255,.06);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: .85rem;
-            flex-shrink: 0;
+            font-size: .9rem;
         }
-
-        /* İtem bilgi */
-        .cal-item-info { flex: 1; min-width: 0; }
-        .cal-item-name {
-            font-size: .7rem;
-            font-weight: 600;
+        .cal-card-lib-badge {
+            position: absolute;
+            top: -4px; right: -4px;
+            width: 14px; height: 14px;
+            background: #10b981;
+            border-radius: 50%;
+            font-size: .52rem;
+            font-weight: 800;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1.5px solid #141824;
+            line-height: 1;
+        }
+        .cal-card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: .18rem; }
+        .cal-card-title {
+            font-size: .68rem;
+            font-weight: 700;
+            color: var(--text1, #fff);
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            line-height: 1.35;
-            color: var(--text1, #fff);
+            line-height: 1.3;
         }
-        .cal-item-name.in-lib { color: #10b981; }
-
-        .cal-item-meta {
-            display: flex;
-            align-items: center;
-            gap: .25rem;
-            margin-top: .12rem;
-            flex-wrap: nowrap;
-            overflow: hidden;
-        }
-        .cal-time {
-            font-size: .58rem;
-            color: #00d4ff;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-        .cal-ep {
-            font-size: .57rem;
-            color: var(--text-muted, #4b5563);
-            white-space: nowrap;
-        }
-        .cal-score {
-            font-size: .58rem;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-        .cal-lib-dot {
-            width: 5px; height: 5px;
-            border-radius: 50%;
-            background: #10b981;
-            flex-shrink: 0;
-            margin-left: auto;
+        .cal-card--inlib .cal-card-title { color: #10b981; }
+        .cal-card-meta { display: flex; align-items: center; gap: .28rem; flex-wrap: nowrap; overflow: hidden; }
+        .cal-card-time { font-size: .56rem; color: #00d4ff; font-weight: 700; white-space: nowrap; }
+        .cal-card-ep { font-size: .55rem; color: var(--text-muted, #4b5563); white-space: nowrap; font-weight: 600; }
+        .cal-card-ep-total { opacity: .5; }
+        .cal-card-score { font-size: .57rem; font-weight: 800; white-space: nowrap; margin-left: auto; flex-shrink: 0; }
+        .cal-card-genres { display: flex; gap: .2rem; flex-wrap: nowrap; overflow: hidden; }
+        .cal-card-genre {
+            font-size: .5rem; font-weight: 600;
+            color: rgba(255,255,255,.35);
+            background: rgba(255,255,255,.06);
+            padding: 1px 5px; border-radius: 10px; white-space: nowrap;
         }
 
-        /* Boş gün */
+        /* ============ EMPTY DAY ============ */
         .cal-empty {
-            text-align: center;
-            padding: 1.2rem .5rem;
-            color: var(--text-muted, #4b5563);
-            font-size: .72rem;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: .3rem; padding: 1.5rem .5rem;
+            color: var(--text-muted, #4b5563); font-size: .7rem; text-align: center;
         }
-        .cal-empty-icon { font-size: 1.4rem; margin-bottom: .3rem; opacity: .4; }
+        .cal-empty-icon { font-size: 1.6rem; opacity: .35; }
 
-        /* Daha fazla butonu */
+        /* ============ MORE ============ */
         .cal-more {
-            font-size: .62rem;
-            color: var(--accent-primary, #ff3366);
-            text-align: center;
-            padding: .3rem;
-            margin-top: .15rem;
-            opacity: .8;
-            cursor: pointer;
-            border-radius: 6px;
-            background: rgba(255,51,102,.05);
-            transition: background .15s;
+            font-size: .6rem; font-weight: 700; color: #ff3366;
+            text-align: center; padding: .35rem; border-radius: 8px;
+            background: rgba(255,51,102,.06); margin-top: .1rem; opacity: .85;
         }
-        .cal-more:hover { background: rgba(255,51,102,.1); }
 
-        /* Kütüphane göstergesi (üst) */
+        /* ============ LEGEND ============ */
         .cal-legend {
-            display: flex;
-            align-items: center;
-            gap: 1.2rem;
-            margin-bottom: 1rem;
-            font-size: .75rem;
-            color: var(--text-secondary);
+            display: flex; align-items: center; gap: 1.2rem;
+            margin-bottom: 1rem; font-size: .75rem; color: var(--text-secondary, #8892a4);
         }
-        .cal-legend-item {
-            display: flex;
-            align-items: center;
-            gap: .35rem;
-        }
-        .cal-legend-dot {
-            width: 8px; height: 8px;
-            border-radius: 2px;
-            flex-shrink: 0;
-        }
+        .cal-legend-item { display: flex; align-items: center; gap: .4rem; }
+        .cal-legend-pip { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; display: block; }
 
-        @media (max-width: 1100px) {
-            #weekdaysContainer { grid-template-columns: repeat(4, minmax(0,1fr)) !important; }
-        }
-        @media (max-width: 750px) {
-            #weekdaysContainer { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
-        }
-        @media (max-width: 450px) {
-            #weekdaysContainer { grid-template-columns: 1fr !important; }
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 1200px) { .cal-grid { grid-template-columns: repeat(4, minmax(0,1fr)); } }
+        @media (max-width: 800px)  { .cal-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+        @media (max-width: 480px)  {
+            .cal-grid {
+                display: flex; flex-direction: row;
+                overflow-x: auto; scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch; gap: .6rem; padding-bottom: .5rem;
+            }
+            .cal-col { min-width: 220px; scroll-snap-align: start; flex-shrink: 0; }
         }
     `;
     document.head.appendChild(s);
