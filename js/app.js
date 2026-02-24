@@ -68,18 +68,30 @@ async function loadContentFromAPI() {
     showLoadingPlaceholders();
 
     try {
+        // Hızlı ön yükleme callback'i: AniList'ten ilk 300 içerik gelince hemen göster
+        window._onFastContentReady = (fastContent) => {
+            if (!contentLoaded && fastContent.length > 0) {
+                allContent = fastContent;
+                trendingContent = fastContent.filter(i => i.type === 'anime').slice(0, 20);
+                console.log('⚡ Hızlı içerik gösteriliyor:', fastContent.length);
+                renderHomePage();
+                renderDiscoverGrid();
+            }
+        };
+
         const [seasonal, all] = await Promise.all([
             JikanAPI.fetchSeasonNow(20),
             JikanAPI.loadAllContent()
         ]);
 
+        window._onFastContentReady = null; // Callback temizle
         seasonContent = seasonal || [];
         allContent = all || [];
         trendingContent = allContent.filter(i => i.type === 'anime').slice(0, 20);
         contentLoaded = true;
         contentLoading = false;
 
-        console.log('Yüklendi:', allContent.length, 'içerik');
+        console.log('✅ Tam yükleme:', allContent.length, 'içerik');
         renderHomePage();
         renderDiscoverGrid();
     } catch(e) {
@@ -88,7 +100,7 @@ async function loadContentFromAPI() {
         contentLoaded = true; // Tekrar denemeyi önle
         renderHomePage();
         renderDiscoverGrid();
-        showNotification(typeof _lang !== 'undefined' && _lang === 'en' ? 'Error loading content.' : 'İçerik yüklenirken hata oluştu.', 'error');
+        showNotification(_lang === 'en' ? 'Error loading content.' : 'İçerik yüklenirken hata oluştu.', 'error');
     }
 }
 
@@ -99,7 +111,7 @@ function showLoadingPlaceholders() {
         if (el) el.innerHTML = skeleton;
     });
     const dg = document.getElementById('discoverGrid');
-    if (dg) dg.innerHTML = '<div class="discover-loading"><div class="loader"></div><p style="margin-top:1rem;color:var(--text-muted);">' + (typeof _lang !== 'undefined' && _lang === 'en' ? 'Loading 500+ titles...' : '500+ içerik yükleniyor...') + '</p></div>';
+    if (dg) dg.innerHTML = '<div class="discover-loading"><div class="loader"></div><p style="margin-top:1rem;color:var(--text-muted);">500+ içerik yükleniyor...</p></div>';
 }
 
 // ===== BÖLÜM GEÇİŞİ =====
@@ -197,7 +209,7 @@ function renderContinueWatching() {
     const watching = dataManager.data.items.filter(i => i.status === 'watching').slice(0, 8);
 
     if (watching.length === 0) {
-        container.innerHTML = '<div style="color:var(--text-muted);font-size:0.9rem;padding:1rem;">' + (typeof _lang !== 'undefined' && _lang === 'en' ? 'No items in "Watching" status.' : '"İzliyorum" statüsünde içerik yok.') + ' <span style="color:var(--accent-secondary);cursor:pointer;" onclick="openAddModal()">' + (typeof _lang !== 'undefined' && _lang === 'en' ? 'Add content →' : 'İçerik ekle →') + '</span></div>';
+        container.innerHTML = '<div style="color:var(--text-muted);font-size:0.9rem;padding:1rem;">"İzliyorum" statüsünde içerik yok. <span style="color:var(--accent-secondary);cursor:pointer;" onclick="openAddModal()">İçerik ekle →</span></div>';
         return;
     }
 
@@ -219,7 +231,7 @@ function renderContinueWatching() {
                 '<div class="media-score-badge">▶ ' + (item.currentEpisode || 0) + '/' + (item.totalEpisodes || '?') + '</div>' +
             '</div>' +
             '<div class="media-info">' +
-                '<div class="media-title">' + (item.name || (typeof _lang !== 'undefined' && _lang === 'en' ? 'Untitled' : 'İsimsiz')) + '</div>' +
+                '<div class="media-title">' + (item.name || 'İsimsiz') + '</div>' +
                 '<div style="background:var(--bg-secondary);height:3px;border-radius:3px;margin:0.4rem 0;overflow:hidden;">' +
                     '<div style="width:' + pct + '%;height:100%;background:var(--accent-primary);"></div>' +
                 '</div>' +
@@ -233,7 +245,7 @@ function renderMediaRow(containerId, items) {
     if (!container) return;
 
     if (!items || items.length === 0) {
-        container.innerHTML = '<div style="color:var(--text-muted);font-size:0.9rem;padding:1rem;text-align:center;grid-column:1/-1;">' + (typeof _lang !== 'undefined' && _lang === 'en' ? 'Loading...' : 'Yükleniyor...') + '</div>';
+        container.innerHTML = '<div style="color:var(--text-muted);font-size:0.9rem;padding:1rem;text-align:center;grid-column:1/-1;">Yükleniyor...</div>';
         return;
     }
 
@@ -257,7 +269,7 @@ function renderMediaRow(containerId, items) {
         const safeItem = itemJson.replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
         const addBtn = isGuest
-            ? '<button class="add-to-list-btn" onclick="openAuthModal(\'register\')">🔐 ' + (_lang === 'en' ? 'Sign up & add' : 'Kayıt ol & ekle') + '</button>'
+            ? '<button class="add-to-list-btn" onclick="openAuthModal(\'register\')">🔐 Kayıt ol & ekle</button>'
             : '<button class="add-to-list-btn' + (inLibrary ? ' in-library' : '') + '" onclick="event.stopPropagation();quickAddFromJson(\'' + safeItem + '\')">' + (inLibrary ? '✓ Listende' : '+ Ekle') + '</button>';
 
         return '<div class="media-card" style="cursor:pointer" onclick="openDetailPage(\'' + safeItem + '\')">' +
@@ -270,7 +282,7 @@ function renderMediaRow(containerId, items) {
                 (rating ? '<div class="media-score-badge">' + rating + '</div>' : '') +
             '</div>' +
             '<div class="media-info">' +
-                '<div class="media-title">' + (item.name || (typeof _lang !== 'undefined' && _lang === 'en' ? 'Untitled' : 'İsimsiz')) + '</div>' +
+                '<div class="media-title">' + (item.name || 'İsimsiz') + '</div>' +
                 '<div class="media-meta">' + meta + '</div>' +
                 addBtn +
             '</div>' +
@@ -300,7 +312,7 @@ function renderDiscoverGrid() {
     if (!grid) return;
 
     if (!contentLoaded) {
-        grid.innerHTML = '<div class="discover-loading"><div class="loader"></div><p style="margin-top:1rem;color:var(--text-muted);">' + (typeof _lang !== 'undefined' && _lang === 'en' ? 'Loading content...' : 'İçerikler yükleniyor...') + '</p></div>';
+        grid.innerHTML = '<div class="discover-loading"><div class="loader"></div><p style="margin-top:1rem;color:var(--text-muted);">İçerikler yükleniyor...</p></div>';
         return;
     }
 
@@ -327,7 +339,7 @@ function renderDiscoverGrid() {
     if (statsEl) statsEl.textContent = total + ' içerik bulundu';
 
     if (page.length === 0) {
-        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:3rem;font-size:1.1rem;">' + (typeof _lang !== 'undefined' && _lang === 'en' ? '🔍 No results found' : '🔍 Sonuç bulunamadı') + '</div>';
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:3rem;font-size:1.1rem;">🔍 Sonuç bulunamadı</div>';
         return;
     }
 
@@ -345,7 +357,7 @@ function renderDiscoverGrid() {
         const safeItem = itemJson.replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
         const addBtn = isGuest
-            ? '<button class="add-to-list-btn" onclick="openAuthModal(\'register\')">🔐 ' + (_lang === 'en' ? 'Sign up & add' : 'Kayıt ol & ekle') + '</button>'
+            ? '<button class="add-to-list-btn" onclick="openAuthModal(\'register\')">🔐 Kayıt ol & ekle</button>'
             : '<button class="add-to-list-btn' + (inLibrary ? ' in-library' : '') + '" onclick="event.stopPropagation();quickAddFromJson(\'' + safeItem + '\')">' + (inLibrary ? '✓ Listende' : '+ Ekle') + '</button>';
 
         return '<div class="media-card" style="cursor:pointer" onclick="openDetailPage(\'' + safeItem + '\')">' +
@@ -358,7 +370,7 @@ function renderDiscoverGrid() {
                 (rating ? '<div class="media-score-badge">' + rating + '</div>' : '') +
             '</div>' +
             '<div class="media-info">' +
-                '<div class="media-title">' + (item.name || (typeof _lang !== 'undefined' && _lang === 'en' ? 'Untitled' : 'İsimsiz')) + '</div>' +
+                '<div class="media-title">' + (item.name || 'İsimsiz') + '</div>' +
                 '<div class="media-meta">' + meta + '</div>' +
                 addBtn +
             '</div>' +
@@ -389,7 +401,7 @@ function quickAddFromJson(jsonStr) {
         quickAdd(item);
     } catch(e) {
         console.error('quickAddFromJson parse error:', e);
-        showNotification(typeof _lang !== 'undefined' && _lang === 'en' ? 'Error adding item.' : 'Ekleme sırasında hata oluştu.', 'error');
+        showNotification('Ekleme sırasında hata oluştu.', 'error');
     }
 }
 
@@ -398,7 +410,7 @@ function quickAdd(item) {
     if (!item || !dataManager.data) return;
 
     if (dataManager.data.items.some(i => (i.name || '').toLowerCase() === (item.name || '').toLowerCase())) {
-        showNotification((item.name || '') + (typeof _lang !== 'undefined' && _lang === 'en' ? ' is already in your list!' : ' zaten listenizde!'), 'info');
+        showNotification((item.name || '') + ' zaten listenizde!', 'info');
         return;
     }
 
@@ -422,7 +434,7 @@ function quickAdd(item) {
     xpSystem.addXP(XP_REWARDS.addItem, (item.name || '') + ' eklendi');
     checkAchievements();
     updateStats();
-    showNotification('✅ ' + newItem.name + ' ' + (typeof _lang !== 'undefined' && _lang === 'en' ? 'added to "Plan to Watch"!' : '"İzlenecek" listesine eklendi!'), 'success');
+    showNotification('✅ ' + newItem.name + ' "İzlenecek" listesine eklendi!', 'success');
     renderDiscoverGrid();
     renderHomePage();
 }
@@ -458,7 +470,7 @@ function addItem(event) {
     const notesEl  = document.getElementById('itemNotes');
 
     const name = nameEl ? nameEl.value.trim() : '';
-    if (!name) { showNotification(typeof _lang !== 'undefined' && _lang === 'en' ? 'Please enter a title!' : 'Lütfen bir isim girin!', 'error'); return; }
+    if (!name) { showNotification('Lütfen bir isim girin!', 'error'); return; }
 
     const newItem = {
         id: Date.now() + '_' + Math.random().toString(36).substr(2, 5),
@@ -481,7 +493,7 @@ function addItem(event) {
     updateStats();
     filterItems();
     closeModal();
-    showNotification('✅ ' + newItem.name + ' ' + (typeof _lang !== 'undefined' && _lang === 'en' ? 'added!' : 'eklendi!'), 'success');
+    showNotification('✅ ' + newItem.name + ' eklendi!', 'success');
 }
 
 // ===== JIKAN ARAMA (modal içi) =====
@@ -496,7 +508,7 @@ async function searchAPI() {
     if (query.length < 2) { resultsDiv.innerHTML = ''; return; }
 
     searchTimeout = setTimeout(async () => {
-        resultsDiv.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:0.8rem;font-size:0.85rem;">🔍 ' + (typeof _lang !== 'undefined' && _lang === 'en' ? 'Searching...' : 'Aranıyor...') + '</div>';
+        resultsDiv.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:0.8rem;font-size:0.85rem;">🔍 Aranıyor...</div>';
         try {
             const results = await JikanAPI.searchAll(query, 5);
             if (results.length > 0) {
@@ -519,10 +531,10 @@ async function searchAPI() {
                     '</div>';
                 }).join('');
             } else {
-                resultsDiv.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:0.8rem;font-size:0.85rem;">' + (typeof _lang !== 'undefined' && _lang === 'en' ? 'No results found' : 'Sonuç bulunamadı') + '</div>';
+                resultsDiv.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:0.8rem;font-size:0.85rem;">Sonuç bulunamadı</div>';
             }
         } catch {
-            resultsDiv.innerHTML = '<div style="color:var(--danger);text-align:center;padding:0.8rem;font-size:0.85rem;">' + (typeof _lang !== 'undefined' && _lang === 'en' ? 'API connection error' : 'API bağlantı hatası') + '</div>';
+            resultsDiv.innerHTML = '<div style="color:var(--danger);text-align:center;padding:0.8rem;font-size:0.85rem;">API bağlantı hatası</div>';
         }
     }, 500);
 }
@@ -544,7 +556,7 @@ function fillFromAPI(jsonStr) {
         if (apiSearch)   apiSearch.value = '';
         if (apiResults)  apiResults.innerHTML = '';
 
-        showNotification(typeof _lang !== 'undefined' && _lang === 'en' ? 'Filled from API! ✓' : "API'den bilgiler dolduruldu! ✓", 'success');
+        showNotification("API'den bilgiler dolduruldu! ✓", 'success');
     } catch(e) {
         console.error('fillFromAPI error:', e);
     }
@@ -664,8 +676,8 @@ function showAnnouncementModal(ann) {
     };
     const t = themes[ann.type] || themes.info;
     const icon = icons[ann.type] || 'ℹ️';
-    const typeLabels = typeof _lang !== 'undefined' && _lang === 'en' ? { info: 'INFO', success: 'SUCCESS', warning: 'WARNING', update: 'UPDATE' } : { info: 'BİLGİ', success: 'BAŞARILI', warning: 'UYARI', update: 'GÜNCELLEME' };
-    const prioLabel = ann.priority === 'critical' ? (typeof _lang !== 'undefined' && _lang === 'en' ? '🔴 CRITICAL' : '🔴 ACİL') : ann.priority === 'high' ? (typeof _lang !== 'undefined' && _lang === 'en' ? '🟠 IMPORTANT' : '🟠 ÖNEMLİ') : null;
+    const typeLabels = { info: 'BİLGİ', success: 'BAŞARILI', warning: 'UYARI', update: 'GÜNCELLEME' };
+    const prioLabel = ann.priority === 'critical' ? '🔴 ACİL' : ann.priority === 'high' ? '🟠 ÖNEMLİ' : null;
 
     const overlay = document.createElement('div');
     overlay.id = 'annModal';
@@ -737,7 +749,7 @@ function showAnnouncementModal(ann) {
                         <div style="
                             color:#8892a4;font-size:0.75rem;
                             font-family:'DM Sans',sans-serif;
-                        ">${new Date(ann.created_at).toLocaleDateString(typeof _lang !== 'undefined' && _lang === 'en' ? 'en-GB' : 'tr-TR',{day:'numeric',month:'long',year:'numeric'})}</div>
+                        ">${new Date(ann.created_at).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'})}</div>
                     </div>
                 </div>
 
@@ -766,7 +778,7 @@ function showAnnouncementModal(ann) {
                     transition:all 0.2s;
                     box-shadow:0 4px 20px ${t.glow};
                 " onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
-                    ' + (typeof _lang !== 'undefined' && _lang === 'en' ? 'Got it ✓' : 'Anladım ✓') + '
+                    Anladım ✓
                 </button>
             </div>
         </div>
@@ -888,8 +900,7 @@ function _fillDetailBasic(item) {
     s('dpTitle', item.name);
     s('dpYear', item.year);
     s('dpScore', item.rating ? '⭐ ' + item.rating : '—');
-    const _epLabel = typeof _lang !== 'undefined' && _lang === 'en' ? ' Episodes' : ' Bölüm';
-    s('dpEpisodes', item.episodes ? item.episodes + _epLabel : item.chapters ? item.chapters + _epLabel : '—');
+    s('dpEpisodes', item.episodes ? item.episodes + ' Bölüm' : item.chapters ? item.chapters + ' Bölüm' : '—');
     s('dpSynopsis', item.synopsis || 'Açıklama yükleniyor...');
     s('dpStatus', '—');
     s('dpRank', '—');
@@ -907,12 +918,12 @@ function _fillDetailBasic(item) {
     const addBtn = document.getElementById('dpAddBtn');
     if (addBtn) {
         const inLib = !isGuest && dataManager.data?.items?.some(i => i.name?.toLowerCase() === item.name?.toLowerCase());
-        addBtn.textContent = inLib ? (typeof _lang !== 'undefined' && _lang === 'en' ? '✓ In Library' : '✓ Listende') : (typeof _lang !== 'undefined' && _lang === 'en' ? '+ Add to List' : '+ Listeye Ekle');
+        addBtn.textContent = inLib ? '✓ Listende' : '+ Listeye Ekle';
         addBtn.className = 'dp-add-btn' + (inLib ? ' in-library' : '');
         addBtn.onclick = () => {
             if (isGuest) { openAuthModal('register'); return; }
             quickAdd(item);
-            addBtn.textContent = typeof _lang !== 'undefined' && _lang === 'en' ? '✓ In Library' : '✓ Listende';
+            addBtn.textContent = '✓ Listende';
             addBtn.className = 'dp-add-btn in-library';
         };
     }
@@ -934,8 +945,7 @@ async function _fetchFullDetail(item) {
         const s = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
 
         s('dpScore', d.score ? '⭐ ' + d.score.toFixed(1) : null);
-        const _fepLabel = typeof _lang !== 'undefined' && _lang === 'en' ? ' Episodes' : ' Bölüm';
-        s('dpEpisodes', d.episodes ? d.episodes + _fepLabel : d.chapters ? d.chapters + _fepLabel : null);
+        s('dpEpisodes', d.episodes ? d.episodes + ' Bölüm' : d.chapters ? d.chapters + ' Bölüm' : null);
         s('dpStatus', d.status || null);
         s('dpRank', d.rank ? '#' + d.rank : null);
         s('dpMembers', d.members ? d.members.toLocaleString('tr-TR') : null);
@@ -967,7 +977,7 @@ async function loadReviews(contentId) {
     if (!container) return;
     container.innerHTML = '<div class="reviews-loading"><div class="mini-spinner"></div> Yorumlar yükleniyor...</div>';
 
-    if (!window.supabaseClient) { container.innerHTML = '<p style="color:var(--text-muted);text-align:center;">' + (typeof _lang !== 'undefined' && _lang === 'en' ? 'Reviews could not be loaded.' : 'Yorumlar yüklenemedi.') + '</p>'; return; }
+    if (!window.supabaseClient) { container.innerHTML = '<p style="color:var(--text-muted);text-align:center;">Yorumlar yüklenemedi.</p>'; return; }
 
     const { data, error } = await window.supabaseClient
         .from('reviews')
@@ -977,7 +987,7 @@ async function loadReviews(contentId) {
         .limit(30);
 
     if (error || !data?.length) {
-        container.innerHTML = '<div class="no-reviews"><div style="font-size:2.5rem;">💬</div><p>' + (typeof _lang !== 'undefined' && _lang === 'en' ? 'No reviews yet. Be the first!' : 'Henüz yorum yok. İlk yorumu sen yaz!') + '</p></div>';
+        container.innerHTML = '<div class="no-reviews"><div style="font-size:2.5rem;">💬</div><p>Henüz yorum yok. İlk yorumu sen yaz!</p></div>';
         return;
     }
 
@@ -986,7 +996,7 @@ async function loadReviews(contentId) {
     const avgEl = document.getElementById('dpUserScore');
     if (avgEl) avgEl.textContent = avg + ' / 10';
     const cntEl = document.getElementById('dpReviewCount');
-    if (cntEl) cntEl.textContent = data.length + ' ' + (typeof _lang !== 'undefined' && _lang === 'en' ? 'reviews' : 'yorum');
+    if (cntEl) cntEl.textContent = data.length + ' yorum';
 
     container.innerHTML = data.map(r => `
         <div class="review-card">
@@ -1037,7 +1047,7 @@ function setStarRating(rating) {
 
 async function submitReview() {
     if (isGuest) { openAuthModal('register'); return; }
-    if (!selectedRating) { showNotification(typeof _lang !== 'undefined' && _lang === 'en' ? 'Please select a rating!' : 'Lütfen bir puan seç!', 'error'); return; }
+    if (!selectedRating) { showNotification('Lütfen bir puan seç!', 'error'); return; }
     if (!currentDetailItem) return;
 
     const comment = document.getElementById('reviewComment')?.value?.trim() || '';
@@ -1056,15 +1066,30 @@ async function submitReview() {
             updated_at:   new Date().toISOString()
         }, { onConflict: 'content_id,user_id' });
 
-    if (error) { showNotification((typeof _lang !== 'undefined' && _lang === 'en' ? 'Review failed: ' : 'Yorum gönderilemedi: ') + error.message, 'error'); return; }
-    showNotification(typeof _lang !== 'undefined' && _lang === 'en' ? '✅ Review saved!' : '✅ Yorumun kaydedildi!', 'success');
+    if (error) { showNotification('Yorum gönderilemedi: ' + error.message, 'error'); return; }
+    showNotification('✅ Yorumun kaydedildi!', 'success');
+
+    // XP: Yorum uzunluğuna göre ödül
+    const reviewXP = comment.length >= 200
+        ? XP_REWARDS.writeLongReview   // 40 XP - detaylı yorum
+        : XP_REWARDS.writeReview;      // 20 XP - kısa yorum
+    xpSystem.addXP(reviewXP, _lang === 'en'
+        ? (comment.length >= 200 ? 'Detailed review written! ✍️' : 'Review written!')
+        : (comment.length >= 200 ? 'Detaylı yorum yazıldı! ✍️' : 'Yorum yazıldı!'));
+
+    // Yorum sayacını güncelle (başarımlar için)
+    if (dataManager.data) {
+        dataManager.data.reviewCount = (dataManager.data.reviewCount || 0) + 1;
+        dataManager.saveAll();
+    }
+    checkAchievements();
     loadReviews(currentDetailItem.id);
 }
 
 async function deleteReview(reviewId, contentId) {
     if (!window.supabaseClient) return;
     const { error } = await window.supabaseClient.from('reviews').delete().eq('id', reviewId);
-    if (!error) { showNotification(typeof _lang !== 'undefined' && _lang === 'en' ? 'Review deleted.' : 'Yorum silindi.', 'info'); loadReviews(contentId); }
+    if (!error) { showNotification('Yorum silindi.', 'info'); loadReviews(contentId); }
 }
 
 // ===== SIMILAR CONTENT =====
@@ -1132,7 +1157,7 @@ function _esc(str) {
 }
 function _fmtDate(iso) {
     if (!iso) return '';
-    return new Date(iso).toLocaleDateString(typeof _lang !== 'undefined' && _lang === 'en' ? 'en-GB' : 'tr-TR', { day:'numeric', month:'short', year:'numeric' });
+    return new Date(iso).toLocaleDateString('tr-TR', { day:'numeric', month:'short', year:'numeric' });
 }
 
 // Star hover effects

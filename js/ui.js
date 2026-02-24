@@ -1071,11 +1071,15 @@ function updateItem(id, field, value) {
 
     if (field === 'status' && value === 'completed' && oldValue !== 'completed') {
         if (item.totalEpisodes > 0) item.currentEpisode = item.totalEpisodes;
-        xpSystem.addXP(XP_REWARDS.completeItem, item.name + (_lang === 'en' ? ' completed' : ' tamamlandı'));
+        xpSystem.addXP(XP_REWARDS.completeItem, item.name + (_lang === 'en' ? ' completed! 🎉' : ' tamamlandı! 🎉'));
         checkAchievements();
+    } else if (field === 'status' && value === 'watching' && oldValue !== 'watching') {
+        xpSystem.addXP(XP_REWARDS.startWatching, _lang === 'en' ? 'Started watching' : 'İzlemeye başlandı');
     } else if (field === 'rating' && value > 0 && oldValue !== value) {
-        xpSystem.addXP(XP_REWARDS.rateItem, _lang === 'en' ? 'Rated!' : 'Puan verildi');
-        if (value === 5) checkAchievements();
+        xpSystem.addXP(XP_REWARDS.rateItem, _lang === 'en' ? 'Rated! ⭐' : 'Puan verildi ⭐');
+        checkAchievements();
+    } else if (field === 'notes' && value && value.length >= 30 && (!oldValue || oldValue.length < 30)) {
+        xpSystem.addXP(XP_REWARDS.addNote, _lang === 'en' ? 'Note added 📝' : 'Not eklendi 📝');
     }
     dataManager.saveAll(); // FIX: ensure saves to Supabase
     filterItems();
@@ -1241,12 +1245,13 @@ function renderProfilePage() {
     if (recentAch) {
         const achList = typeof ACHIEVEMENTS !== 'undefined' ? ACHIEVEMENTS : [];
         const unlocked = achList.filter(a => (d.achievements || []).includes(a.id)).slice(-4).reverse();
+        const _a = (obj) => (typeof obj === 'object' && obj !== null) ? (obj[_lang] || obj.tr || Object.values(obj)[0]) : obj;
         recentAch.innerHTML = unlocked.length > 0
             ? unlocked.map(a => `
                 <div class="ach-mini">
                     <span class="ach-mini-icon">${a.icon}</span>
                     <div style="flex:1;min-width:0;">
-                        <div class="ach-mini-name">${a.title}</div>
+                        <div class="ach-mini-name">${_a(a.title)}</div>
                     </div>
                     ${a.xp > 0 ? '<span class="ach-mini-xp">+' + a.xp + ' XP</span>' : ''}
                 </div>`).join('')
@@ -1376,14 +1381,18 @@ function renderAchievements() {
     const container = document.getElementById('achievementsGrid');
     if (!container || !dataManager.data) return;
     const unlocked = dataManager.data.achievements;
+    // Dil yardımcısı - achievement title/desc için (string veya {tr,en} objesi)
+    const _a = (obj) => (typeof obj === 'object' && obj !== null)
+        ? (obj[_lang] || obj.tr || Object.values(obj)[0])
+        : obj;
 
     container.innerHTML = ACHIEVEMENTS.map(ach => {
         const done = unlocked.includes(ach.id);
         return `<div class="ach-card${done ? ' unlocked' : ''}" style="${!done ? 'opacity:.55;filter:grayscale(.5);' : ''}">
             <div class="ach-icon${done ? ' unlocked-icon' : ''}">${ach.icon}</div>
             <div class="ach-info">
-                <div class="ach-title">${ach.title}</div>
-                <div class="ach-desc">${ach.desc}</div>
+                <div class="ach-title">${_a(ach.title)}</div>
+                <div class="ach-desc">${_a(ach.desc)}</div>
                 ${ach.xp > 0 ? `<div class="ach-xp">+${ach.xp} XP</div>` : ''}
             </div>
             <div class="ach-status ${done ? 'done' : 'locked'}">${done ? '✓' : '🔒'}</div>
@@ -1634,7 +1643,7 @@ async function renderCalendar() {
                         </div>
                         <div class="cal-item-meta">
                             <span class="cal-time">⏰ ${airTime}</span>
-                            <span class="cal-ep">Bl.${a.episode}${a.totalEps ? '/' + a.totalEps : ''}</span>
+                            <span class="cal-ep">${_lang === 'en' ? 'Ep' : 'Bl'}.${a.episode}${a.totalEps ? '/' + a.totalEps : ''}</span>
                             ${a.score ? `<span class="cal-score" style="color:${scoreColor};">★${a.score}</span>` : ''}
                             ${a.genres.length ? `<span class="cal-genre">${a.genres[0]}</span>` : ''}
                         </div>

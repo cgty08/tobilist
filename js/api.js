@@ -4,7 +4,7 @@
 // ===== CACHE =====
 const APICache = {
     PREFIX: 'at5_',
-    HOURS: 24,
+    HOURS: 48,   // 24→48 saat: Bir kez yüklendi mi, 2 gün geçerli
     // Bellek içi cache - aynı oturumda tab yenilenirse tekrar API'ye gitme
     _mem: {},
 
@@ -488,20 +488,54 @@ const JikanAPI = {
         const ck = 'all_v5'; const c = APICache.get(ck);
         if (c) { if (onProgress) onProgress(c.length, c.length); return c; }
 
+        // ── AŞAMA 1: HIZLI ÖN YÜKLEMİ (3-5 saniye) ──────────────────────────
+        // Sadece AniList ilk sayfaları (hızlı GraphQL) → hemen ekrana yansıt
+        const ckFast = 'all_v5_fast';
+        const cached_fast = APICache.get(ckFast);
+
+        if (!cached_fast) {
+            if (onProgress) onProgress(0, 500);
+            console.log('⚡ API: Hızlı ön yükleme başlıyor...');
+
+            const [fastA, fastM, fastW] = await Promise.allSettled([
+                _AniList.topAnime(2),    // 2×50 = 100 anime (hızlı)
+                _AniList.topManga(2),    // 2×50 = 100 manga
+                _AniList.topWebtoon(2),  // 2×50 = 100 webtoon
+            ]);
+
+            const fastAll = [
+                ...(fastA.status === 'fulfilled' ? fastA.value : []),
+                ...(fastM.status === 'fulfilled' ? fastM.value : []),
+                ...(fastW.status === 'fulfilled' ? fastW.value : []),
+            ];
+            const fastDeduped = deduplicateContent(fastAll);
+            APICache.set(ckFast, fastDeduped);
+            if (onProgress) onProgress(fastDeduped.length, fastDeduped.length);
+            console.log(`⚡ Hızlı yükleme tamamlandı: ${fastDeduped.length} içerik`);
+
+            // UI'ya hızlı sonuçları göster
+            if (window._onFastContentReady) window._onFastContentReady(fastDeduped);
+        } else {
+            if (onProgress) onProgress(cached_fast.length, cached_fast.length);
+            if (window._onFastContentReady) window._onFastContentReady(cached_fast);
+        }
+
+        // ── AŞAMA 2: ARKA PLANDA TAM YÜKLEMİ ──────────────────────────────────
+        // Bu Promise'i döndür ama UI'yı bloklamadan arka planda çalıştır
         if (onProgress) onProgress(0, 2000);
-        console.log('🚀 API v5: Jikan + AniList + Kitsu (CORS-free)');
+        console.log('🚀 API v5: Tam yükleme arka planda başlıyor...');
 
         // Grup 1: AniList (anime + manga + webtoon + manhua ayrı ayrı)
         const [alA, alM, alW, alMH, ktA, ktM] = await Promise.allSettled([
             _AniList.topAnime(6),    // 6×50 = 300 anime
             _AniList.topManga(5),    // 5×50 = 250 manga
-            _AniList.topWebtoon(8),  // 8×50 = 400 Kore webtoon ← ana artış buradan
+            _AniList.topWebtoon(8),  // 8×50 = 400 Kore webtoon
             _AniList.topManhua(4),   // 4×50 = 200 Çin webtoon
             _Kitsu.topAnime(5),      // 5×20 = 100 anime
             _Kitsu.topManga(4),      // 4×20 = 80 manga
         ]);
 
-        // Grup 2: Jikan (rate limit ayrı)
+        // Grup 2: Jikan (rate limit ayrı - sıralı çalışır)
         const [jkA, jkM, jkW, jkMH] = await Promise.allSettled([
             _Jikan.topAnime(8),     // 8×25 = 200 anime
             _Jikan.topManga(6),     // 6×25 = 150 manga
