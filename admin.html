@@ -180,6 +180,22 @@
         .fi:focus,.fs:focus,.fta:focus{border-color:var(--accent);background:rgba(255,51,102,.04);box-shadow:0 0 0 3px rgba(255,51,102,.1);}
         .fta{resize:vertical;min-height:100px;}
         .fs option{background:var(--bg3);}
+
+        /* ===== SELECT / DROPDOWN DARK FIX ===== */
+        select, select.fi, select.fs {
+            background: #111827 !important;
+            color: #e2e8f0 !important;
+            color-scheme: dark;
+        }
+        select option {
+            background: #111827 !important;
+            color: #e2e8f0 !important;
+        }
+        select option:checked {
+            background: linear-gradient(#ff3366, #ff3366) !important;
+            color: #fff !important;
+        }
+        .fi, .fs, .ban-field select, #banDuration { color-scheme: dark; }
         .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
         .submit-btn{padding:.75rem 1.5rem;background:linear-gradient(135deg,var(--accent),#ff5580);border:none;border-radius:10px;color:#fff;font-size:.88rem;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .25s;box-shadow:0 4px 20px rgba(255,51,102,.25);}
         .submit-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(255,51,102,.4);}
@@ -924,17 +940,7 @@ function refreshCurrent() { showPage(curPage); }
 
 // ===== ONLINE COUNT =====
 async function updateOnlineCount() {
-    // get_all_user_data RPC ile tüm kullanıcıları çek
-    let rawData = [];
-    try {
-        const rpcRes = await sb.rpc('get_all_user_data');
-        rawData = rpcRes.error
-            ? ((await sb.from('user_data').select('user_id,data,updated_at').order('updated_at',{ascending:false})).data || [])
-            : (rpcRes.data || []);
-    } catch(e) {
-        rawData = (await sb.from('user_data').select('user_id,data,updated_at').order('updated_at',{ascending:false})).data || [];
-    }
-    const data = rawData;
+    const { data } = await sb.from('user_data').select('user_id,data,updated_at').order('updated_at',{ascending:false});
     const now15 = new Date(Date.now() - 15*60*1000).toISOString();
     const online = (data||[]).filter(u => u.updated_at > now15 && !u.data?.banned);
     const count = online.length;
@@ -957,22 +963,7 @@ async function updateOnlineCount() {
 
 // ===== DASHBOARD =====
 async function loadDashboard() {
-    // get_all_user_data RPC — SECURITY DEFINER, tüm kullanıcıları görür (RLS bypass)
-    let rows = [], error = null;
-    try {
-        const rpcRes = await sb.rpc('get_all_user_data');
-        if (rpcRes.error) {
-            // RPC yoksa doğrudan sorgu dene (service key ile çalışıyorsa)
-            const fallback = await sb.from('user_data').select('user_id,data,updated_at').order('updated_at',{ascending:false});
-            rows = fallback.data || [];
-            error = fallback.error;
-        } else {
-            rows = rpcRes.data || [];
-        }
-    } catch(e) {
-        const fallback = await sb.from('user_data').select('user_id,data,updated_at').order('updated_at',{ascending:false});
-        rows = fallback.data || [];
-    }
+    const { data: rows, error } = await sb.from('user_data').select('user_id,data,updated_at').order('updated_at',{ascending:false});
     if (error) { toast('Yükleme hatası: ' + error.message, 'error'); return; }
     const users = rows || [];
 
@@ -1080,17 +1071,8 @@ function buildDailyActivity(users, days=14) {
 
 // ===== ANALYTICS =====
 async function loadAnalytics() {
-    // get_all_user_data RPC — SECURITY DEFINER, tüm kullanıcıları görür
-    let rows = [];
-    try {
-        const rpcRes = await sb.rpc('get_all_user_data');
-        rows = rpcRes.error
-            ? ((await sb.from('user_data').select('data,updated_at')).data || [])
-            : (rpcRes.data || []);
-    } catch(e) {
-        rows = (await sb.from('user_data').select('data,updated_at')).data || [];
-    }
-    if (!rows.length) return;
+    const { data: rows } = await sb.from('user_data').select('data,updated_at');
+    if (!rows) return;
 
     let streakSum=0, listSum=0, ratingSum=0, ratingN=0, levelSum=0;
     let totalEntries=0, totalCompleted=0, longestStreak=0;
@@ -1189,9 +1171,23 @@ async function loadAnalytics() {
 // ===== USERS =====
 async function loadUsers() {
     document.getElementById('usersBody').innerHTML = '<tr class="loading-td"><td colspan="8"><span class="spinner"></span>Yükleniyor…</td></tr>';
-    const { data, error } = await sb.from('user_data').select('user_id,data,updated_at').order('updated_at',{ascending:false});
+    // get_all_user_data RPC — SECURITY DEFINER ile RLS bypass, tüm kullanıcılar görünür
+    let data = [], error = null;
+    try {
+        const rpc = await sb.rpc('get_all_user_data');
+        if (rpc.error) {
+            // RPC henüz kurulmadıysa doğrudan sorgu dene
+            const fb = await sb.from('user_data').select('user_id,data,updated_at').order('updated_at',{ascending:false});
+            data = fb.data || []; error = fb.error;
+        } else {
+            data = rpc.data || [];
+        }
+    } catch(e) {
+        const fb = await sb.from('user_data').select('user_id,data,updated_at').order('updated_at',{ascending:false});
+        data = fb.data || []; error = fb.error;
+    }
     if (error) { toast('Hata: '+error.message,'error'); return; }
-    allUsers = data||[];
+    allUsers = data;
     usersPage=1;
     renderUsers();
 }
@@ -1358,11 +1354,16 @@ async function loadOnline() {
     document.getElementById('onlineBody').innerHTML='<tr class="loading-td"><td colspan="5"><span class="spinner"></span>Yükleniyor…</td></tr>';
     document.getElementById('allMembersBody').innerHTML='<tr class="loading-td"><td colspan="6"><span class="spinner"></span>Yükleniyor…</td></tr>';
 
-    const { data } = await sb.from('user_data').select('user_id,data,updated_at').order('updated_at',{ascending:false});
+    // RPC ile tüm kullanıcıları çek (RLS bypass)
+    let _raw = [];
+    try {
+        const rpc = await sb.rpc('get_all_user_data');
+        _raw = rpc.error ? ((await sb.from('user_data').select('user_id,data,updated_at').order('updated_at',{ascending:false})).data||[]) : (rpc.data||[]);
+    } catch(e) { _raw = (await sb.from('user_data').select('user_id,data,updated_at').order('updated_at',{ascending:false})).data||[]; }
     const now15  = new Date(Date.now()-15*60*1000).toISOString();
     const now1h  = new Date(Date.now()-60*60*1000).toISOString();
     const today  = new Date(); today.setHours(0,0,0,0);
-    const users  = data || [];
+    const users  = _raw;
 
     const online  = users.filter(u => u.updated_at > now15 && !u.data?.banned);
     const hour1   = users.filter(u => u.updated_at > now1h && !u.data?.banned);
