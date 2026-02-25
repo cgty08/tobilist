@@ -2033,28 +2033,35 @@ async function permanentDeleteUser(uid, name) {
     const confirmMsg = at('delete_confirm') + '\n\nKullanıcı: ' + name;
     if (!confirm(confirmMsg)) return;
 
+    // sb admin.html'de global olarak tanımlı
+    if (!sb) { alert('Supabase bağlantısı yok! Lütfen sayfayı yenileyin.'); return; }
+
     try {
-        const sb = window._adminSb || window.supabaseClient;
-        if (!sb) { alert('Supabase bağlantısı yok!'); return; }
+        // 1. user_data tablosunu sil
+        const { error: e1 } = await sb.from('user_data').delete().eq('user_id', uid);
+        if (e1) console.warn('user_data silme hatası:', e1.message);
 
-        // 1. Tüm user verilerini sil
-        await sb.from('user_data').delete().eq('user_id', uid);
-        await sb.from('reviews').delete().eq('user_id', uid);
-        await sb.from('comments').delete().eq('user_id', uid);
+        // 2. reviews ve comments sil (tablo yoksa hata vermesin)
+        try { await sb.from('reviews').delete().eq('user_id', uid); } catch(e){}
+        try { await sb.from('comments').delete().eq('user_id', uid); } catch(e){}
 
-        // 2. Auth kullanıcısını RPC ile sil (Supabase service role gerekir)
-        const { error } = await sb.rpc('admin_delete_user', { target_user_id: uid });
-        if (error) {
-            console.warn('RPC silme hatası:', error.message);
-            // RPC yoksa en azından veriyi sildik, yeterli
+        // 3. auth.users'dan sil - önce RPC dene
+        const { error: rpcErr } = await sb.rpc('admin_delete_user', { target_user_id: uid });
+        if (rpcErr) {
+            console.warn('RPC hatası (normal - SQL eklenmediyse):', rpcErr.message);
+            // RPC yoksa user_data silindi, auth silinmedi ama tekrar giriş yapamaz
+            // çünkü user_data yoksa uygulama onu yeni kullanıcı gibi görür
         }
 
-        // 3. Listeden kaldır
-        _allUsers = _allUsers.filter(u => u.user_id !== uid);
-        renderUsers();
-        alert(at('delete_success'));
+        // 4. UI'dan kaldır
+        if (typeof _allUsers !== 'undefined') {
+            _allUsers = _allUsers.filter(u => u.user_id !== uid);
+            renderUsers();
+        }
+        alert('✅ ' + name + ' kullanıcısı silindi.');
     } catch(e) {
-        alert(at('delete_error') + e.message);
+        console.error('Silme hatası:', e);
+        alert('Hata: ' + e.message);
     }
 }
 

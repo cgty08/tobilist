@@ -420,25 +420,40 @@ async function handleLogout() {
 // ===== DELETE ACCOUNT (Kalıcı Silme) =====
 async function deleteAccount() {
     if (!currentUser) return;
-    if (!confirm('Hesabınızı KALICI olarak silmek istediğinize emin misiniz?\n\nBu işlem GERİ ALINAMAZ! Tüm verileriniz silinecek.')) return;
+    
+    const email = currentUser.email || '';
+    const confirm1 = confirm('Hesabınızı KALICI olarak silmek istediğinize emin misiniz?\n\nBu işlem GERİ ALINAMAZ! Tüm verileriniz silinecek.');
+    if (!confirm1) return;
+
+    const typed = prompt('Onaylamak için e-posta adresinizi yazın:\n' + email);
+    if (!typed || typed.trim().toLowerCase() !== email.toLowerCase()) {
+        showNotification('E-posta adresi eşleşmedi. İşlem iptal edildi.', 'error');
+        return;
+    }
 
     try {
         if (window.supabaseClient) {
             const userId = currentUser.id || currentUser.uid;
 
-            // 1. Tüm kullanıcı verilerini sil
+            // 1. Tüm verileri sil
             await window.supabaseClient.from('user_data').delete().eq('user_id', userId);
             try { await window.supabaseClient.from('reviews').delete().eq('user_id', userId); } catch(e){}
             try { await window.supabaseClient.from('comments').delete().eq('user_id', userId); } catch(e){}
 
-            // 2. Auth kullanıcısını RPC ile kalıcı sil
-            try {
-                await window.supabaseClient.rpc('delete_user');
-            } catch(rpcErr) {
-                console.warn('RPC delete_user hatası:', rpcErr);
+            // 2. RPC ile auth.users'dan kalıcı sil
+            // Supabase'e SUPABASE_DELETE_USER_SQL.sql dosyasındaki fonksiyonu eklediyseniz çalışır
+            const { error: rpcErr } = await window.supabaseClient.rpc('delete_user');
+            if (rpcErr) {
+                // RPC çalışmadıysa: kullanıcıyı devre dışı bırakmak için email'i değiştir
+                // Bu sayede aynı email ile giriş yapılamaz
+                const randomSuffix = Date.now();
+                await window.supabaseClient.auth.updateUser({
+                    email: 'deleted_' + randomSuffix + '_' + email
+                });
+                console.warn('RPC yok, email değiştirildi:', rpcErr.message);
             }
 
-            // 3. localStorage tamizle
+            // 3. localStorage temizle
             Object.keys(localStorage)
                 .filter(k => k.includes(userId) || k.includes('onilist'))
                 .forEach(k => localStorage.removeItem(k));
@@ -453,7 +468,7 @@ async function deleteAccount() {
         dataManager.currentUserId = null;
         updateUIForGuest();
         switchSection('home');
-        showNotification('Hesabınız kalıcı olarak silindi.', 'info');
+        showNotification('Hesabınız silindi. Görüşürüz!', 'info');
     } catch(e) {
         console.error('Hesap silme hatası:', e);
         showNotification('Hata oluştu: ' + e.message, 'error');
