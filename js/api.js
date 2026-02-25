@@ -1,10 +1,10 @@
-// API.JS v5.0 - Jikan + AniList + Kitsu
+// API.JS v6.0 - Jikan + AniList + Kitsu — Genişletilmiş İçerik
 // MangaDex kaldırıldı (CORS), AniList Kore manhwa ile webtoon zenginleştirildi
 
 // ===== CACHE =====
 const APICache = {
-    PREFIX: 'at5_',
-    HOURS: 48,   // 24→48 saat: Bir kez yüklendi mi, 2 gün geçerli
+    PREFIX: 'at6_',
+    HOURS: 72,   // 72 saat: 3 gün cache
     // Bellek içi cache - aynı oturumda tab yenilenirse tekrar API'ye gitme
     _mem: {},
 
@@ -36,7 +36,7 @@ const APICache = {
             // localStorage doluysa eski at5_ kayıtlarını temizle
             try {
                 Object.keys(localStorage)
-                    .filter(k => k.startsWith('at5_'))
+                    .filter(k => k.startsWith('at6_'))
                     .sort((a, b) => {
                         try { return JSON.parse(localStorage.getItem(a)).ts - JSON.parse(localStorage.getItem(b)).ts; } catch { return 0; }
                     })
@@ -57,7 +57,7 @@ const APICache = {
     clearAll() {
         this._mem = {};
         try {
-            Object.keys(localStorage).filter(k => k.startsWith('at5_')).forEach(k => localStorage.removeItem(k));
+            Object.keys(localStorage).filter(k => k.startsWith('at6_')).forEach(k => localStorage.removeItem(k));
         } catch {}
     }
 };
@@ -159,7 +159,7 @@ const _Jikan = {
             rating: i.score ? +i.score.toFixed(1) : null,
             year: i.year || (i.aired?.from ? new Date(i.aired.from).getFullYear() : null),
             episodes: i.episodes || null,
-            synopsis: (i.synopsis || '').substring(0, 300),
+            synopsis: (i.synopsis || '').substring(0, 600),
             genres: (i.genres || []).map(g => mapGenre(g.name)).filter(Boolean),
             malId: i.mal_id, source: 'jikan'
         };
@@ -175,13 +175,13 @@ const _Jikan = {
             rating: i.score ? +i.score.toFixed(1) : null,
             year: i.published?.from ? new Date(i.published.from).getFullYear() : null,
             chapters: i.chapters || null,
-            synopsis: (i.synopsis || '').substring(0, 300),
+            synopsis: (i.synopsis || '').substring(0, 600),
             genres: (i.genres || []).map(g => mapGenre(g.name)).filter(Boolean),
             malId: i.mal_id, source: 'jikan'
         };
     },
 
-    async topAnime(pages = 8) {
+    async topAnime(pages = 12) {
         const ck = 'jk_a_' + pages; const c = APICache.get(ck); if (c) return c;
         const out = [];
         for (let p = 1; p <= pages; p++) {
@@ -194,7 +194,7 @@ const _Jikan = {
         APICache.set(ck, out); return out;
     },
 
-    async topManga(pages = 6) {
+    async topManga(pages = 10) {
         const ck = 'jk_m_' + pages; const c = APICache.get(ck); if (c) return c;
         const out = [];
         for (let p = 1; p <= pages; p++) {
@@ -207,7 +207,7 @@ const _Jikan = {
         APICache.set(ck, out); return out;
     },
 
-    async topWebtoon(pages = 6) {
+    async topWebtoon(pages = 8) {
         const ck = 'jk_w_' + pages; const c = APICache.get(ck); if (c) return c;
         const out = [];
         for (let p = 1; p <= pages; p++) {
@@ -220,7 +220,7 @@ const _Jikan = {
         APICache.set(ck, out); return out;
     },
 
-    async topManhua(pages = 4) {
+    async topManhua(pages = 6) {
         // Çin webtoon
         const ck = 'jk_mh_' + pages; const c = APICache.get(ck); if (c) return c;
         const out = [];
@@ -282,25 +282,35 @@ const _AniList = {
             else if ((i.format||'').toUpperCase() === 'MANGA') type = 'manga';
             else type = 'anime';
         }
+        const studio = i.studios?.nodes?.[0]?.name || null;
+        const director = (i.staff?.edges || []).find(e => e.role === 'Director')?.node?.name?.full || null;
         return {
             id: 'al_' + i.id,
             name: i.title?.romaji || i.title?.english || i.title?.native || 'Unknown',
             nameEn: i.title?.english || i.title?.romaji || '',
             type,
             poster: i.coverImage?.extraLarge || i.coverImage?.large || i.coverImage?.medium || '',
+            color: i.coverImage?.color || null,
             rating: i.averageScore ? +(i.averageScore / 10).toFixed(1) : null,
+            popularity: i.popularity || 0,
             year: i.seasonYear || i.startDate?.year || null,
+            endYear: i.endDate?.year || null,
             episodes: i.episodes || null,
             chapters: i.chapters || null,
-            synopsis: (i.description || '').replace(/<[^>]*>/g, '').substring(0, 300),
+            volumes: i.volumes || null,
+            status: i.status || null,
+            synopsis: (i.description || '').replace(/<[^>]*>/g, '').substring(0, 600),
             genres: (i.genres || []).map(g => mapGenre(g)).filter(Boolean),
+            tags: (i.tags || []).filter(t => !t.isMediaSpoiler && t.rank >= 60).slice(0,5).map(t => t.name),
+            studio: studio,
+            director: director,
             anilistId: i.id, source: 'anilist'
         };
     },
 
-    FRAG: `id title{romaji english native} format coverImage{extraLarge large medium} averageScore seasonYear startDate{year} episodes chapters description genres countryOfOrigin`,
+    FRAG: `id title{romaji english native} format coverImage{extraLarge large medium color} averageScore meanScore popularity seasonYear startDate{year} endDate{year} episodes chapters volumes description genres tags{name rank isMediaSpoiler} countryOfOrigin status studios{nodes{name}} staff{edges{role node{name{full}}}}`,
 
-    async topAnime(pages = 6) {
+    async topAnime(pages = 10) {
         const ck = 'al_a_' + pages; const c = APICache.get(ck); if (c) return c;
         const gql = `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:ANIME,sort:[POPULARITY_DESC],isAdult:false){${this.FRAG}}}}`;
         const out = [];
@@ -314,7 +324,7 @@ const _AniList = {
         APICache.set(ck, out); return out;
     },
 
-    async topManga(pages = 5) {
+    async topManga(pages = 8) {
         // Japon manga (CN/KR hariç)
         const ck = 'al_m_' + pages; const c = APICache.get(ck); if (c) return c;
         const gql = `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:MANGA,sort:[POPULARITY_DESC],isAdult:false,countryOfOrigin:"JP"){${this.FRAG}}}}`;
@@ -329,7 +339,7 @@ const _AniList = {
         APICache.set(ck, out); return out;
     },
 
-    async topWebtoon(pages = 8) {
+    async topWebtoon(pages = 12) {
         // Kore manhwa - AniList'in en güçlü olduğu alan
         const ck = 'al_w_' + pages; const c = APICache.get(ck); if (c) return c;
         const gql = `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:MANGA,sort:[POPULARITY_DESC],isAdult:false,countryOfOrigin:"KR"){${this.FRAG}}}}`;
@@ -344,7 +354,7 @@ const _AniList = {
         APICache.set(ck, out); return out;
     },
 
-    async topManhua(pages = 4) {
+    async topManhua(pages = 6) {
         // Çin manhwa
         const ck = 'al_mh_' + pages; const c = APICache.get(ck); if (c) return c;
         const gql = `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:MANGA,sort:[POPULARITY_DESC],isAdult:false,countryOfOrigin:"CN"){${this.FRAG}}}}`;
@@ -399,7 +409,7 @@ const _Kitsu = {
             rating: a.averageRating ? +(parseFloat(a.averageRating) / 10).toFixed(1) : null,
             year: a.startDate ? new Date(a.startDate).getFullYear() : null,
             episodes: a.episodeCount || null,
-            synopsis: (a.synopsis || '').substring(0, 300),
+            synopsis: (a.synopsis || '').substring(0, 600),
             genres: [], kitsuId: i.id, source: 'kitsu'
         };
     },
@@ -416,12 +426,12 @@ const _Kitsu = {
             rating: a.averageRating ? +(parseFloat(a.averageRating) / 10).toFixed(1) : null,
             year: a.startDate ? new Date(a.startDate).getFullYear() : null,
             chapters: a.chapterCount || null,
-            synopsis: (a.synopsis || '').substring(0, 300),
+            synopsis: (a.synopsis || '').substring(0, 600),
             genres: [], kitsuId: i.id, source: 'kitsu'
         };
     },
 
-    async topAnime(pages = 5) {
+    async topAnime(pages = 7) {
         const ck = 'kt_a_' + pages; const c = APICache.get(ck); if (c) return c;
         const out = [];
         for (let p = 0; p < pages; p++) {
@@ -434,7 +444,7 @@ const _Kitsu = {
         APICache.set(ck, out); return out;
     },
 
-    async topManga(pages = 4) {
+    async topManga(pages = 6) {
         const ck = 'kt_m_' + pages; const c = APICache.get(ck); if (c) return c;
         const out = [];
         for (let p = 0; p < pages; p++) {
@@ -460,7 +470,7 @@ const _Kitsu = {
 const JikanAPI = {
 
     async fetchSeasonNow(limit = 25) {
-        const ck = 'season_v5'; const c = APICache.get(ck); if (c) return c;
+        const ck = 'season_v6'; const c = APICache.get(ck); if (c) return c;
         let results = [];
         try { results = await _AniList.seasonal(); } catch {}
         if (results.length < 10) { try { results = [...results, ...await _Jikan.seasonNow()]; } catch {} }
@@ -485,7 +495,7 @@ const JikanAPI = {
     },
 
     async loadAllContent(onProgress) {
-        const ck = 'all_v5'; const c = APICache.get(ck);
+        const ck = 'all_v6'; const c = APICache.get(ck);
         if (c) { if (onProgress) onProgress(c.length, c.length); return c; }
 
         // ── AŞAMA 1: HIZLI ÖN YÜKLEMİ (3-5 saniye) ──────────────────────────
@@ -498,9 +508,9 @@ const JikanAPI = {
             console.log('⚡ API: Hızlı ön yükleme başlıyor...');
 
             const [fastA, fastM, fastW] = await Promise.allSettled([
-                _AniList.topAnime(2),    // 2×50 = 100 anime (hızlı)
-                _AniList.topManga(2),    // 2×50 = 100 manga
-                _AniList.topWebtoon(2),  // 2×50 = 100 webtoon
+                _AniList.topAnime(3),    // 3×50 = 150 anime (hızlı)
+                _AniList.topManga(3),    // 3×50 = 150 manga
+                _AniList.topWebtoon(3),  // 3×50 = 150 webtoon
             ]);
 
             const fastAll = [
@@ -527,20 +537,20 @@ const JikanAPI = {
 
         // Grup 1: AniList (anime + manga + webtoon + manhua ayrı ayrı)
         const [alA, alM, alW, alMH, ktA, ktM] = await Promise.allSettled([
-            _AniList.topAnime(6),    // 6×50 = 300 anime
-            _AniList.topManga(5),    // 5×50 = 250 manga
-            _AniList.topWebtoon(8),  // 8×50 = 400 Kore webtoon
-            _AniList.topManhua(4),   // 4×50 = 200 Çin webtoon
-            _Kitsu.topAnime(5),      // 5×20 = 100 anime
-            _Kitsu.topManga(4),      // 4×20 = 80 manga
+            _AniList.topAnime(10),   // 10×50 = 500 anime
+            _AniList.topManga(8),    // 8×50  = 400 manga
+            _AniList.topWebtoon(12), // 12×50 = 600 Kore webtoon
+            _AniList.topManhua(6),   // 6×50  = 300 Çin webtoon
+            _Kitsu.topAnime(7),      // 7×20  = 140 anime
+            _Kitsu.topManga(6),      // 6×20  = 120 manga
         ]);
 
         // Grup 2: Jikan (rate limit ayrı - sıralı çalışır)
         const [jkA, jkM, jkW, jkMH] = await Promise.allSettled([
-            _Jikan.topAnime(8),     // 8×25 = 200 anime
-            _Jikan.topManga(6),     // 6×25 = 150 manga
-            _Jikan.topWebtoon(6),   // 6×25 = 150 manhwa
-            _Jikan.topManhua(4),    // 4×25 = 100 manhua
+            _Jikan.topAnime(12),    // 12×25 = 300 anime
+            _Jikan.topManga(10),    // 10×25 = 250 manga
+            _Jikan.topWebtoon(8),   // 8×25  = 200 manhwa
+            _Jikan.topManhua(6),    // 6×25  = 150 manhua
         ]);
 
         const all = [
@@ -568,4 +578,4 @@ const JikanAPI = {
     }
 };
 
-console.log('✅ API v5.0 loaded — Jikan + AniList + Kitsu');
+console.log('✅ API v6.0 loaded — Jikan + AniList + Kitsu — ~3000+ içerik');

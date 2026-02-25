@@ -1,4 +1,4 @@
-// APP.JS v5.1 - TobiList Ana Uygulama - Hatalar düzeltildi
+// APP.JS v5.2 - TobiList Ana Uygulama - Genişletilmiş İçerik
 
 let currentSection = 'home';
 let previousSection = 'home';
@@ -7,7 +7,7 @@ let deferredPrompt;
 let currentDiscoverType = 'all';
 let currentGenreFilter = 'all';
 let discoverPage = 1;
-const DISCOVER_PAGE_SIZE = 40;
+const DISCOVER_PAGE_SIZE = 60;
 
 let allContent = [];
 let trendingContent = [];
@@ -189,7 +189,7 @@ window.addEventListener('popstate', function(e) {
 function renderHomePage() {
     const trending = trendingContent.length > 0 ? trendingContent.slice(0, 10) : [];
     const seasonal = seasonContent.length > 0 ? seasonContent.slice(0, 10) : [];
-    const recs     = allContent.filter(i => i.rating && i.rating >= 8.0).slice(0, 10);
+    const recs     = allContent.filter(i => i.rating && i.rating >= 8.0).slice(0, 20);
 
     renderMediaRow('trendingGrid', trending);
     renderMediaRow('seasonPopularGrid', seasonal.length > 0 ? seasonal : trending.slice(5, 15));
@@ -1200,7 +1200,7 @@ function loadSimilarContent(item) {
     ).slice(0, 8);
 
     if (similar.length < 4) {
-        similar = allContent.filter(c => c.type === type && c.id !== item.id).slice(0, 8);
+        similar = allContent.filter(c => c.type === type && c.id !== item.id).slice(0, 12);
     }
 
     if (!similar.length) {
