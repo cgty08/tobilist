@@ -899,7 +899,10 @@ function _fillDetailBasic(item) {
     s('dpYear', item.year);
     s('dpScore', item.rating ? '⭐ ' + item.rating : '—');
     s('dpEpisodes', item.episodes ? item.episodes + ' Bölüm' : item.chapters ? item.chapters + ' Bölüm' : '—');
-    s('dpSynopsis', item.synopsis || 'Açıklama yükleniyor...');
+    // Reset synopsis cache on each new detail open
+    window._detailSynopsis = { en: null, tr: null };
+    const synopsisText = item.synopsis || ((typeof getCurrentLang === 'function' && getCurrentLang() === 'en') ? 'Loading description...' : 'Açıklama yükleniyor...');
+    s('dpSynopsis', synopsisText);
     s('dpStatus', '—');
     s('dpRank', '—');
     s('dpMembers', '—');
@@ -931,42 +934,123 @@ function _fillDetailBasic(item) {
     if (titleBc) titleBc.textContent = item.name || '';
 }
 
+// Store synopsis in both languages for live switching
+window._detailSynopsis = { en: null, tr: null };
+
 async function _fetchFullDetail(item) {
-    if (!item.malId) return;
-    try {
-        const type = item.type === 'anime' ? 'anime' : 'manga';
-        const res = await fetch(`https://api.jikan.moe/v4/${type}/${item.malId}`);
-        if (!res.ok) return;
-        const { data: d } = await res.json();
-        if (!d) return;
+    // Try Jikan first if malId available
+    if (item.malId) {
+        try {
+            const type = item.type === 'anime' ? 'anime' : 'manga';
+            const res = await fetch(`https://api.jikan.moe/v4/${type}/${item.malId}`);
+            if (res.ok) {
+                const { data: d } = await res.json();
+                if (d) {
+                    const s = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
+                    s('dpScore', d.score ? '⭐ ' + d.score.toFixed(1) : null);
+                    s('dpEpisodes', d.episodes ? d.episodes + ' Bölüm' : d.chapters ? d.chapters + ' Bölüm' : null);
+                    s('dpStatus', d.status || null);
+                    s('dpRank', d.rank ? '#' + d.rank : null);
+                    s('dpMembers', d.members ? d.members.toLocaleString('tr-TR') : null);
+                    s('dpStudio', (d.studios?.[0]?.name) || (d.authors?.[0]?.name) || null);
+                    s('dpYear', d.year || (d.aired?.from ? new Date(d.aired.from).getFullYear() : null));
 
-        const s = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
+                    if (d.genres || d.themes) {
+                        const genres = [...(d.genres || []), ...(d.themes || [])].map(g => g.name);
+                        const el = document.getElementById('dpGenres');
+                        if (el) el.innerHTML = genres.map(g => `<span class="dp-genre-tag">${g}</span>`).join('');
+                    }
+                    if (d.images?.jpg?.large_image_url) {
+                        const bg = document.getElementById('dpBannerBg');
+                        if (bg) { bg.style.backgroundImage = `url(${d.images.jpg.large_image_url})`; bg.style.backgroundSize = 'cover'; bg.style.backgroundPosition = 'center top'; }
+                    }
 
-        s('dpScore', d.score ? '⭐ ' + d.score.toFixed(1) : null);
-        s('dpEpisodes', d.episodes ? d.episodes + ' Bölüm' : d.chapters ? d.chapters + ' Bölüm' : null);
-        s('dpStatus', d.status || null);
-        s('dpRank', d.rank ? '#' + d.rank : null);
-        s('dpMembers', d.members ? d.members.toLocaleString('tr-TR') : null);
-        s('dpStudio', (d.studios?.[0]?.name) || (d.authors?.[0]?.name) || null);
-        s('dpSynopsis', d.synopsis || null);
-        s('dpYear', d.year || (d.aired?.from ? new Date(d.aired.from).getFullYear() : null));
-
-        if (d.genres || d.themes) {
-            const genres = [...(d.genres || []), ...(d.themes || [])].map(g => g.name);
-            const el = document.getElementById('dpGenres');
-            if (el) el.innerHTML = genres.map(g => `<span class="dp-genre-tag">${g}</span>`).join('');
-        }
-
-        // Background poster if available
-        if (d.images?.jpg?.large_image_url) {
-            const bg = document.getElementById('dpBannerBg');
-            if (bg) {
-                bg.style.backgroundImage = `url(${d.images.jpg.large_image_url})`;
-                bg.style.backgroundSize = 'cover';
-                bg.style.backgroundPosition = 'center top';
+                    if (d.synopsis) {
+                        window._detailSynopsis.en = d.synopsis;
+                        // Apply immediately
+                        _applyDetailSynopsis();
+                        // Also fetch Turkish synopsis from AniList if anilistId available
+                        if (item.anilistId) _fetchAniListSynopsis(item.anilistId);
+                        return;
+                    }
+                }
             }
+        } catch(e) { /* fall through to AniList */ }
+    }
+
+    // Fallback: fetch from AniList (works for calendar items and items without malId)
+    const aniId = item.anilistId || (item.id && String(item.id).startsWith('al_') ? String(item.id).replace('al_','') : null);
+    if (aniId) {
+        await _fetchAniListSynopsis(aniId);
+        return;
+    }
+
+    // Last resort: search AniList by name
+    if (item.name) {
+        try {
+            const res = await fetch('https://graphql.anilist.co', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    query: `query($s:String){Media(search:$s,type:ANIME){id description(asHtml:false) coverImage{large color} averageScore episodes status startDate{year} genres studios{nodes{name}}}}`,
+                    variables: { s: item.name }
+                })
+            });
+            const json = await res.json();
+            const m = json?.data?.Media;
+            if (m) {
+                const s = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
+                s('dpScore', m.averageScore ? '⭐ ' + (m.averageScore/10).toFixed(1) : null);
+                s('dpEpisodes', m.episodes ? m.episodes + ' Bölüm' : null);
+                s('dpStatus', m.status || null);
+                s('dpStudio', m.studios?.nodes?.[0]?.name || null);
+                s('dpYear', m.startDate?.year || null);
+                if (m.genres?.length) {
+                    const el = document.getElementById('dpGenres');
+                    if (el) el.innerHTML = m.genres.map(g => `<span class="dp-genre-tag">${g}</span>`).join('');
+                }
+                if (m.coverImage?.large) {
+                    const bg = document.getElementById('dpBannerBg');
+                    if (bg) { bg.style.backgroundImage = `url(${m.coverImage.large})`; bg.style.backgroundSize = 'cover'; bg.style.backgroundPosition = 'center top'; }
+                    const poster = document.getElementById('dpPoster');
+                    if (poster && !poster.src) poster.src = m.coverImage.large;
+                }
+                if (m.description) {
+                    window._detailSynopsis.en = m.description.replace(/<[^>]+>/g, '').trim();
+                    _applyDetailSynopsis();
+                }
+            }
+        } catch(e) { /* ignore */ }
+    }
+}
+
+async function _fetchAniListSynopsis(anilistId) {
+    try {
+        const res = await fetch('https://graphql.anilist.co', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                query: `query($id:Int){Media(id:$id){description(asHtml:false)}}`,
+                variables: { id: parseInt(anilistId) }
+            })
+        });
+        const json = await res.json();
+        const desc = json?.data?.Media?.description;
+        if (desc) {
+            window._detailSynopsis.en = desc.replace(/<[^>]+>/g, '').trim();
+            _applyDetailSynopsis();
         }
     } catch(e) { /* ignore */ }
+}
+
+function _applyDetailSynopsis() {
+    const el = document.getElementById('dpSynopsis');
+    if (!el) return;
+    const lang = (typeof getCurrentLang === 'function') ? getCurrentLang() : 'tr';
+    const text = (lang === 'tr' && window._detailSynopsis.tr)
+        ? window._detailSynopsis.tr
+        : window._detailSynopsis.en;
+    if (text) el.textContent = text;
 }
 
 // ===== REVIEWS =====

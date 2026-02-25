@@ -77,6 +77,8 @@
         .live-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
         .refresh-btn{padding:.42rem .9rem;background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:8px;color:var(--text2);font-size:.82rem;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;}
         .refresh-btn:hover{background:rgba(255,255,255,.08);color:var(--text);}
+        .admin-lang-toggle{display:flex;align-items:center;gap:.35rem;padding:.42rem .8rem;background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:.82rem;font-weight:700;cursor:pointer;transition:all .2s;user-select:none;}
+        .admin-lang-toggle:hover{background:rgba(255,51,102,.1);border-color:rgba(255,51,102,.3);color:var(--accent);}
 
         /* PAGES */
         .page{padding:2rem;display:none;}
@@ -394,8 +396,12 @@
             <p id="pageSub">TobiList platform genel bakışı</p>
         </div>
         <div class="top-actions">
-            <div class="live-badge"><div class="live-dot"></div><span>Canlı</span></div>
-            <button class="refresh-btn" onclick="refreshCurrent()">🔄 Yenile</button>
+            <div class="live-badge"><div class="live-dot"></div><span id="adminLiveTxt">Canlı</span></div>
+            <div class="admin-lang-toggle" id="adminLangToggle" onclick="adminToggleLang()" title="Dil Değiştir / Switch Language">
+                <span id="adminLangFlag">🇹🇷</span>
+                <span id="adminLangLabel">TR</span>
+            </div>
+            <button class="refresh-btn" onclick="refreshCurrent()" id="adminRefreshBtn">🔄 Yenile</button>
             <span id="lastUpdated" style="font-size:.75rem;color:var(--text3);"></span>
         </div>
     </div>
@@ -901,17 +907,17 @@ async function adminLogout() { await sb.auth.signOut(); location.reload(); }
 
 // ===== NAVIGATION =====
 const PAGE_META = {
-    dashboard:    ['Dashboard',                'Platform genel bakışı'],
-    analytics:    ['Analitik',                 'Derinlemesine içgörüler'],
-    users:        ['Tüm Kullanıcılar',         'Kayıtlı hesapları yönet'],
-    online:       ['Online Kullanıcılar',      'Şu an aktif olanlar'],
-    bans:         ['Banlı Kullanıcılar',       'Banlı hesapları yönet'],
-    content:      ['İçerik Listesi',           'Kullanıcıların eklediği tüm içerik'],
-    reviews:      ['Yorumlar',                 'Kullanıcı yorumları'],
-    announcements:['Duyurular',                'Kullanıcılara duyuru gönder'],
-    restrictions: ['Kısıtlamalar',             'Platform kısıtlamalarını yönet'],
-    logs:         ['Aktivite Logu',            'Sistem olay geçmişi'],
-    settings:     ['Ayarlar',                  'Site yapılandırması'],
+    dashboard:    { tr:['Dashboard','Platform genel bakışı'],       en:['Dashboard','Platform overview'] },
+    analytics:    { tr:['Analitik','Derinlemesine içgörüler'],      en:['Analytics','Deep insights'] },
+    users:        { tr:['Tüm Kullanıcılar','Kayıtlı hesapları yönet'], en:['All Users','Manage registered accounts'] },
+    online:       { tr:['Online Kullanıcılar','Şu an aktif olanlar'],  en:['Online Users','Currently active'] },
+    bans:         { tr:['Banlı Kullanıcılar','Banlı hesapları yönet'], en:['Banned Users','Manage banned accounts'] },
+    content:      { tr:['İçerik Listesi','Kullanıcıların eklediği tüm içerik'], en:['Content List','All user-added content'] },
+    reviews:      { tr:['Yorumlar','Kullanıcı yorumları'],           en:['Reviews','User reviews'] },
+    announcements:{ tr:['Duyurular','Kullanıcılara duyuru gönder'], en:['Announcements','Send announcements to users'] },
+    restrictions: { tr:['Kısıtlamalar','Platform kısıtlamalarını yönet'], en:['Restrictions','Manage platform restrictions'] },
+    logs:         { tr:['Aktivite Logu','Sistem olay geçmişi'],     en:['Activity Log','System event history'] },
+    settings:     { tr:['Ayarlar','Site yapılandırması'],           en:['Settings','Site configuration'] },
 };
 
 function showPage(page) {
@@ -922,10 +928,13 @@ function showPage(page) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById('page-' + page)?.classList.add('active');
     curPage = page;
-    const [title, sub] = PAGE_META[page] || ['—',''];
+    const pageLang = (typeof _adminLang !== 'undefined' ? _adminLang : 'tr');
+    const [title, sub] = (PAGE_META[page]?.[pageLang]) || PAGE_META[page]?.tr || ['—',''];
     document.getElementById('pageTitle').textContent = title;
     document.getElementById('pageSub').textContent = sub;
-    document.getElementById('lastUpdated').textContent = 'Güncellendi: ' + new Date().toLocaleTimeString('tr-TR');
+    const locale = pageLang === 'en' ? 'en-GB' : 'tr-TR';
+    const updatedLabel = pageLang === 'en' ? 'Updated: ' : 'Güncellendi: ';
+    document.getElementById('lastUpdated').textContent = updatedLabel + new Date().toLocaleTimeString(locale);
     const loaders = {
         dashboard: loadDashboard, analytics: loadAnalytics,
         users: loadUsers, online: loadOnline, bans: loadBans,
@@ -1881,6 +1890,104 @@ function avatarHtml(d, size) {
     }
     return '<div style="width:'+size+';height:'+size+';border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent3));display:inline-flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;">'+em+'</div>';
 }
+
+// ===== ADMIN LANGUAGE SYSTEM =====
+let _adminLang = localStorage.getItem('admin_lang') || 'tr';
+
+const adminTr = {
+    live: 'Canlı', refresh: '🔄 Yenile',
+    updated: 'Güncellendi: ',
+    pageTitle_dashboard: 'Dashboard', pageSub_dashboard: 'TobiList platform genel bakışı',
+    pageTitle_users: 'Kullanıcılar', pageSub_users: 'Kayıtlı kullanıcı listesi ve detayları',
+    pageTitle_content: 'İçerik Yönetimi', pageSub_content: 'Anime, manga ve webtoon veritabanı',
+    pageTitle_announcements: 'Duyurular', pageSub_announcements: 'Kullanıcılara bildirim gönder',
+    pageTitle_restrictions: 'Kısıtlamalar', pageSub_restrictions: 'Bakım modu ve erişim kontrolü',
+    pageTitle_system: 'Sistem', pageSub_system: 'Sistem bilgisi ve bağlantı durumu',
+    nav_dashboard: 'Dashboard', nav_users: 'Kullanıcılar', nav_content: 'İçerik',
+    nav_announcements: 'Duyurular', nav_restrictions: 'Kısıtlamalar', nav_system: 'Sistem',
+    logout: 'Çıkış Yap',
+};
+
+const adminEn = {
+    live: 'Live', refresh: '🔄 Refresh',
+    updated: 'Updated: ',
+    pageTitle_dashboard: 'Dashboard', pageSub_dashboard: 'TobiList platform overview',
+    pageTitle_users: 'Users', pageSub_users: 'Registered user list and details',
+    pageTitle_content: 'Content Management', pageSub_content: 'Anime, manga and webtoon database',
+    pageTitle_announcements: 'Announcements', pageSub_announcements: 'Send notifications to users',
+    pageTitle_restrictions: 'Restrictions', pageSub_restrictions: 'Maintenance mode and access control',
+    pageTitle_system: 'System', pageSub_system: 'System info and connection status',
+    nav_dashboard: 'Dashboard', nav_users: 'Users', nav_content: 'Content',
+    nav_announcements: 'Announcements', nav_restrictions: 'Restrictions', nav_system: 'System',
+    logout: 'Logout',
+};
+
+function at(key) {
+    return (_adminLang === 'en' ? adminEn : adminTr)[key] || key;
+}
+
+function adminToggleLang() {
+    _adminLang = _adminLang === 'tr' ? 'en' : 'tr';
+    localStorage.setItem('admin_lang', _adminLang);
+    applyAdminLang();
+}
+
+function applyAdminLang() {
+    const flag = document.getElementById('adminLangFlag');
+    const label = document.getElementById('adminLangLabel');
+    if (flag) flag.textContent = _adminLang === 'tr' ? '🇹🇷' : '🇬🇧';
+    if (label) label.textContent = _adminLang === 'tr' ? 'TR' : 'EN';
+
+    const liveTxt = document.getElementById('adminLiveTxt');
+    if (liveTxt) liveTxt.textContent = at('live');
+
+    const refreshBtn = document.getElementById('adminRefreshBtn');
+    if (refreshBtn) refreshBtn.textContent = at('refresh');
+
+    // Nav items
+    const navMap = {
+        'page-dashboard': 'nav_dashboard',
+        'page-users': 'nav_users',
+        'page-content': 'nav_content',
+        'page-announcements': 'nav_announcements',
+        'page-restrictions': 'nav_restrictions',
+        'page-system': 'nav_system',
+    };
+    document.querySelectorAll('.nav-item[onclick]').forEach(el => {
+        const match = (el.getAttribute('onclick') || '').match(/showPage\('([^']+)'/);
+        if (match && navMap[match[1]]) {
+            const icon = el.querySelector('.nav-icon');
+            const iconHtml = icon ? icon.outerHTML : '';
+            const badge = el.querySelector('.nav-badge');
+            const badgeHtml = badge ? badge.outerHTML : '';
+            // Only update text node, keep icon and badge
+            const textNode = Array.from(el.childNodes).find(n => n.nodeType === 3 && n.textContent.trim());
+            if (textNode) textNode.textContent = at(navMap[match[1]]);
+        }
+    });
+
+    // Logout button
+    const logoutBtn = document.querySelector('.logout-btn');
+    if (logoutBtn) logoutBtn.textContent = at('logout');
+
+    // Update current page title
+    const currentPageEl = document.querySelector('.page.active');
+    if (currentPageEl) {
+        const pageId = currentPageEl.id;
+        const titleEl = document.getElementById('pageTitle');
+        const subEl = document.getElementById('pageSub');
+        const titleKey = 'pageTitle_' + pageId.replace('page-', '');
+        const subKey = 'pageSub_' + pageId.replace('page-', '');
+        if (titleEl && at(titleKey) !== titleKey) titleEl.textContent = at(titleKey);
+        if (subEl && at(subKey) !== subKey) subEl.textContent = at(subKey);
+    }
+}
+
+// Apply on load
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(applyAdminLang, 500);
+});
+
 </script>
 </body>
 </html>
