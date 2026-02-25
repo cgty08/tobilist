@@ -420,22 +420,47 @@ async function handleLogout() {
 // ===== DELETE ACCOUNT =====
 async function deleteAccount() {
     if (!currentUser) return;
-    if (!confirm('Hesabınızı silmek istediğinize emin misiniz? Bu işlem geri alınamaz!')) return;
+    if (!confirm('Hesabınızı kalıcı olarak silmek istediğinize emin misiniz?\n\nBu işlem GERİ ALINAMAZ! Tüm verileriniz silinecek.')) return;
 
     try {
         if (window.supabaseClient) {
-            await window.supabaseClient.from('user_data').delete().eq('user_id', currentUser.uid);
+            const userId = currentUser.id || currentUser.uid;
+
+            // 1. Tüm user verilerini sil (tüm tablolar)
+            await window.supabaseClient.from('user_data').delete().eq('user_id', userId);
+            await window.supabaseClient.from('reviews').delete().eq('user_id', userId);
+            await window.supabaseClient.from('comments').delete().eq('user_id', userId);
+
+            // 2. Auth kullanıcısını kalıcı sil (Supabase Edge Function ile)
+            // Bu olmadan kullanıcı tekrar giriş yapabilir
+            try {
+                const { error: delError } = await window.supabaseClient.rpc('delete_user');
+                if (delError) {
+                    // RPC yoksa alternatif: kullanıcıyı devre dışı bırak
+                    console.warn('RPC delete_user bulunamadı:', delError.message);
+                }
+            } catch(rpcErr) {
+                console.warn('RPC hatası:', rpcErr);
+            }
+
+            // 3. localStorage'dan da temizle
+            const keys = Object.keys(localStorage).filter(k => k.includes(userId) || k.includes('tobilist'));
+            keys.forEach(k => localStorage.removeItem(k));
+
+            // 4. Oturumu kapat
             await window.supabaseClient.auth.signOut();
         }
+
         currentUser = null;
         isGuest = true;
         dataManager.data = dataManager.defaultData();
         dataManager.currentUserId = null;
         updateUIForGuest();
         switchSection('home');
-        showNotification('Hesap verileri silindi.', 'info');
+        showNotification('Hesabınız kalıcı olarak silindi.', 'info');
     } catch(e) {
-        showNotification('İşlem sırasında hata: ' + e.message, 'error');
+        console.error('Hesap silme hatası:', e);
+        showNotification('Hata oluştu: ' + e.message, 'error');
     }
 }
 

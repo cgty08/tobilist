@@ -114,6 +114,20 @@ function showLoadingPlaceholders() {
     if (dg) dg.innerHTML = '<div class="discover-loading"><div class="loader"></div><p style="margin-top:1rem;color:var(--text-muted);">500+ içerik yükleniyor...</p></div>';
 }
 
+// ===== SLUG YARDIMCISI =====
+function toSlug(str) {
+    if (!str) return 'icerik';
+    return str
+        .toLowerCase()
+        .replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's')
+        .replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c')
+        .replace(/[^a-z0-9\s-]/g, '')
+        .trim()
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .substring(0, 60);
+}
+
 // ===== BÖLÜM GEÇİŞİ =====
 function switchSection(section, pushHistory = true) {
     previousSection = currentSection;
@@ -858,10 +872,14 @@ async function openDetailPage(itemJsonStr) {
     currentSection = 'detail';
 
     // History'ye push et
+    // URL'de içerik adını göster (örn: #anime-naruto)
+    const typeSlug = (item.type || 'icerik').toLowerCase();
+    const nameSlug = toSlug(item.name || item.nameEn || '');
+    const detailSlug = typeSlug + '-' + nameSlug;
     history.pushState(
-        { section: previousSection, discoverScrollY: discoverScrollPosition },
+        { section: previousSection, discoverScrollY: discoverScrollPosition, itemId: item.id },
         '',
-        '#detail-' + (item.id || '')
+        '#' + detailSlug
     );
 
     // Detay section'ı göster
