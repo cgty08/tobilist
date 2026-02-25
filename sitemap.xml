@@ -6,7 +6,7 @@
 
   <!-- Ana Sayfa -->
   <url>
-    <loc>https://tobilist.com/</loc>
+    <loc>https://onilist.com/</loc>
     <lastmod>2025-02-22</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
@@ -14,7 +14,7 @@
 
   <!-- Keşfet -->
   <url>
-    <loc>https://tobilist.com/#discover</loc>
+    <loc>https://onilist.com/#discover</loc>
     <lastmod>2025-02-22</lastmod>
     <changefreq>hourly</changefreq>
     <priority>0.9</priority>
@@ -22,7 +22,7 @@
 
   <!-- Kütüphane -->
   <url>
-    <loc>https://tobilist.com/#library</loc>
+    <loc>https://onilist.com/#library</loc>
     <lastmod>2025-02-22</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
@@ -30,7 +30,7 @@
 
   <!-- Kayıt -->
   <url>
-    <loc>https://tobilist.com/?register=true</loc>
+    <loc>https://onilist.com/?register=true</loc>
     <lastmod>2025-02-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -38,7 +38,7 @@
 
   <!-- Gizlilik Politikası -->
   <url>
-    <loc>https://tobilist.com/privacy.html</loc>
+    <loc>https://onilist.com/privacy.html</loc>
     <lastmod>2025-02-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>

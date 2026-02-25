@@ -1,4 +1,4 @@
-// APP.JS v5.2 - TobiList Ana Uygulama - Genişletilmiş İçerik
+// APP.JS v5.2 - OniList Ana Uygulama - Genişletilmiş İçerik
 
 let currentSection = 'home';
 let previousSection = 'home';
@@ -17,7 +17,7 @@ let contentLoading = false;
 
 // ===== INIT =====
 function initializeApp() {
-    console.log('TobiList v5.1 başlatılıyor...');
+    console.log('OniList v5.1 başlatılıyor...');
 
     if (dataManager.data) {
         updateStreak();
@@ -38,7 +38,8 @@ function initializeApp() {
     }
 
     // Duyuruları kontrol et
-    setTimeout(() => { if (typeof checkAnnouncements === 'function') checkAnnouncements(); }, 2000);
+    // Duyuru popup'ı devre dışı bırakıldı
+    // setTimeout(() => { if (typeof checkAnnouncements === 'function') checkAnnouncements(); }, 2000);
 
     const hour = new Date().getHours();
     const greet = hour < 6 ? 'Gece yarısı 🌙' : hour < 12 ? 'Günaydın ☀️' : hour < 18 ? 'İyi günler 🌤️' : 'İyi akşamlar 🌙';
@@ -114,20 +115,6 @@ function showLoadingPlaceholders() {
     if (dg) dg.innerHTML = '<div class="discover-loading"><div class="loader"></div><p style="margin-top:1rem;color:var(--text-muted);">500+ içerik yükleniyor...</p></div>';
 }
 
-// ===== SLUG YARDIMCISI =====
-function toSlug(str) {
-    if (!str) return 'icerik';
-    return str
-        .toLowerCase()
-        .replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's')
-        .replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c')
-        .replace(/[^a-z0-9\s-]/g, '')
-        .trim()
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-')
-        .substring(0, 60);
-}
-
 // ===== BÖLÜM GEÇİŞİ =====
 function switchSection(section, pushHistory = true) {
     previousSection = currentSection;
@@ -201,7 +188,7 @@ window.addEventListener('popstate', function(e) {
 
 // ===== ANA SAYFA =====
 function renderHomePage() {
-    const trending = trendingContent.length > 0 ? trendingContent.slice(0, 10) : [];
+    const trending = trendingContent.length > 0 ? trendingContent.slice(0, 20) : [];
     const seasonal = seasonContent.length > 0 ? seasonContent.slice(0, 10) : [];
     const recs     = allContent.filter(i => i.rating && i.rating >= 8.0).slice(0, 20);
 
@@ -872,14 +859,10 @@ async function openDetailPage(itemJsonStr) {
     currentSection = 'detail';
 
     // History'ye push et
-    // URL'de içerik adını göster (örn: #anime-naruto)
-    const typeSlug = (item.type || 'icerik').toLowerCase();
-    const nameSlug = toSlug(item.name || item.nameEn || '');
-    const detailSlug = typeSlug + '-' + nameSlug;
     history.pushState(
-        { section: previousSection, discoverScrollY: discoverScrollPosition, itemId: item.id },
+        { section: previousSection, discoverScrollY: discoverScrollPosition },
         '',
-        '#' + detailSlug
+        '#detail-' + (item.id || '')
     );
 
     // Detay section'ı göster

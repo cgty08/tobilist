@@ -7,7 +7,7 @@ Disallow: /admin.html
 Disallow: /admin/
 
 # Sitemap
-Sitemap: https://tobilist.com/sitemap.xml
+Sitemap: https://onilist.com/sitemap.xml
 
 # Crawl hızı (agresif botları yavaşlatır)
 Crawl-delay: 1
