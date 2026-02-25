@@ -38,8 +38,7 @@ function initializeApp() {
     }
 
     // Duyuruları kontrol et
-    // Duyuru popup'ı devre dışı bırakıldı
-    // setTimeout(() => { if (typeof checkAnnouncements === 'function') checkAnnouncements(); }, 2000);
+    // Duyuru popup'ı devre dışı
 
     const hour = new Date().getHours();
     const greet = hour < 6 ? 'Gece yarısı 🌙' : hour < 12 ? 'Günaydın ☀️' : hour < 18 ? 'İyi günler 🌤️' : 'İyi akşamlar 🌙';
@@ -113,6 +112,18 @@ function showLoadingPlaceholders() {
     });
     const dg = document.getElementById('discoverGrid');
     if (dg) dg.innerHTML = '<div class="discover-loading"><div class="loader"></div><p style="margin-top:1rem;color:var(--text-muted);">500+ içerik yükleniyor...</p></div>';
+}
+
+// ===== SLUG YARDIMCISI =====
+function toSlug(str) {
+    if (!str) return 'icerik';
+    return str
+        .toLowerCase()
+        .replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s')
+        .replace(/ı/g,'i').replace(/ö/g,'o').replace(/ç/g,'c')
+        .replace(/[^a-z0-9\s-]/g,'')
+        .trim().replace(/\s+/g,'-').replace(/-+/g,'-')
+        .substring(0,60);
 }
 
 // ===== BÖLÜM GEÇİŞİ =====
@@ -859,10 +870,13 @@ async function openDetailPage(itemJsonStr) {
     currentSection = 'detail';
 
     // History'ye push et
+    // URL'de içerik adını güzel göster: #anime-naruto
+    const _typeSlug = (item.type || 'icerik').toLowerCase();
+    const _nameSlug = toSlug(item.name || item.nameEn || '');
     history.pushState(
-        { section: previousSection, discoverScrollY: discoverScrollPosition },
+        { section: previousSection, discoverScrollY: discoverScrollPosition, itemId: item.id },
         '',
-        '#detail-' + (item.id || '')
+        '#' + _typeSlug + '-' + _nameSlug
     );
 
     // Detay section'ı göster

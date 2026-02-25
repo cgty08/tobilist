@@ -417,25 +417,46 @@ async function handleLogout() {
 }
 
 
-// ===== DELETE ACCOUNT =====
+// ===== DELETE ACCOUNT (Kalıcı Silme) =====
 async function deleteAccount() {
     if (!currentUser) return;
-    if (!confirm('Hesabınızı silmek istediğinize emin misiniz? Bu işlem geri alınamaz!')) return;
+    if (!confirm('Hesabınızı KALICI olarak silmek istediğinize emin misiniz?\n\nBu işlem GERİ ALINAMAZ! Tüm verileriniz silinecek.')) return;
 
     try {
         if (window.supabaseClient) {
-            await window.supabaseClient.from('user_data').delete().eq('user_id', currentUser.uid);
+            const userId = currentUser.id || currentUser.uid;
+
+            // 1. Tüm kullanıcı verilerini sil
+            await window.supabaseClient.from('user_data').delete().eq('user_id', userId);
+            try { await window.supabaseClient.from('reviews').delete().eq('user_id', userId); } catch(e){}
+            try { await window.supabaseClient.from('comments').delete().eq('user_id', userId); } catch(e){}
+
+            // 2. Auth kullanıcısını RPC ile kalıcı sil
+            try {
+                await window.supabaseClient.rpc('delete_user');
+            } catch(rpcErr) {
+                console.warn('RPC delete_user hatası:', rpcErr);
+            }
+
+            // 3. localStorage tamizle
+            Object.keys(localStorage)
+                .filter(k => k.includes(userId) || k.includes('onilist'))
+                .forEach(k => localStorage.removeItem(k));
+
+            // 4. Oturumu kapat
             await window.supabaseClient.auth.signOut();
         }
+
         currentUser = null;
         isGuest = true;
         dataManager.data = dataManager.defaultData();
         dataManager.currentUserId = null;
         updateUIForGuest();
         switchSection('home');
-        showNotification('Hesap verileri silindi.', 'info');
+        showNotification('Hesabınız kalıcı olarak silindi.', 'info');
     } catch(e) {
-        showNotification('İşlem sırasında hata: ' + e.message, 'error');
+        console.error('Hesap silme hatası:', e);
+        showNotification('Hata oluştu: ' + e.message, 'error');
     }
 }
 
