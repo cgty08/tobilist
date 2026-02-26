@@ -37,9 +37,7 @@ function initializeApp() {
         changeLanguage();
     }
 
-    // Duyuruları kontrol et
     // Duyuru popup'ı devre dışı
-
     const hour = new Date().getHours();
     const greet = hour < 6 ? 'Gece yarısı 🌙' : hour < 12 ? 'Günaydın ☀️' : hour < 18 ? 'İyi günler 🌤️' : 'İyi akşamlar 🌙';
     const gEl = document.getElementById('bannerGreeting');
@@ -53,8 +51,7 @@ function initializeApp() {
     setupPWA();
     setupNetworkListeners();
 
-    const msg = isGuest ? '🎭 Keşfetmeye başlayın!' : '✅ Hoş geldiniz' + (currentUser?.displayName ? ', ' + currentUser.displayName : '') + '!';
-    showNotification(msg, 'success');
+    // Açılış popup'ı devre dışı
 }
 
 // ===== API İÇERİK YÜKLEME =====
@@ -647,11 +644,10 @@ function openDetailPageFromLibrary(itemId) {
 // =====================================================
 // DUYURU SİSTEMİ v2 - Güçlü & Güzel
 // =====================================================
+// Duyuru sistemi - admin panelden gönderilince otomatik çalışır
+// Kullanıcı giriş yaptıktan 5 saniye sonra yeni duyuruları kontrol eder
 async function checkAnnouncements() {
-    if (!window.supabaseClient) {
-        console.warn('Supabase yok, duyuru kontrol edilemiyor');
-        return;
-    }
+    if (!window.supabaseClient) return;
     try {
         const { data, error } = await window.supabaseClient
             .from('announcements')
@@ -659,10 +655,8 @@ async function checkAnnouncements() {
             .order('created_at', { ascending: false })
             .limit(10);
 
-        if (error) { console.warn('Duyuru hatası:', error.message); return; }
-        if (!data || data.length === 0) return;
+        if (error || !data || data.length === 0) return;
 
-        // String karşılaştırması (BIGSERIAL number vs stored string sorunu)
         let dismissed = [];
         try { dismissed = JSON.parse(localStorage.getItem('dismissed_announcements') || '[]'); } catch(e) {}
         const dismissedStr = dismissed.map(d => String(d));

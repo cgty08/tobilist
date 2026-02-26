@@ -32,8 +32,8 @@ const dataManager = {
         this.currentUserId = userId;
         if (!userId) { this.data = this.defaultData(); return; }
 
-        const localKey = 'tobilist_user_' + userId;
-        const backupKey = 'tobilist_backup_' + userId;
+        const localKey = 'onilist_user_' + userId;
+        const backupKey = 'onilist_backup_' + userId;
         if (remoteData) {
             this.data = this.deepMerge(this.defaultData(), remoteData);
             try {
@@ -55,8 +55,8 @@ const dataManager = {
         // Önce localStorage'a kaydet
         try {
             const s = JSON.stringify(this.data);
-            localStorage.setItem('tobilist_user_' + this.currentUserId, s);
-            localStorage.setItem('tobilist_backup_' + this.currentUserId, s);
+            localStorage.setItem('onilist_user_' + this.currentUserId, s);
+            localStorage.setItem('onilist_backup_' + this.currentUserId, s);
         } catch(e) {}
 
         // Sonra Supabase'e kaydet

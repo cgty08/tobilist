@@ -121,7 +121,7 @@ async function loginSuccess(user) {
     updateUIForLoggedIn();
     if (typeof initializeApp === 'function') initializeApp();
     hideLoadingScreen();
-    setTimeout(function() { if (typeof checkAnnouncements === 'function') checkAnnouncements(); }, 2500);
+    // Duyuru otomatik popup devre dışı - admin panelden gönderilince gösterilir
 }
 
 function guestMode() {
@@ -131,7 +131,7 @@ function guestMode() {
     updateUIForGuest();
     if (typeof initializeApp === 'function') initializeApp();
     hideLoadingScreen();
-    setTimeout(function() { if (typeof checkAnnouncements === 'function') checkAnnouncements(); }, 2500);
+    // Duyuru otomatik popup devre dışı - admin panelden gönderilince gösterilir
 }
 
 // ===== LOADING =====
@@ -666,3 +666,103 @@ window.addEventListener('beforeunload', () => {
 });
 
 console.log('✅ Auth v5.1 - Supabase loaded');
+
+
+// ===== ŞİFRE DEĞİŞTİRME (Ayarlar sayfası) =====
+function checkPasswordStrengthSettings(pw) {
+    const bar = document.getElementById('settingsPwStrengthBar');
+    const txt = document.getElementById('settingsPwStrengthText');
+    if (!bar || !txt) return;
+    let score = 0;
+    if (pw.length >= 8) score++;
+    if (/[A-Z]/.test(pw)) score++;
+    if (/[0-9]/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+    const colors = ['#ef4444','#f97316','#eab308','#22c55e'];
+    const labels = ['Zayıf 😟','Orta 😐','İyi 👍','Güçlü 💪'];
+    bar.style.width = (score * 25) + '%';
+    bar.style.background = colors[score-1] || '#ef4444';
+    txt.textContent = pw.length ? labels[score-1] || 'Zayıf' : '';
+    txt.style.color = colors[score-1] || '#ef4444';
+}
+
+async function changePasswordSettings() {
+    const currentPw = (document.getElementById('currentPassword')?.value || '').trim();
+    const newPw = (document.getElementById('newPassword')?.value || '').trim();
+    const confirmPw = (document.getElementById('confirmNewPassword')?.value || '').trim();
+    const errEl = document.getElementById('pwChangeError');
+    const sucEl = document.getElementById('pwChangeSuccess');
+    const btn = document.getElementById('pwChangeBtn');
+
+    if (errEl) errEl.style.display = 'none';
+    if (sucEl) sucEl.style.display = 'none';
+
+    if (!currentPw) { if (errEl) { errEl.textContent = '⚠️ Mevcut şifrenizi girin.'; errEl.style.display = 'block'; } return; }
+    if (!newPw || newPw.length < 8) { if (errEl) { errEl.textContent = '⚠️ Yeni şifre en az 8 karakter olmalıdır.'; errEl.style.display = 'block'; } return; }
+    if (newPw !== confirmPw) { if (errEl) { errEl.textContent = '⚠️ Yeni şifreler eşleşmiyor!'; errEl.style.display = 'block'; } return; }
+    if (currentPw === newPw) { if (errEl) { errEl.textContent = '⚠️ Yeni şifre mevcut şifreyle aynı olamaz.'; errEl.style.display = 'block'; } return; }
+
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Güncelleniyor...'; }
+
+    try {
+        if (!window.supabaseClient || !currentUser) throw new Error('Oturum bulunamadı.');
+
+        const { error: signInErr } = await window.supabaseClient.auth.signInWithPassword({
+            email: currentUser.email, password: currentPw
+        });
+        if (signInErr) throw new Error('Mevcut şifre yanlış!');
+
+        const { error: updateErr } = await window.supabaseClient.auth.updateUser({ password: newPw });
+        if (updateErr) throw updateErr;
+
+        if (sucEl) { sucEl.textContent = '✅ Şifreniz başarıyla güncellendi!'; sucEl.style.display = 'block'; }
+        ['currentPassword','newPassword','confirmNewPassword'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+        const bar = document.getElementById('settingsPwStrengthBar');
+        if (bar) bar.style.width = '0%';
+        if (btn) { btn.disabled = false; btn.textContent = '🔐 Şifreyi Güncelle'; }
+        setTimeout(() => { if (sucEl) sucEl.style.display = 'none'; }, 4000);
+    } catch(e) {
+        if (btn) { btn.disabled = false; btn.textContent = '🔐 Şifreyi Güncelle'; }
+        if (errEl) { errEl.textContent = '❌ ' + (e.message || 'Bir hata oluştu.'); errEl.style.display = 'block'; }
+    }
+}
+
+function togglePwVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; }
+    else { input.type = 'password'; btn.textContent = '👁'; }
+}
+
+// ===== ŞİFREMİ UNUTTUM - GELİŞMİŞ =====
+async function handleForgotPassword() {
+    if (!window.supabaseClient) { showError('forgotError', 'Sunucu bağlantısı kurulamadı.'); return; }
+
+    const emailEl = document.getElementById('forgotEmail');
+    const btn = document.querySelector('#modalForgotBox .auth-btn-primary');
+    if (!emailEl) return;
+
+    const email = emailEl.value.trim();
+    if (!email) { showError('forgotError', 'E-posta adresinizi girin!'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('forgotError', 'Geçerli bir e-posta adresi girin.'); return; }
+
+    clearAllErrors();
+    if (btn) { btn.disabled = true; btn.innerHTML = '<span class="btn-spinner"></span> Gönderiliyor...'; }
+
+    try {
+        const redirectUrl = window.location.origin + window.location.pathname + '?reset=1';
+        const { error } = await window.supabaseClient.auth.resetPasswordForEmail(email, { redirectTo: redirectUrl });
+        if (error && (error.message.includes('rate limit') || error.message.includes('Rate limit'))) {
+            throw new Error('Çok fazla deneme. Lütfen birkaç dakika bekleyin.');
+        }
+        const successEl = document.getElementById('forgotSuccess');
+        if (successEl) {
+            successEl.style.display = 'block';
+            successEl.innerHTML = '✅ <strong>' + email + '</strong> adresine sıfırlama linki gönderildi!<br><small style="opacity:0.8;">Gelmezse spam klasörünü kontrol edin. Link 1 saat geçerlidir.</small>';
+        }
+        if (btn) btn.style.display = 'none';
+    } catch(e) {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<span>Sıfırlama Linki Gönder</span>'; }
+        showError('forgotError', e.message || 'Bir hata oluştu.');
+    }
+}

@@ -1128,6 +1128,39 @@
                                 <span data-i18n="settingsNotifLabel">Push bildirimleri etkinleştir</span>
                             </label>
                         </div>
+                        
+                        <div class="chart-container" id="passwordChangeCard">
+                            <h3 class="chart-title">🔐 Şifre Değiştir</h3>
+                            <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:1.2rem;">Hesap güvenliğiniz için güçlü bir şifre kullanın.</p>
+                            <div style="margin-bottom:0.9rem;">
+                                <label style="display:block;font-size:0.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.4rem;">Mevcut Şifre</label>
+                                <div class="password-wrapper">
+                                    <input type="password" id="currentPassword" placeholder="••••••••" style="width:100%;padding:0.8rem 2.8rem 0.8rem 1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;font-size:0.9rem;font-family:DM Sans,sans-serif;outline:none;box-sizing:border-box;transition:border-color 0.2s;" onfocus="this.style.borderColor='rgba(255,51,102,0.7)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+                                    <button type="button" class="toggle-pw" onclick="togglePwVisibility('currentPassword',this)">👁</button>
+                                </div>
+                            </div>
+                            <div style="margin-bottom:0.9rem;">
+                                <label style="display:block;font-size:0.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.4rem;">Yeni Şifre</label>
+                                <div class="password-wrapper">
+                                    <input type="password" id="newPassword" placeholder="En az 8 karakter" style="width:100%;padding:0.8rem 2.8rem 0.8rem 1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;font-size:0.9rem;font-family:DM Sans,sans-serif;outline:none;box-sizing:border-box;transition:border-color 0.2s;" oninput="checkPasswordStrengthSettings(this.value)" onfocus="this.style.borderColor='rgba(255,51,102,0.7)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+                                    <button type="button" class="toggle-pw" onclick="togglePwVisibility('newPassword',this)">👁</button>
+                                </div>
+                                <div class="password-strength" style="margin-top:0.5rem;"><div class="strength-bar" id="settingsPwStrengthBar"></div></div>
+                                <div id="settingsPwStrengthText" style="font-size:0.73rem;margin-top:0.25rem;min-height:1rem;font-weight:600;"></div>
+                            </div>
+                            <div style="margin-bottom:1.2rem;">
+                                <label style="display:block;font-size:0.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.4rem;">Yeni Şifre (Tekrar)</label>
+                                <div class="password-wrapper">
+                                    <input type="password" id="confirmNewPassword" placeholder="Şifreyi tekrar girin" style="width:100%;padding:0.8rem 2.8rem 0.8rem 1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;font-size:0.9rem;font-family:DM Sans,sans-serif;outline:none;box-sizing:border-box;transition:border-color 0.2s;" onfocus="this.style.borderColor='rgba(255,51,102,0.7)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+                                    <button type="button" class="toggle-pw" onclick="togglePwVisibility('confirmNewPassword',this)">👁</button>
+                                </div>
+                            </div>
+                            <div id="pwChangeError" style="display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-left:3px solid #ef4444;color:#ef4444;padding:0.7rem 1rem;border-radius:8px;font-size:0.85rem;margin-bottom:1rem;"></div>
+                            <div id="pwChangeSuccess" style="display:none;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-left:3px solid #10b981;color:#10b981;padding:0.7rem 1rem;border-radius:8px;font-size:0.85rem;margin-bottom:1rem;"></div>
+                            <button onclick="changePasswordSettings()" id="pwChangeBtn" style="background:linear-gradient(135deg,#ff3366,#ff5580);color:#fff;border:none;border-radius:10px;padding:0.85rem 1.5rem;font-size:0.9rem;font-weight:700;cursor:pointer;font-family:DM Sans,sans-serif;width:100%;transition:all 0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+                                🔐 Şifreyi Güncelle
+                            </button>
+                        </div>
                         <div class="chart-container danger-zone">
                             <h3 class="chart-title" data-i18n="settingsDangerTitle">⚠️ Hesap İşlemleri</h3>
                             <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:1rem;">Bu işlemler geri alınamaz.</p>
