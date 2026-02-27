@@ -537,10 +537,19 @@
                                 <div class="chat-loading"><span class="chat-loading-dots"><span></span><span></span><span></span></span></div>
                             </div>
                             <div class="inline-chat-guest" id="inlineChatGuest" style="display:flex;">
-                                <span>Sohbete kat&#x131;lmak i&#xe7;in</span>
-                                <button onclick="openAuthModal('login')">Giri&#x15f; Yap</button>
-                                <span>veya</span>
-                                <button onclick="openAuthModal('register')">Kay&#x131;t Ol</button>
+                                <div class="icg-inner">
+                                    <div class="icg-avatars">
+                                        <span>&#x1F98A;</span><span>&#x1F409;</span><span>&#x2694;&#xFE0F;</span><span>&#x1F338;</span><span>&#x1F47E;</span>
+                                    </div>
+                                    <div class="icg-text">
+                                        <strong>Toplulu&#x11F;a Kat&#x131;l!</strong>
+                                        <p>Anime hakk&#x131;nda sohbet et, arkada&#x15F; edin</p>
+                                    </div>
+                                    <div class="icg-btns">
+                                        <button class="icg-btn-login" onclick="openAuthModal('login')">&#x1F511; Giri&#x15F; Yap</button>
+                                        <button class="icg-btn-register" onclick="openAuthModal('register')">&#x2728; &#xDC;cretsiz Kay&#x131;t</button>
+                                    </div>
+                                </div>
                             </div>
                             <div class="inline-chat-input-area" id="inlineChatInputArea" style="display:none;">
                                 <div class="inline-chat-input-row">

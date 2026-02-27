@@ -64,7 +64,7 @@ const OniChat = (function () {
             <div class="chat-input-area" id="chatInputArea">
                 <textarea
                     id="chatInput"
-                    placeholder="Bir şeyler yaz... (Enter = gönder)"
+                    placeholder="Bir şeyler yaz..."
                     rows="1"
                     maxlength="${MAX_LEN}"
                 ></textarea>
@@ -588,7 +588,8 @@ const InlineChat = (function () {
         if (!inputArea || !guest) return;
 
         if (isLoggedIn) {
-            inputArea.style.display = 'block';
+            inputArea.style.display = 'flex';
+            inputArea.style.flexDirection = 'column';
             guest.style.display = 'none';
             // Avatar güncelle
             const avatarEl = q('inlineChatMyAvatar');
@@ -600,6 +601,21 @@ const InlineChat = (function () {
             inputArea.style.display = 'none';
             guest.style.display = 'flex';
         }
+    }
+
+    // Sürekli auth durumunu kontrol eden polling (fallback)
+    let _authPollCount = 0;
+    function startAuthPolling() {
+        const poll = setInterval(() => {
+            _authPollCount++;
+            const u = window.currentUser;
+            const isLoggedIn = !!(u && (u.uid || u.id));
+            const inputArea = q('inlineChatInputArea');
+            if (isLoggedIn && inputArea && inputArea.style.display === 'none') {
+                updateAuthUI();
+            }
+            if (_authPollCount > 20) clearInterval(poll); // 10 saniye sonra dur
+        }, 500);
     }
 
     function bindEvents() {
@@ -623,9 +639,13 @@ const InlineChat = (function () {
         sendBtn.addEventListener('click', sendMessage);
 
         document.addEventListener('onilist:authChange', updateAuthUI);
-        setTimeout(updateAuthUI, 800);
+        // Fallback zamanlamaları - auth yavaş yüklenebilir
+        setTimeout(updateAuthUI, 500);
+        setTimeout(updateAuthUI, 1000);
         setTimeout(updateAuthUI, 2000);
-        setTimeout(updateAuthUI, 4000);
+        setTimeout(updateAuthUI, 3500);
+        setTimeout(updateAuthUI, 6000);
+        startAuthPolling();
     }
 
     function init() {
