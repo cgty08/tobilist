@@ -56,7 +56,7 @@ const OniChat = (function () {
             <div id="chatGuestPrompt" class="chat-guest-prompt" style="display:none;">
                 <div class="chat-guest-icon">🔐</div>
                 <h4>Sohbete Katıl</h4>
-                <p>Mesaj göndermek için giriş yapman gerekiyor. Okumak herkese ücretsiz!</p>
+                <p>Mesaj göndermek için giriş yapman gerekiyor. </p>
                 <button onclick="openAuthModal('login')">Giriş Yap →</button>
             </div>
 
@@ -125,8 +125,8 @@ const OniChat = (function () {
 
     // ── Render Mesaj ─────────────────────────────────────────
     function getMyUserId() {
-        // auth.js'deki currentUser veya window.currentUser
-        return (window.currentUser && window.currentUser.uid || window.currentUser.id) ? window.currentUser.uid || window.currentUser.id : null;
+        if (!window.currentUser) return null;
+        return window.currentUser.uid || window.currentUser.id || null;
     }
 
     function getDisplayName(row) {
@@ -354,7 +354,7 @@ const OniChat = (function () {
 
     // ── Auth durumuna göre input göster/gizle ────────────────
     function updateAuthUI() {
-        const isLoggedIn = !!(window.currentUser && window.currentUser.uid || window.currentUser.id);
+        const isLoggedIn = !!(window.currentUser && (window.currentUser.uid || window.currentUser.id));
         const inputArea   = q('chatInputArea');
         const guestPrompt = q('chatGuestPrompt');
         if (!inputArea || !guestPrompt) return;

@@ -363,6 +363,7 @@
         <div class="nav-item" onclick="showPage('content')"><span class="nav-icon">🎬</span> İçerik Listesi</div>
         <div class="nav-item" onclick="showPage('reviews')"><span class="nav-icon">💬</span> Yorumlar</div>
         <div class="nav-item" onclick="showPage('announcements')"><span class="nav-icon">📢</span> Duyurular</div>
+        <div class="nav-item" onclick="showPage('chat')"><span class="nav-icon">💬</span> Sohbet Mesajları <span class="nav-badge" id="chatMsgBadge" style="background:var(--pink);display:none;">0</span></div>
 
         <div class="sb-section">Sistem</div>
         <div class="nav-item" onclick="showPage('restrictions')"><span class="nav-icon">🛡️</span> Kısıtlamalar</div>
@@ -574,6 +575,33 @@
             <table><thead><tr><th>Kullanıcı</th><th>İçerik</th><th>Puan</th><th>Yorum</th><th>Tarih</th><th>İşlem</th></tr></thead>
             <tbody id="reviewsBody"><tr class="loading-td"><td colspan="6"><span class="spinner"></span>Yükleniyor…</td></tr></tbody></table>
             <div class="pagination"><div class="pag-info" id="reviewsPageInfo">—</div><div class="pag-btns" id="reviewsPageBtns"></div></div>
+        </div>
+    </div>
+
+    <!-- ===== CHAT MESSAGES ===== -->
+    <div class="page" id="page-chat">
+        <div class="table-card">
+            <div class="table-header">
+                <h3>💬 Topluluk Sohbet Mesajları</h3>
+                <button class="tbl-btn" onclick="loadChatMessages()" style="margin-left:auto;">🔄 Yenile</button>
+                <button class="tbl-btn" onclick="clearOldChatMessages()" style="background:rgba(239,68,68,.1);color:#ef4444;border-color:rgba(239,68,68,.3);margin-left:.5rem;">🗑️ Eskileri Temizle</button>
+            </div>
+            <div style="padding:.5rem 1rem;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border2);font-size:.78rem;color:var(--text2);">
+                Son 100 mesaj gösteriliyor. Silme işlemi geri alınamaz.
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kullanıcı</th>
+                        <th>Mesaj</th>
+                        <th>Tarih</th>
+                        <th>İşlem</th>
+                    </tr>
+                </thead>
+                <tbody id="chatMsgBody">
+                    <tr class="loading-td"><td colspan="4"><span class="spinner"></span>Yükleniyor…</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -908,6 +936,7 @@ const PAGE_META = {
     restrictions: { tr:['Kısıtlamalar','Platform kısıtlamalarını yönet'], en:['Restrictions','Manage platform restrictions'] },
     logs:         { tr:['Aktivite Logu','Sistem olay geçmişi'],     en:['Activity Log','System event history'] },
     settings:     { tr:['Ayarlar','Site yapılandırması'],           en:['Settings','Site configuration'] },
+    chat:         { tr:['Sohbet Mesajları','Topluluk chat geçmişi'], en:['Chat Messages','Community chat history'] },
 };
 
 function showPage(page) {
@@ -931,6 +960,7 @@ function showPage(page) {
         content: loadContent, reviews: loadReviews,
         announcements: loadAnnouncements, logs: loadLogs,
         restrictions: ()=>{}, settings: loadSettings,
+        chat: loadChatMessages,
     };
     loaders[page]?.();
 }
@@ -2069,6 +2099,74 @@ async function permanentDeleteUser(uid, name) {
 document.addEventListener('DOMContentLoaded', () => {
     setTimeout(applyAdminLang, 500);
 });
+
+// ===== CHAT MESSAGES =====
+async function loadChatMessages() {
+    const tbody = document.getElementById('chatMsgBody');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr class="loading-td"><td colspan="4"><span class="spinner"></span>Yükleniyor…</td></tr>';
+
+    const { data, error } = await sb
+        .from('chat_messages')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(100);
+
+    if (error) {
+        tbody.innerHTML = `<tr><td colspan="4" style="color:var(--red);padding:1rem;">Hata: ${esc(error.message)}</td></tr>`;
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--text3);">Henüz mesaj yok</td></tr>';
+        return;
+    }
+
+    // Badge güncelle
+    const badge = document.getElementById('chatMsgBadge');
+    if (badge) { badge.textContent = data.length; badge.style.display = 'inline-flex'; }
+
+    tbody.innerHTML = data.map(msg => {
+        const date = new Date(msg.created_at).toLocaleString('tr-TR');
+        const avatar = msg.avatar || '👤';
+        const name = esc(msg.display_name || 'Kullanıcı');
+        const email = esc(msg.email || '—');
+        const content = esc(msg.content || '');
+        const uid = esc(msg.user_id || '');
+        return `<tr>
+            <td>
+                <div style="display:flex;align-items:center;gap:.6rem;">
+                    <span style="font-size:1.1rem;">${avatar}</span>
+                    <div>
+                        <div style="font-weight:600;font-size:.85rem;">${name}</div>
+                        <div style="font-size:.73rem;color:var(--text3);">${email}</div>
+                    </div>
+                </div>
+            </td>
+            <td style="max-width:400px;word-break:break-word;font-size:.85rem;">${content}</td>
+            <td style="font-size:.78rem;color:var(--text2);white-space:nowrap;">${date}</td>
+            <td>
+                <button onclick="deleteChatMsg('${esc(msg.id)}')" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#ef4444;border-radius:6px;padding:.3rem .7rem;cursor:pointer;font-size:.78rem;">🗑️ Sil</button>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+async function deleteChatMsg(id) {
+    if (!confirm('Bu mesajı silmek istediğine emin misin?')) return;
+    const { error } = await sb.from('chat_messages').delete().eq('id', id);
+    if (error) { alert('Hata: ' + error.message); return; }
+    loadChatMessages();
+}
+
+async function clearOldChatMessages() {
+    if (!confirm('7 günden eski tüm mesajları silmek istediğine emin misin?')) return;
+    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const { error } = await sb.from('chat_messages').delete().lt('created_at', weekAgo);
+    if (error) { alert('Hata: ' + error.message); return; }
+    alert('Eski mesajlar temizlendi!');
+    loadChatMessages();
+}
 
 </script>
 </body>
