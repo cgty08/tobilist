@@ -525,6 +525,34 @@
                         </div>
                     </div>
 
+
+                    <!-- COMMUNITY CHAT -->
+                    <div class="inline-chat-section">
+                        <div class="inline-chat-box">
+                            <div class="inline-chat-header">
+                                <span class="inline-chat-title">&#x1F4AC; Canl&#x131; Topluluk Sohbeti</span>
+                                <span class="inline-chat-online"><span class="chat-online-dot"></span> Canl&#x131;</span>
+                            </div>
+                            <div class="inline-chat-messages" id="inlineChatMessages">
+                                <div class="chat-loading"><span class="chat-loading-dots"><span></span><span></span><span></span></span></div>
+                            </div>
+                            <div class="inline-chat-guest" id="inlineChatGuest" style="display:none;">
+                                <span>Sohbete kat&#x131;lmak i&#xe7;in</span>
+                                <button onclick="openAuthModal('login')">Giri&#x15f; Yap</button>
+                                <span>veya</span>
+                                <button onclick="openAuthModal('register')">Kay&#x131;t Ol</button>
+                            </div>
+                            <div class="inline-chat-input-area" id="inlineChatInputArea" style="display:none;">
+                                <div class="inline-chat-input-row">
+                                    <span class="inline-chat-my-avatar" id="inlineChatMyAvatar">&#x1F464;</span>
+                                    <textarea id="inlineChatInput" placeholder="Bir &#x15f;eyler yaz... (Enter = g&#xf6;nder)" rows="1" maxlength="300"></textarea>
+                                    <button id="inlineChatSendBtn" disabled>&#x27A4;</button>
+                                </div>
+                                <div class="inline-chat-hint">Enter ile g&#xf6;nder &middot; Shift+Enter yeni sat&#x131;r &middot; Max 300 karakter</div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- PLATFORM LIVE STATS (canlı istatistik) -->
                     <div class="platform-stats-bar" id="platformStatsBar">
                         <div class="psb-item">
@@ -759,34 +787,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- INLINE COMMUNITY CHAT -->
-                    <div class="inline-chat-section">
-                        <div class="community-header">
-                            <h3 class="features-title">&#x1F4AC; <span class="gradient-text">Canl&#x131; Sohbet</span></h3>
-                            <p class="features-sub">Toplulukla ger&#xe7;ek zamanl&#x131; konu&#x15f;</p>
-                        </div>
-                        <div class="inline-chat-box">
-                            <div class="inline-chat-messages" id="inlineChatMessages">
-                                <div class="chat-loading"><span class="chat-loading-dots"><span></span><span></span><span></span></span></div>
-                            </div>
-                            <div class="inline-chat-guest" id="inlineChatGuest" style="display:none;">
-                                <span>Sohbete kat&#x131;lmak i&#xe7;in</span>
-                                <button onclick="openAuthModal('login')">Giri&#x15f; Yap</button>
-                                <span>veya</span>
-                                <button onclick="openAuthModal('register')">Kay&#x131;t Ol</button>
-                            </div>
-                            <div class="inline-chat-input-area" id="inlineChatInputArea" style="display:none;">
-                                <div class="inline-chat-input-row">
-                                    <span class="inline-chat-my-avatar" id="inlineChatMyAvatar">&#x1F464;</span>
-                                    <textarea id="inlineChatInput" placeholder="Bir &#x15f;eyler yaz... (Enter = g&#xf6;nder)" rows="1" maxlength="300"></textarea>
-                                    <button id="inlineChatSendBtn" disabled>&#x27A4;</button>
-                                </div>
-                                <div class="inline-chat-hint">Enter ile g&#xf6;nder &middot; Shift+Enter yeni sat&#x131;r &middot; Max 300 karakter</div>
-                            </div>
-                        </div>
-                    </div>
-
                                         <!-- FOOTER -->
                     <div class="site-footer">
                         <div class="footer-logo">

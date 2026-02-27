@@ -125,8 +125,9 @@ const OniChat = (function () {
 
     // ── Render Mesaj ─────────────────────────────────────────
     function getMyUserId() {
-        // auth.js'deki currentUser veya window.currentUser
-        return (window.currentUser && window.currentUser.id) ? window.currentUser.id : null;
+        const u = window.currentUser;
+        if (!u) return null;
+        return u.uid || u.id || null;
     }
 
     function getDisplayName(row) {
@@ -354,7 +355,7 @@ const OniChat = (function () {
 
     // ── Auth durumuna göre input göster/gizle ────────────────
     function updateAuthUI() {
-        const isLoggedIn = !!(window.currentUser && window.currentUser.id);
+        const isLoggedIn = !!(window.currentUser && (window.currentUser.uid || window.currentUser.id));
         const inputArea   = q('chatInputArea');
         const guestPrompt = q('chatGuestPrompt');
         if (!inputArea || !guestPrompt) return;
@@ -481,7 +482,7 @@ const InlineChat = (function () {
         const myId = getMyUserId();
         const isOwn = myId && row.user_id === myId;
         const avatar = row.avatar || '👤';
-        const name = escapeHTML(row.display_name || row.email?.split('@')[0] || 'Kullanıcı');
+        const name = escapeHTML(row.display_name || 'Kullanıcı');
         const text = escapeHTML(row.content || '');
         const time = formatTime(row.created_at);
 

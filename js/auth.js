@@ -78,9 +78,11 @@ async function initSupabaseSession() {
 async function loginSuccess(user) {
     currentUser = {
         uid: user.id,
+        id: user.id,
         displayName: user.user_metadata?.username || user.email.split('@')[0],
         email: user.email
     };
+    window.currentUser = currentUser;
     isGuest = false;
 
     // Önce localStorage'dan yükle (anında, kayıp riski yok)
@@ -121,11 +123,13 @@ async function loginSuccess(user) {
     updateUIForLoggedIn();
     if (typeof initializeApp === 'function') initializeApp();
     hideLoadingScreen();
+    document.dispatchEvent(new Event('onilist:authChange'));
     // Duyuru otomatik popup devre dışı - admin panelden gönderilince gösterilir
 }
 
 function guestMode() {
     currentUser = null;
+    window.currentUser = null;
     isGuest = true;
     dataManager.data = dataManager.defaultData();
     updateUIForGuest();
