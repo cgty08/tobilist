@@ -121,6 +121,8 @@ async function loginSuccess(user) {
     updateUIForLoggedIn();
     if (typeof initializeApp === 'function') initializeApp();
     hideLoadingScreen();
+    // ✅ Chat UI'yi güncelle (giriş yapıldı)
+    document.dispatchEvent(new Event('onilist:authChange'));
     // Duyuru otomatik popup devre dışı - admin panelden gönderilince gösterilir
 }
 
@@ -131,6 +133,8 @@ function guestMode() {
     updateUIForGuest();
     if (typeof initializeApp === 'function') initializeApp();
     hideLoadingScreen();
+    // ✅ Chat UI'yi güncelle (misafir mod)
+    document.dispatchEvent(new Event('onilist:authChange'));
     // Duyuru otomatik popup devre dışı - admin panelden gönderilince gösterilir
 }
 
