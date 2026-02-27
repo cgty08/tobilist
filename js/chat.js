@@ -322,20 +322,30 @@ const OniChat = (function () {
             return;
         }
 
-        const { error } = await window.supabaseClient
-            .from(TABLE)
-            .insert({
-                user_id: user.id,
-                display_name: displayName,
-                avatar: avatar,
-                avatar_url: avatarUrl,
-                email: user.email,
-                content: text
-            });
-
-        if (error) {
-            console.warn('Chat send error:', error.message);
-            showSystemMsg('⚠️ Mesaj gönderilemedi: ' + error.message);
+        // Önce temel kolonlarla dene, hata olursa daha az kolonla tekrar dene
+        let insertData = {
+            user_id: user.id,
+            display_name: displayName,
+            avatar: avatar,
+            content: text
+        };
+        // email ve avatar_url kolonları varsa ekle (olmayan kolonlar hataya yol açar)
+        try {
+            const { error } = await window.supabaseClient
+                .from(TABLE)
+                .insert({ ...insertData, email: user.email, avatar_url: avatarUrl });
+            if (error) {
+                // Kolon yoksa temel insert dene
+                if (error.code === '42703' || error.message?.includes('column')) {
+                    const { error: err2 } = await window.supabaseClient
+                        .from(TABLE).insert(insertData);
+                    if (err2) showSystemMsg('⚠️ Mesaj gönderilemedi: ' + err2.message);
+                } else {
+                    showSystemMsg('⚠️ Mesaj gönderilemedi: ' + error.message);
+                }
+            }
+        } catch(e) {
+            console.warn('Chat send error:', e.message);
         }
 
         setTimeout(() => { q('chatSendBtn').disabled = false; }, 800);
@@ -584,13 +594,21 @@ const InlineChat = (function () {
         });
 
         if (window.supabaseClient) {
-            await window.supabaseClient.from(TABLE).insert({
-                user_id: user.uid || user.id,
-                display_name: displayName,
-                avatar: avatar,
-                avatar_url: avatarUrl,
-                content: text
-            });
+            const uid = user.uid || user.id;
+            const insertData = { user_id: uid, display_name: displayName, avatar: avatar, content: text };
+            try {
+                const { error } = await window.supabaseClient.from(TABLE)
+                    .insert({ ...insertData, avatar_url: avatarUrl });
+                if (error) {
+                    // avatar_url kolonu yoksa temel insert dene
+                    if (error.code === '42703' || error.message?.includes('column')) {
+                        const { error: err2 } = await window.supabaseClient.from(TABLE).insert(insertData);
+                        if (err2) console.warn('Chat insert error:', err2.message);
+                    } else {
+                        console.warn('Chat insert error:', error.message);
+                    }
+                }
+            } catch(e) { console.warn('Chat error:', e.message); }
         }
 
         setTimeout(() => { if (sendBtn) sendBtn.disabled = false; }, 800);

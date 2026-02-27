@@ -585,6 +585,7 @@
                 <h3>💬 Topluluk Sohbet Mesajları</h3>
                 <input class="search-inp" type="text" id="chatSearch" placeholder="🔍 Kullanıcı adıyla ara…" oninput="filterChatMessages()" style="margin-left:auto;">
                 <button class="tbl-btn" onclick="loadChatMessages()" style="margin-left:.5rem;">🔄 Yenile</button>
+                <button class="tbl-btn" onclick="showChatRLSGuide()" title="Silme çalışmıyorsa tıkla" style="margin-left:.5rem;">🔧 RLS</button>
                 <button class="tbl-btn" onclick="clearOldChatMessages()" style="background:rgba(239,68,68,.1);color:#ef4444;border-color:rgba(239,68,68,.3);margin-left:.5rem;">🗑️ Eskileri Temizle</button>
             </div>
             <div style="padding:.5rem 1rem;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border2);font-size:.78rem;color:var(--text2);">
@@ -2181,19 +2182,81 @@ async function loadChatMessages() {
 async function deleteChatMsg(id) {
     if (!confirm('Bu mesajı silmek istediğine emin misin?')) return;
     try {
+        // Yöntem 1: Doğrudan DELETE
         const { error } = await sb.from('chat_messages').delete().eq('id', id);
-        if (error) {
-            console.error('Delete error:', error);
-            alert('Silme hatası: ' + error.message + '\n\nNot: Supabase RLS politikası engel olabilir. chat_messages tablosunda admin silme yetkisini kontrol et.');
+        if (!error) {
+            allChatData = allChatData.filter(m => String(m.id) !== String(id));
+            filterChatMessages();
+            toast('🗑 Mesaj silindi', 'info');
             return;
         }
-        // Yerel listeden de kaldır
-        allChatData = allChatData.filter(m => String(m.id) !== String(id));
-        filterChatMessages();
-        toast('🗑 Mesaj silindi', 'info');
+
+        // Yöntem 2: RPC ile sil (admin_delete_chat_message fonksiyonu varsa)
+        if (error.code === '42501' || error.message?.includes('policy') || error.message?.includes('permission')) {
+            const { error: rpcErr } = await sb.rpc('admin_delete_chat_message', { msg_id: id });
+            if (!rpcErr) {
+                allChatData = allChatData.filter(m => String(m.id) !== String(id));
+                filterChatMessages();
+                toast('🗑 Mesaj silindi', 'info');
+                return;
+            }
+        }
+
+        // Yöntem 3: Soft delete - içeriği temizle (RLS bypass)
+        const { error: updateErr } = await sb.from('chat_messages')
+            .update({ content: '[Mesaj silindi]', display_name: '—', avatar: '🗑️' })
+            .eq('id', id);
+        if (!updateErr) {
+            allChatData = allChatData.filter(m => String(m.id) !== String(id));
+            filterChatMessages();
+            toast('🗑 Mesaj kaldırıldı', 'info');
+            return;
+        }
+
+        // Hiçbiri çalışmadı - Supabase'de politika eksik
+        const sqlPolicy = `-- Supabase SQL Editor'de bu komutu çalıştır:\n` +
+            `CREATE POLICY "admin_delete_chat" ON chat_messages\n` +
+            `FOR DELETE USING (auth.email() = 'list086@gmail.com');`;
+        console.error('RLS politikası eksik. Çözüm:\n' + sqlPolicy);
+        alert('Silme yetkisi yok!\n\nSupabase Dashboard > SQL Editor > Yeni Query:\n\n' +
+            'CREATE POLICY "admin_delete_chat"\nON chat_messages FOR DELETE\n' +
+            'USING (auth.email() = \'list086@gmail.com\');\n\n' +
+            'Bu komutu çalıştırınca silme çalışacak.');
     } catch(e) {
         alert('Beklenmeyen hata: ' + e.message);
     }
+}
+
+
+// ===== CHAT RLS GUIDE =====
+function showChatRLSGuide() {
+    var sql = '-- Supabase SQL Editor\'de bu uc komutu calistir:\n\n' +
+        '-- 1) Admin mesaj silebilsin:\n' +
+        'CREATE POLICY "admin_can_delete_chat"\n' +
+        'ON public.chat_messages FOR DELETE\n' +
+        'USING (auth.email() = \'list086@gmail.com\');\n\n' +
+        '-- 2) avatar_url kolonu yoksa ekle:\n' +
+        'ALTER TABLE public.chat_messages\n' +
+        'ADD COLUMN IF NOT EXISTS avatar_url TEXT DEFAULT \'\';\n\n' +
+        '-- 3) email kolonu yoksa ekle:\n' +
+        'ALTER TABLE public.chat_messages\n' +
+        'ADD COLUMN IF NOT EXISTS email TEXT DEFAULT \'\';';
+
+    var modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:1rem;';
+    modal.innerHTML = '<div style="background:#111318;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:1.5rem;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">' +
+        '<h3 style="color:#fff;font-size:1rem;">🔧 Supabase RLS Politikasi Kur</h3>' +
+        '<button onclick="this.closest(\'div[style]\').parentElement.remove()" style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:7px;color:#8892a4;padding:.3rem .6rem;cursor:pointer;font-size:.8rem;">✕ Kapat</button>' +
+        '</div>' +
+        '<p style="color:#8892a4;font-size:.82rem;margin-bottom:1rem;">Supabase Dashboard &rarr; SQL Editor &rarr; New Query &rarr; Asagidaki kodu yapistir ve Calistir:</p>' +
+        '<pre id="rlsSqlPre" style="background:#0d1117;border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:1rem;font-size:.78rem;color:#10b981;overflow-x:auto;white-space:pre-wrap;"></pre>' +
+        '<button onclick="navigator.clipboard.writeText(document.getElementById(\'rlsSqlPre\').textContent).then(function(){this.textContent=\'✅ Kopyalandi!\';}.bind(this))" style="margin-top:1rem;background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:#10b981;border-radius:8px;padding:.5rem 1rem;cursor:pointer;font-size:.83rem;font-family:inherit;">📋 SQLi Kopyala</button>' +
+        '<p style="color:#f59e0b;font-size:.78rem;margin-top:.8rem;">Bu SQLi calistirdiktan sonra silme ve yazma sorunlari cozulecek.</p>' +
+        '</div>';
+    document.body.appendChild(modal);
+    document.getElementById('rlsSqlPre').textContent = sql;
+    modal.addEventListener('click', function(e) { if(e.target === modal) modal.remove(); });
 }
 
 async function clearOldChatMessages() {
