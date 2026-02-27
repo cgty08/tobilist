@@ -32,7 +32,7 @@ const OniChat = (function () {
         <div id="chatWindow" role="dialog" aria-label="Topluluk Sohbeti">
             <!-- Header -->
             <div class="chat-header">
-                <span class="chat-header-icon"></span>
+                <span class="chat-header-icon">🌍</span>
                 <div class="chat-header-info">
                     <div class="chat-header-title">Topluluk Sohbeti</div>
                     <div class="chat-header-sub">
@@ -56,7 +56,7 @@ const OniChat = (function () {
             <div id="chatGuestPrompt" class="chat-guest-prompt" style="display:none;">
                 <div class="chat-guest-icon">🔐</div>
                 <h4>Sohbete Katıl</h4>
-                <p>Mesaj göndermek için giriş yapman gerekiyor.</p>
+                <p>Mesaj göndermek için giriş yapman gerekiyor. Okumak herkese ücretsiz!</p>
                 <button onclick="openAuthModal('login')">Giriş Yap →</button>
             </div>
 
@@ -126,7 +126,7 @@ const OniChat = (function () {
     // ── Render Mesaj ─────────────────────────────────────────
     function getMyUserId() {
         // auth.js'deki currentUser veya window.currentUser
-        return (window.currentUser && window.currentUser.id) ? window.currentUser.id : null;
+        return (window.currentUser && window.currentUser.uid || window.currentUser.id) ? window.currentUser.uid || window.currentUser.id : null;
     }
 
     function getDisplayName(row) {
@@ -305,7 +305,7 @@ const OniChat = (function () {
         // Optimistic render (anında göster)
         const optimistic = {
             id: 'opt_' + now,
-            user_id: user.id,
+            user_id: user.uid || user.id,
             display_name: displayName,
             avatar: avatar,
             email: user.email,
@@ -323,7 +323,7 @@ const OniChat = (function () {
         const { error } = await window.supabaseClient
             .from(TABLE)
             .insert({
-                user_id: user.id,
+                user_id: user.uid || user.id,
                 display_name: displayName,
                 avatar: avatar,
                 email: user.email,
@@ -354,7 +354,7 @@ const OniChat = (function () {
 
     // ── Auth durumuna göre input göster/gizle ────────────────
     function updateAuthUI() {
-        const isLoggedIn = !!(window.currentUser && window.currentUser.id);
+        const isLoggedIn = !!(window.currentUser && window.currentUser.uid || window.currentUser.id);
         const inputArea   = q('chatInputArea');
         const guestPrompt = q('chatGuestPrompt');
         if (!inputArea || !guestPrompt) return;
