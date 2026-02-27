@@ -78,9 +78,11 @@ async function initSupabaseSession() {
 async function loginSuccess(user) {
     currentUser = {
         uid: user.id,
+        id: user.id,
         displayName: user.user_metadata?.username || user.email.split('@')[0],
         email: user.email
     };
+    window.currentUser = currentUser; // Chat icin global
     isGuest = false;
 
     // Önce localStorage'dan yükle (anında, kayıp riski yok)
@@ -121,20 +123,17 @@ async function loginSuccess(user) {
     updateUIForLoggedIn();
     if (typeof initializeApp === 'function') initializeApp();
     hideLoadingScreen();
-    // ✅ Chat UI'yi güncelle (giriş yapıldı)
-    document.dispatchEvent(new Event('onilist:authChange'));
     // Duyuru otomatik popup devre dışı - admin panelden gönderilince gösterilir
 }
 
 function guestMode() {
     currentUser = null;
+    window.currentUser = null; // Chat icin global temizle
     isGuest = true;
     dataManager.data = dataManager.defaultData();
     updateUIForGuest();
     if (typeof initializeApp === 'function') initializeApp();
     hideLoadingScreen();
-    // ✅ Chat UI'yi güncelle (misafir mod)
-    document.dispatchEvent(new Event('onilist:authChange'));
     // Duyuru otomatik popup devre dışı - admin panelden gönderilince gösterilir
 }
 
