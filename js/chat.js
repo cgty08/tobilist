@@ -23,7 +23,7 @@ const OniChat = (function () {
         const el = document.createElement('div');
         el.innerHTML = `
         <!-- Floating Button -->
-        <button id="chatToggleBtn" title="Topluluk Sohbeti" aria-label="Sohbeti Aç">
+        <button id="chatToggleBtn" title="Topluluk Sohbeti" aria-label="Sohbeti Aç" style="display:none!important">
             💬
             <span id="chatBadge"></span>
         </button>
@@ -298,10 +298,10 @@ const OniChat = (function () {
         q('chatSendBtn').disabled = true;
 
         const userData = window.dataManager && window.dataManager.data;
-        const displayName = (userData && userData.social && userData.social.name)
-            ? userData.social.name
-            : (user.email ? user.email.split('@')[0] : 'Kullanıcı');
-        const avatar = (userData && userData.social && userData.social.avatar) || '👤';
+        const social = (userData && userData.social) || {};
+        const displayName = social.name || (user.email ? user.email.split('@')[0] : 'Kullanıcı');
+        const avatar = social.avatar || '👤';
+        const avatarUrl = social.avatarUrl || '';
 
         // Optimistic render (anında göster)
         const optimistic = {
@@ -309,6 +309,7 @@ const OniChat = (function () {
             user_id: user.id,
             display_name: displayName,
             avatar: avatar,
+            avatar_url: avatarUrl,
             email: user.email,
             content: text,
             created_at: new Date().toISOString()
@@ -327,6 +328,7 @@ const OniChat = (function () {
                 user_id: user.id,
                 display_name: displayName,
                 avatar: avatar,
+                avatar_url: avatarUrl,
                 email: user.email,
                 content: text
             });
