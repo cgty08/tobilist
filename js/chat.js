@@ -56,7 +56,7 @@ const OniChat = (function () {
             <div id="chatGuestPrompt" class="chat-guest-prompt" style="display:none;">
                 <div class="chat-guest-icon">🔐</div>
                 <h4>Sohbete Katıl</h4>
-                <p>Mesaj göndermek için giriş yapman gerekiyor. </p>
+                <p>Mesaj göndermek için giriş yapman gerekiyor. Okumak herkese ücretsiz!</p>
                 <button onclick="openAuthModal('login')">Giriş Yap →</button>
             </div>
 
@@ -125,8 +125,9 @@ const OniChat = (function () {
 
     // ── Render Mesaj ─────────────────────────────────────────
     function getMyUserId() {
-        if (!window.currentUser) return null;
-        return window.currentUser.uid || window.currentUser.id || null;
+        const u = window.currentUser;
+        if (!u) return null;
+        return u.uid || u.id || null;
     }
 
     function getDisplayName(row) {
@@ -354,7 +355,9 @@ const OniChat = (function () {
 
     // ── Auth durumuna göre input göster/gizle ────────────────
     function updateAuthUI() {
-        const isLoggedIn = !!(window.currentUser && (window.currentUser.uid || window.currentUser.id));
+        // auth.js currentUser.uid kullanıyor (id değil)
+        const u = window.currentUser;
+        const isLoggedIn = !!(u && (u.uid || u.id));
         const inputArea   = q('chatInputArea');
         const guestPrompt = q('chatGuestPrompt');
         if (!inputArea || !guestPrompt) return;
@@ -396,8 +399,10 @@ const OniChat = (function () {
 
         // Auth değişikliklerini dinle (auth.js'den tetiklenir)
         document.addEventListener('onilist:authChange', updateAuthUI);
-        // Fallback: 1 saniye sonra kontrol et
-        setTimeout(updateAuthUI, 1200);
+        // Fallback: birkaç kez kontrol et (auth geç gelebilir)
+        setTimeout(updateAuthUI, 800);
+        setTimeout(updateAuthUI, 2000);
+        setTimeout(updateAuthUI, 4000);
     }
 
     // ── Init ─────────────────────────────────────────────────
