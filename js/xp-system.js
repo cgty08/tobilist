@@ -1,4 +1,4 @@
-// XP SYSTEM v3.0 - TobiList Kapsamlı Level & Unvan Sistemi
+// XP SYSTEM v3.0 - OniList Kapsamlı Level & Unvan Sistemi
 
 // ===== XP ÖDÜLLERI =====
 // Tasarım prensibi: İçerik eklemek az ödül, kaliteli etkileşimler daha fazla ödül

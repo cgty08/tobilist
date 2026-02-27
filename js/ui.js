@@ -30,7 +30,7 @@ const translations = {
         planToWatchStatCard: 'İzlenecek', onHoldStatCard: 'Beklemede',
         avgRatingCard: 'Ort. Puan', streakCard: 'Streak',
         // FEATURES
-        featuresTitle: 'Neden', featuresTitleSpan: 'TobiList?',
+        featuresTitle: 'Neden', featuresTitleSpan: 'OniList?',
         featuresSub: 'Anime takibini bir üst seviyeye taşıyan özellikler',
         feat1Title: 'AI Öneri Motoru',
         feat1Desc: 'İzleme alışkanlıklarını analiz ederek sana özel anime ve manga önerileri üretir.',
@@ -67,7 +67,7 @@ const translations = {
         sortRecent: 'En Yeni', sortName: 'İsim (A-Z)', sortRating: 'Puan', sortProgress: 'İlerleme',
         // COMMUNITY
         commTitle: '🌍', commTitleSpan: 'Topluluk',
-        commSub: 'TobiList büyüyor — seninle büyüyor',
+        commSub: 'OniList büyüyor — seninle büyüyor',
         leaderboardTitle: '🏆 XP Liderler', leaderboardLoading: 'Yükleniyor...',
         leaderboardProfileBtn: 'Profilini Gör →',
         platformStatsTitle: '📈 Platform İstatistikleri',
@@ -238,7 +238,7 @@ const translations = {
         planToWatchStatCard: 'Plan to Watch', onHoldStatCard: 'On Hold',
         avgRatingCard: 'Avg Rating', streakCard: 'Streak',
         // FEATURES
-        featuresTitle: 'Why', featuresTitleSpan: 'TobiList?',
+        featuresTitle: 'Why', featuresTitleSpan: 'OniList?',
         featuresSub: 'Features that take your anime tracking to the next level',
         feat1Title: 'AI Recommendation Engine',
         feat1Desc: 'Analyzes your watching habits to generate personalized anime and manga picks.',
@@ -275,7 +275,7 @@ const translations = {
         sortRecent: 'Newest', sortName: 'Name (A-Z)', sortRating: 'Rating', sortProgress: 'Progress',
         // COMMUNITY
         commTitle: '🌍', commTitleSpan: 'Community',
-        commSub: 'TobiList is growing — growing with you',
+        commSub: 'OniList is growing — growing with you',
         leaderboardTitle: '🏆 XP Leaders', leaderboardLoading: 'Loading...',
         leaderboardProfileBtn: 'View Profile →',
         platformStatsTitle: '📈 Platform Statistics',
@@ -2114,8 +2114,8 @@ function shareToTwitter() {
     if (!dataManager.data) return;
     const count = dataManager.data.items.length;
     const text = _lang==='en'
-        ? `Tracking ${count} titles on TobiList! 🎌\n#TobiList #Anime`
-        : `TobiList'te ${count} içerik takip ediyorum! 🎌\n#TobiList #Anime`;
+        ? `Tracking ${count} titles on OniList! 🎌\n#OniList #Anime`
+        : `OniList'te ${count} içerik takip ediyorum! 🎌\n#OniList #Anime`;
     window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text), '_blank');
 }
 
@@ -2134,7 +2134,7 @@ function exportData(format) {
     const url     = URL.createObjectURL(blob);
     const a       = document.createElement('a');
     a.href = url;
-    a.download = 'tobilist-' + Date.now() + '.' + format;
+    a.download = 'onilist-' + Date.now() + '.' + format;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
