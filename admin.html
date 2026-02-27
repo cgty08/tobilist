@@ -583,7 +583,8 @@
         <div class="table-card">
             <div class="table-header">
                 <h3>💬 Topluluk Sohbet Mesajları</h3>
-                <button class="tbl-btn" onclick="loadChatMessages()" style="margin-left:auto;">🔄 Yenile</button>
+                <input class="search-inp" type="text" id="chatSearch" placeholder="🔍 Kullanıcı adıyla ara…" oninput="filterChatMessages()" style="margin-left:auto;">
+                <button class="tbl-btn" onclick="loadChatMessages()" style="margin-left:.5rem;">🔄 Yenile</button>
                 <button class="tbl-btn" onclick="clearOldChatMessages()" style="background:rgba(239,68,68,.1);color:#ef4444;border-color:rgba(239,68,68,.3);margin-left:.5rem;">🗑️ Eskileri Temizle</button>
             </div>
             <div style="padding:.5rem 1rem;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border2);font-size:.78rem;color:var(--text2);">
@@ -2101,6 +2102,51 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ===== CHAT MESSAGES =====
+let allChatData = [];
+
+function renderChatRow(msg) {
+    const date = new Date(msg.created_at).toLocaleString('tr-TR');
+    const avatarUrl = msg.avatar_url || '';
+    const avatarEmoji = msg.avatar || '👤';
+    const avatarHtml = avatarUrl
+        ? `<img src="${avatarUrl}" alt="" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
+        : `<span style="font-size:1.3rem;line-height:1;">${esc(avatarEmoji)}</span>`;
+    const name = esc(msg.display_name || 'Kullanıcı');
+    const email = esc(msg.email || '—');
+    const content = esc(msg.content || '');
+    const msgId = String(msg.id || '');
+    return `<tr>
+        <td>
+            <div style="display:flex;align-items:center;gap:.6rem;">
+                ${avatarHtml}
+                <div>
+                    <div style="font-weight:600;font-size:.85rem;">${name}</div>
+                    <div style="font-size:.73rem;color:var(--text3);">${email}</div>
+                </div>
+            </div>
+        </td>
+        <td style="max-width:400px;word-break:break-word;font-size:.85rem;">${content}</td>
+        <td style="font-size:.78rem;color:var(--text2);white-space:nowrap;">${date}</td>
+        <td>
+            <button onclick="deleteChatMsg('${msgId}')" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#ef4444;border-radius:6px;padding:.3rem .7rem;cursor:pointer;font-size:.78rem;">🗑️ Sil</button>
+        </td>
+    </tr>`;
+}
+
+function filterChatMessages() {
+    const q = (document.getElementById('chatSearch')?.value || '').toLowerCase().trim();
+    const filtered = q
+        ? allChatData.filter(m => (m.display_name||'').toLowerCase().includes(q) || (m.email||'').toLowerCase().includes(q))
+        : allChatData;
+    const tbody = document.getElementById('chatMsgBody');
+    if (!tbody) return;
+    if (!filtered.length) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--text3);">Sonuç bulunamadı</td></tr>';
+        return;
+    }
+    tbody.innerHTML = filtered.map(renderChatRow).join('');
+}
+
 async function loadChatMessages() {
     const tbody = document.getElementById('chatMsgBody');
     if (!tbody) return;
@@ -2118,45 +2164,36 @@ async function loadChatMessages() {
     }
 
     if (!data || data.length === 0) {
+        allChatData = [];
         tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--text3);">Henüz mesaj yok</td></tr>';
         return;
     }
+
+    allChatData = data;
 
     // Badge güncelle
     const badge = document.getElementById('chatMsgBadge');
     if (badge) { badge.textContent = data.length; badge.style.display = 'inline-flex'; }
 
-    tbody.innerHTML = data.map(msg => {
-        const date = new Date(msg.created_at).toLocaleString('tr-TR');
-        const avatar = msg.avatar || '👤';
-        const name = esc(msg.display_name || 'Kullanıcı');
-        const email = esc(msg.email || '—');
-        const content = esc(msg.content || '');
-        const uid = esc(msg.user_id || '');
-        return `<tr>
-            <td>
-                <div style="display:flex;align-items:center;gap:.6rem;">
-                    <span style="font-size:1.1rem;">${avatar}</span>
-                    <div>
-                        <div style="font-weight:600;font-size:.85rem;">${name}</div>
-                        <div style="font-size:.73rem;color:var(--text3);">${email}</div>
-                    </div>
-                </div>
-            </td>
-            <td style="max-width:400px;word-break:break-word;font-size:.85rem;">${content}</td>
-            <td style="font-size:.78rem;color:var(--text2);white-space:nowrap;">${date}</td>
-            <td>
-                <button onclick="deleteChatMsg('${esc(msg.id)}')" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#ef4444;border-radius:6px;padding:.3rem .7rem;cursor:pointer;font-size:.78rem;">🗑️ Sil</button>
-            </td>
-        </tr>`;
-    }).join('');
+    filterChatMessages();
 }
 
 async function deleteChatMsg(id) {
     if (!confirm('Bu mesajı silmek istediğine emin misin?')) return;
-    const { error } = await sb.from('chat_messages').delete().eq('id', id);
-    if (error) { alert('Hata: ' + error.message); return; }
-    loadChatMessages();
+    try {
+        const { error } = await sb.from('chat_messages').delete().eq('id', id);
+        if (error) {
+            console.error('Delete error:', error);
+            alert('Silme hatası: ' + error.message + '\n\nNot: Supabase RLS politikası engel olabilir. chat_messages tablosunda admin silme yetkisini kontrol et.');
+            return;
+        }
+        // Yerel listeden de kaldır
+        allChatData = allChatData.filter(m => String(m.id) !== String(id));
+        filterChatMessages();
+        toast('🗑 Mesaj silindi', 'info');
+    } catch(e) {
+        alert('Beklenmeyen hata: ' + e.message);
+    }
 }
 
 async function clearOldChatMessages() {

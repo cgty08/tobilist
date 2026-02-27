@@ -17,14 +17,13 @@ const OniChat = (function () {
     let lastSentAt   = 0;
     let unreadCount  = 0;
     let initialized  = false;
-    let userScrolled = false;
 
     // ── HTML Şablonu ─────────────────────────────────────────
     function buildHTML() {
         const el = document.createElement('div');
         el.innerHTML = `
         <!-- Floating Button -->
-        <button id="chatToggleBtn" title="Topluluk Sohbeti" aria-label="Sohbeti Aç" style="display:none!important">
+        <button id="chatToggleBtn" title="Topluluk Sohbeti" aria-label="Sohbeti Aç">
             💬
             <span id="chatBadge"></span>
         </button>
@@ -118,38 +117,10 @@ const OniChat = (function () {
     function scrollToBottom(force) {
         const el = q('chatMessages');
         if (!el) return;
-        if (force) { el.scrollTop = el.scrollHeight; userScrolled = false; return; }
-        if (userScrolled) return;
-        el.scrollTop = el.scrollHeight;
-    }
-
-    function bindChatScrollEvents() {
-        const el = q('chatMessages');
-        if (!el) return;
-        el.addEventListener('scroll', function() {
-            const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 60;
-            if (atBottom) {
-                userScrolled = false;
-                const ind = document.getElementById('oniChatScrollInd');
-                if (ind) ind.style.display = 'none';
-            } else {
-                userScrolled = true;
-                let ind = document.getElementById('oniChatScrollInd');
-                if (!ind) {
-                    ind = document.createElement('div');
-                    ind.id = 'oniChatScrollInd';
-                    ind.textContent = '⬇ Yeni mesaj';
-                    ind.style.cssText = 'position:absolute;bottom:4.2rem;left:50%;transform:translateX(-50%);' +
-                        'background:rgba(255,51,102,0.92);color:#fff;padding:0.28rem 0.75rem;border-radius:20px;' +
-                        'font-size:0.72rem;font-weight:700;cursor:pointer;z-index:10;white-space:nowrap;' +
-                        'border:1px solid rgba(255,255,255,0.2);';
-                    ind.onclick = () => scrollToBottom(true);
-                    const win = document.getElementById('chatWindow');
-                    if (win) { win.style.position = 'relative'; win.appendChild(ind); }
-                }
-                ind.style.display = 'block';
-            }
-        });
+        const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+        if (force || atBottom) {
+            setTimeout(() => { el.scrollTop = el.scrollHeight; }, 50);
+        }
     }
 
     // ── Render Mesaj ─────────────────────────────────────────
@@ -161,8 +132,8 @@ const OniChat = (function () {
 
     function getDisplayName(row) {
         // Önce display_name alanı, sonra email'den ilk kısım
-        if (row.display_name && row.display_name.trim()) return row.display_name.trim();
-        if (row.username && row.username.trim()) return row.username.trim();
+        if (row.display_name) return row.display_name;
+        if (row.email) return row.email.split('@')[0];
         return 'Kullanıcı';
     }
 
@@ -401,7 +372,6 @@ const OniChat = (function () {
     function bindEvents() {
         q('chatToggleBtn').addEventListener('click', toggle);
         q('chatCloseBtn').addEventListener('click', toggle);
-        bindChatScrollEvents();
 
         const input = q('chatInput');
         const sendBtn = q('chatSendBtn');
@@ -468,11 +438,9 @@ const InlineChat = (function () {
     const TABLE = 'chat_messages';
     const MAX_LEN = 300;
     const RATE_LIMIT_MS = 2500;
-    const SCROLL_KEY = 'onilist_inline_scroll';
     let lastSentAt = 0;
     let realtimeCh = null;
     let initialized = false;
-    let userScrolled = false;
 
     function q(id) { return document.getElementById(id); }
 
@@ -493,57 +461,9 @@ const InlineChat = (function () {
         return u.uid || u.id || null;
     }
 
-    function scrollToBottom(force) {
+    function scrollToBottom() {
         const el = q('inlineChatMessages');
-        if (!el) return;
-        if (force) { el.scrollTop = el.scrollHeight; userScrolled = false; return; }
-        if (userScrolled) return;
-        el.scrollTop = el.scrollHeight;
-    }
-
-    function saveScrollPos() {
-        const el = q('inlineChatMessages');
-        if (!el) return;
-        try { sessionStorage.setItem(SCROLL_KEY, el.scrollTop); } catch(e) {}
-    }
-
-    function restoreScrollPos() {
-        const el = q('inlineChatMessages');
-        if (!el) return;
-        try {
-            const s = sessionStorage.getItem(SCROLL_KEY);
-            el.scrollTop = s !== null ? parseInt(s, 10) : el.scrollHeight;
-        } catch(e) { el.scrollTop = el.scrollHeight; }
-    }
-
-    function bindInlineScrollEvents() {
-        const el = q('inlineChatMessages');
-        if (!el) return;
-        el.addEventListener('scroll', function() {
-            const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 60;
-            if (atBottom) {
-                userScrolled = false;
-                const ind = document.getElementById('inlineChatScrollInd');
-                if (ind) ind.style.display = 'none';
-            } else {
-                userScrolled = true;
-                let ind = document.getElementById('inlineChatScrollInd');
-                if (!ind) {
-                    ind = document.createElement('div');
-                    ind.id = 'inlineChatScrollInd';
-                    ind.textContent = '⬇ Yeni mesaj';
-                    ind.style.cssText = 'position:absolute;bottom:0.5rem;left:50%;transform:translateX(-50%);' +
-                        'background:rgba(255,51,102,0.92);color:#fff;padding:0.28rem 0.75rem;border-radius:20px;' +
-                        'font-size:0.72rem;font-weight:700;cursor:pointer;z-index:10;white-space:nowrap;' +
-                        'border:1px solid rgba(255,255,255,0.2);';
-                    ind.onclick = () => scrollToBottom(true);
-                    const msgs = q('inlineChatMessages');
-                    if (msgs) msgs.appendChild(ind);
-                }
-                ind.style.display = 'block';
-            }
-            saveScrollPos();
-        });
+        if (el) setTimeout(() => { el.scrollTop = el.scrollHeight; }, 50);
     }
 
     function renderMessage(row) {
@@ -561,23 +481,26 @@ const InlineChat = (function () {
 
         const myId = getMyUserId();
         const isOwn = myId && row.user_id === myId;
-        const avatar = row.avatar || '👤';
-        const name = escapeHTML((row.display_name && row.display_name.trim()) ? row.display_name.trim() : (row.username && row.username.trim() ? row.username.trim() : 'Kullanıcı'));
+        const avatarRaw = row.avatar || '👤';
+        const avatarUrl = row.avatar_url || '';
+        const avatarHtml = avatarUrl
+            ? `<img src="${avatarUrl}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">`
+            : `<span>${escapeHTML(avatarRaw)}</span>`;
+        const name = escapeHTML((row.display_name && row.display_name.trim()) ? row.display_name.trim() : 'Kullanıcı');
         const text = escapeHTML(row.content || '');
         const time = formatTime(row.created_at);
 
         const div = document.createElement('div');
         div.className = 'chat-msg' + (isOwn ? ' own' : '');
         div.innerHTML = `
-            <div class="chat-avatar">${avatar}</div>
+            <div class="chat-avatar">${avatarHtml}</div>
             <div class="chat-bubble-wrap">
                 ${!isOwn ? `<div class="chat-sender">${name}</div>` : ''}
                 <div class="chat-bubble">${text}</div>
                 <div class="chat-time">${time}</div>
             </div>`;
         container.appendChild(div);
-        scrollToBottom(false);
-        saveScrollPos();
+        scrollToBottom();
     }
 
     async function loadMessages() {
@@ -598,9 +521,8 @@ const InlineChat = (function () {
             container.appendChild(div);
         } else {
             [...data].reverse().forEach(row => renderMessage(row));
-            restoreScrollPos();
         }
-        if (!data || data.length === 0) scrollToBottom(true);
+        scrollToBottom();
         subscribeRealtime();
     }
 
@@ -628,6 +550,13 @@ const InlineChat = (function () {
 
         const user = window.currentUser;
         if (!user) return;
+
+        // Banlı kullanıcı chat yazamaz
+        if (user.isBanned) {
+            if (typeof showBanNotice === 'function') showBanNotice();
+            return;
+        }
+
         lastSentAt = now;
 
         const sendBtn = q('inlineChatSendBtn');
@@ -635,17 +564,19 @@ const InlineChat = (function () {
         input.value = '';
         input.style.height = 'auto';
 
-        const userData = window.dataManager?.data;
-        const displayName = userData?.social?.name || user.displayName || user.email?.split('@')[0] || 'Kullanıcı';
-        const avatar = userData?.social?.avatar || '👤';
+        const userData  = window.dataManager?.data;
+        const social    = userData?.social || {};
+        const displayName = social.name || user.displayName || user.email?.split('@')[0] || 'Kullanıcı';
+        const avatar    = social.avatar || '👤';
+        const avatarUrl = social.avatarUrl || '';
 
         // Optimistic render
-        userScrolled = false; // kendi mesajında her zaman aşağı
         renderMessage({
             id: 'opt_' + now,
             user_id: user.uid || user.id,
             display_name: displayName,
             avatar: avatar,
+            avatar_url: avatarUrl,
             content: text,
             created_at: new Date().toISOString()
         });
@@ -655,7 +586,7 @@ const InlineChat = (function () {
                 user_id: user.uid || user.id,
                 display_name: displayName,
                 avatar: avatar,
-                email: user.email,
+                avatar_url: avatarUrl,
                 content: text
             });
         }
@@ -732,7 +663,6 @@ const InlineChat = (function () {
 
         sendBtn.addEventListener('click', sendMessage);
         document.addEventListener('onilist:authChange', updateAuthUI);
-        bindInlineScrollEvents();
     }
 
     function init() {

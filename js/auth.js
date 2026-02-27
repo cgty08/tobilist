@@ -120,6 +120,47 @@ async function loginSuccess(user) {
         console.warn('Could not sync with Supabase, using localStorage:', e.message);
     }
 
+    // ── BAN KONTROLÜ ──────────────────────────────────────
+    const userData = dataManager.data;
+    if (userData && userData.banned === true) {
+        // Ban süresi dolmuş mu kontrol et
+        const banExpiry = userData.ban_expiry;
+        const isExpired = banExpiry && new Date(banExpiry) < new Date();
+
+        if (!isExpired) {
+            // Banlı kullanıcı - kısıtlı mod
+            currentUser.isBanned = true;
+            currentUser.banReason = userData.ban_reason || 'Kural ihlali';
+            currentUser.banExpiry = banExpiry;
+            window.currentUser = currentUser;
+
+            updateUIForBanned();
+            if (typeof initializeApp === 'function') initializeApp();
+            hideLoadingScreen();
+            document.dispatchEvent(new Event('onilist:authChange'));
+
+            // Ban bildirimini göster
+            setTimeout(() => {
+                const expiryText = banExpiry
+                    ? new Date(banExpiry).toLocaleDateString('tr-TR')
+                    : 'kalıcı';
+                showNotification(
+                    '🚫 Hesabın kısıtlanmış. Sebep: ' + currentUser.banReason +
+                    (banExpiry ? ' | Bitiş: ' + expiryText : ' | Kalıcı ban'),
+                    'error'
+                );
+            }, 1500);
+            return;
+        } else {
+            // Ban süresi dolmuş - otomatik kaldır
+            userData.banned = false;
+            userData.ban_reason = null;
+            userData.ban_expiry = null;
+            dataManager.saveAll();
+        }
+    }
+    // ── BAN KONTROLÜ SONU ─────────────────────────────────
+
     updateUIForLoggedIn();
     if (typeof initializeApp === 'function') initializeApp();
     hideLoadingScreen();
@@ -547,6 +588,59 @@ function updateUIForGuest() {
         bannerActions.innerHTML = '<button class="btn btn-primary btn-large" onclick="openAuthModal(\'register\')">✨ Ücretsiz Kayıt Ol</button><button class="btn btn-ghost btn-large" onclick="switchSection(\'discover\')">🔍 Keşfet</button>';
     }
 }
+
+// ===== BAN MOD UI =====
+function updateUIForBanned() {
+    if (!currentUser) return;
+
+    const show = (id, disp = 'flex') => { const e = document.getElementById(id); if (e) e.style.display = disp; };
+    const hide = (id) => { const e = document.getElementById(id); if (e) e.style.display = 'none'; };
+
+    // Header: normal kullanıcı gibi göster (giriş yapmış)
+    hide('guestHeaderBtns');
+    show('userMenuWrapper', 'flex');
+    hide('addContentBtn');       // İçerik ekleme yasak
+    show('levelBadge', 'flex');
+    show('streakBadge', 'flex');
+    show('totalBadge', 'flex');
+    hide('guestAppBanner');
+
+    // Tüm nav tab'larını kilitle - sadece library ve discover açık
+    document.querySelectorAll('[data-section]').forEach(tab => {
+        const section = tab.getAttribute('data-section');
+        const allowed = ['library', 'discover', 'home'];
+        if (!allowed.includes(section)) {
+            tab.setAttribute('onclick', "showBanNotice()");
+        }
+    });
+
+    // Banner aksiyonları - sadece keşfet
+    const bannerActions = document.getElementById('bannerActions');
+    if (bannerActions) {
+        bannerActions.innerHTML = '<button class="btn btn-ghost btn-large" onclick="switchSection(\'discover\')">🔍 Keşfet</button>';
+    }
+
+    const guestCTA = document.getElementById('guestCTA');
+    if (guestCTA) guestCTA.style.display = 'none';
+
+    updateHeaderUser();
+}
+
+function showBanNotice() {
+    const reason = window.currentUser?.banReason || 'Kural ihlali';
+    const expiry = window.currentUser?.banExpiry;
+    const expiryText = expiry
+        ? new Date(expiry).toLocaleDateString('tr-TR') + ' tarihine kadar'
+        : 'kalıcı olarak';
+    showNotification('🚫 Hesabın ' + expiryText + ' kısıtlı. Sebep: ' + reason, 'error');
+}
+
+// Banlı kullanıcının chat yazmasını engelle - chat.js'den çağrılır
+function isBannedUser() {
+    return !!(window.currentUser?.isBanned);
+}
+
+
 
 function updateHeaderUser() {
     if (!currentUser) return;
