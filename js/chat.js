@@ -32,7 +32,7 @@ const OniChat = (function () {
         <div id="chatWindow" role="dialog" aria-label="Topluluk Sohbeti">
             <!-- Header -->
             <div class="chat-header">
-                <span class="chat-header-icon">🌍</span>
+                <span class="chat-header-icon"></span>
                 <div class="chat-header-info">
                     <div class="chat-header-title">Topluluk Sohbeti</div>
                     <div class="chat-header-sub">
@@ -56,7 +56,7 @@ const OniChat = (function () {
             <div id="chatGuestPrompt" class="chat-guest-prompt" style="display:none;">
                 <div class="chat-guest-icon">🔐</div>
                 <h4>Sohbete Katıl</h4>
-                <p>Mesaj göndermek için giriş yapman gerekiyor. Okumak herkese ücretsiz!</p>
+                <p>Mesaj göndermek için giriş yapman gerekiyor.</p>
                 <button onclick="openAuthModal('login')">Giriş Yap →</button>
             </div>
 
