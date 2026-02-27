@@ -64,7 +64,7 @@ const OniChat = (function () {
             <div class="chat-input-area" id="chatInputArea">
                 <textarea
                     id="chatInput"
-                    placeholder="Bir şeyler yaz..."
+                    placeholder="Bir şeyler yaz... (Enter = gönder)"
                     rows="1"
                     maxlength="${MAX_LEN}"
                 ></textarea>
@@ -588,10 +588,10 @@ const InlineChat = (function () {
         if (!inputArea || !guest) return;
 
         if (isLoggedIn) {
+            // flex + column gerekli - sadece display:block çalışmıyor
             inputArea.style.display = 'flex';
             inputArea.style.flexDirection = 'column';
             guest.style.display = 'none';
-            // Avatar güncelle
             const avatarEl = q('inlineChatMyAvatar');
             if (avatarEl) {
                 const av = window.dataManager?.data?.social?.avatar || '👤';
@@ -603,19 +603,30 @@ const InlineChat = (function () {
         }
     }
 
-    // Sürekli auth durumunu kontrol eden polling (fallback)
-    let _authPollCount = 0;
-    function startAuthPolling() {
-        const poll = setInterval(() => {
-            _authPollCount++;
-            const u = window.currentUser;
-            const isLoggedIn = !!(u && (u.uid || u.id));
-            const inputArea = q('inlineChatInputArea');
-            if (isLoggedIn && inputArea && inputArea.style.display === 'none') {
-                updateAuthUI();
-            }
-            if (_authPollCount > 20) clearInterval(poll); // 10 saniye sonra dur
-        }, 500);
+    // window.currentUser atandığı an yakalamak için setter trap
+    function patchCurrentUserSetter() {
+        if (window.__currentUserPatched) return;
+        window.__currentUserPatched = true;
+        let _val = window.currentUser;
+        try {
+            Object.defineProperty(window, 'currentUser', {
+                configurable: true,
+                enumerable: true,
+                get() { return _val; },
+                set(v) {
+                    _val = v;
+                    if (v && (v.uid || v.id)) {
+                        setTimeout(updateAuthUI, 0);
+                        setTimeout(updateAuthUI, 200);
+                    } else {
+                        setTimeout(updateAuthUI, 0);
+                    }
+                }
+            });
+        } catch(e) {
+            // defineProperty başarısız olursa polling yap
+            setInterval(updateAuthUI, 1000);
+        }
     }
 
     function bindEvents() {
@@ -637,24 +648,19 @@ const InlineChat = (function () {
         });
 
         sendBtn.addEventListener('click', sendMessage);
-
         document.addEventListener('onilist:authChange', updateAuthUI);
-        // Fallback zamanlamaları - auth yavaş yüklenebilir
-        setTimeout(updateAuthUI, 500);
-        setTimeout(updateAuthUI, 1000);
-        setTimeout(updateAuthUI, 2000);
-        setTimeout(updateAuthUI, 3500);
-        setTimeout(updateAuthUI, 6000);
-        startAuthPolling();
     }
 
     function init() {
         if (initialized) return;
         if (!q('inlineChatMessages')) return;
         initialized = true;
+        patchCurrentUserSetter();
         bindEvents();
         loadMessages();
         updateAuthUI();
+        // Fallback polling - auth geç yüklenebilir
+        [300, 700, 1500, 3000, 5000].forEach(t => setTimeout(updateAuthUI, t));
     }
 
     return { init, updateAuthUI };
