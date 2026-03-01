@@ -1400,12 +1400,29 @@
                 if(lse) lse.textContent = (stats.longest_streak || 0) + (typeof _lang!=='undefined'&&_lang==='en'?' days':' gün');
             }
 
-            // 2) Leaderboard — public_leaderboard view (herkese açık, hassas veri yok)
-            const { data: leaders, error: lbErr } = await window.supabaseClient
+            // 2) Leaderboard — public_leaderboard view
+            // Önce tam kolonlarla dene (user_id, avatar_url varsa), hata olursa temel kolonlarla dene
+            let leaders = null, lbErr = null, hasUserId = false;
+
+            const r1 = await window.supabaseClient
                 .from('public_leaderboard')
                 .select('user_id,name,avatar,avatar_url,xp_total,level')
                 .order('xp_total', { ascending: false })
                 .limit(5);
+
+            if (!r1.error) {
+                leaders = r1.data;
+                hasUserId = true;
+            } else {
+                // Kolon yoksa temel sorgu
+                const r2 = await window.supabaseClient
+                    .from('public_leaderboard')
+                    .select('name,avatar,xp_total,level')
+                    .order('xp_total', { ascending: false })
+                    .limit(5);
+                leaders = r2.data;
+                lbErr = r2.error;
+            }
 
             const lb = document.getElementById('leaderboardList');
             if (lb) {
@@ -1418,10 +1435,13 @@
                     const avatarHtml = u.avatar_url
                         ? `<img src="${u.avatar_url}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;display:block;">`
                         : `<span style="font-size:1.1rem;line-height:1;">${u.avatar||'👤'}</span>`;
+                    const uid = hasUserId ? (u.user_id||'') : '';
+                    const uname = (u.name||'Kullanıcı').replace(/'/g,"\\'");
+                    const clickable = uid ? `lb-item-clickable" onclick="openPublicProfile('${uid}','${uname}')` : '';
                     return `
-                    <div class="lb-item lb-item-clickable" onclick="openPublicProfile('${u.user_id||''}','${(u.name||'Kullanıcı').replace(/'/g,"\\'")}')">
+                    <div class="lb-item ${clickable}">
                         <span class="lb-rank ${rankClass[i]||''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)}</span>
-                        <div class="lb-av" style="display:flex;align-items:center;justify-content:center;">${avatarHtml}</div>
+                        <div class="lb-av" style="display:flex;align-items:center;justify-content:center;overflow:hidden;">${avatarHtml}</div>
                         <span class="lb-name">${u.name||'Kullanıcı'}</span>
                         <span class="lb-xp">⭐${fmt(u.xp_total||0)} XP</span>
                     </div>`;
@@ -1600,18 +1620,50 @@ window.openPublicProfile = async function(userId, fallbackName) {
     try {
         if (!window.supabaseClient) throw new Error('Supabase bağlantısı yok');
 
-        // user_data tablosundan veriyi çek
-        const { data: rows, error } = await window.supabaseClient
-            .from('user_data')
-            .select('data,updated_at')
-            .eq('user_id', userId)
-            .limit(1);
+        // Önce get_public_profile RPC dene (Supabase'de varsa)
+        let uData = null;
 
-        if (error) throw error;
-        if (!rows || rows.length === 0) throw new Error('Kullanıcı bulunamadı');
+        try {
+            const { data: rpcData, error: rpcErr } = await window.supabaseClient
+                .rpc('get_public_profile', { p_user_id: userId });
+            if (!rpcErr && rpcData) {
+                uData = typeof rpcData === 'string' ? JSON.parse(rpcData) : rpcData;
+            }
+        } catch(e) { /* RPC yoksa devam et */ }
 
-        const uData = rows[0].data || {};
-        renderPublicProfile(uData, rows[0].updated_at, fallbackName);
+        // RPC yoksa user_data tablosunu dene (RLS izin veriyorsa)
+        if (!uData) {
+            const { data: rows, error } = await window.supabaseClient
+                .from('user_data')
+                .select('data,updated_at')
+                .eq('user_id', userId)
+                .limit(1);
+
+            if (!error && rows && rows.length > 0) {
+                uData = rows[0].data || {};
+            }
+        }
+
+        // Hiçbiri çalışmadıysa public_leaderboard'dan temel bilgi göster
+        if (!uData) {
+            const { data: lbRows } = await window.supabaseClient
+                .from('public_leaderboard')
+                .select('name,avatar,avatar_url,xp_total,level')
+                .eq('user_id', userId)
+                .limit(1);
+
+            if (lbRows && lbRows.length > 0) {
+                const lb = lbRows[0];
+                uData = {
+                    social: { name: lb.name, avatar: lb.avatar, avatarUrl: lb.avatar_url, bio: '' },
+                    xp: { level: lb.level, total: lb.xp_total },
+                    items: [], achievements: [], streak: {}
+                };
+            }
+        }
+
+        if (!uData) throw new Error('Kullanıcı verisi alınamadı');
+        renderPublicProfile(uData, null, fallbackName);
     } catch(e) {
         console.warn('Public profile error:', e.message);
         body.innerHTML = `

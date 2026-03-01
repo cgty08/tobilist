@@ -18,6 +18,47 @@ const OniChat = (function () {
     let unreadCount  = 0;
     let initialized  = false;
 
+    // Avatar cache: user_id → { avatar, avatarUrl }
+    // public_leaderboard'dan önceden yüklenir, mesajlarda kullanılır
+    const _avatarCache = {};
+
+    async function loadAvatarCache() {
+        if (!window.supabaseClient) return;
+        try {
+            const { data } = await window.supabaseClient
+                .from('public_leaderboard')
+                .select('user_id,name,avatar,avatar_url')
+                .limit(50);
+            if (data) data.forEach(u => {
+                if (u.user_id) _avatarCache[u.user_id] = { avatar: u.avatar || '👤', avatarUrl: u.avatar_url || '', name: u.name || '' };
+            });
+        } catch(e) {}
+    }
+
+    function getAvatarHtml(row) {
+        // 1) Mesajdan gelen avatar_url
+        let url = row.avatar_url || '';
+        let emoji = row.avatar || '👤';
+        // 2) Cache'den bak
+        if (!url && row.user_id && _avatarCache[row.user_id]) {
+            url = _avatarCache[row.user_id].avatarUrl || '';
+            emoji = _avatarCache[row.user_id].avatar || emoji;
+        }
+        // 3) Kendi kullanıcımızın datası
+        if (!url && row.user_id) {
+            const myId = window.currentUser ? (window.currentUser.uid || window.currentUser.id) : null;
+            if (myId && row.user_id === myId) {
+                const soc = window.dataManager?.data?.social || {};
+                url = soc.avatarUrl || '';
+                emoji = soc.avatar || emoji;
+            }
+        }
+        if (url) {
+            return `<img src="${url}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;display:block;" onerror="this.style.display='none';this.nextSibling.style.display='flex'"><span style="display:none;font-size:1rem;line-height:1;">${escapeHTML(emoji)}</span>`;
+        }
+        return `<span style="font-size:1rem;line-height:1;">${escapeHTML(emoji)}</span>`;
+    }
+
     // ── HTML Şablonu ─────────────────────────────────────────
     function buildHTML() {
         const el = document.createElement('div');
@@ -168,11 +209,7 @@ const OniChat = (function () {
 
         const myId   = getMyUserId();
         const isOwn  = myId && row.user_id === myId;
-        const avatarRaw = row.avatar || '👤';
-        const avatarUrl = row.avatar_url || '';
-        const avatarHtml = avatarUrl
-            ? `<img src="${avatarUrl}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;display:block;">`
-            : `<span style="font-size:1rem;line-height:1;">${escapeHTML(avatarRaw)}</span>`;
+        const avatarHtml = getAvatarHtml(row);
         const name   = escapeHTML(getDisplayName(row));
         const text   = escapeHTML(row.content || '');
         const time   = formatTime(row.created_at);
@@ -220,6 +257,9 @@ const OniChat = (function () {
             return;
         }
         showLoading();
+
+        // Avatar cache'i önceden yükle
+        await loadAvatarCache();
 
         const { data, error } = await window.supabaseClient
             .from(TABLE)
@@ -434,13 +474,16 @@ const OniChat = (function () {
 
         buildHTML();
         bindEvents();
-        loadMessages();
+        loadMessages().then(() => {
+            // Cache'i global yap, InlineChat da kullanabilsin
+            window._avatarCache = _avatarCache;
+        });
 
         console.log('✅ OniChat v1.0 loaded');
     }
 
     // Public API
-    return { init, toggle, updateAuthUI };
+    return { init, toggle, updateAuthUI, _cache: _avatarCache };
 })();
 
 // ── Auto-init ────────────────────────────────────────────────
@@ -459,6 +502,34 @@ const InlineChat = (function () {
     let lastSentAt = 0;
     let realtimeCh = null;
     let initialized = false;
+
+    // OniChat ile paylaşılan global avatar cache kullan (zaten yüklendi)
+    function getAvatarHtmlInline(row) {
+        let url = row.avatar_url || '';
+        let emoji = row.avatar || '👤';
+        // OniChat'in cache'ini kullan (varsa)
+        if (!url && row.user_id && typeof OniChat !== 'undefined' && OniChat._cache) {
+            const c = OniChat._cache[row.user_id];
+            if (c) { url = c.avatarUrl || ''; emoji = c.avatar || emoji; }
+        }
+        // window._avatarCache global cache
+        if (!url && row.user_id && window._avatarCache && window._avatarCache[row.user_id]) {
+            url = window._avatarCache[row.user_id].avatarUrl || '';
+            emoji = window._avatarCache[row.user_id].avatar || emoji;
+        }
+        if (!url && row.user_id) {
+            const myId = window.currentUser ? (window.currentUser.uid || window.currentUser.id) : null;
+            if (myId && row.user_id === myId) {
+                const soc = window.dataManager?.data?.social || {};
+                url = soc.avatarUrl || '';
+                emoji = soc.avatar || emoji;
+            }
+        }
+        if (url) {
+            return `<img src="${url}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;display:block;" onerror="this.style.display='none';this.nextSibling.style.display='flex'"><span style="display:none;font-size:1rem;line-height:1;">${escapeHTML(emoji)}</span>`;
+        }
+        return `<span style="font-size:1rem;line-height:1;">${escapeHTML(emoji)}</span>`;
+    }
 
     function q(id) { return document.getElementById(id); }
 
@@ -499,11 +570,7 @@ const InlineChat = (function () {
 
         const myId = getMyUserId();
         const isOwn = myId && row.user_id === myId;
-        const avatarRaw = row.avatar || '👤';
-        const avatarUrl = row.avatar_url || '';
-        const avatarHtml = avatarUrl
-            ? `<img src="${avatarUrl}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;display:block;">`
-            : `<span style="font-size:1rem;line-height:1;">${escapeHTML(avatarRaw)}</span>`;
+        const avatarHtml = getAvatarHtmlInline(row);
         const name = escapeHTML((row.display_name && row.display_name.trim()) ? row.display_name.trim() : 'Kullanıcı');
         const text = escapeHTML(row.content || '');
         const time = formatTime(row.created_at);
@@ -528,6 +595,16 @@ const InlineChat = (function () {
         const container = q('inlineChatMessages');
         if (!container) return;
         container.innerHTML = '<div class="chat-loading"><span class="chat-loading-dots"><span></span><span></span><span></span></span></div>';
+
+        // Avatar cache yoksa yükle
+        if (!window._avatarCache) {
+            try {
+                const { data: lbData } = await window.supabaseClient
+                    .from('public_leaderboard').select('user_id,avatar,avatar_url').limit(50);
+                window._avatarCache = {};
+                if (lbData) lbData.forEach(u => { if(u.user_id) window._avatarCache[u.user_id] = { avatar: u.avatar||'👤', avatarUrl: u.avatar_url||'' }; });
+            } catch(e) { window._avatarCache = {}; }
+        }
 
         const { data, error } = await window.supabaseClient
             .from(TABLE).select('*')
