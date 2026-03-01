@@ -168,18 +168,24 @@ const OniChat = (function () {
 
         const myId   = getMyUserId();
         const isOwn  = myId && row.user_id === myId;
-        const avatar = row.avatar || '👤';
+        const avatarRaw = row.avatar || '👤';
+        const avatarUrl = row.avatar_url || '';
+        const avatarHtml = avatarUrl
+            ? `<img src="${avatarUrl}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;display:block;">`
+            : `<span style="font-size:1rem;line-height:1;">${escapeHTML(avatarRaw)}</span>`;
         const name   = escapeHTML(getDisplayName(row));
         const text   = escapeHTML(row.content || '');
         const time   = formatTime(row.created_at);
+        const canClick = !isOwn && row.user_id;
+        const clickAttr = canClick ? `onclick="openPublicProfile('${row.user_id}','${getDisplayName(row).replace(/'/g,"\\'")}')" style="cursor:pointer;" title="${getDisplayName(row)} profilini gör"` : '';
 
         const div = document.createElement('div');
         div.className = 'chat-msg' + (isOwn ? ' own' : '');
         div.dataset.msgId = row.id || '';
         div.innerHTML = `
-            <div class="chat-avatar">${avatar}</div>
+            <div class="chat-avatar" ${clickAttr}>${avatarHtml}</div>
             <div class="chat-bubble-wrap">
-                ${!isOwn ? `<div class="chat-sender">${name}</div>` : ''}
+                ${!isOwn ? `<div class="chat-sender" ${canClick ? `onclick="openPublicProfile('${row.user_id}','${getDisplayName(row).replace(/'/g,"\\'")}')" style="cursor:pointer;"` : ''}>${name}</div>` : ''}
                 <div class="chat-bubble">${text}</div>
                 <div class="chat-time">${time}</div>
             </div>`;
@@ -496,18 +502,20 @@ const InlineChat = (function () {
         const avatarRaw = row.avatar || '👤';
         const avatarUrl = row.avatar_url || '';
         const avatarHtml = avatarUrl
-            ? `<img src="${avatarUrl}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">`
-            : `<span>${escapeHTML(avatarRaw)}</span>`;
+            ? `<img src="${avatarUrl}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;display:block;">`
+            : `<span style="font-size:1rem;line-height:1;">${escapeHTML(avatarRaw)}</span>`;
         const name = escapeHTML((row.display_name && row.display_name.trim()) ? row.display_name.trim() : 'Kullanıcı');
         const text = escapeHTML(row.content || '');
         const time = formatTime(row.created_at);
+        const canClick = !isOwn && row.user_id;
+        const clickAttr = canClick ? `onclick="openPublicProfile('${row.user_id}','${((row.display_name||'Kullanıcı').trim()).replace(/'/g,"\\'")}')" style="cursor:pointer;" title="${name} profilini gör"` : '';
 
         const div = document.createElement('div');
         div.className = 'chat-msg' + (isOwn ? ' own' : '');
         div.innerHTML = `
-            <div class="chat-avatar">${avatarHtml}</div>
+            <div class="chat-avatar" ${clickAttr}>${avatarHtml}</div>
             <div class="chat-bubble-wrap">
-                ${!isOwn ? `<div class="chat-sender">${name}</div>` : ''}
+                ${!isOwn ? `<div class="chat-sender" ${canClick ? `onclick="openPublicProfile('${row.user_id}','${((row.display_name||'Kullanıcı').trim()).replace(/'/g,"\\'")}')" style="cursor:pointer;"` : ''}>${name}</div>` : ''}
                 <div class="chat-bubble">${text}</div>
                 <div class="chat-time">${time}</div>
             </div>`;

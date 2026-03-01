@@ -242,12 +242,15 @@
         border-bottom:1px solid rgba(255,255,255,.05);
     }
     .lb-item:last-child { border-bottom:none; }
+    .lb-item-clickable { cursor:pointer; border-radius:8px; padding:.55rem .4rem; margin:0 -.4rem; transition:background 0.18s; }
+    .lb-item-clickable:hover { background:rgba(255,51,102,0.07); }
+    .lb-item-clickable:hover .lb-name { color:#ff3366; }
     .lb-rank { font-size:.75rem; font-weight:900; width:20px; text-align:center; color:var(--text-secondary,#8892a4); }
     .lb-rank.gold   { color:#fbbf24; }
     .lb-rank.silver { color:#94a3b8; }
     .lb-rank.bronze { color:#cd7c4a; }
-    .lb-av { width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,#ff3366,#7c3aed); display:flex; align-items:center; justify-content:center; font-size:.85rem; flex-shrink:0; }
-    .lb-name { font-size:.84rem; font-weight:600; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .lb-av { width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,#ff3366,#7c3aed); display:flex; align-items:center; justify-content:center; font-size:.85rem; flex-shrink:0; overflow:hidden; }
+    .lb-name { font-size:.84rem; font-weight:600; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; transition:color 0.18s; }
     .lb-xp { font-size:.75rem; font-weight:700; color:#fbbf24; flex-shrink:0; }
 
     /* Community stats */
@@ -1400,7 +1403,7 @@
             // 2) Leaderboard — public_leaderboard view (herkese açık, hassas veri yok)
             const { data: leaders, error: lbErr } = await window.supabaseClient
                 .from('public_leaderboard')
-                .select('name,avatar,xp_total,level')
+                .select('user_id,name,avatar,avatar_url,xp_total,level')
                 .order('xp_total', { ascending: false })
                 .limit(5);
 
@@ -1411,13 +1414,18 @@
                     return;
                 }
                 const rankClass = ['gold','silver','bronze'];
-                lb.innerHTML = leaders.map((u, i) => `
-                    <div class="lb-item">
+                lb.innerHTML = leaders.map((u, i) => {
+                    const avatarHtml = u.avatar_url
+                        ? `<img src="${u.avatar_url}" alt="" style="width:28px;height:28px;border-radius:50%;object-fit:cover;display:block;">`
+                        : `<span style="font-size:1.1rem;line-height:1;">${u.avatar||'👤'}</span>`;
+                    return `
+                    <div class="lb-item lb-item-clickable" onclick="openPublicProfile('${u.user_id||''}','${(u.name||'Kullanıcı').replace(/'/g,"\\'")}')">
                         <span class="lb-rank ${rankClass[i]||''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)}</span>
-                        <div class="lb-av">${u.avatar||'👤'}</div>
+                        <div class="lb-av" style="display:flex;align-items:center;justify-content:center;">${avatarHtml}</div>
                         <span class="lb-name">${u.name||'Kullanıcı'}</span>
                         <span class="lb-xp">⭐${fmt(u.xp_total||0)} XP</span>
-                    </div>`).join('');
+                    </div>`;
+                }).join('');
             }
         } catch(e) { console.warn('Live stats error:', e); }
     }
@@ -1529,5 +1537,258 @@
         }
     };
     </script>
+
+<!-- ============================================================
+     PUBLIC PROFILE MODAL
+     Başka kullanıcıların profilini görüntülemek için
+     ============================================================ -->
+<div id="publicProfileModal" style="display:none;position:fixed;inset:0;z-index:9500;align-items:center;justify-content:center;padding:1rem;">
+    <div id="publicProfileBackdrop" style="position:absolute;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);"></div>
+    <div id="publicProfileContent" style="position:relative;z-index:1;background:#141824;border:1px solid rgba(255,255,255,0.1);border-radius:20px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 40px 120px rgba(0,0,0,0.8);transform:scale(0.95) translateY(10px);opacity:0;transition:all 0.3s cubic-bezier(0.175,0.885,0.32,1.275);">
+        <button onclick="closePublicProfile()" style="position:absolute;top:1rem;right:1rem;width:32px;height:32px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#8892a4;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.85rem;transition:all 0.2s;z-index:2;" onmouseover="this.style.background='rgba(239,68,68,0.15)';this.style.color='#ef4444'" onmouseout="this.style.background='rgba(255,255,255,0.07)';this.style.color='#8892a4'">✕</button>
+        <div id="publicProfileBody">
+            <div style="display:flex;align-items:center;justify-content:center;padding:3rem;flex-direction:column;gap:0.8rem;">
+                <div class="chat-loading-dots"><span></span><span></span><span></span></div>
+                <span style="color:#8892a4;font-size:0.85rem;">Profil yükleniyor...</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================================
+//  PUBLIC PROFILE SYSTEM v1.0
+//  Başka kullanıcıların profilini modal olarak göster
+// ============================================================
+
+const COVERS_MAP = {
+    gradient1: 'linear-gradient(135deg,#ff3366,#7c3aed)',
+    gradient2: 'linear-gradient(135deg,#00d4ff,#0ea5e9)',
+    gradient3: 'linear-gradient(135deg,#10b981,#059669)',
+    gradient4: 'linear-gradient(135deg,#f59e0b,#ef4444)',
+    gradient5: 'linear-gradient(135deg,#8b5cf6,#ec4899)',
+    gradient6: 'linear-gradient(135deg,#f97316,#fbbf24)',
+    gradient7: 'linear-gradient(135deg,#06b6d4,#6366f1)',
+};
+
+window.openPublicProfile = async function(userId, fallbackName) {
+    if (!userId) return;
+    const modal = document.getElementById('publicProfileModal');
+    const content = document.getElementById('publicProfileContent');
+    const body = document.getElementById('publicProfileBody');
+    if (!modal) return;
+
+    // Kendi profilimse kendi profil sayfasına yönlendir
+    const myId = window.currentUser ? (window.currentUser.uid || window.currentUser.id) : null;
+    if (myId && userId === myId) {
+        if (typeof switchSection === 'function') switchSection('profile');
+        return;
+    }
+
+    // Modal aç
+    modal.style.display = 'flex';
+    requestAnimationFrame(() => { content.style.transform = 'scale(1) translateY(0)'; content.style.opacity = '1'; });
+    document.body.style.overflow = 'hidden';
+
+    // Loading göster
+    body.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:center;padding:3rem;flex-direction:column;gap:0.8rem;">
+            <div class="chat-loading-dots"><span></span><span></span><span></span></div>
+            <span style="color:#8892a4;font-size:0.85rem;">Profil yükleniyor...</span>
+        </div>`;
+
+    try {
+        if (!window.supabaseClient) throw new Error('Supabase bağlantısı yok');
+
+        // user_data tablosundan veriyi çek
+        const { data: rows, error } = await window.supabaseClient
+            .from('user_data')
+            .select('data,updated_at')
+            .eq('user_id', userId)
+            .limit(1);
+
+        if (error) throw error;
+        if (!rows || rows.length === 0) throw new Error('Kullanıcı bulunamadı');
+
+        const uData = rows[0].data || {};
+        renderPublicProfile(uData, rows[0].updated_at, fallbackName);
+    } catch(e) {
+        console.warn('Public profile error:', e.message);
+        body.innerHTML = `
+            <div style="padding:2.5rem;text-align:center;">
+                <div style="font-size:2.5rem;margin-bottom:0.8rem;">😕</div>
+                <h3 style="color:#fff;font-size:1.1rem;margin-bottom:0.4rem;">${fallbackName || 'Kullanıcı'}</h3>
+                <p style="color:#8892a4;font-size:0.88rem;">Bu profil şu an görüntülenemiyor.</p>
+            </div>`;
+    }
+};
+
+function renderPublicProfile(d, updatedAt, fallbackName) {
+    const body = document.getElementById('publicProfileBody');
+    if (!body) return;
+
+    const social = d.social || {};
+    const xp     = d.xp     || {};
+    const streak = d.streak  || {};
+    const items  = d.items   || [];
+    const achs   = d.achievements || [];
+
+    const name = social.name || fallbackName || 'Kullanıcı';
+    const bio  = social.bio  || 'Anime, manga ve webtoon takipçisi';
+    const cover = COVERS_MAP[social.cover || 'gradient1'];
+    const level = xp.level || 1;
+
+    // Avatar HTML
+    let avatarHtml;
+    if (social.avatarUrl) {
+        avatarHtml = `<img src="${social.avatarUrl}" alt="${name}" style="width:72px;height:72px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,0.2);">`;
+    } else {
+        avatarHtml = `<div style="width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,0.08);border:3px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:2.2rem;line-height:1;">${social.avatar || '👤'}</div>`;
+    }
+
+    // Level title
+    const LEVEL_TITLES_LOCAL = [
+        { min:1,max:2,title:'Acemi İzleyici',icon:'🌱'},{min:3,max:4,title:'Meraklı Seyirci',icon:'👀'},
+        {min:5,max:7,title:'Anime Meraklısı',icon:'🎌'},{min:8,max:10,title:'Seri Takipçisi',icon:'📺'},
+        {min:11,max:14,title:'Otaku Adayı',icon:'⚡'},{min:15,max:19,title:'Gerçek Otaku',icon:'🔥'},
+        {min:20,max:24,title:'Anime Uzmanı',icon:'🎯'},{min:25,max:29,title:'Manga Ustası',icon:'📚'},
+        {min:30,max:39,title:'Efsane Otaku',icon:'👑'},{min:40,max:49,title:'Anime Lordu',icon:'🏆'},
+        {min:50,max:999,title:'Ölümsüz Weeb',icon:'💎'},
+    ];
+    const lvlInfo = LEVEL_TITLES_LOCAL.find(t => level >= t.min && level <= t.max) || LEVEL_TITLES_LOCAL[LEVEL_TITLES_LOCAL.length-1];
+
+    // İstatistikler
+    const anime   = items.filter(i => i.type === 'anime').length;
+    const manga   = items.filter(i => i.type === 'manga').length;
+    const webtoon = items.filter(i => i.type === 'webtoon').length;
+    const completed = items.filter(i => i.status === 'completed').length;
+    const totalXP = xp.total || 0;
+
+    // Durum dağılımı
+    const watching   = items.filter(i => i.status === 'watching').length;
+    const plantowatch= items.filter(i => i.status === 'plantowatch').length;
+    const dropped    = items.filter(i => i.status === 'dropped').length;
+    const total = items.length || 1;
+    const pct = (n) => Math.round(n/total*100);
+
+    // Son başarımlar
+    let achHtml = '<span style="color:#6b7280;font-size:0.82rem;">Henüz başarım yok</span>';
+    if (typeof ACHIEVEMENTS !== 'undefined') {
+        const unlocked = ACHIEVEMENTS.filter(a => achs.includes(a.id)).slice(-6).reverse();
+        if (unlocked.length > 0) {
+            achHtml = unlocked.map(a => {
+                const title = (typeof a.title === 'object') ? (a.title.tr || Object.values(a.title)[0]) : a.title;
+                return `<div title="${title}" style="display:inline-flex;align-items:center;gap:0.3rem;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:0.3rem 0.6rem;font-size:0.78rem;">
+                    <span>${a.icon}</span><span style="color:#c8d0e0;">${title}</span>
+                    ${a.xp>0?`<span style="color:#fbbf24;font-size:0.7rem;">+${a.xp}XP</span>`:''}
+                </div>`;
+            }).join('');
+        }
+    }
+
+    // İzleme listesi (son 8 item)
+    const recentItems = [...items].reverse().slice(0, 8);
+    const typeIcons = { anime:'🎬', manga:'📖', webtoon:'📱' };
+    const statusColors = { watching:'#00d4ff', completed:'#10b981', plantowatch:'#a78bfa', onhold:'#fbbf24', dropped:'#f87171' };
+    const statusLabels = { watching:'İzliyor', completed:'Tamamladı', plantowatch:'Planlıyor', onhold:'Beklemede', dropped:'Bıraktı' };
+
+    let listHtml = '<span style="color:#6b7280;font-size:0.82rem;">Liste boş</span>';
+    if (recentItems.length > 0) {
+        listHtml = `<div style="display:flex;flex-direction:column;gap:0.4rem;">` +
+        recentItems.map(i => `
+            <div style="display:flex;align-items:center;gap:0.6rem;padding:0.45rem 0.6rem;background:rgba(255,255,255,0.04);border-radius:8px;">
+                <span style="font-size:1rem;">${typeIcons[i.type]||'📄'}</span>
+                <span style="flex:1;font-size:0.82rem;color:#c8d0e0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${i.name||'—'}</span>
+                <span style="font-size:0.7rem;color:${statusColors[i.status]||'#6b7280'};white-space:nowrap;">● ${statusLabels[i.status]||i.status}</span>
+                ${i.rating ? `<span style="font-size:0.7rem;color:#fbbf24;">★${i.rating}</span>` : ''}
+            </div>`).join('') +
+        `</div>`;
+    }
+
+    const joinDate = social.joinDate ? new Date(social.joinDate).toLocaleDateString('tr-TR', {year:'numeric',month:'long'}) : '—';
+
+    body.innerHTML = `
+        <!-- Kapak -->
+        <div style="height:90px;background:${cover};border-radius:20px 20px 0 0;position:relative;flex-shrink:0;"></div>
+
+        <!-- Ana bilgi -->
+        <div style="padding:0 1.5rem 1.5rem;margin-top:-36px;">
+            <div style="display:flex;align-items:flex-end;gap:1rem;margin-bottom:0.8rem;">
+                ${avatarHtml}
+                <div style="padding-bottom:4px;min-width:0;">
+                    <h3 style="font-size:1.2rem;font-weight:700;color:#fff;margin:0 0 0.1rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name}</h3>
+                    <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
+                        <span style="font-size:0.78rem;background:rgba(255,51,102,0.15);color:#ff3366;padding:0.15rem 0.5rem;border-radius:5px;font-weight:700;">Lv.${level} ${lvlInfo.icon} ${lvlInfo.title}</span>
+                        <span style="font-size:0.72rem;color:#6b7280;">${joinDate} katıldı</span>
+                    </div>
+                </div>
+            </div>
+            <p style="color:#8892a4;font-size:0.85rem;line-height:1.5;margin-bottom:1rem;">${bio}</p>
+
+            <!-- İstatistik kartları -->
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-bottom:1rem;">
+                ${[
+                    ['🎬','Anime',anime],['📖','Manga',manga],['📱','Webtoon',webtoon],
+                    ['✅','Tamamladı',completed],['⭐','Toplam XP',totalXP.toLocaleString('tr-TR')],['🔥','En Uzun Seri',(streak.longest||streak.count||0)+' gün']
+                ].map(([ic,lb,vl]) => `
+                    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:0.6rem;text-align:center;">
+                        <div style="font-size:1.1rem;">${ic}</div>
+                        <div style="font-size:0.95rem;font-weight:700;color:#fff;margin:0.1rem 0;">${vl}</div>
+                        <div style="font-size:0.68rem;color:#6b7280;">${lb}</div>
+                    </div>`).join('')}
+            </div>
+
+            <!-- Durum dağılımı -->
+            <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:0.9rem;margin-bottom:1rem;">
+                <div style="font-size:0.8rem;font-weight:700;color:#a0a8b9;margin-bottom:0.6rem;text-transform:uppercase;letter-spacing:0.5px;">İzleme Durumu</div>
+                ${[
+                    ['İzliyor',watching,'#00d4ff'],['Tamamladı',completed,'#10b981'],
+                    ['Planlıyor',plantowatch,'#a78bfa'],['Bıraktı',dropped,'#f87171']
+                ].map(([lb,cnt,col]) => `
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;">
+                        <span style="font-size:0.74rem;color:#8892a4;width:70px;flex-shrink:0;">${lb}</span>
+                        <div style="flex:1;height:5px;background:rgba(255,255,255,0.07);border-radius:3px;overflow:hidden;">
+                            <div style="width:${pct(cnt)}%;height:100%;background:${col};border-radius:3px;transition:width 0.6s ease;"></div>
+                        </div>
+                        <span style="font-size:0.74rem;color:#6b7280;width:20px;text-align:right;">${cnt}</span>
+                    </div>`).join('')}
+            </div>
+
+            <!-- Son Başarımlar -->
+            <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:0.9rem;margin-bottom:1rem;">
+                <div style="font-size:0.8rem;font-weight:700;color:#a0a8b9;margin-bottom:0.6rem;text-transform:uppercase;letter-spacing:0.5px;">🏅 Başarımlar</div>
+                <div style="display:flex;flex-wrap:wrap;gap:0.4rem;">${achHtml}</div>
+            </div>
+
+            <!-- İçerik Listesi -->
+            <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:0.9rem;">
+                <div style="font-size:0.8rem;font-weight:700;color:#a0a8b9;margin-bottom:0.6rem;text-transform:uppercase;letter-spacing:0.5px;">📋 Son İçerikler</div>
+                ${listHtml}
+            </div>
+        </div>`;
+}
+
+window.closePublicProfile = function() {
+    const modal = document.getElementById('publicProfileModal');
+    const content = document.getElementById('publicProfileContent');
+    if (!modal) return;
+    content.style.transform = 'scale(0.95) translateY(10px)';
+    content.style.opacity = '0';
+    setTimeout(() => { modal.style.display = 'none'; document.body.style.overflow = ''; }, 300);
+};
+
+// Backdrop tıklamasıyla kapat
+document.addEventListener('DOMContentLoaded', function() {
+    const backdrop = document.getElementById('publicProfileBackdrop');
+    if (backdrop) backdrop.addEventListener('click', window.closePublicProfile);
+    // ESC ile kapat
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('publicProfileModal');
+            if (modal && modal.style.display !== 'none') window.closePublicProfile();
+        }
+    });
+});
+</script>
 </body>
 </html>
