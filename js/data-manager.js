@@ -1,4 +1,4 @@
-// DATA MANAGER v5.1 - Supabase + localStorage
+// DATA MANAGER v5.2 - Supabase + localStorage
 
 const dataManager = {
     version: '5.2.0',
@@ -57,7 +57,13 @@ const dataManager = {
             const s = JSON.stringify(this.data);
             localStorage.setItem('onilist_user_' + this.currentUserId, s);
             localStorage.setItem('onilist_backup_' + this.currentUserId, s);
-        } catch(e) {}
+        } catch(e) {
+            console.warn('localStorage kayıt hatası (quota dolmuş olabilir):', e.message);
+            // Kullanıcıya bildirim göster (showNotification global fonksiyon varsa)
+            if (typeof showNotification === 'function') {
+                showNotification('⚠️ Yerel depolama dolu! Veriler yalnızca buluta kaydediliyor.', 'warning');
+            }
+        }
 
         // Sonra Supabase'e kaydet
         clearTimeout(this.saveTimeout);

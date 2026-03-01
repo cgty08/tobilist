@@ -858,6 +858,68 @@ const SUPABASE_URL  = 'https://qhfjpuwduuxzojurngte.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoZmpwdXdkdXV4em9qdXJuZ3RlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2NzU1MTksImV4cCI6MjA4NzI1MTUxOX0.lgtxEwGFW07P1vY9Soid2s_sM47jODk_nsUECznHSFA';
 const ADMIN_EMAILS  = ['list086@gmail.com'];
 
+// ===== BRUTE-FORCE KORUMA =====
+// Maksimum deneme sayısı ve kilit süresi (client-side katman)
+const MAX_LOGIN_ATTEMPTS = 5;
+const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 dakika
+const LOCKOUT_KEY = 'onilist_admin_lockout';
+const ATTEMPTS_KEY = 'onilist_admin_attempts';
+
+function getLoginAttempts() {
+    try { return JSON.parse(sessionStorage.getItem(ATTEMPTS_KEY)) || { count: 0, firstAt: null }; }
+    catch { return { count: 0, firstAt: null }; }
+}
+
+function isLockedOut() {
+    try {
+        const lockUntil = parseInt(sessionStorage.getItem(LOCKOUT_KEY) || '0');
+        if (Date.now() < lockUntil) return lockUntil;
+        // Kilit süresi geçtiyse sıfırla
+        sessionStorage.removeItem(LOCKOUT_KEY);
+        sessionStorage.removeItem(ATTEMPTS_KEY);
+        return false;
+    } catch { return false; }
+}
+
+function recordFailedAttempt() {
+    const attempts = getLoginAttempts();
+    attempts.count = (attempts.count || 0) + 1;
+    if (!attempts.firstAt) attempts.firstAt = Date.now();
+    sessionStorage.setItem(ATTEMPTS_KEY, JSON.stringify(attempts));
+    if (attempts.count >= MAX_LOGIN_ATTEMPTS) {
+        const lockUntil = Date.now() + LOCKOUT_DURATION_MS;
+        sessionStorage.setItem(LOCKOUT_KEY, lockUntil.toString());
+        return true; // kilitlendi
+    }
+    return false;
+}
+
+function clearLoginAttempts() {
+    sessionStorage.removeItem(ATTEMPTS_KEY);
+    sessionStorage.removeItem(LOCKOUT_KEY);
+}
+
+// ===== SESSION GÜVENLİĞİ =====
+// Admin oturumu için ek kontrol: session token her 30dk'da doğrulanır
+const SESSION_VERIFY_INTERVAL_MS = 30 * 60 * 1000;
+let sessionVerifyTimer = null;
+
+function startSessionVerify() {
+    if (sessionVerifyTimer) clearInterval(sessionVerifyTimer);
+    sessionVerifyTimer = setInterval(async () => {
+        if (!sb || !currentAdmin) return;
+        try {
+            const { data: { session }, error } = await sb.auth.getSession();
+            if (error || !session || !isAdmin(session.user?.email)) {
+                console.warn('[Admin] Oturum doğrulama başarısız, çıkış yapılıyor.');
+                await adminLogout();
+            }
+        } catch(e) {
+            console.warn('[Admin] Session check error:', e);
+        }
+    }, SESSION_VERIFY_INTERVAL_MS);
+}
+
 let sb, currentAdmin = null, curPage = 'dashboard';
 let allUsers = [], allBans = [], allContent = [], allReviews = [];
 let usersPage = 1, contentPage = 1, reviewsPage = 1;
@@ -870,6 +932,15 @@ const charts = {};
 // ===== BOOT =====
 window.onload = async () => {
     sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+    // Kilit kontrolü — sayfa yüklenince göster
+    const lockUntil = isLockedOut();
+    if (lockUntil) {
+        const mins = Math.ceil((lockUntil - Date.now()) / 60000);
+        showErr(`Çok fazla hatalı giriş. ${mins} dakika sonra tekrar deneyin.`);
+        document.getElementById('loginBtn').disabled = true;
+    }
+
     try {
         const { data: { session } } = await sb.auth.getSession();
         if (session?.user && isAdmin(session.user.email)) {
@@ -877,6 +948,16 @@ window.onload = async () => {
             boot();
         }
     } catch(e) { console.warn(e); }
+
+    // Auth state değişikliklerini izle (başka tab'da çıkış yapılırsa burası da kapansın)
+    try {
+        sb.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_OUT' && currentAdmin) {
+                currentAdmin = null;
+                location.reload();
+            }
+        });
+    } catch(e) {}
 };
 
 function isAdmin(email) {
@@ -888,6 +969,8 @@ function boot() {
     document.getElementById('mainContent').style.display = 'block';
     document.getElementById('adminNameEl').textContent = currentAdmin.email.split('@')[0];
     document.getElementById('supaUrlEl').value = SUPABASE_URL;
+    clearLoginAttempts();      // Başarılı girişte sayacı sıfırla
+    startSessionVerify();      // Periyodik session doğrulamasını başlat
     checkSupabase();
     loadDashboard();
     // Auto-refresh online every 30s
@@ -896,11 +979,26 @@ function boot() {
 
 // ===== LOGIN =====
 async function adminLogin() {
+    // Kilit kontrolü
+    const lockUntil = isLockedOut();
+    if (lockUntil) {
+        const mins = Math.ceil((lockUntil - Date.now()) / 60000);
+        showErr(`Hesap geçici olarak kilitlendi. ${mins} dakika sonra tekrar deneyin.`);
+        return;
+    }
+
     const email = document.getElementById('adminEmail').value.trim();
     const pw    = document.getElementById('adminPassword').value;
     document.getElementById('loginErr').style.display = 'none';
     if (!email || !pw) { showErr('Email ve şifre gerekli.'); return; }
-    if (!isAdmin(email)) { showErr('Bu hesabın admin yetkisi yok.'); return; }
+
+    // Email whitelist kontrolü (ağ isteği yapmadan önce hızlı ret)
+    if (!isAdmin(email)) {
+        recordFailedAttempt();
+        showErr('Bu hesabın admin yetkisi yok.');
+        return;
+    }
+
     const btn = document.getElementById('loginBtn');
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span>Giriş yapılıyor…';
@@ -913,7 +1011,15 @@ async function adminLogin() {
     } catch(e) {
         btn.disabled = false;
         btn.textContent = 'Admin Olarak Giriş Yap →';
-        showErr(e.message || 'Giriş başarısız.');
+        const locked = recordFailedAttempt();
+        const attempts = getLoginAttempts();
+        if (locked) {
+            showErr(`Çok fazla hatalı giriş. Hesap 15 dakika kilitlendi.`);
+            btn.disabled = true;
+        } else {
+            const remaining = MAX_LOGIN_ATTEMPTS - attempts.count;
+            showErr((e.message || 'Giriş başarısız.') + (remaining > 0 ? ` (${remaining} deneme hakkı kaldı)` : ''));
+        }
     }
 }
 

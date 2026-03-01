@@ -17,7 +17,7 @@ let contentLoading = false;
 
 // ===== INIT =====
 function initializeApp() {
-    console.log('OniList v5.1 başlatılıyor...');
+    console.log('OniList v5.2 başlatılıyor...');
 
     if (dataManager.data) {
         updateStreak();
@@ -585,6 +585,25 @@ function toggleNotifications() {
 
 // ===== PWA =====
 function setupPWA() {
+    // Service Worker kaydet (offline destek + PWA kurulumu)
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js', { scope: '/' })
+            .then(reg => {
+                console.log('✅ Service Worker kayıtlı:', reg.scope);
+                // Yeni SW hazır olduğunda otomatik aktive et
+                reg.addEventListener('updatefound', () => {
+                    const newWorker = reg.installing;
+                    if (!newWorker) return;
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            console.log('[SW] Yeni sürüm mevcut, sayfa yenilendiğinde aktif olacak.');
+                        }
+                    });
+                });
+            })
+            .catch(err => console.warn('Service Worker kaydedilemedi:', err));
+    }
+
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
@@ -839,7 +858,7 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-console.log('✅ App.js v5.1 loaded');
+console.log('✅ App.js v5.2 loaded');
 // =====================================================
 // DETAY SAYFASI SİSTEMİ
 // =====================================================
