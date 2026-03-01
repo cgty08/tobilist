@@ -1760,8 +1760,8 @@ function renderPublicProfile(d, updatedAt, fallbackName) {
     const joinDate = social.joinDate ? new Date(social.joinDate).toLocaleDateString('tr-TR', {year:'numeric',month:'long'}) : '—';
 
     body.innerHTML = `
-        <!-- Kapak -->
-        <div style="height:90px;background:${cover};border-radius:20px 20px 0 0;position:relative;flex-shrink:0;"></div>
+        <!-- Kapak — siteyle uyumlu koyu header -->
+        <div style="height:60px;background:linear-gradient(135deg,rgba(255,51,102,0.12),rgba(124,58,237,0.08));border-radius:20px 20px 0 0;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;"></div>
 
         <!-- Ana bilgi -->
         <div style="padding:0 1.5rem 1.5rem;margin-top:-36px;">
