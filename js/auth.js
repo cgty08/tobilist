@@ -76,10 +76,16 @@ async function initSupabaseSession() {
 }
 
 async function loginSuccess(user) {
+    // displayName XSS koruması: script/html karakterleri temizleniyor
+    function _sanitizeName(str) {
+        if (!str) return '';
+        return String(str).replace(/[<>"'&]/g, '').trim().substring(0, 50);
+    }
+
     currentUser = {
         uid: user.id,
         id: user.id,
-        displayName: user.user_metadata?.username || user.email.split('@')[0],
+        displayName: _sanitizeName(user.user_metadata?.username || user.email.split('@')[0]),
         email: user.email
     };
     window.currentUser = currentUser;

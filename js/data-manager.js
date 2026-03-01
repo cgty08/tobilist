@@ -59,7 +59,6 @@ const dataManager = {
             localStorage.setItem('onilist_backup_' + this.currentUserId, s);
         } catch(e) {
             console.warn('localStorage kayıt hatası (quota dolmuş olabilir):', e.message);
-            // Kullanıcıya bildirim göster (showNotification global fonksiyon varsa)
             if (typeof showNotification === 'function') {
                 showNotification('⚠️ Yerel depolama dolu! Veriler yalnızca buluta kaydediliyor.', 'warning');
             }
@@ -82,10 +81,16 @@ const dataManager = {
 
     save() { return this.saveAll(); },
 
+    // deepMerge — prototype pollution koruması eklendi:
+    // __proto__, constructor, prototype anahtarları yoksayılıyor
     deepMerge(target, source) {
         if (!source) return target;
         const result = { ...target };
         for (const key in source) {
+            // Sadece kaynak objenin kendi anahtarlarını al, prototype zincirinden gelenleri değil
+            if (!Object.prototype.hasOwnProperty.call(source, key)) continue;
+            // Tehlikeli anahtarları engelle
+            if (key === '__proto__' || key === 'constructor' || key === 'prototype') continue;
             if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
                 result[key] = this.deepMerge(target[key] || {}, source[key]);
             } else {
@@ -111,16 +116,44 @@ const dataManager = {
         return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
     },
 
+    // importData — prototype pollution + alan whitelist koruması eklendi
     importData(rawData) {
         try {
             const imported = JSON.parse(rawData);
             if (!this.data) return false;
-            if (imported.data && imported.data.items) {
-                const existing = this.data.items.map(i => i.name.toLowerCase());
-                this.data.items = [...this.data.items, ...imported.data.items.filter(i => !existing.includes((i.name||'').toLowerCase()))];
-            } else if (Array.isArray(imported)) {
-                this.data.items = [...this.data.items, ...imported];
+
+            // Güvenli alan listesi — dışarıdan gelen nesnede sadece bu anahtarlara izin ver
+            const SAFE_ITEM_KEYS = [
+                'id','name','nameEn','type','status','poster','rating',
+                'currentEpisode','totalEpisodes','chapters','genre','genres',
+                'synopsis','addedDate','year','malId','anilistId','kitsuId',
+                'source','review','notes'
+            ];
+
+            function sanitizeItem(item) {
+                if (!item || typeof item !== 'object' || Array.isArray(item)) return null;
+                const safe = {};
+                for (const key of SAFE_ITEM_KEYS) {
+                    if (Object.prototype.hasOwnProperty.call(item, key)) {
+                        safe[key] = item[key];
+                    }
+                }
+                return (safe.name) ? safe : null;
             }
+
+            let newItems = [];
+            if (imported.data && Array.isArray(imported.data.items)) {
+                newItems = imported.data.items;
+            } else if (Array.isArray(imported)) {
+                newItems = imported;
+            }
+
+            const existing = this.data.items.map(i => (i.name || '').toLowerCase());
+            const sanitized = newItems
+                .map(sanitizeItem)
+                .filter(i => i && !existing.includes((i.name || '').toLowerCase()));
+
+            this.data.items = [...this.data.items, ...sanitized];
             this.saveAll();
             return true;
         } catch(e) { return false; }

@@ -1,5 +1,17 @@
 // UI.JS v6.0 - Full TR/EN language support + bug fixes
 
+// ===== XSS KORUMA YARDIMCISI =====
+// Kullanıcıdan gelen tüm metinler innerHTML'e girmeden önce bu fonksiyondan geçmeli
+function escapeHTML(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 // ===== TRANSLATIONS =====
 const translations = {
     tr: {
@@ -1041,7 +1053,7 @@ function renderLibraryGrid(items) {
             </div>
             <div class="item-header">
                 <span class="item-type-badge ${item.type}">${item.type}</span>
-                <div class="item-title">${item.name || (t('noContent'))}</div>
+                <div class="item-title">${escapeHTML(item.name) || (t('noContent'))}</div>
             </div>
             <div class="item-body">
                 <label>${t('statusLabel')}</label>

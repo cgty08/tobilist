@@ -33,7 +33,7 @@ const APICache = {
         try {
             localStorage.setItem(this.PREFIX + key, JSON.stringify({ data, ts }));
         } catch {
-            // localStorage doluysa eski at5_ kayıtlarını temizle
+            // localStorage doluysa eski at6_ kayıtlarını (en eskiden başlayarak) temizle
             try {
                 Object.keys(localStorage)
                     .filter(k => k.startsWith('at6_'))
@@ -221,7 +221,6 @@ const _Jikan = {
     },
 
     async topManhua(pages = 4) {
-        // Çin webtoon
         const ck = 'jk_mh_' + pages; const c = APICache.get(ck); if (c) return c;
         const out = [];
         for (let p = 1; p <= pages; p++) {
@@ -315,7 +314,6 @@ const _AniList = {
     },
 
     async topManga(pages = 7) {
-        // Japon manga (CN/KR hariç)
         const ck = 'al_m_' + pages; const c = APICache.get(ck); if (c) return c;
         const gql = `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:MANGA,sort:[POPULARITY_DESC],isAdult:false,countryOfOrigin:"JP"){${this.FRAG}}}}`;
         const out = [];
@@ -330,7 +328,6 @@ const _AniList = {
     },
 
     async topWebtoon(pages = 10) {
-        // Kore manhwa - AniList'in en güçlü olduğu alan
         const ck = 'al_w_' + pages; const c = APICache.get(ck); if (c) return c;
         const gql = `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:MANGA,sort:[POPULARITY_DESC],isAdult:false,countryOfOrigin:"KR"){${this.FRAG}}}}`;
         const out = [];
@@ -345,7 +342,6 @@ const _AniList = {
     },
 
     async topManhua(pages = 5) {
-        // Çin manhwa
         const ck = 'al_mh_' + pages; const c = APICache.get(ck); if (c) return c;
         const gql = `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:MANGA,sort:[POPULARITY_DESC],isAdult:false,countryOfOrigin:"CN"){${this.FRAG}}}}`;
         const out = [];
@@ -489,7 +485,6 @@ const JikanAPI = {
         if (c) { if (onProgress) onProgress(c.length, c.length); return c; }
 
         // ── AŞAMA 1: HIZLI ÖN YÜKLEMİ (3-5 saniye) ──────────────────────────
-        // Sadece AniList ilk sayfaları (hızlı GraphQL) → hemen ekrana yansıt
         const ckFast = 'all_v5_fast';
         const cached_fast = APICache.get(ckFast);
 
@@ -498,9 +493,9 @@ const JikanAPI = {
             console.log('⚡ API: Hızlı ön yükleme başlıyor...');
 
             const [fastA, fastM, fastW] = await Promise.allSettled([
-                _AniList.topAnime(2),    // 2×50 = 100 anime (hızlı)
-                _AniList.topManga(2),    // 2×50 = 100 manga
-                _AniList.topWebtoon(2),  // 2×50 = 100 webtoon
+                _AniList.topAnime(2),
+                _AniList.topManga(2),
+                _AniList.topWebtoon(2),
             ]);
 
             const fastAll = [
@@ -513,34 +508,31 @@ const JikanAPI = {
             if (onProgress) onProgress(fastDeduped.length, fastDeduped.length);
             console.log(`⚡ Hızlı yükleme tamamlandı: ${fastDeduped.length} içerik`);
 
-            // UI'ya hızlı sonuçları göster
-            if (window._onFastContentReady) window._onFastContentReady(fastDeduped);
+            // UI'ya hızlı sonuçları custom event ile bildir (window global kirliliği önlenir)
+            document.dispatchEvent(new CustomEvent('onilist:fastContentReady', { detail: fastDeduped }));
         } else {
             if (onProgress) onProgress(cached_fast.length, cached_fast.length);
-            if (window._onFastContentReady) window._onFastContentReady(cached_fast);
+            document.dispatchEvent(new CustomEvent('onilist:fastContentReady', { detail: cached_fast }));
         }
 
         // ── AŞAMA 2: ARKA PLANDA TAM YÜKLEMİ ──────────────────────────────────
-        // Bu Promise'i döndür ama UI'yı bloklamadan arka planda çalıştır
         if (onProgress) onProgress(0, 2000);
-        console.log('🚀 API v5: Tam yükleme arka planda başlıyor...');
+        console.log('🚀 API v6: Tam yükleme arka planda başlıyor...');
 
-        // Grup 1: AniList (anime + manga + webtoon + manhua ayrı ayrı)
         const [alA, alM, alW, alMH, ktA, ktM] = await Promise.allSettled([
-            _AniList.topAnime(8),    // 8×50 = 400 anime
-            _AniList.topManga(7),    // 7×50 = 350 manga
-            _AniList.topWebtoon(10), // 10×50 = 500 Kore webtoon
-            _AniList.topManhua(5),   // 5×50 = 250 Çin webtoon
-            _Kitsu.topAnime(5),      // 5×20 = 100 anime
-            _Kitsu.topManga(4),      // 4×20 = 80 manga
+            _AniList.topAnime(8),
+            _AniList.topManga(7),
+            _AniList.topWebtoon(10),
+            _AniList.topManhua(5),
+            _Kitsu.topAnime(5),
+            _Kitsu.topManga(4),
         ]);
 
-        // Grup 2: Jikan (rate limit ayrı - sıralı çalışır)
         const [jkA, jkM, jkW, jkMH] = await Promise.allSettled([
-            _Jikan.topAnime(8),     // 8×25 = 200 anime
-            _Jikan.topManga(6),     // 6×25 = 150 manga
-            _Jikan.topWebtoon(6),   // 6×25 = 150 manhwa
-            _Jikan.topManhua(4),    // 4×25 = 100 manhua
+            _Jikan.topAnime(8),
+            _Jikan.topManga(6),
+            _Jikan.topWebtoon(6),
+            _Jikan.topManhua(4),
         ]);
 
         const all = [

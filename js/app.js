@@ -50,8 +50,6 @@ function initializeApp() {
     if (!isGuest) renderProfilePage();
     setupPWA();
     setupNetworkListeners();
-
-    // Açılış popup'ı devre dışı
 }
 
 // ===== API İÇERİK YÜKLEME =====
@@ -65,8 +63,10 @@ async function loadContentFromAPI() {
     showLoadingPlaceholders();
 
     try {
-        // Hızlı ön yükleme callback'i: AniList'ten ilk 300 içerik gelince hemen göster
-        window._onFastContentReady = (fastContent) => {
+        // Hızlı ön yükleme: AniList'ten ilk içerikler gelince hemen göster
+        // window global kirliliği önlemek için custom event kullanılıyor
+        function _fastContentHandler(e) {
+            const fastContent = e.detail || [];
             if (!contentLoaded && fastContent.length > 0) {
                 allContent = fastContent;
                 trendingContent = fastContent.filter(i => i.type === 'anime').slice(0, 20);
@@ -74,14 +74,15 @@ async function loadContentFromAPI() {
                 renderHomePage();
                 renderDiscoverGrid();
             }
-        };
+            document.removeEventListener('onilist:fastContentReady', _fastContentHandler);
+        }
+        document.addEventListener('onilist:fastContentReady', _fastContentHandler);
 
         const [seasonal, all] = await Promise.all([
             JikanAPI.fetchSeasonNow(20),
             JikanAPI.loadAllContent()
         ]);
 
-        window._onFastContentReady = null; // Callback temizle
         seasonContent = seasonal || [];
         allContent = all || [];
         trendingContent = allContent.filter(i => i.type === 'anime').slice(0, 20);
@@ -233,14 +234,14 @@ function renderContinueWatching() {
         return '<div class="media-card" style="cursor:pointer" onclick="openDetailPage(\'' + safeItem + '\')">' +
             '<div class="media-poster">' +
                 (item.poster
-                    ? '<img src="' + item.poster + '" alt="' + (item.name || '') + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
+                    ? '<img src="' + item.poster + '" alt="' + _esc(item.name || '') + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
                       '<div class="media-poster-fallback" style="display:none">' + getTypeIcon(item.type) + '</div>'
                     : '<div class="media-poster-fallback">' + getTypeIcon(item.type) + '</div>') +
                 '<span class="media-type-badge ' + item.type + '">' + item.type + '</span>' +
                 '<div class="media-score-badge">▶ ' + (item.currentEpisode || 0) + '/' + (item.totalEpisodes || '?') + '</div>' +
             '</div>' +
             '<div class="media-info">' +
-                '<div class="media-title">' + (item.name || 'İsimsiz') + '</div>' +
+                '<div class="media-title">' + _esc(item.name || 'İsimsiz') + '</div>' +
                 '<div style="background:var(--bg-secondary);height:3px;border-radius:3px;margin:0.4rem 0;overflow:hidden;">' +
                     '<div style="width:' + pct + '%;height:100%;background:var(--accent-primary);"></div>' +
                 '</div>' +
@@ -263,7 +264,6 @@ function renderMediaRow(containerId, items) {
         const rating = item.rating ? '⭐ ' + item.rating : '';
         const meta = [item.year, item.episodes ? item.episodes + ' Ep' : item.chapters ? item.chapters + ' Ch' : ''].filter(Boolean).join(' · ');
 
-        // JSON stringify ile XSS güvenli hale getir
         const itemJson = JSON.stringify({
             id: item.id,
             name: item.name,
@@ -284,14 +284,14 @@ function renderMediaRow(containerId, items) {
         return '<div class="media-card" style="cursor:pointer" onclick="openDetailPage(\'' + safeItem + '\')">' +
             '<div class="media-poster">' +
                 (item.poster
-                    ? '<img src="' + item.poster + '" alt="' + (item.name || '') + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
+                    ? '<img src="' + item.poster + '" alt="' + _esc(item.name || '') + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
                       '<div class="media-poster-fallback" style="display:none">' + getTypeIcon(item.type) + '</div>'
                     : '<div class="media-poster-fallback">' + getTypeIcon(item.type) + '</div>') +
                 '<span class="media-type-badge ' + (item.type || 'anime') + '">' + (item.type || 'anime') + '</span>' +
                 (rating ? '<div class="media-score-badge">' + rating + '</div>' : '') +
             '</div>' +
             '<div class="media-info">' +
-                '<div class="media-title">' + (item.name || 'İsimsiz') + '</div>' +
+                '<div class="media-title">' + _esc(item.name || 'İsimsiz') + '</div>' +
                 '<div class="media-meta">' + meta + '</div>' +
                 addBtn +
             '</div>' +
@@ -372,14 +372,14 @@ function renderDiscoverGrid() {
         return '<div class="media-card" style="cursor:pointer" onclick="openDetailPage(\'' + safeItem + '\')">' +
             '<div class="media-poster">' +
                 (item.poster
-                    ? '<img src="' + item.poster + '" alt="' + (item.name || '') + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
+                    ? '<img src="' + item.poster + '" alt="' + _esc(item.name || '') + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
                       '<div class="media-poster-fallback" style="display:none">' + getTypeIcon(item.type) + '</div>'
                     : '<div class="media-poster-fallback">' + getTypeIcon(item.type) + '</div>') +
                 '<span class="media-type-badge ' + (item.type || 'anime') + '">' + (item.type || 'anime') + '</span>' +
                 (rating ? '<div class="media-score-badge">' + rating + '</div>' : '') +
             '</div>' +
             '<div class="media-info">' +
-                '<div class="media-title">' + (item.name || 'İsimsiz') + '</div>' +
+                '<div class="media-title">' + _esc(item.name || 'İsimsiz') + '</div>' +
                 '<div class="media-meta">' + meta + '</div>' +
                 addBtn +
             '</div>' +
@@ -404,7 +404,6 @@ function onDiscoverSearch() {
 // ===== HIZLI EKLE =====
 function quickAddFromJson(jsonStr) {
     try {
-        // HTML entity decode
         const decoded = jsonStr.replace(/&quot;/g, '"');
         const item = JSON.parse(decoded);
         quickAdd(item);
@@ -440,9 +439,9 @@ function quickAdd(item) {
 
     dataManager.data.items.unshift(newItem);
     dataManager.saveAll();
-    checkAchievements(); // XP yok — sadece başarım kontrolü
+    checkAchievements();
     updateStats();
-    showNotification('✅ ' + newItem.name + ' "İzlenecek" listesine eklendi!', 'success');
+    showNotification('✅ ' + _esc(newItem.name) + ' "İzlenecek" listesine eklendi!', 'success');
     renderDiscoverGrid();
     renderHomePage();
 }
@@ -496,11 +495,11 @@ function addItem(event) {
 
     dataManager.data.items.unshift(newItem);
     dataManager.saveAll();
-    checkAchievements(); // XP yok — sadece başarım kontrolü
+    checkAchievements();
     updateStats();
     filterItems();
     closeModal();
-    showNotification('✅ ' + newItem.name + ' eklendi!', 'success');
+    showNotification('✅ ' + _esc(newItem.name) + ' eklendi!', 'success');
 }
 
 // ===== JIKAN ARAMA (modal içi) =====
@@ -529,10 +528,10 @@ async function searchAPI() {
 
                     return '<div class="api-result-item" onclick="fillFromAPI(\'' + safeData.replace(/'/g, "\\'") + '\')">' +
                         (item.poster
-                            ? '<img src="' + item.poster + '" alt="' + (item.name || '') + '">'
+                            ? '<img src="' + item.poster + '" alt="' + _esc(item.name || '') + '">'
                             : '<div style="width:40px;height:55px;background:var(--bg-card);border-radius:4px;display:flex;align-items:center;justify-content:center;">' + getTypeIcon(item.type) + '</div>') +
                         '<div>' +
-                            '<div class="api-result-title">' + (item.name || '') + '</div>' +
+                            '<div class="api-result-title">' + _esc(item.name || '') + '</div>' +
                             '<div class="api-result-meta">' + item.type + ' · ' + (item.episodes ? item.episodes + ' ep' : item.chapters ? item.chapters + ' ch' : '?') + (item.rating ? ' · ⭐' + item.rating : '') + '</div>' +
                         '</div>' +
                     '</div>';
@@ -585,12 +584,10 @@ function toggleNotifications() {
 
 // ===== PWA =====
 function setupPWA() {
-    // Service Worker kaydet (offline destek + PWA kurulumu)
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js', { scope: '/' })
             .then(reg => {
                 console.log('✅ Service Worker kayıtlı:', reg.scope);
-                // Yeni SW hazır olduğunda otomatik aktive et
                 reg.addEventListener('updatefound', () => {
                     const newWorker = reg.installing;
                     if (!newWorker) return;
@@ -640,8 +637,6 @@ function setupNetworkListeners() {
     });
 }
 
-// ===== MODAL KAPAT (dışına tıklayınca) =====
-
 // =====================================================
 // LIBRARY'DEN DETAY SAYFASI
 // =====================================================
@@ -663,8 +658,6 @@ function openDetailPageFromLibrary(itemId) {
 // =====================================================
 // DUYURU SİSTEMİ v2 - Güçlü & Güzel
 // =====================================================
-// Duyuru sistemi - admin panelden gönderilince otomatik çalışır
-// Kullanıcı giriş yaptıktan 5 saniye sonra yeni duyuruları kontrol eder
 async function checkAnnouncements() {
     if (!window.supabaseClient) return;
     try {
@@ -702,6 +695,11 @@ function showAnnouncementModal(ann) {
     const typeLabels = { info: 'BİLGİ', success: 'BAŞARILI', warning: 'UYARI', update: 'GÜNCELLEME' };
     const prioLabel = ann.priority === 'critical' ? '🔴 ACİL' : ann.priority === 'high' ? '🟠 ÖNEMLİ' : null;
 
+    // Duyuru içeriği _esc ile XSS'e karşı korunuyor
+    const safeTitle   = _esc(ann.title || '');
+    const safeContent = _esc(ann.content || '');
+    const safeDate    = new Date(ann.created_at).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
+
     const overlay = document.createElement('div');
     overlay.id = 'annModal';
     overlay.style.cssText = `
@@ -727,12 +725,8 @@ function showAnnouncementModal(ann) {
             animation:annSlideUp 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
             position:relative;
         ">
-            <!-- Renkli üst şerit -->
             <div style="height:4px;background:linear-gradient(90deg,${t.accent},${t.accent}88);"></div>
-
-            <!-- İçerik -->
             <div style="padding:1.8rem 1.8rem 1.5rem;">
-                <!-- Badge + Kapat -->
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;">
                     <div style="display:flex;align-items:center;gap:0.5rem;">
                         <span style="
@@ -743,7 +737,7 @@ function showAnnouncementModal(ann) {
                         ">${typeLabels[ann.type] || 'DUYURU'}</span>
                         ${prioLabel ? `<span style="font-size:0.75rem;font-weight:700;color:${t.accent};">${prioLabel}</span>` : ''}
                     </div>
-                    <button onclick="dismissAnnouncement('${ann.id}')" style="
+                    <button onclick="dismissAnnouncement('${_esc(String(ann.id))}')" style="
                         background:rgba(255,255,255,0.07);
                         border:1px solid rgba(255,255,255,0.12);
                         border-radius:8px;color:#8892a4;
@@ -753,8 +747,6 @@ function showAnnouncementModal(ann) {
                     " onmouseover="this.style.background='rgba(239,68,68,0.15)';this.style.color='#ef4444'"
                        onmouseout="this.style.background='rgba(255,255,255,0.07)';this.style.color='#8892a4'">✕</button>
                 </div>
-
-                <!-- İkon + Başlık -->
                 <div style="display:flex;align-items:flex-start;gap:1rem;margin-bottom:1rem;">
                     <div style="
                         width:48px;height:48px;border-radius:14px;
@@ -768,16 +760,14 @@ function showAnnouncementModal(ann) {
                             color:#fff;font-size:1.05rem;font-weight:700;
                             margin:0 0 0.3rem;line-height:1.3;
                             font-family:'DM Sans',sans-serif;
-                        ">${ann.title || ''}</h3>
+                        ">${safeTitle}</h3>
                         <div style="
                             color:#8892a4;font-size:0.75rem;
                             font-family:'DM Sans',sans-serif;
-                        ">${new Date(ann.created_at).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'})}</div>
+                        ">${safeDate}</div>
                     </div>
                 </div>
-
-                <!-- Mesaj -->
-                ${ann.content ? `
+                ${safeContent ? `
                 <div style="
                     background:rgba(255,255,255,0.04);
                     border:1px solid rgba(255,255,255,0.08);
@@ -789,10 +779,8 @@ function showAnnouncementModal(ann) {
                     line-height:1.6;
                     font-family:'DM Sans',sans-serif;
                     margin-bottom:1.3rem;
-                ">${ann.content}</div>` : '<div style="margin-bottom:1.3rem;"></div>'}
-
-                <!-- Buton -->
-                <button onclick="dismissAnnouncement('${ann.id}')" style="
+                ">${safeContent}</div>` : '<div style="margin-bottom:1.3rem;"></div>'}
+                <button onclick="dismissAnnouncement('${_esc(String(ann.id))}')" style="
                     width:100%;padding:0.75rem;
                     background:linear-gradient(135deg,${t.accent},${t.accent}cc);
                     border:none;border-radius:10px;
@@ -811,7 +799,6 @@ function showAnnouncementModal(ann) {
         </style>
     `;
 
-    // Backdrop tıklamasıyla kapat
     overlay.addEventListener('click', (e) => {
         if (e.target === overlay) dismissAnnouncement(String(ann.id));
     });
@@ -865,7 +852,6 @@ console.log('✅ App.js v5.2 loaded');
 
 let currentDetailItem = null;
 
-// Ana açma fonksiyonu - kartlara onclick ile bağlı
 async function openDetailPage(itemJsonStr) {
     let item;
     try {
@@ -875,15 +861,12 @@ async function openDetailPage(itemJsonStr) {
 
     currentDetailItem = item;
 
-    // Keşfet'ten açıldıysa scroll pozisyonunu kaydet
     if (currentSection === 'discover') {
         discoverScrollPosition = window.scrollY || document.documentElement.scrollTop;
     }
     previousSection = currentSection;
     currentSection = 'detail';
 
-    // History'ye push et
-    // URL'de içerik adını güzel göster: #anime-naruto
     const _typeSlug = (item.type || 'icerik').toLowerCase();
     const _nameSlug = toSlug(item.name || item.nameEn || '');
     history.pushState(
@@ -892,34 +875,22 @@ async function openDetailPage(itemJsonStr) {
         '#' + _typeSlug + '-' + _nameSlug
     );
 
-    // Detay section'ı göster
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
     const detailSec = document.getElementById('detailSection');
     if (detailSec) detailSec.classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // Temel bilgileri hemen doldur
     _fillDetailBasic(item);
-
-    // Jikan'dan tam detay çek
     _fetchFullDetail(item);
-
-    // Yorumları yükle
     loadReviews(item.id);
-
-    // Kullanıcının mevcut puanını yükle
     loadUserReview(item.id);
-
-    // Benzer içerikleri yükle
     loadSimilarContent(item);
 }
 
 function _fillDetailBasic(item) {
     const s = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '—'; };
-    const sh = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html || ''; };
 
-    // Poster
     const posterEl = document.getElementById('dpPoster');
     if (posterEl) { posterEl.src = item.poster || ''; posterEl.onerror = () => posterEl.style.display = 'none'; }
 
@@ -927,7 +898,6 @@ function _fillDetailBasic(item) {
     s('dpYear', item.year);
     s('dpScore', item.rating ? '⭐ ' + item.rating : '—');
     s('dpEpisodes', item.episodes ? item.episodes + ' Bölüm' : item.chapters ? item.chapters + ' Bölüm' : '—');
-    // Reset synopsis cache on each new detail open
     window._detailSynopsis = { en: null, tr: null };
     const synopsisText = item.synopsis || ((typeof getCurrentLang === 'function' && getCurrentLang() === 'en') ? 'Loading description...' : 'Açıklama yükleniyor...');
     s('dpSynopsis', synopsisText);
@@ -936,14 +906,15 @@ function _fillDetailBasic(item) {
     s('dpMembers', '—');
     s('dpStudio', '—');
 
-    // Type badge
     const badge = document.getElementById('dpTypeBadge');
     if (badge) { badge.textContent = (item.type || 'anime').toUpperCase(); badge.className = 'dp-type-badge ' + (item.type || 'anime'); }
 
-    // Genres
-    sh('dpGenres', (item.genres || []).map(g => `<span class="dp-genre-tag">${g}</span>`).join('') || '<span style="color:var(--text-muted)">Yükleniyor...</span>');
+    // Genres — API'den gelen veriler, _esc ile korunuyor
+    const genresEl = document.getElementById('dpGenres');
+    if (genresEl) {
+        genresEl.innerHTML = (item.genres || []).map(g => `<span class="dp-genre-tag">${_esc(g)}</span>`).join('') || '<span style="color:var(--text-muted)">Yükleniyor...</span>';
+    }
 
-    // Add button
     const addBtn = document.getElementById('dpAddBtn');
     if (addBtn) {
         const inLib = !isGuest && dataManager.data?.items?.some(i => i.name?.toLowerCase() === item.name?.toLowerCase());
@@ -957,16 +928,13 @@ function _fillDetailBasic(item) {
         };
     }
 
-    // Back breadcrumb
     const titleBc = document.getElementById('dpBreadcrumbTitle');
     if (titleBc) titleBc.textContent = item.name || '';
 }
 
-// Store synopsis in both languages for live switching
 window._detailSynopsis = { en: null, tr: null };
 
 async function _fetchFullDetail(item) {
-    // Try Jikan first if malId available
     if (item.malId) {
         try {
             const type = item.type === 'anime' ? 'anime' : 'manga';
@@ -986,7 +954,7 @@ async function _fetchFullDetail(item) {
                     if (d.genres || d.themes) {
                         const genres = [...(d.genres || []), ...(d.themes || [])].map(g => g.name);
                         const el = document.getElementById('dpGenres');
-                        if (el) el.innerHTML = genres.map(g => `<span class="dp-genre-tag">${g}</span>`).join('');
+                        if (el) el.innerHTML = genres.map(g => `<span class="dp-genre-tag">${_esc(g)}</span>`).join('');
                     }
                     if (d.images?.jpg?.large_image_url) {
                         const bg = document.getElementById('dpBannerBg');
@@ -995,9 +963,7 @@ async function _fetchFullDetail(item) {
 
                     if (d.synopsis) {
                         window._detailSynopsis.en = d.synopsis;
-                        // Apply immediately
                         _applyDetailSynopsis();
-                        // Also fetch Turkish synopsis from AniList if anilistId available
                         if (item.anilistId) _fetchAniListSynopsis(item.anilistId);
                         return;
                     }
@@ -1006,14 +972,12 @@ async function _fetchFullDetail(item) {
         } catch(e) { /* fall through to AniList */ }
     }
 
-    // Fallback: fetch from AniList (works for calendar items and items without malId)
     const aniId = item.anilistId || (item.id && String(item.id).startsWith('al_') ? String(item.id).replace('al_','') : null);
     if (aniId) {
         await _fetchAniListSynopsis(aniId);
         return;
     }
 
-    // Last resort: search AniList by name
     if (item.name) {
         try {
             const res = await fetch('https://graphql.anilist.co', {
@@ -1035,7 +999,7 @@ async function _fetchFullDetail(item) {
                 s('dpYear', m.startDate?.year || null);
                 if (m.genres?.length) {
                     const el = document.getElementById('dpGenres');
-                    if (el) el.innerHTML = m.genres.map(g => `<span class="dp-genre-tag">${g}</span>`).join('');
+                    if (el) el.innerHTML = m.genres.map(g => `<span class="dp-genre-tag">${_esc(g)}</span>`).join('');
                 }
                 if (m.coverImage?.large) {
                     const bg = document.getElementById('dpBannerBg');
@@ -1101,7 +1065,6 @@ async function loadReviews(contentId) {
         return;
     }
 
-    // Avg score
     const avg = (data.reduce((s, r) => s + r.rating, 0) / data.length).toFixed(1);
     const avgEl = document.getElementById('dpUserScore');
     if (avgEl) avgEl.textContent = avg + ' / 10';
@@ -1111,13 +1074,13 @@ async function loadReviews(contentId) {
     container.innerHTML = data.map(r => `
         <div class="review-card">
             <div class="review-header">
-                <div class="review-avatar">${(r.username || 'U')[0].toUpperCase()}</div>
+                <div class="review-avatar">${_esc((r.username || 'U')[0].toUpperCase())}</div>
                 <div class="review-meta">
                     <div class="review-username">${_esc(r.username)}</div>
                     <div class="review-date">${_fmtDate(r.created_at)}</div>
                 </div>
                 <div class="review-score-badge">${r.rating}<span>/10</span></div>
-                ${!isGuest && currentUser?.uid === r.user_id ? `<button class="review-delete-btn" onclick="deleteReview('${r.id}','${_esc(currentDetailItem?.id||'')}')">🗑️</button>` : ''}
+                ${!isGuest && currentUser?.uid === r.user_id ? `<button class="review-delete-btn" onclick="deleteReview('${_esc(String(r.id))}','${_esc(String(currentDetailItem?.id||''))}')">🗑️</button>` : ''}
             </div>
             ${r.comment ? `<p class="review-comment">${_esc(r.comment)}</p>` : ''}
         </div>
@@ -1134,7 +1097,6 @@ async function loadUserReview(contentId) {
         .single();
 
     if (data) {
-        // Pre-fill form
         setStarRating(data.rating);
         const commentEl = document.getElementById('reviewComment');
         if (commentEl) commentEl.value = data.comment || '';
@@ -1179,25 +1141,21 @@ async function submitReview() {
     if (error) { showNotification('Yorum gönderilemedi: ' + error.message, 'error'); return; }
     showNotification('✅ Yorumun kaydedildi!', 'success');
 
-    // XP: Yalnızca yeni yorum ise ver (güncelleme XP vermiyor — döngü önleme)
-    // reviewedItems: daha önce yorum yazılan content_id'leri tutar
     if (dataManager.data) {
         const reviewedItems = dataManager.data.reviewedItems || [];
         const contentKey = String(currentDetailItem.id);
         const isNewReview = !reviewedItems.includes(contentKey);
 
         if (isNewReview && comment.length >= 50) {
-            // İlk yorum — XP ver ve kaydet
             const reviewXP = comment.length >= 200
-                ? XP_REWARDS.writeLongReview   // 100 XP - detaylı yorum
-                : XP_REWARDS.writeReview;      // 50 XP - kısa yorum
+                ? XP_REWARDS.writeLongReview
+                : XP_REWARDS.writeReview;
             xpSystem.addXP(reviewXP, _lang === 'en'
                 ? (comment.length >= 200 ? 'Detailed review! ✍️' : 'Review written!')
                 : (comment.length >= 200 ? 'Detaylı yorum! ✍️' : 'Yorum yazıldı!'));
             reviewedItems.push(contentKey);
             dataManager.data.reviewedItems = reviewedItems;
         }
-        // Sayaç her durumda güncellenir (başarımlar için)
         dataManager.data.reviewCount = (dataManager.data.reviewCount || 0) + 1;
         dataManager.saveAll();
     }
@@ -1219,7 +1177,6 @@ function loadSimilarContent(item) {
     const genres = item.genres || [];
     const type = item.type;
 
-    // Find similar from allContent
     let similar = allContent.filter(c =>
         c.id !== item.id &&
         c.type === type &&
@@ -1271,8 +1228,9 @@ function goBackFromDetail() {
     }
 }
 
+// ===== XSS KORUMA YARDIMCILARI =====
 function _esc(str) {
-    return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
 }
 function _fmtDate(iso) {
     if (!iso) return '';
