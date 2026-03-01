@@ -1146,13 +1146,13 @@ function renderProfilePage() {
     const cover = document.getElementById('profileCoverBg');
     if (cover) {
         const covers = {
-            gradient1: 'linear-gradient(135deg,#ff3366,#7c3aed)',
-            gradient2: 'linear-gradient(135deg,#00d4ff,#0ea5e9)',
-            gradient3: 'linear-gradient(135deg,#10b981,#059669)',
-            gradient4: 'linear-gradient(135deg,#f59e0b,#ef4444)',
-            gradient5: 'linear-gradient(135deg,#8b5cf6,#ec4899)',
-            gradient6: 'linear-gradient(135deg,#f97316,#fbbf24)',
-            gradient7: 'linear-gradient(135deg,#06b6d4,#6366f1)',
+            gradient1: 'linear-gradient(135deg,rgba(255,51,102,0.18),rgba(124,58,237,0.12))',
+            gradient2: 'linear-gradient(135deg,rgba(0,212,255,0.18),rgba(14,165,233,0.12))',
+            gradient3: 'linear-gradient(135deg,rgba(16,185,129,0.18),rgba(5,150,105,0.12))',
+            gradient4: 'linear-gradient(135deg,rgba(245,158,11,0.18),rgba(239,68,68,0.12))',
+            gradient5: 'linear-gradient(135deg,rgba(139,92,246,0.18),rgba(236,72,153,0.12))',
+            gradient6: 'linear-gradient(135deg,rgba(249,115,22,0.18),rgba(251,191,36,0.12))',
+            gradient7: 'linear-gradient(135deg,rgba(6,182,212,0.18),rgba(99,102,241,0.12))',
         };
         cover.style.background = covers[d.social.cover || 'gradient1'];
     }
