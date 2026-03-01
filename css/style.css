@@ -787,7 +787,7 @@ header {
 
 .profile-cover {
     height: 150px;
-    background: linear-gradient(135deg, #ff3366, #7c3aed);
+    background: var(--bg-secondary, #141824);
     transition: background 0.4s;
 }
 
