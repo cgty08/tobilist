@@ -39,7 +39,7 @@ function initializeApp() {
 
     // Duyuru popup'ı devre dışı
     const hour = new Date().getHours();
-    const greet = hour < 6 ? 'Gece yarısı 🌙' : hour < 12 ? 'Günaydın ☀️' : hour < 18 ? 'İyi günler 🌤️' : 'İyi akşamlar 🌙';
+    const greet = hour < 6 ? 'Good night 🌙' : hour < 12 ? 'Good morning ☀️' : hour < 18 ? 'Good afternoon 🌤️' : 'Good evening 🌙';
     const gEl = document.getElementById('bannerGreeting');
     if (gEl) {
         const name = currentUser ? (dataManager.data?.social?.name || currentUser.displayName || '') : '';

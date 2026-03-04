@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -328,9 +328,9 @@
         </div>
         <p class="login-sub">Admin Panel — <span>RESTRICTED ACCESS</span></p>
         <div class="lf"><label>Email Adresi</label><input type="email" id="adminEmail" placeholder="admin@onilist.com" autocomplete="email"></div>
-        <div class="lf"><label>Şifre</label><input type="password" id="adminPassword" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')adminLogin()"></div>
+        <div class="lf"><label>Password</label><input type="password" id="adminPassword" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')adminLogin()"></div>
         <div id="loginErr" class="login-err"></div>
-        <button class="login-btn" id="loginBtn" onclick="adminLogin()">Admin Olarak Giriş Yap →</button>
+        <button class="login-btn" id="loginBtn" onclick="adminLogin()">Login as Admin →</button>
     </div>
 </div>
 
@@ -346,36 +346,36 @@
 
     <div class="online-pill">
         <div class="online-dot"></div>
-        <span id="sideOnlineCount">0 kullanıcı online</span>
+        <span id="sideOnlineCount">0 users online</span>
     </div>
 
     <div class="sb-nav">
-        <div class="sb-section">Genel Bakış</div>
+        <div class="sb-section">Overview</div>
         <div class="nav-item active" onclick="showPage('dashboard')"><span class="nav-icon">📊</span> Dashboard</div>
-        <div class="nav-item" onclick="showPage('analytics')"><span class="nav-icon">📈</span> Analitik</div>
+        <div class="nav-item" onclick="showPage('analytics')"><span class="nav-icon">📈</span> Analytics</div>
 
-        <div class="sb-section">Kullanıcılar</div>
-        <div class="nav-item" onclick="showPage('users')"><span class="nav-icon">👥</span> Tüm Kullanıcılar <span class="nav-badge" id="userCountBadge">0</span></div>
-        <div class="nav-item" onclick="showPage('online')"><span class="nav-icon">🟢</span> Online Kullanıcılar <span class="nav-badge green" id="onlineBadge">0</span></div>
-        <div class="nav-item" onclick="showPage('bans')"><span class="nav-icon">🚫</span> Banlı Kullanıcılar <span class="nav-badge" id="banCountBadge" style="background:var(--red);display:none;">0</span></div>
+        <div class="sb-section">Users</div>
+        <div class="nav-item" onclick="showPage('users')"><span class="nav-icon">👥</span> All Users <span class="nav-badge" id="userCountBadge">0</span></div>
+        <div class="nav-item" onclick="showPage('online')"><span class="nav-icon">🟢</span> Online Users <span class="nav-badge green" id="onlineBadge">0</span></div>
+        <div class="nav-item" onclick="showPage('bans')"><span class="nav-icon">🚫</span> Banned Users <span class="nav-badge" id="banCountBadge" style="background:var(--red);display:none;">0</span></div>
 
-        <div class="sb-section">İçerik</div>
-        <div class="nav-item" onclick="showPage('content')"><span class="nav-icon">🎬</span> İçerik Listesi</div>
+        <div class="sb-section">Content</div>
+        <div class="nav-item" onclick="showPage('content')"><span class="nav-icon">🎬</span> Content List</div>
         <div class="nav-item" onclick="showPage('reviews')"><span class="nav-icon">💬</span> Yorumlar</div>
-        <div class="nav-item" onclick="showPage('announcements')"><span class="nav-icon">📢</span> Duyurular</div>
-        <div class="nav-item" onclick="showPage('chat')"><span class="nav-icon">💬</span> Sohbet Mesajları <span class="nav-badge" id="chatMsgBadge" style="background:var(--pink);display:none;">0</span></div>
+        <div class="nav-item" onclick="showPage('announcements')"><span class="nav-icon">📢</span> Announcements</div>
+        <div class="nav-item" onclick="showPage('chat')"><span class="nav-icon">💬</span> Chat Messages <span class="nav-badge" id="chatMsgBadge" style="background:var(--pink);display:none;">0</span></div>
 
-        <div class="sb-section">Sistem</div>
-        <div class="nav-item" onclick="showPage('restrictions')"><span class="nav-icon">🛡️</span> Kısıtlamalar</div>
-        <div class="nav-item" onclick="showPage('logs')"><span class="nav-icon">📋</span> Aktivite Log</div>
-        <div class="nav-item" onclick="showPage('settings')"><span class="nav-icon">⚙️</span> Ayarlar</div>
+        <div class="sb-section">System</div>
+        <div class="nav-item" onclick="showPage('restrictions')"><span class="nav-icon">🛡️</span> Restrictions</div>
+        <div class="nav-item" onclick="showPage('logs')"><span class="nav-icon">📋</span> Activity Log</div>
+        <div class="nav-item" onclick="showPage('settings')"><span class="nav-icon">⚙️</span> Settings</div>
     </div>
     <div class="sb-footer">
         <div class="admin-info">
             <div class="admin-av">👑</div>
             <div><div class="admin-name" id="adminNameEl">Admin</div><div class="admin-role">Super Admin</div></div>
         </div>
-        <button class="logout-btn" onclick="adminLogout()">🚪 Çıkış Yap</button>
+        <button class="logout-btn" onclick="adminLogout()">🚪 Logout</button>
     </div>
 </nav>
 
@@ -384,11 +384,11 @@
     <div class="top-bar">
         <div class="page-title-bar">
             <h1 id="pageTitle">Dashboard</h1>
-            <p id="pageSub">OniList platform genel bakışı</p>
+            <p id="pageSub">OniList platform overview</p>
         </div>
         <div class="top-actions">
-            <div class="live-badge"><div class="live-dot"></div><span id="adminLiveTxt">Canlı</span></div>
-            <div class="admin-lang-toggle" id="adminLangToggle" onclick="adminToggleLang()" title="Dil Değiştir / Switch Language">
+            <div class="live-badge"><div class="live-dot"></div><span id="adminLiveTxt">Live</span></div>
+            <div class="admin-lang-toggle" id="adminLangToggle" onclick="adminToggleLang()" title="Switch Language">
                 <span id="adminLangFlag">🇹🇷</span>
                 <span id="adminLangLabel">TR</span>
             </div>
@@ -400,55 +400,55 @@
     <!-- ===== DASHBOARD ===== -->
     <div class="page active" id="page-dashboard">
         <div class="stat-grid" id="dashStatGrid">
-            <div class="stat-card c-blue"><div class="stat-icon">👥</div><div class="stat-label">Toplam Kayıtlı</div><div class="stat-value" id="s-total-users">—</div><div class="stat-change up" id="s-users-change">Yükleniyor…</div></div>
-            <div class="stat-card online-card"><div class="stat-icon">🟢</div><div class="stat-label">Şu An Online</div><div class="stat-value" id="s-online">—</div><div class="stat-change">Son 15 dakikada aktif</div><div class="online-users-list" id="dashOnlineList"></div></div>
-            <div class="stat-card c-green"><div class="stat-icon">👤</div><div class="stat-label">Aktif (7 gün)</div><div class="stat-value" id="s-active">—</div><div class="stat-change">Son haftada giriş yapan</div></div>
-            <div class="stat-card c-pink"><div class="stat-icon">🎬</div><div class="stat-label">Toplam İçerik Girişi</div><div class="stat-value" id="s-entries">—</div><div class="stat-change">Tüm kullanıcıların toplamı</div></div>
-            <div class="stat-card c-purple"><div class="stat-icon">⭐</div><div class="stat-label">Toplam XP</div><div class="stat-value" id="s-xp">—</div><div class="stat-change">Tüm kullanıcıların kazandığı</div></div>
-            <div class="stat-card c-yellow"><div class="stat-icon">✅</div><div class="stat-label">Toplam Tamamlanan</div><div class="stat-value" id="s-completed">—</div><div class="stat-change">Tüm kullanıcıların bitirdiği</div></div>
-            <div class="stat-card c-orange"><div class="stat-icon">💬</div><div class="stat-label">Toplam Yorum</div><div class="stat-value" id="s-reviews">—</div><div class="stat-change">Platforma yazılan yorumlar</div></div>
-            <div class="stat-card c-red"><div class="stat-icon">🚫</div><div class="stat-label">Banlı Hesap</div><div class="stat-value" id="s-banned">—</div><div class="stat-change">Aktif ban</div></div>
+            <div class="stat-card c-blue"><div class="stat-icon">👥</div><div class="stat-label">Total Registered</div><div class="stat-value" id="s-total-users">—</div><div class="stat-change up" id="s-users-change">Loading…</div></div>
+            <div class="stat-card online-card"><div class="stat-icon">🟢</div><div class="stat-label">Currently Online</div><div class="stat-value" id="s-online">—</div><div class="stat-change">Active last 15 minutes</div><div class="online-users-list" id="dashOnlineList"></div></div>
+            <div class="stat-card c-green"><div class="stat-icon">👤</div><div class="stat-label">Active (7 days)</div><div class="stat-value" id="s-active">—</div><div class="stat-change">Logged in last week</div></div>
+            <div class="stat-card c-pink"><div class="stat-icon">🎬</div><div class="stat-label">Total Content Entries</div><div class="stat-value" id="s-entries">—</div><div class="stat-change">Sum of all users</div></div>
+            <div class="stat-card c-purple"><div class="stat-icon">⭐</div><div class="stat-label">Total XP</div><div class="stat-value" id="s-xp">—</div><div class="stat-change">Earned by all users</div></div>
+            <div class="stat-card c-yellow"><div class="stat-icon">✅</div><div class="stat-label">Total Completed</div><div class="stat-value" id="s-completed">—</div><div class="stat-change">Finished by all users</div></div>
+            <div class="stat-card c-orange"><div class="stat-icon">💬</div><div class="stat-label">Total Reviews</div><div class="stat-value" id="s-reviews">—</div><div class="stat-change">Reviews written on platform</div></div>
+            <div class="stat-card c-red"><div class="stat-icon">🚫</div><div class="stat-label">Banned Accounts</div><div class="stat-value" id="s-banned">—</div><div class="stat-change">Active bans</div></div>
         </div>
         <div class="chart-grid-2">
-            <div class="chart-card"><h3>📈 Kullanıcı Aktivitesi</h3><p>Son 14 günlük günlük aktivite</p><canvas id="chartUsers" height="180"></canvas></div>
-            <div class="chart-card"><h3>🎯 İçerik Türleri</h3><p>Kategori dağılımı</p><canvas id="chartContent" height="180"></canvas></div>
+            <div class="chart-card"><h3>📈 User Activity</h3><p>Daily activity last 14 days</p><canvas id="chartUsers" height="180"></canvas></div>
+            <div class="chart-card"><h3>🎯 Content Types</h3><p>Category breakdown</p><canvas id="chartContent" height="180"></canvas></div>
         </div>
         <div class="chart-grid-eq">
-            <div class="chart-card"><h3>📊 İzleme Durumu</h3><p>Genel durum dağılımı</p><canvas id="chartStatus" height="180"></canvas></div>
-            <div class="chart-card"><h3>🏆 Level Dağılımı</h3><p>Kullanıcı level seviyeleri</p><canvas id="chartLevels" height="180"></canvas></div>
+            <div class="chart-card"><h3>📊 Watch Status</h3><p>Overall status distribution</p><canvas id="chartStatus" height="180"></canvas></div>
+            <div class="chart-card"><h3>🏆 Level Distribution</h3><p>User level breakdown</p><canvas id="chartLevels" height="180"></canvas></div>
         </div>
         <div class="table-card">
-            <div class="table-header"><h3>🕐 Son Aktif Kullanıcılar</h3><button class="tbl-btn" onclick="showPage('users')">Tümünü Gör →</button></div>
-            <table><thead><tr><th>Kullanıcı</th><th>Son Aktivite</th><th>Giriş</th><th>XP</th><th>Durum</th></tr></thead>
-            <tbody id="recentUsersBody"><tr class="loading-td"><td colspan="5"><span class="spinner"></span>Yükleniyor…</td></tr></tbody></table>
+            <div class="table-header"><h3>🕐 Recently Active Users</h3><button class="tbl-btn" onclick="showPage('users')">View All →</button></div>
+            <table><thead><tr><th>User</th><th>Last Activity</th><th>Login</th><th>XP</th><th>Status</th></tr></thead>
+            <tbody id="recentUsersBody"><tr class="loading-td"><td colspan="5"><span class="spinner"></span>Loading…</td></tr></tbody></table>
         </div>
     </div>
 
     <!-- ===== ANALYTICS ===== -->
     <div class="page" id="page-analytics">
         <div class="stat-grid">
-            <div class="stat-card c-pink"><div class="stat-icon">🔥</div><div class="stat-label">Ort. Streak</div><div class="stat-value" id="a-streak">—</div><div class="stat-change">gün/kullanıcı</div></div>
-            <div class="stat-card c-blue"><div class="stat-icon">📊</div><div class="stat-label">Ort. Liste Boyutu</div><div class="stat-value" id="a-list">—</div><div class="stat-change">giriş/kullanıcı</div></div>
-            <div class="stat-card c-green"><div class="stat-icon">⭐</div><div class="stat-label">Ort. Puan</div><div class="stat-value" id="a-rating">—</div><div class="stat-change">10 üzerinden</div></div>
-            <div class="stat-card c-purple"><div class="stat-icon">🏆</div><div class="stat-label">Ort. Level</div><div class="stat-value" id="a-level">—</div><div class="stat-change">kullanıcı başına</div></div>
-            <div class="stat-card c-yellow"><div class="stat-icon">📋</div><div class="stat-label">Tamamlama Oranı</div><div class="stat-value" id="a-complete-rate">—</div><div class="stat-change">% tamamlandı</div></div>
-            <div class="stat-card c-orange"><div class="stat-icon">🌟</div><div class="stat-label">En Uzun Streak</div><div class="stat-value" id="a-longest-streak">—</div><div class="stat-change">gün</div></div>
+            <div class="stat-card c-pink"><div class="stat-icon">🔥</div><div class="stat-label">Avg. Streak</div><div class="stat-value" id="a-streak">—</div><div class="stat-change">days/user</div></div>
+            <div class="stat-card c-blue"><div class="stat-icon">📊</div><div class="stat-label">Avg. List Size</div><div class="stat-value" id="a-list">—</div><div class="stat-change">entries/user</div></div>
+            <div class="stat-card c-green"><div class="stat-icon">⭐</div><div class="stat-label">Avg. Rating</div><div class="stat-value" id="a-rating">—</div><div class="stat-change">out of 10</div></div>
+            <div class="stat-card c-purple"><div class="stat-icon">🏆</div><div class="stat-label">Avg. Level</div><div class="stat-value" id="a-level">—</div><div class="stat-change">per user</div></div>
+            <div class="stat-card c-yellow"><div class="stat-icon">📋</div><div class="stat-label">Completion Rate</div><div class="stat-value" id="a-complete-rate">—</div><div class="stat-change">% completed</div></div>
+            <div class="stat-card c-orange"><div class="stat-icon">🌟</div><div class="stat-label">Longest Streak</div><div class="stat-value" id="a-longest-streak">—</div><div class="stat-change">days</div></div>
         </div>
         <div class="chart-grid-eq">
-            <div class="chart-card"><h3>🎭 Tür Dağılımı</h3><p>En popüler türler</p><canvas id="chartGenre" height="260"></canvas></div>
-            <div class="chart-card"><h3>👀 İzleme Durumu</h3><p>Genel durum breakdown</p><canvas id="chartStatus2" height="260"></canvas></div>
+            <div class="chart-card"><h3>🎭 Genre Distribution</h3><p>Most popular genres</p><canvas id="chartGenre" height="260"></canvas></div>
+            <div class="chart-card"><h3>👀 Watch Status</h3><p>Overall status breakdown</p><canvas id="chartStatus2" height="260"></canvas></div>
         </div>
         <div class="chart-grid-eq">
-            <div class="chart-card"><h3>📅 Aylık Kayıt</h3><p>Son 6 aydaki yeni kayıtlar</p><canvas id="chartMonthly" height="200"></canvas></div>
-            <div class="chart-card"><h3>⚡ XP Dağılımı</h3><p>Kullanıcı XP seviyeleri</p><canvas id="chartXP" height="200"></canvas></div>
+            <div class="chart-card"><h3>📅 Monthly Registrations</h3><p>New signups last 6 months</p><canvas id="chartMonthly" height="200"></canvas></div>
+            <div class="chart-card"><h3>⚡ XP Distribution</h3><p>User XP levels</p><canvas id="chartXP" height="200"></canvas></div>
         </div>
         <div class="table-card">
             <div class="table-header">
                 <h3>🏆 XP Liderlik Tablosu <span style="font-size:.75rem;font-weight:400;color:var(--text2);">— Tüm Kayıtlı Kullanıcılar</span></h3>
                 <span style="font-size:.78rem;color:var(--green);display:flex;align-items:center;gap:.4rem;"><span style="width:6px;height:6px;background:var(--green);border-radius:50%;display:inline-block;"></span>Gerçek zamanlı sıralama</span>
             </div>
-            <table><thead><tr><th>#</th><th>Kullanıcı</th><th>XP</th><th>Level</th><th>Giriş</th><th>Streak</th><th>Tamamlanan</th></tr></thead>
-            <tbody id="topUsersBody"><tr class="loading-td"><td colspan="7"><span class="spinner"></span>Yükleniyor…</td></tr></tbody></table>
+            <table><thead><tr><th>#</th><th>User</th><th>XP</th><th>Level</th><th>Login</th><th>Streak</th><th>Completed</th></tr></thead>
+            <tbody id="topUsersBody"><tr class="loading-td"><td colspan="7"><span class="spinner"></span>Loading…</td></tr></tbody></table>
         </div>
     </div>
 
@@ -456,25 +456,25 @@
     <div class="page" id="page-users">
         <div class="table-card">
             <div class="table-header">
-                <h3>👥 Tüm Kullanıcılar</h3>
+                <h3>👥 All Users</h3>
                 <div class="table-actions">
-                    <input class="search-inp" type="text" id="userSearch" placeholder="🔍 Kullanıcı ara…" oninput="filterUsers()">
+                    <input class="search-inp" type="text" id="userSearch" placeholder="🔍 Search users…" oninput="filterUsers()">
                     <select class="fi" style="width:auto;padding:.38rem .8rem;" id="userStatusF" onchange="filterUsers()">
-                        <option value="all">Tüm Durumlar</option>
+                        <option value="all">All Statuses</option>
                         <option value="active">✅ Aktif</option>
-                        <option value="banned">🚫 Banlı</option>
+                        <option value="banned">🚫 Banned</option>
                     </select>
                     <select class="fi" style="width:auto;padding:.38rem .8rem;" id="userSort" onchange="renderUsers()">
                         <option value="newest">En Yeni</option>
                         <option value="oldest">En Eski</option>
-                        <option value="xp">XP'ye Göre</option>
-                        <option value="entries">Giriş Sayısına Göre</option>
+                        <option value="xp">By XP</option>
+                        <option value="entries">By Entry Count</option>
                     </select>
-                    <button class="tbl-btn" onclick="exportCSV()">📥 CSV İndir</button>
+                    <button class="tbl-btn" onclick="exportCSV()">📥 Download CSV</button>
                 </div>
             </div>
-            <table><thead><tr><th>Kullanıcı</th><th>E-posta</th><th>Katılım</th><th>XP / Level</th><th>Giriş</th><th>Streak</th><th>Durum</th><th>İşlemler</th></tr></thead>
-            <tbody id="usersBody"><tr class="loading-td"><td colspan="8"><span class="spinner"></span>Yükleniyor…</td></tr></tbody></table>
+            <table><thead><tr><th>User</th><th>Email</th><th>Joined</th><th>XP / Level</th><th>Login</th><th>Streak</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="usersBody"><tr class="loading-td"><td colspan="8"><span class="spinner"></span>Loading…</td></tr></tbody></table>
             <div class="pagination"><div class="pag-info" id="usersPageInfo">—</div><div class="pag-btns" id="usersPageBtns"></div></div>
         </div>
     </div>
@@ -482,10 +482,10 @@
     <!-- ===== ONLINE ===== -->
     <div class="page" id="page-online">
         <div class="stat-grid">
-            <div class="stat-card online-card"><div class="stat-icon">🟢</div><div class="stat-label">Şu An Online</div><div class="stat-value" id="o-online">—</div><div class="stat-change">Son 15 dakika</div></div>
-            <div class="stat-card c-blue"><div class="stat-icon">👤</div><div class="stat-label">Son 1 saat</div><div class="stat-value" id="o-hour">—</div><div class="stat-change">aktif kullanıcı</div></div>
-            <div class="stat-card c-green"><div class="stat-icon">📅</div><div class="stat-label">Bugün aktif</div><div class="stat-value" id="o-today">—</div><div class="stat-change">kullanıcı</div></div>
-            <div class="stat-card c-purple"><div class="stat-icon">👥</div><div class="stat-label">Toplam Kayıtlı</div><div class="stat-value" id="o-total">—</div><div class="stat-change">tüm üyeler</div></div>
+            <div class="stat-card online-card"><div class="stat-icon">🟢</div><div class="stat-label">Currently Online</div><div class="stat-value" id="o-online">—</div><div class="stat-change">Last 15 minutes</div></div>
+            <div class="stat-card c-blue"><div class="stat-icon">👤</div><div class="stat-label">Last 1 hour</div><div class="stat-value" id="o-hour">—</div><div class="stat-change">active users</div></div>
+            <div class="stat-card c-green"><div class="stat-icon">📅</div><div class="stat-label">Active today</div><div class="stat-value" id="o-today">—</div><div class="stat-change">users</div></div>
+            <div class="stat-card c-purple"><div class="stat-icon">👥</div><div class="stat-label">Total Registered</div><div class="stat-value" id="o-total">—</div><div class="stat-change">all members</div></div>
         </div>
         <!-- Online Kullanıcılar -->
         <div class="table-card" style="margin-bottom:1.5rem;">
@@ -493,24 +493,24 @@
                 <h3>🟢 Online Kullanıcılar <span style="font-size:.75rem;font-weight:400;color:var(--text2);">(Son 15 dakika)</span></h3>
                 <button class="tbl-btn" onclick="loadOnline()">🔄 Yenile</button>
             </div>
-            <table><thead><tr><th>Kullanıcı</th><th>Son Aktivite</th><th>Level</th><th>Giriş Sayısı</th><th>Durum</th></tr></thead>
-            <tbody id="onlineBody"><tr class="loading-td"><td colspan="5"><span class="spinner"></span>Yükleniyor…</td></tr></tbody></table>
+            <table><thead><tr><th>User</th><th>Last Activity</th><th>Level</th><th>Login Count</th><th>Status</th></tr></thead>
+            <tbody id="onlineBody"><tr class="loading-td"><td colspan="5"><span class="spinner"></span>Loading…</td></tr></tbody></table>
         </div>
         <!-- TÜM Üyeler Tablosu -->
         <div class="table-card">
             <div class="table-header">
                 <h3>👥 Tüm Kayıtlı Üyeler <span style="font-size:.75rem;font-weight:400;color:var(--text2);">— Son aktiviteye göre sıralı</span></h3>
                 <div class="table-actions">
-                    <input class="search-inp" type="text" id="allMembersSearch" placeholder="🔍 Üye ara…" oninput="filterAllMembers()">
+                    <input class="search-inp" type="text" id="allMembersSearch" placeholder="🔍 Search members…" oninput="filterAllMembers()">
                     <select class="fi" style="width:auto;padding:.38rem .8rem;" id="allMembersSort" onchange="renderAllMembers()">
                         <option value="activity">Son Aktivite</option>
-                        <option value="xp">XP'ye Göre</option>
-                        <option value="entries">İçerik Sayısına Göre</option>
+                        <option value="xp">By XP</option>
+                        <option value="entries">By Content Count</option>
                     </select>
                 </div>
             </div>
-            <table><thead><tr><th>Kullanıcı</th><th>Son Giriş</th><th>Level / XP</th><th>İçerik</th><th>Streak</th><th>Durum</th></tr></thead>
-            <tbody id="allMembersBody"><tr class="loading-td"><td colspan="6"><span class="spinner"></span>Yükleniyor…</td></tr></tbody></table>
+            <table><thead><tr><th>User</th><th>Last Login</th><th>Level / XP</th><th>Content</th><th>Streak</th><th>Status</th></tr></thead>
+            <tbody id="allMembersBody"><tr class="loading-td"><td colspan="6"><span class="spinner"></span>Loading…</td></tr></tbody></table>
             <div class="pagination"><div class="pag-info" id="allMembersPageInfo">—</div><div class="pag-btns" id="allMembersPageBtns"></div></div>
         </div>
     </div>
@@ -519,13 +519,13 @@
     <div class="page" id="page-bans">
         <div class="table-card">
             <div class="table-header">
-                <h3>🚫 Banlı Kullanıcılar</h3>
+                <h3>🚫 Banned Users</h3>
                 <div class="table-actions">
                     <input class="search-inp" type="text" id="banSearch" placeholder="🔍 Ara…" oninput="filterBans()">
                 </div>
             </div>
-            <table><thead><tr><th>Kullanıcı</th><th>Banlanma Tarihi</th><th>Sebep</th><th>Süre</th><th>İşlemler</th></tr></thead>
-            <tbody id="bansBody"><tr class="loading-td"><td colspan="5"><span class="spinner"></span>Yükleniyor…</td></tr></tbody></table>
+            <table><thead><tr><th>User</th><th>Ban Date</th><th>Reason</th><th>Duration</th><th>Actions</th></tr></thead>
+            <tbody id="bansBody"><tr class="loading-td"><td colspan="5"><span class="spinner"></span>Loading…</td></tr></tbody></table>
         </div>
     </div>
 
@@ -533,26 +533,26 @@
     <div class="page" id="page-content">
         <div class="table-card">
             <div class="table-header">
-                <h3>🎬 İçerik Listesi</h3>
+                <h3>🎬 Content List</h3>
                 <div class="table-actions">
-                    <input class="search-inp" type="text" id="contentSearch" placeholder="🔍 İçerik ara…" oninput="filterContent()">
+                    <input class="search-inp" type="text" id="contentSearch" placeholder="🔍 Search content…" oninput="filterContent()">
                     <select class="fi" style="width:auto;padding:.38rem .8rem;" id="contentTypeF" onchange="loadContent()">
-                        <option value="all">Tüm Türler</option>
+                        <option value="all">All Types</option>
                         <option value="anime">Anime</option>
                         <option value="manga">Manga</option>
                         <option value="webtoon">Webtoon</option>
                     </select>
                     <select class="fi" style="width:auto;padding:.38rem .8rem;" id="contentStatusF" onchange="filterContent()">
-                        <option value="all">Tüm Durumlar</option>
-                        <option value="watching">İzleniyor</option>
-                        <option value="completed">Tamamlandı</option>
-                        <option value="plantowatch">Planlandı</option>
-                        <option value="dropped">Bırakıldı</option>
+                        <option value="all">All Statuses</option>
+                        <option value="watching">Watching</option>
+                        <option value="completed">Completed</option>
+                        <option value="plantowatch">Plan to Watch</option>
+                        <option value="dropped">Dropped</option>
                     </select>
                 </div>
             </div>
-            <table><thead><tr><th>Başlık</th><th>Tür</th><th>Kullanıcı</th><th>Durum</th><th>Puan</th><th>Eklenme</th></tr></thead>
-            <tbody id="contentBody"><tr class="loading-td"><td colspan="6"><span class="spinner"></span>Yükleniyor…</td></tr></tbody></table>
+            <table><thead><tr><th>Title</th><th>Type</th><th>User</th><th>Status</th><th>Rating</th><th>Added</th></tr></thead>
+            <tbody id="contentBody"><tr class="loading-td"><td colspan="6"><span class="spinner"></span>Loading…</td></tr></tbody></table>
             <div class="pagination"><div class="pag-info" id="contentPageInfo">—</div><div class="pag-btns" id="contentPageBtns"></div></div>
         </div>
     </div>
@@ -561,19 +561,19 @@
     <div class="page" id="page-reviews">
         <div class="table-card">
             <div class="table-header">
-                <h3>💬 Kullanıcı Yorumları</h3>
+                <h3>💬 User Reviews</h3>
                 <div class="table-actions">
                     <input class="search-inp" type="text" id="reviewSearch" placeholder="🔍 Yorum ara…" oninput="filterReviews()">
                     <select class="fi" style="width:auto;padding:.38rem .8rem;" id="reviewSort" onchange="loadReviews()">
                         <option value="newest">En Yeni</option>
                         <option value="oldest">En Eski</option>
-                        <option value="rating_high">En Yüksek Puan</option>
-                        <option value="rating_low">En Düşük Puan</option>
+                        <option value="rating_high">Highest Rating</option>
+                        <option value="rating_low">Lowest Rating</option>
                     </select>
                 </div>
             </div>
-            <table><thead><tr><th>Kullanıcı</th><th>İçerik</th><th>Puan</th><th>Yorum</th><th>Tarih</th><th>İşlem</th></tr></thead>
-            <tbody id="reviewsBody"><tr class="loading-td"><td colspan="6"><span class="spinner"></span>Yükleniyor…</td></tr></tbody></table>
+            <table><thead><tr><th>User</th><th>Content</th><th>Rating</th><th>Review</th><th>Date</th><th>Action</th></tr></thead>
+            <tbody id="reviewsBody"><tr class="loading-td"><td colspan="6"><span class="spinner"></span>Loading…</td></tr></tbody></table>
             <div class="pagination"><div class="pag-info" id="reviewsPageInfo">—</div><div class="pag-btns" id="reviewsPageBtns"></div></div>
         </div>
     </div>
@@ -582,26 +582,26 @@
     <div class="page" id="page-chat">
         <div class="table-card">
             <div class="table-header">
-                <h3>💬 Topluluk Sohbet Mesajları</h3>
-                <input class="search-inp" type="text" id="chatSearch" placeholder="🔍 Kullanıcı adıyla ara…" oninput="filterChatMessages()" style="margin-left:auto;">
+                <h3>💬 Community Chat Messages</h3>
+                <input class="search-inp" type="text" id="chatSearch" placeholder="🔍 Search by username…" oninput="filterChatMessages()" style="margin-left:auto;">
                 <button class="tbl-btn" onclick="loadChatMessages()" style="margin-left:.5rem;">🔄 Yenile</button>
-                <button class="tbl-btn" onclick="showChatRLSGuide()" title="Silme çalışmıyorsa tıkla" style="margin-left:.5rem;">🔧 RLS</button>
+                <button class="tbl-btn" onclick="showChatRLSGuide()" title="Click if delete is not working" style="margin-left:.5rem;">🔧 RLS</button>
                 <button class="tbl-btn" onclick="clearOldChatMessages()" style="background:rgba(239,68,68,.1);color:#ef4444;border-color:rgba(239,68,68,.3);margin-left:.5rem;">🗑️ Eskileri Temizle</button>
             </div>
             <div style="padding:.5rem 1rem;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border2);font-size:.78rem;color:var(--text2);">
-                Son 100 mesaj gösteriliyor. Silme işlemi geri alınamaz.
+                Showing last 100 messages. Deletion cannot be undone.
             </div>
             <table>
                 <thead>
                     <tr>
-                        <th>Kullanıcı</th>
+                        <th>User</th>
                         <th>Mesaj</th>
                         <th>Tarih</th>
-                        <th>İşlem</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody id="chatMsgBody">
-                    <tr class="loading-td"><td colspan="4"><span class="spinner"></span>Yükleniyor…</td></tr>
+                    <tr class="loading-td"><td colspan="4"><span class="spinner"></span>Loading…</td></tr>
                 </tbody>
             </table>
         </div>
@@ -610,33 +610,33 @@
     <!-- ===== ANNOUNCEMENTS ===== -->
     <div class="page" id="page-announcements">
         <div class="form-card">
-            <h3>📢 Yeni Duyuru Gönder</h3>
+            <h3>📢 Send New Announcement</h3>
             <div class="form-row">
-                <div class="fg"><label>Başlık</label><input type="text" class="fi" id="annTitle" placeholder="Duyuru başlığı…"></div>
-                <div class="fg"><label>Tür</label>
+                <div class="fg"><label>Title</label><input type="text" class="fi" id="annTitle" placeholder="Announcement title…"></div>
+                <div class="fg"><label>Type</label>
                     <select class="fs" id="annType">
                         <option value="info">ℹ️ Bilgi</option>
-                        <option value="success">✅ Başarı</option>
-                        <option value="warning">⚠️ Uyarı</option>
-                        <option value="update">🚀 Güncelleme</option>
+                        <option value="success">✅ Success</option>
+                        <option value="warning">⚠️ Warning</option>
+                        <option value="update">🚀 Update</option>
                     </select>
                 </div>
             </div>
-            <div class="fg"><label>Mesaj</label><textarea class="fta" id="annContent" placeholder="Duyuru mesajını yaz…"></textarea></div>
+            <div class="fg"><label>Message</label><textarea class="fta" id="annContent" placeholder="Write your announcement…"></textarea></div>
             <div class="form-row">
                 <div class="fg"><label>Hedef</label>
-                    <select class="fs" id="annTarget"><option value="all">Tüm Kullanıcılar</option><option value="registered">Sadece Kayıtlılar</option></select>
+                    <select class="fs" id="annTarget"><option value="all">All Users</option><option value="registered">Registered Only</option></select>
                 </div>
-                <div class="fg"><label>Öncelik</label>
-                    <select class="fs" id="annPriority"><option value="normal">Normal</option><option value="high">Yüksek</option><option value="critical">Kritik</option></select>
+                <div class="fg"><label>Priority</label>
+                    <select class="fs" id="annPriority"><option value="normal">Normal</option><option value="high">High</option><option value="critical">Critical</option></select>
                 </div>
             </div>
-            <button class="submit-btn" onclick="sendAnnouncement()">📢 Duyuruyu Yayınla</button>
+            <button class="submit-btn" onclick="sendAnnouncement()">📢 Publish Announcement</button>
         </div>
         <div class="table-card">
-            <div class="table-header"><h3>📜 Duyuru Geçmişi</h3></div>
-            <table><thead><tr><th>Başlık</th><th>Tür</th><th>Tarih</th><th>İşlem</th></tr></thead>
-            <tbody id="annBody"><tr class="loading-td"><td colspan="4"><span class="spinner"></span>Yükleniyor…</td></tr></tbody></table>
+            <div class="table-header"><h3>📜 Announcement History</h3></div>
+            <table><thead><tr><th>Title</th><th>Type</th><th>Date</th><th>Action</th></tr></thead>
+            <tbody id="annBody"><tr class="loading-td"><td colspan="4"><span class="spinner"></span>Loading…</td></tr></tbody></table>
         </div>
     </div>
 
@@ -648,21 +648,21 @@
         </div>
         <div class="restrict-grid">
             <div class="restrict-card">
-                <h4>👤 Kullanıcı Kısıtlamaları</h4>
+                <h4>👤 User Restrictions</h4>
                 <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Yeni Kayıt</div><div style="font-size:.72rem;color:var(--text2);">Yeni hesap oluşturma</div></div><div class="toggle on" id="rt-registration" onclick="toggleRestriction(this,'registration')"></div></div>
                 <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Misafir Erişimi</div><div style="font-size:.72rem;color:var(--text2);">Giriş yapmadan gezme</div></div><div class="toggle on" id="rt-guest" onclick="toggleRestriction(this,'guest')"></div></div>
                 <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Profil Düzenleme</div><div style="font-size:.72rem;color:var(--text2);">Kullanıcı profil güncellemeleri</div></div><div class="toggle on" id="rt-profile-edit" onclick="toggleRestriction(this,'profile-edit')"></div></div>
                 <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Şifre Değiştirme</div><div style="font-size:.72rem;color:var(--text2);">Hesap şifresi güncellemeleri</div></div><div class="toggle on" id="rt-password-change" onclick="toggleRestriction(this,'password-change')"></div></div>
             </div>
             <div class="restrict-card">
-                <h4>🎬 İçerik Kısıtlamaları</h4>
+                <h4>🎬 Content Restrictions</h4>
                 <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">İçerik Ekleme</div><div style="font-size:.72rem;color:var(--text2);">Listeye yeni öge ekleme</div></div><div class="toggle on" id="rt-add-content" onclick="toggleRestriction(this,'add-content')"></div></div>
                 <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Yorum Yazma</div><div style="font-size:.72rem;color:var(--text2);">Kullanıcı yorumları</div></div><div class="toggle on" id="rt-reviews" onclick="toggleRestriction(this,'reviews')"></div></div>
                 <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Puan Verme</div><div style="font-size:.72rem;color:var(--text2);">İçerik puanlama</div></div><div class="toggle on" id="rt-rating" onclick="toggleRestriction(this,'rating')"></div></div>
                 <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">İçerik Silme</div><div style="font-size:.72rem;color:var(--text2);">Kullanıcı kendi içeriklerini silme</div></div><div class="toggle on" id="rt-delete-content" onclick="toggleRestriction(this,'delete-content')"></div></div>
             </div>
             <div class="restrict-card">
-                <h4>⚙️ Sistem Ayarları</h4>
+                <h4>⚙️ System Settings</h4>
                 <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Bakım Modu</div><div style="font-size:.72rem;color:var(--text2);">Siteyi geçici olarak kapat</div></div><div class="toggle" id="rt-maintenance" onclick="toggleRestriction(this,'maintenance')"></div></div>
                 <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">AI Önerileri</div><div style="font-size:.72rem;color:var(--text2);">AI bölümünü etkinleştir</div></div><div class="toggle on" id="rt-ai" onclick="toggleRestriction(this,'ai')"></div></div>
                 <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Liderlik Tablosu</div><div style="font-size:.72rem;color:var(--text2);">Kullanıcı sıralamaları</div></div><div class="toggle on" id="rt-leaderboard" onclick="toggleRestriction(this,'leaderboard')"></div></div>
@@ -677,9 +677,9 @@
             </div>
         </div>
         <div class="form-card" style="margin-top:1rem;">
-            <h3>⚠️ Kısıtlama Mesajı</h3>
+            <h3>⚠️ Restriction Message</h3>
             <p style="font-size:.83rem;color:var(--text2);margin-bottom:1rem;">Bakım modu aktifken kullanıcılara gösterilecek mesaj.</p>
-            <div class="fg"><label>Bakım Mesajı</label><textarea class="fta" id="maintenanceMsg" placeholder="Sistem bakımda, lütfen daha sonra tekrar deneyin…" style="min-height:80px;"></textarea></div>
+            <div class="fg"><label>Maintenance Message</label><textarea class="fta" id="maintenanceMsg" placeholder="System is under maintenance, please try again later…" style="min-height:80px;"></textarea></div>
             <button class="submit-btn" onclick="saveMaintenanceMsg()" style="padding:.6rem 1.2rem;font-size:.85rem;">💾 Kaydet</button>
         </div>
     </div>
@@ -690,11 +690,11 @@
             <div class="table-header"><h3>📋 Aktivite Logu</h3>
                 <div class="table-actions">
                     <select class="fi" style="width:auto;padding:.38rem .8rem;" id="logFilter" onchange="loadLogs()">
-                        <option value="all">Tüm Olaylar</option>
+                        <option value="all">All Events</option>
                         <option value="recent">Son 24 Saat</option>
                         <option value="bans">Sadece Banlar</option>
                     </select>
-                    <button class="tbl-btn" onclick="exportLogs()">📥 Log İndir</button>
+                    <button class="tbl-btn" onclick="exportLogs()">📥 Download Logs</button>
                 </div>
             </div>
             <div id="logList" style="max-height:600px;overflow-y:auto;"></div>
@@ -707,26 +707,26 @@
             <div class="settings-card">
                 <h3>📡 Supabase Durumu</h3>
                 <div class="fg"><label>Project URL</label><input type="text" class="fi mono" id="supaUrlEl" readonly></div>
-                <div class="fg"><label>Bağlantı</label><div id="supaStatus" class="badge bg-yellow" style="display:inline-flex;">⏳ Kontrol ediliyor…</div></div>
+                <div class="fg"><label>Connection</label><div id="supaStatus" class="badge bg-yellow" style="display:inline-flex;">⏳ Checking…</div></div>
                 <div class="fg" style="margin-top:1rem;"><label>Hızlı İstatistikler</label><div id="supaStats" style="font-size:.83rem;color:var(--text2);line-height:2;">—</div></div>
             </div>
             <div class="settings-card">
-                <h3>🔒 Güvenlik</h3>
-                <div class="fg"><label>Yeni Admin Şifresi</label><input type="password" class="fi" id="newPw" placeholder="Yeni şifre…"></div>
-                <div class="fg"><label>Şifre Tekrar</label><input type="password" class="fi" id="confirmPw" placeholder="Tekrar gir…"></div>
+                <h3>🔒 Security</h3>
+                <div class="fg"><label>New Admin Password</label><input type="password" class="fi" id="newPw" placeholder="New password…"></div>
+                <div class="fg"><label>Confirm Password</label><input type="password" class="fi" id="confirmPw" placeholder="Re-enter…"></div>
                 <button class="submit-btn" style="padding:.6rem 1.2rem;font-size:.85rem;" onclick="changePassword()">Şifreyi Güncelle</button>
             </div>
             <div class="settings-card">
-                <h3>📊 Veritabanı Yönetimi</h3>
+                <h3>📊 Database Management</h3>
                 <div style="display:flex;flex-direction:column;gap:.8rem;margin-top:.5rem;">
-                    <button class="tbl-btn" style="width:100%;padding:.7rem;text-align:left;" onclick="exportAllData()">📥 Tüm Kullanıcı Verilerini İndir (JSON)</button>
-                    <button class="tbl-btn" style="width:100%;padding:.7rem;text-align:left;" onclick="exportCSV()">📥 Kullanıcı Listesi İndir (CSV)</button>
+                    <button class="tbl-btn" style="width:100%;padding:.7rem;text-align:left;" onclick="exportAllData()">📥 Download All User Data (JSON)</button>
+                    <button class="tbl-btn" style="width:100%;padding:.7rem;text-align:left;" onclick="exportCSV()">📥 Download User List (CSV)</button>
                     <button class="tbl-btn" style="width:100%;padding:.7rem;text-align:left;" onclick="loadDashboard()">🔄 Dashboard Verilerini Yenile</button>
                 </div>
             </div>
             <div class="settings-card">
                 <h3>ℹ️ Platform Bilgisi</h3>
-                <div style="font-size:.83rem;color:var(--text2);line-height:2.2;" id="platformInfoEl">Yükleniyor…</div>
+                <div style="font-size:.83rem;color:var(--text2);line-height:2.2;" id="platformInfoEl">Loading…</div>
             </div>
         </div>
     </div>
@@ -738,7 +738,7 @@
         <h3 id="confirmTitle">Emin misin?</h3>
         <p id="confirmText" style="color:var(--text2);font-size:.87rem;line-height:1.6;"></p>
         <div class="modal-actions">
-            <button class="btn-cancel" onclick="closeModal('confirmModal')">İptal</button>
+            <button class="btn-cancel" onclick="closeModal('confirmModal')">Cancel</button>
             <button class="btn-confirm" id="confirmBtn">Onayla</button>
         </div>
     </div>
@@ -747,7 +747,7 @@
 <!-- USER DETAIL MODAL -->
 <div class="modal-ov" id="userModal">
     <div class="modal-box" style="max-width:600px;">
-        <h3>👤 Kullanıcı Detayları</h3>
+        <h3>👤 User Details</h3>
         <div id="userModalContent" style="margin-top:1rem;"></div>
         <div class="modal-actions"><button class="btn-cancel" onclick="closeModal('userModal')">Kapat</button></div>
     </div>
@@ -757,7 +757,7 @@
 <div class="ban-modal-overlay" id="banModalOverlay" onclick="closeBanModal(event)">
     <div class="ban-modal">
         <div class="ban-modal-header">
-            <div class="ban-modal-title">🚫 Kullanıcıyı Banla</div>
+            <div class="ban-modal-title">🚫 Ban User</div>
             <button class="ban-modal-close" onclick="closeBanModal()">✕</button>
         </div>
         <div class="ban-user-card">
@@ -765,33 +765,33 @@
             <div><div style="font-weight:700;font-size:1rem;" id="banTargetName">Kullanıcı</div><div style="font-size:.78rem;color:var(--text2);margin-top:.1rem;" id="banTargetId">—</div></div>
         </div>
         <div class="ban-field">
-            <label>⚡ Hızlı Sebep</label>
+            <label>⚡ Quick Reason</label>
             <div class="ban-reason-chips">
                 <span class="ban-chip" onclick="selectChip(this,'Spam / Reklam')">🔁 Spam</span>
-                <span class="ban-chip" onclick="selectChip(this,'Uygunsuz içerik')">🔞 Uygunsuz</span>
-                <span class="ban-chip" onclick="selectChip(this,'Hakaret / Küfür')">🤬 Hakaret</span>
+                <span class="ban-chip" onclick="selectChip(this,'Inappropriate content')">🔞 Inappropriate</span>
+                <span class="ban-chip" onclick="selectChip(this,'Harassment / Insults')">🤬 Harassment</span>
                 <span class="ban-chip" onclick="selectChip(this,'Sahte hesap')">🎭 Sahte Hesap</span>
-                <span class="ban-chip" onclick="selectChip(this,'Kural ihlali')">⚠️ Kural İhlali</span>
+                <span class="ban-chip" onclick="selectChip(this,'Rule violation')">⚠️ Rule Violation</span>
                 <span class="ban-chip" onclick="selectChip(this,'Bot/Script aktivitesi')">🤖 Bot</span>
             </div>
         </div>
         <div class="ban-field">
             <label>📝 Ban Sebebi</label>
-            <textarea id="banReasonInput" rows="3" placeholder="Ban sebebini açıklayın..."></textarea>
+            <textarea id="banReasonInput" rows="3" placeholder="Explain the ban reason..."></textarea>
         </div>
         <div class="ban-field">
-            <label>⏱️ Ban Süresi</label>
+            <label>⏱️ Ban Duration</label>
             <select id="banDuration">
-                <option value="permanent">♾️ Kalıcı Ban</option>
-                <option value="1">📅 1 Gün</option>
-                <option value="3">📅 3 Gün</option>
-                <option value="7">📅 7 Gün</option>
-                <option value="30">📅 30 Gün</option>
-                <option value="90">📅 90 Gün</option>
+                <option value="permanent">♾️ Permanent Ban</option>
+                <option value="1">📅 1 Day</option>
+                <option value="3">📅 3 Days</option>
+                <option value="7">📅 7 Days</option>
+                <option value="30">📅 30 Days</option>
+                <option value="90">📅 90 Days</option>
             </select>
         </div>
         <div class="ban-modal-actions">
-            <button class="btn-ban-cancel" onclick="closeBanModal()">İptal</button>
+            <button class="btn-ban-cancel" onclick="closeBanModal()">Cancel</button>
             <button class="btn-ban-confirm" onclick="executeBan()">🚫 Banla</button>
         </div>
     </div>
@@ -809,20 +809,20 @@
             <div><div style="font-weight:700;font-size:1rem;" id="warnTargetName">Kullanıcı</div><div style="font-size:.78rem;color:var(--text2);" id="warnTargetId">—</div></div>
         </div>
         <div class="ban-field">
-            <label>⚡ Uyarı Türü</label>
+            <label>⚡ Warning Type</label>
             <div class="ban-reason-chips">
-                <span class="ban-chip" onclick="selectWarnChip(this,'Kural ihlali uyarısı')" style="border-color:rgba(245,158,11,0.2);">⚠️ Kural İhlali</span>
-                <span class="ban-chip" onclick="selectWarnChip(this,'Uygunsuz davranış')" style="border-color:rgba(245,158,11,0.2);">😤 Uygunsuz</span>
+                <span class="ban-chip" onclick="selectWarnChip(this,'Rule violation warning')" style="border-color:rgba(245,158,11,0.2);">⚠️ Rule Violation</span>
+                <span class="ban-chip" onclick="selectWarnChip(this,'Inappropriate behavior')" style="border-color:rgba(245,158,11,0.2);">😤 Inappropriate</span>
                 <span class="ban-chip" onclick="selectWarnChip(this,'Spam aktivitesi')" style="border-color:rgba(245,158,11,0.2);">🔁 Spam</span>
-                <span class="ban-chip" onclick="selectWarnChip(this,'Son uyarı — ban gelebilir')" style="border-color:rgba(239,68,68,0.3);">🚨 Son Uyarı</span>
+                <span class="ban-chip" onclick="selectWarnChip(this,'Final warning — ban incoming')" style="border-color:rgba(239,68,68,0.3);">🚨 Final Warning</span>
             </div>
         </div>
         <div class="ban-field">
-            <label>📝 Uyarı Mesajı</label>
-            <textarea id="warnMessage" rows="3" placeholder="Kullanıcıya gösterilecek mesaj..."></textarea>
+            <label>📝 Warning Message</label>
+            <textarea id="warnMessage" rows="3" placeholder="Message to show to user..."></textarea>
         </div>
         <div style="display:flex;gap:.8rem;margin-top:1rem;">
-            <button class="btn-ban-cancel" onclick="closeWarnModal()" style="flex:1;">İptal</button>
+            <button class="btn-ban-cancel" onclick="closeWarnModal()" style="flex:1;">Cancel</button>
             <button style="flex:1;background:linear-gradient(135deg,var(--yellow),var(--orange));color:#000;border:none;border-radius:10px;padding:.85rem;font-size:.95rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="executeWarn()">⚠️ Uyarı Gönder</button>
         </div>
     </div>
@@ -839,13 +839,13 @@
             <button class="ban-modal-close" onclick="closeEntriesModal()">✕</button>
         </div>
         <div style="padding:.8rem 1.5rem;border-bottom:1px solid var(--border);display:flex;gap:.5rem;flex-wrap:wrap;">
-            <button class="tbl-btn active" id="entTabAll" onclick="filterEntries('all')">Tümü</button>
+            <button class="tbl-btn active" id="entTabAll" onclick="filterEntries('all')">All</button>
             <button class="tbl-btn" id="entTabAnime" onclick="filterEntries('anime')">🎬 Anime</button>
             <button class="tbl-btn" id="entTabManga" onclick="filterEntries('manga')">📚 Manga</button>
             <button class="tbl-btn" id="entTabWebtoon" onclick="filterEntries('webtoon')">🌐 Webtoon</button>
         </div>
         <div class="entries-modal-body" id="entriesModalBody">
-            <div style="text-align:center;padding:3rem;color:var(--text2);">Yükleniyor…</div>
+            <div style="text-align:center;padding:3rem;color:var(--text2);">Loading…</div>
         </div>
     </div>
 </div>
@@ -911,7 +911,7 @@ function startSessionVerify() {
         try {
             const { data: { session }, error } = await sb.auth.getSession();
             if (error || !session || !isAdmin(session.user?.email)) {
-                console.warn('[Admin] Oturum doğrulama başarısız, çıkış yapılıyor.');
+                console.warn('[Admin] Session verification failed, logging out.');
                 await adminLogout();
             }
         } catch(e) {
@@ -937,7 +937,7 @@ window.onload = async () => {
     const lockUntil = isLockedOut();
     if (lockUntil) {
         const mins = Math.ceil((lockUntil - Date.now()) / 60000);
-        showErr(`Çok fazla hatalı giriş. ${mins} dakika sonra tekrar deneyin.`);
+        showErr(`Too many failed attempts. Try again in ${mins} minutes.`);
         document.getElementById('loginBtn').disabled = true;
     }
 
@@ -983,42 +983,42 @@ async function adminLogin() {
     const lockUntil = isLockedOut();
     if (lockUntil) {
         const mins = Math.ceil((lockUntil - Date.now()) / 60000);
-        showErr(`Hesap geçici olarak kilitlendi. ${mins} dakika sonra tekrar deneyin.`);
+        showErr(`Account temporarily locked. Try again in ${mins} minutes.`);
         return;
     }
 
     const email = document.getElementById('adminEmail').value.trim();
     const pw    = document.getElementById('adminPassword').value;
     document.getElementById('loginErr').style.display = 'none';
-    if (!email || !pw) { showErr('Email ve şifre gerekli.'); return; }
+    if (!email || !pw) { showErr('Email and password required.'); return; }
 
     // Email whitelist kontrolü (ağ isteği yapmadan önce hızlı ret)
     if (!isAdmin(email)) {
         recordFailedAttempt();
-        showErr('Bu hesabın admin yetkisi yok.');
+        showErr('This account does not have admin access.');
         return;
     }
 
     const btn = document.getElementById('loginBtn');
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>Giriş yapılıyor…';
+    btn.innerHTML = '<span class="spinner"></span>Logging in…';
     try {
         const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
         if (error) throw error;
-        if (!isAdmin(data.user.email)) throw new Error('Admin hesabı değil.');
+        if (!isAdmin(data.user.email)) throw new Error('Not an admin account.');
         currentAdmin = data.user;
         boot();
     } catch(e) {
         btn.disabled = false;
-        btn.textContent = 'Admin Olarak Giriş Yap →';
+        btn.textContent = 'Login as Admin →';
         const locked = recordFailedAttempt();
         const attempts = getLoginAttempts();
         if (locked) {
-            showErr(`Çok fazla hatalı giriş. Hesap 15 dakika kilitlendi.`);
+            showErr(`Too many failed attempts. Account locked for 15 minutes.`);
             btn.disabled = true;
         } else {
             const remaining = MAX_LOGIN_ATTEMPTS - attempts.count;
-            showErr((e.message || 'Giriş başarısız.') + (remaining > 0 ? ` (${remaining} deneme hakkı kaldı)` : ''));
+            showErr((e.message || 'Login failed.') + (remaining > 0 ? ` (${remaining} attempts remaining)` : ''));
         }
     }
 }
@@ -1055,7 +1055,7 @@ function showPage(page) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById('page-' + page)?.classList.add('active');
     curPage = page;
-    const pageLang = (typeof _adminLang !== 'undefined' ? _adminLang : 'en');
+    const pageLang = (typeof _adminLang !== 'undefined' ? _adminLang : 'tr');
     const [title, sub] = (PAGE_META[page]?.[pageLang]) || PAGE_META[page]?.tr || ['—',''];
     document.getElementById('pageTitle').textContent = title;
     document.getElementById('pageSub').textContent = sub;
@@ -1081,7 +1081,7 @@ async function updateOnlineCount() {
     const now15 = new Date(Date.now() - 15*60*1000).toISOString();
     const online = (data||[]).filter(u => u.updated_at > now15 && !u.data?.banned);
     const count = online.length;
-    document.getElementById('sideOnlineCount').textContent = `${count} kullanıcı online`;
+    document.getElementById('sideOnlineCount').textContent = `${count} users online`;
     document.getElementById('onlineBadge').textContent = count;
     if (document.getElementById('s-online')) {
         document.getElementById('s-online').textContent = count;
@@ -1092,7 +1092,7 @@ async function updateOnlineCount() {
         listEl.innerHTML = online.slice(0,3).map(u => `
             <div class="online-user-row">
                 <div class="online-user-dot"></div>
-                <span>${esc(u.data?.social?.name || 'Kullanıcı')}</span>
+                <span>${esc(u.data?.social?.name || 'User')}</span>
             </div>`).join('') + (count > 3 ? `<div class="online-user-row" style="color:var(--green);font-size:.7rem;">+${count-3} kişi daha…</div>` : '');
     }
     return { data, online };
@@ -1101,7 +1101,7 @@ async function updateOnlineCount() {
 // ===== DASHBOARD =====
 async function loadDashboard() {
     const { data: rows, error } = await sb.from('user_data').select('user_id,data,updated_at').order('updated_at',{ascending:false});
-    if (error) { toast('Yükleme hatası: ' + error.message, 'error'); return; }
+    if (error) { toast('Load error: ' + error.message, 'error'); return; }
     const users = rows || [];
 
     // Stats
@@ -1117,7 +1117,7 @@ async function loadDashboard() {
     document.getElementById('s-banned').textContent       = banned.length;
     document.getElementById('userCountBadge').textContent = users.length;
     document.getElementById('onlineBadge').textContent    = online15.length;
-    document.getElementById('sideOnlineCount').textContent = `${online15.length} kullanıcı online`;
+    document.getElementById('sideOnlineCount').textContent = `${online15.length} users online`;
 
     const banBadge = document.getElementById('banCountBadge');
     banBadge.textContent = banned.length;
@@ -1131,7 +1131,7 @@ async function loadDashboard() {
         listEl.innerHTML = online15.slice(0,3).map(u => `
             <div class="online-user-row">
                 <div class="online-user-dot"></div>
-                <span>${esc(u.data?.social?.name||'Kullanıcı')}</span>
+                <span>${esc(u.data?.social?.name||'User')}</span>
             </div>`).join('') + (online15.length > 3 ? `<div class="online-user-row" style="color:var(--green);font-size:.7rem;">+${online15.length-3} kişi daha…</div>` : '');
     }
 
@@ -1172,7 +1172,7 @@ async function loadDashboard() {
     // Charts
     drawLineChart('chartUsers', buildDailyActivity(users, 14));
     drawDonut('chartContent', ['Anime','Manga','Webtoon'], [anime,manga,webtoon], ['#ff3366','#00d4ff','#7c3aed']);
-    drawDonut('chartStatus', ['İzleniyor','Tamamlandı','Planlandı','Beklemede','Bırakıldı'],
+    drawDonut('chartStatus', ['Watching','Completed','Planned','On Hold','Dropped'],
         [statusCounts.watching,statusCounts.completed,statusCounts.plantowatch,statusCounts.onhold,statusCounts.dropped],
         ['#00d4ff','#10b981','#7c3aed','#f59e0b','#ef4444']);
     drawBar('chartLevels', ['Lv.1-5','Lv.6-10','Lv.11-20','Lv.21-30','Lv.31+'], levelBuckets, ['#ff3366','#f97316','#f59e0b','#10b981','#a855f7']);
@@ -1184,14 +1184,14 @@ async function loadDashboard() {
         return `<tr>
             <td><div class="user-cell">
                 <div style="position:relative;">${avatarHtml(d,'32px')}${isOnline?'<div style="position:absolute;bottom:0;right:0;width:9px;height:9px;background:var(--green);border-radius:50%;border:2px solid var(--card);"></div>':''}</div>
-                <div><div class="user-name">${esc(d?.social?.name||'Kullanıcı')}</div><div class="user-email">${esc(d?.social?.email||'')}</div></div>
+                <div><div class="user-name">${esc(d?.social?.name||'User')}</div><div class="user-email">${esc(d?.social?.email||'')}</div></div>
             </div></td>
             <td style="color:var(--text2);font-size:.82rem;">${fmtRelative(u.updated_at)}</td>
             <td>${d?.items?.length||0}</td>
             <td><strong style="color:var(--yellow);">${(d?.xp?.total||0).toLocaleString()}</strong> <span class="badge bg-purple" style="font-size:.68rem;">Lv.${d?.xp?.level||1}</span></td>
-            <td>${d?.banned?'<span class="badge bg-red">🚫 Banlı</span>':isOnline?'<span class="badge bg-green">🟢 Online</span>':'<span class="badge bg-blue">✅ Aktif</span>'}</td>
+            <td>${d?.banned?'<span class="badge bg-red">🚫 Banned</span>':isOnline?'<span class="badge bg-green">🟢 Online</span>':'<span class="badge bg-blue">✅ Active</span>'}</td>
         </tr>`;
-    }).join('') || '<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--text2);">Henüz kullanıcı yok</td></tr>';
+    }).join('') || '<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--text2);">No users yet</td></tr>';
 }
 
 function buildDailyActivity(users, days=14) {
@@ -1256,7 +1256,7 @@ async function loadAnalytics() {
 
     const gL=Object.keys(genres).sort((a,b)=>genres[b]-genres[a]).slice(0,10);
     drawBar('chartGenre', gL, gL.map(g=>genres[g]));
-    const sMap={watching:'▶ İzleniyor',completed:'✅ Tamamlandı',plantowatch:'📋 Planlı',onhold:'⏸ Beklemede',dropped:'❌ Bırakıldı'};
+    const sMap={watching:'▶ Watching',completed:'✅ Completed',plantowatch:'📋 Planned',onhold:'⏸ On Hold',dropped:'❌ Dropped'};
     const sL=Object.keys(statuses);
     drawDonut('chartStatus2', sL.map(k=>sMap[k]||k), sL.map(k=>statuses[k]), ['#00d4ff','#10b981','#7c3aed','#f59e0b','#ef4444']);
 
@@ -1276,7 +1276,7 @@ async function loadAnalytics() {
         .sort((a, b) => (b?.xp?.total || 0) - (a?.xp?.total || 0));
 
     document.getElementById('topUsersBody').innerHTML = allSorted.length === 0
-        ? '<tr><td colspan="7"><div class="empty-state"><div class="ei">🏆</div><h3>Henüz kullanıcı yok</h3></div></td></tr>'
+        ? '<tr><td colspan="7"><div class="empty-state"><div class="ei">🏆</div><h3>No users yet</h3></div></td></tr>'
         : allSorted.map((d, i) => {
             const medals = ['🥇','🥈','🥉'];
             const rankDisplay = i < 3
@@ -1291,11 +1291,11 @@ async function loadAnalytics() {
                 <td><div class="user-cell">
                     ${avatarHtml(d,'32px')}
                     <div>
-                        <div class="user-name">${esc(d?.social?.name || 'Kullanıcı')}</div>
+                        <div class="user-name">${esc(d?.social?.name || 'User')}</div>
                         <div class="user-email" style="font-size:.7rem;color:var(--text3);">⭐ Ort: ${avgRating} · ${esc(d?.social?.email || '')}</div>
                     </div>
                 </div></td>
-                <td><strong style="color:var(--yellow);font-size:1rem;">${(d?.xp?.total || 0).toLocaleString('tr-TR')}</strong> <span style="font-size:.7rem;color:var(--text2);">XP</span></td>
+                <td><strong style="color:var(--yellow);font-size:1rem;">${(d?.xp?.total || 0).toLocaleString('en-GB')}</strong> <span style="font-size:.7rem;color:var(--text2);">XP</span></td>
                 <td><span class="badge bg-purple">Lv.${d?.xp?.level || 1}</span></td>
                 <td><span style="font-weight:600;">${d?.items?.length || 0}</span></td>
                 <td>🔥 <strong>${d?.streak?.count || 0}</strong> <span style="font-size:.7rem;color:var(--text2);">gün</span></td>
@@ -1306,7 +1306,7 @@ async function loadAnalytics() {
 
 // ===== USERS =====
 async function loadUsers() {
-    document.getElementById('usersBody').innerHTML = '<tr class="loading-td"><td colspan="8"><span class="spinner"></span>Yükleniyor…</td></tr>';
+    document.getElementById('usersBody').innerHTML = '<tr class="loading-td"><td colspan="8"><span class="spinner"></span>Loading…</td></tr>';
     // get_all_user_data RPC — SECURITY DEFINER ile RLS bypass, tüm kullanıcılar görünür
     let data = [], error = null;
     try {
@@ -1349,15 +1349,15 @@ function renderUsers() {
     const total=filtered.length, pages=Math.ceil(total/PER_PAGE)||1;
     if (usersPage>pages) usersPage=1;
     const slice=filtered.slice((usersPage-1)*PER_PAGE, usersPage*PER_PAGE);
-    document.getElementById('usersPageInfo').textContent=`${total} kullanıcı • Sayfa ${usersPage}/${pages}`;
+    document.getElementById('usersPageInfo').textContent=`${total} users • Page ${usersPage}/${pages}`;
     renderPag('usersPageBtns', pages, usersPage, p=>{ usersPage=p; renderUsers(); });
 
     const now15 = new Date(Date.now()-15*60*1000).toISOString();
     const tbody=document.getElementById('usersBody');
-    if (!slice.length){tbody.innerHTML='<tr><td colspan="8"><div class="empty-state"><div class="ei">👤</div><h3>Kullanıcı bulunamadı</h3></div></td></tr>';return;}
+    if (!slice.length){tbody.innerHTML='<tr><td colspan="8"><div class="empty-state"><div class="ei">👤</div><h3>User not found</h3></div></td></tr>';return;}
     tbody.innerHTML=slice.map(u=>{
         const d=u.data, banned=d?.banned;
-        const name=d?.social?.name||'Kullanıcı';
+        const name=d?.social?.name||'User';
         const isOnline = u.updated_at > now15;
         const completedCount = d?.items?.filter(i=>i.status==='completed').length||0;
         return `<tr>
@@ -1370,7 +1370,7 @@ function renderUsers() {
             <td><strong style="color:var(--yellow);">${(d?.xp?.total||0).toLocaleString()}</strong> <span class="badge bg-purple" style="font-size:.65rem;">Lv.${d?.xp?.level||1}</span></td>
             <td><span style="font-weight:600;">${d?.items?.length||0}</span> <span style="font-size:.75rem;color:var(--text2);">(${completedCount}✓)</span></td>
             <td>🔥 ${d?.streak?.count||0}</td>
-            <td>${banned?'<span class="badge bg-red">🚫 Banlı</span>':isOnline?'<span class="badge bg-green">🟢 Online</span>':'<span class="badge bg-blue">✅ Aktif</span>'}</td>
+            <td>${banned?'<span class="badge bg-red">🚫 Banned</span>':isOnline?'<span class="badge bg-green">🟢 Online</span>':'<span class="badge bg-blue">✅ Active</span>'}</td>
             <td><div class="act-btns">
                 <button class="act-btn btn-view" onclick='viewUser(${JSON.stringify({uid:u.user_id,data:u.data})})'>👁</button>
                 <button class="act-btn btn-entries" onclick='openUserEntries(${JSON.stringify({uid:u.user_id,data:u.data})})'>📋</button>
@@ -1378,7 +1378,7 @@ function renderUsers() {
                 ${banned
                     ?`<button class="act-btn btn-unban" onclick="setBan('${u.user_id}',false,'${esc(name)}')">✅</button>`
                     :`<button class="act-btn btn-ban" onclick="confirmBan('${u.user_id}','${esc(name)}')">🚫</button>`}
-                <button class="act-btn btn-del" onclick="permanentDeleteUser('${u.user_id}','${esc(name)}')" title="Kalıcı Sil" style="background:rgba(239,68,68,.15);color:#ef4444;border-color:rgba(239,68,68,.3);">🗑</button>
+                <button class="act-btn btn-del" onclick="permanentDeleteUser('${u.user_id}','${esc(name)}')" title="Delete Permanently" style="background:rgba(239,68,68,.15);color:#ef4444;border-color:rgba(239,68,68,.3);">🗑</button>
             </div></td>
         </tr>`;
     }).join('');
@@ -1397,19 +1397,19 @@ function viewUser(u) {
     document.getElementById('userModalContent').innerHTML=`
         <div class="detail-tabs">
             <button class="detail-tab active" onclick="switchDetailTab('info')">📊 Bilgiler</button>
-            <button class="detail-tab" onclick="switchDetailTab('items')">📋 İstatistikler</button>
+            <button class="detail-tab" onclick="switchDetailTab('items')">📋 Stats</button>
             <button class="detail-tab" onclick="switchDetailTab('raw')">🔧 Ham Veri</button>
         </div>
         <div class="detail-tab-pane active" id="dtab-info">
             <div class="detail-grid">
-                <div class="detail-item"><label>Kullanıcı Adı</label><strong>${esc(d?.social?.name||'—')}</strong></div>
+                <div class="detail-item"><label>Username</label><strong>${esc(d?.social?.name||'—')}</strong></div>
                 <div class="detail-item"><label>E-posta</label><strong style="font-size:.82rem;">${esc(d?.social?.email||'—')}</strong></div>
                 <div class="detail-item"><label>Level</label><strong>Lv.${d?.xp?.level||1}</strong></div>
                 <div class="detail-item"><label>Toplam XP</label><strong style="color:var(--yellow)">${(d?.xp?.total||0).toLocaleString()}</strong></div>
-                <div class="detail-item"><label>Streak</label><strong>🔥 ${d?.streak?.count||0} gün</strong></div>
-                <div class="detail-item"><label>En Uzun Streak</label><strong>${d?.streak?.longest||0} gün</strong></div>
-                <div class="detail-item"><label>Başarımlar</label><strong>🏆 ${d?.achievements?.length||0}</strong></div>
-                <div class="detail-item"><label>Durum</label><strong>${d?.banned?'🚫 Banlı':'✅ Aktif'}</strong></div>
+                <div class="detail-item"><label>Streak</label><strong>🔥 ${d?.streak?.count||0} days</strong></div>
+                <div class="detail-item"><label>En Uzun Streak</label><strong>${d?.streak?.longest||0} days</strong></div>
+                <div class="detail-item"><label>Achievements</label><strong>🏆 ${d?.achievements?.length||0}</strong></div>
+                <div class="detail-item"><label>Status</label><strong>${d?.banned?'🚫 Banned':'✅ Active'}</strong></div>
             </div>
             ${d?.ban_reason?`<div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:.8rem;margin-top:.5rem;font-size:.83rem;color:var(--red);">Ban Sebebi: ${esc(d.ban_reason)}</div>`:''}
             <div style="margin-top:.8rem;"><label style="font-size:.75rem;color:var(--text2);display:block;margin-bottom:.3rem;">User ID</label>
@@ -1417,11 +1417,11 @@ function viewUser(u) {
         </div>
         <div class="detail-tab-pane" id="dtab-items">
             <div class="detail-grid">
-                <div class="detail-item"><label>Toplam Giriş</label><strong>${d?.items?.length||0}</strong></div>
+                <div class="detail-item"><label>Total Entries</label><strong>${d?.items?.length||0}</strong></div>
                 <div class="detail-item"><label>Tamamlanan</label><strong style="color:var(--green)">${completedCount}</strong></div>
-                <div class="detail-item"><label>İzleniyor</label><strong style="color:var(--accent2)">${watchingCount}</strong></div>
+                <div class="detail-item"><label>Watching</label><strong style="color:var(--accent2)">${watchingCount}</strong></div>
                 <div class="detail-item"><label>Planlanan</label><strong style="color:var(--accent3)">${plannedCount}</strong></div>
-                <div class="detail-item"><label>Bırakılan</label><strong style="color:var(--red)">${droppedCount}</strong></div>
+                <div class="detail-item"><label>Dropped</label><strong style="color:var(--red)">${droppedCount}</strong></div>
                 <div class="detail-item"><label>Ort. Puan</label><strong>${avgRating} / 10</strong></div>
                 <div class="detail-item"><label>Anime</label><strong>${d?.items?.filter(i=>i.type==='anime').length||0}</strong></div>
                 <div class="detail-item"><label>Manga+Webtoon</label><strong>${d?.items?.filter(i=>i.type!=='anime').length||0}</strong></div>
@@ -1442,11 +1442,11 @@ function switchDetailTab(tab) {
 // ===== USER ENTRIES MODAL =====
 function openUserEntries(u) {
     const d = u.data;
-    const name = d?.social?.name || 'Kullanıcı';
+    const name = d?.social?.name || 'User';
     const items = d?.items || [];
     _entriesAll = items;
-    document.getElementById('entriesModalTitle').textContent = `${name} — İçerik Listesi`;
-    document.getElementById('entriesModalSub').textContent = `${items.length} giriş · ${items.filter(i=>i.status==='completed').length} tamamlandı`;
+    document.getElementById('entriesModalTitle').textContent = `${name} — Content List`;
+    document.getElementById('entriesModalSub').textContent = `${items.length} entries · ${items.filter(i=>i.status==='completed').length} completed`;
     filterEntries('all');
     document.getElementById('entriesModalOverlay').classList.add('open');
 }
@@ -1459,7 +1459,7 @@ function filterEntries(type) {
     const items = type==='all' ? _entriesAll : _entriesAll.filter(i=>i.type===type);
     _entriesFiltered = items;
     const body = document.getElementById('entriesModalBody');
-    if (!items.length) { body.innerHTML='<div class="empty-state"><div class="ei">📋</div><h3>Bu kategoride giriş yok</h3></div>'; return; }
+    if (!items.length) { body.innerHTML='<div class="empty-state"><div class="ei">📋</div><h3>No entries in this category</h3></div>'; return; }
     const sm={watching:'<span class="badge bg-blue" style="font-size:.65rem;">▶ İzleniyor</span>',completed:'<span class="badge bg-green" style="font-size:.65rem;">✅ Tamamlandı</span>',plantowatch:'<span class="badge bg-purple" style="font-size:.65rem;">📋 Planlı</span>',onhold:'<span class="badge bg-yellow" style="font-size:.65rem;">⏸ Beklemede</span>',dropped:'<span class="badge bg-red" style="font-size:.65rem;">❌ Bırakıldı</span>'};
     const typeIcons={anime:'🎬',manga:'📚',webtoon:'🌐'};
     body.innerHTML = items.map(i=>`
@@ -1487,8 +1487,8 @@ let _allMembersData = [];
 let _allMembersPage = 1;
 
 async function loadOnline() {
-    document.getElementById('onlineBody').innerHTML='<tr class="loading-td"><td colspan="5"><span class="spinner"></span>Yükleniyor…</td></tr>';
-    document.getElementById('allMembersBody').innerHTML='<tr class="loading-td"><td colspan="6"><span class="spinner"></span>Yükleniyor…</td></tr>';
+    document.getElementById('onlineBody').innerHTML='<tr class="loading-td"><td colspan="5"><span class="spinner"></span>Loading…</td></tr>';
+    document.getElementById('allMembersBody').innerHTML='<tr class="loading-td"><td colspan="6"><span class="spinner"></span>Loading…</td></tr>';
 
     // RPC ile tüm kullanıcıları çek (RLS bypass)
     let _raw = [];
@@ -1510,19 +1510,19 @@ async function loadOnline() {
     document.getElementById('o-today').textContent  = todayA.length;
     document.getElementById('o-total').textContent  = users.length;
     document.getElementById('onlineBadge').textContent = online.length;
-    document.getElementById('sideOnlineCount').textContent = `${online.length} kullanıcı online`;
+    document.getElementById('sideOnlineCount').textContent = `${online.length} users online`;
 
     // Online tablosu
     const tbody = document.getElementById('onlineBody');
     if (!online.length) {
-        tbody.innerHTML='<tr><td colspan="5"><div class="empty-state"><div class="ei">😴</div><h3>Şu an kimse online değil</h3><p>Son 15 dakikada aktif kullanıcı yok</p></div></td></tr>';
+        tbody.innerHTML='<tr><td colspan="5"><div class="empty-state"><div class="ei">😴</div><h3>Nobody is online right now</h3><p>No active users in the last 15 minutes</p></div></td></tr>';
     } else {
         tbody.innerHTML = online.map(u => {
             const d = u.data;
             return `<tr>
                 <td><div class="user-cell">
                     <div style="position:relative;">${avatarHtml(d,'32px')}<div style="position:absolute;bottom:0;right:0;width:9px;height:9px;background:var(--green);border-radius:50%;border:2px solid var(--card);animation:pulse 2s infinite;"></div></div>
-                    <div><div class="user-name">${esc(d?.social?.name||'Kullanıcı')}</div><div class="user-email">${esc(d?.social?.email||'')}</div></div>
+                    <div><div class="user-name">${esc(d?.social?.name||'User')}</div><div class="user-email">${esc(d?.social?.email||'')}</div></div>
                 </div></td>
                 <td style="color:var(--green);font-size:.82rem;">🟢 ${fmtRelative(u.updated_at)}</td>
                 <td><span class="badge bg-purple">Lv.${d?.xp?.level||1}</span></td>
@@ -1560,12 +1560,12 @@ function renderAllMembers() {
     if (_allMembersPage > pages) _allMembersPage = 1;
     const slice = filtered.slice((_allMembersPage-1)*PER_PAGE, _allMembersPage*PER_PAGE);
 
-    document.getElementById('allMembersPageInfo').textContent = `${total} üye • Sayfa ${_allMembersPage}/${pages}`;
+    document.getElementById('allMembersPageInfo').textContent = `${total} members • Page ${_allMembersPage}/${pages}`;
     renderPag('allMembersPageBtns', pages, _allMembersPage, p => { _allMembersPage = p; renderAllMembers(); });
 
     const tbody = document.getElementById('allMembersBody');
     if (!slice.length) {
-        tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="ei">👤</div><h3>Üye bulunamadı</h3></div></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="ei">👤</div><h3>Member not found</h3></div></td></tr>';
         return;
     }
 
@@ -1573,13 +1573,13 @@ function renderAllMembers() {
         const d = u.data;
         const isOnline  = u.updated_at > now15;
         const isBanned  = d?.banned;
-        const name      = d?.social?.name || 'Kullanıcı';
+        const name      = d?.social?.name || 'User';
         const completed = d?.items?.filter(i => i.status === 'completed').length || 0;
         const statusBadge = isBanned
-            ? '<span class="badge bg-red">🚫 Banlı</span>'
+            ? '<span class="badge bg-red">🚫 Banned</span>'
             : isOnline
                 ? '<span class="badge bg-green">🟢 Online</span>'
-                : '<span class="badge bg-blue">✅ Kayıtlı</span>';
+                : '<span class="badge bg-blue">✅ Registered</span>';
         return `<tr>
             <td><div class="user-cell">
                 <div style="position:relative;">${avatarHtml(d,'32px')}${isOnline&&!isBanned?'<div style="position:absolute;bottom:0;right:0;width:8px;height:8px;background:var(--green);border-radius:50%;border:2px solid var(--card);animation:pulse 2s infinite;"></div>':''}</div>
@@ -1589,7 +1589,7 @@ function renderAllMembers() {
                 </div>
             </div></td>
             <td style="color:var(--text2);font-size:.82rem;">${fmtRelative(u.updated_at)}</td>
-            <td><span class="badge bg-purple">Lv.${d?.xp?.level||1}</span> <strong style="color:var(--yellow);font-size:.82rem;">${(d?.xp?.total||0).toLocaleString('tr-TR')}</strong> XP</td>
+            <td><span class="badge bg-purple">Lv.${d?.xp?.level||1}</span> <strong style="color:var(--yellow);font-size:.82rem;">${(d?.xp?.total||0).toLocaleString('en-GB')}</strong> XP</td>
             <td><span style="font-weight:600;">${d?.items?.length||0}</span> <span style="font-size:.72rem;color:var(--text2);">(${completed}✓)</span></td>
             <td>🔥 ${d?.streak?.count||0}</td>
             <td>${statusBadge}</td>
@@ -1610,12 +1610,12 @@ function filterBans() {
     const q=(document.getElementById('banSearch')?.value||'').toLowerCase();
     const filtered = q ? allBanData.filter(u=>(u.data?.social?.name||'').toLowerCase().includes(q)||(u.data?.social?.email||'').toLowerCase().includes(q)) : allBanData;
     const tbody=document.getElementById('bansBody');
-    if (!filtered.length){tbody.innerHTML='<tr><td colspan="5"><div class="empty-state"><div class="ei">✅</div><h3>Banlı kullanıcı yok</h3><p>Tüm kullanıcılar aktif durumda.</p></div></td></tr>';return;}
+    if (!filtered.length){tbody.innerHTML='<tr><td colspan="5"><div class="empty-state"><div class="ei">✅</div><h3>No banned users</h3><p>All users are currently active.</p></div></td></tr>';return;}
     tbody.innerHTML=filtered.map(u=>{
-        const d=u.data, name=esc(d?.social?.name||'Kullanıcı');
+        const d=u.data, name=esc(d?.social?.name||'User');
         const reason=d?.ban_reason||'Kural ihlali';
         const isPermanent = !d?.ban_expiry;
-        const expiry = isPermanent ? '<span class="badge bg-red">♾️ Kalıcı</span>' : `<span class="badge bg-yellow">⏱ ${fmtDate(d.ban_expiry)}'e kadar</span>`;
+        const expiry = isPermanent ? '<span class="badge bg-red">♾️ Permanent</span>' : `<span class="badge bg-yellow">⏱ until ${fmtDate(d.ban_expiry)}</span>`;
         return `<tr>
             <td><div class="user-cell"><div class="user-av" style="background:linear-gradient(135deg,var(--red),#7c1010);">🚫</div>
             <div><div class="user-name">${name}</div><div class="user-email">${esc(d?.social?.email||'')} — <span class="mono" style="font-size:.72rem;">${u.user_id.substring(0,10)}…</span></div></div></div></td>
@@ -1624,7 +1624,7 @@ function filterBans() {
             <td>${expiry}</td>
             <td><div class="act-btns">
                 <button class="act-btn btn-view" onclick='viewUser(${JSON.stringify({uid:u.user_id,data:u.data})})'>👁 Detay</button>
-                <button class="act-btn btn-unban" onclick="setBan('${u.user_id}',false,'${name}')">✅ Banı Kaldır</button>
+                <button class="act-btn btn-unban" onclick="setBan('${u.user_id}',false,'${name}')">✅ Remove Ban</button>
             </div></td>
         </tr>`;
     }).join('');
@@ -1632,14 +1632,14 @@ function filterBans() {
 
 // ===== CONTENT =====
 async function loadContent() {
-    document.getElementById('contentBody').innerHTML='<tr class="loading-td"><td colspan="6"><span class="spinner"></span>Yükleniyor…</td></tr>';
+    document.getElementById('contentBody').innerHTML='<tr class="loading-td"><td colspan="6"><span class="spinner"></span>Loading…</td></tr>';
     const { data } = await sb.from('user_data').select('user_id,data');
     const typeF=document.getElementById('contentTypeF')?.value||'all';
     allContent=[];
     (data||[]).forEach(u=>{
         (u.data?.items||[]).forEach(item=>{
             if(typeF==='all'||item.type===typeF)
-                allContent.push({...item, _uid:u.user_id, _uname:u.data?.social?.name||'Kullanıcı', _email:u.data?.social?.email||''});
+                allContent.push({...item, _uid:u.user_id, _uname:u.data?.social?.name||'User', _email:u.data?.social?.email||''});
         });
     });
     contentPage=1;
@@ -1656,13 +1656,13 @@ function filterContent() {
     const total=filtered.length, pages=Math.ceil(total/PER_PAGE)||1;
     if (contentPage>pages) contentPage=1;
     const slice=filtered.slice((contentPage-1)*PER_PAGE,contentPage*PER_PAGE);
-    document.getElementById('contentPageInfo').textContent=`${total} giriş • Sayfa ${contentPage}/${pages}`;
+    document.getElementById('contentPageInfo').textContent=`${total} entries • Page ${contentPage}/${pages}`;
     renderPag('contentPageBtns', pages, contentPage, p=>{contentPage=p;filterContent();});
 
     const tb={anime:'bg-red',manga:'bg-blue',webtoon:'bg-purple'};
     const sm={watching:'<span class="badge bg-blue">▶</span>',completed:'<span class="badge bg-green">✅</span>',plantowatch:'<span class="badge bg-purple">📋</span>',onhold:'<span class="badge bg-yellow">⏸</span>',dropped:'<span class="badge bg-red">❌</span>'};
     const tbody=document.getElementById('contentBody');
-    if (!slice.length){tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><div class="ei">🎬</div><h3>İçerik bulunamadı</h3></div></td></tr>';return;}
+    if (!slice.length){tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><div class="ei">🎬</div><h3>Content not found</h3></div></td></tr>';return;}
     tbody.innerHTML=slice.map(i=>`<tr>
         <td><strong>${esc(i.name||'—')}</strong></td>
         <td><span class="badge ${tb[i.type]||'bg-blue'}">${i.type||'?'}</span></td>
@@ -1675,7 +1675,7 @@ function filterContent() {
 
 // ===== REVIEWS =====
 async function loadReviews() {
-    document.getElementById('reviewsBody').innerHTML='<tr class="loading-td"><td colspan="6"><span class="spinner"></span>Yükleniyor…</td></tr>';
+    document.getElementById('reviewsBody').innerHTML='<tr class="loading-td"><td colspan="6"><span class="spinner"></span>Loading…</td></tr>';
     const sortBy=document.getElementById('reviewSort')?.value||'newest';
     let query = sb.from('reviews').select('*');
     if (sortBy==='newest')      query=query.order('updated_at',{ascending:false});
@@ -1683,7 +1683,7 @@ async function loadReviews() {
     else if (sortBy==='rating_high') query=query.order('rating',{ascending:false});
     else if (sortBy==='rating_low')  query=query.order('rating',{ascending:true});
     const { data, error } = await query.limit(500);
-    if (error) { document.getElementById('reviewsBody').innerHTML=`<tr><td colspan="6"><div class="empty-state"><div class="ei">💬</div><h3>Yorumlar yüklenemedi</h3><p>${error.message}</p></div></td></tr>`; return; }
+    if (error) { document.getElementById('reviewsBody').innerHTML=`<tr><td colspan="6"><div class="empty-state"><div class="ei">💬</div><h3>Could not load reviews</h3><p>${error.message}</p></div></td></tr>`; return; }
     allReviews = data||[];
     reviewsPage=1;
     filterReviews();
@@ -1698,7 +1698,7 @@ function filterReviews() {
     document.getElementById('reviewsPageInfo').textContent=`${total} yorum • Sayfa ${reviewsPage}/${pages}`;
     renderPag('reviewsPageBtns', pages, reviewsPage, p=>{reviewsPage=p;filterReviews();});
     const tbody=document.getElementById('reviewsBody');
-    if (!slice.length){tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><div class="ei">💬</div><h3>Yorum bulunamadı</h3></div></td></tr>';return;}
+    if (!slice.length){tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><div class="ei">💬</div><h3>Review not found</h3></div></td></tr>';return;}
     tbody.innerHTML=slice.map(r=>`<tr>
         <td><div class="user-cell"><div class="user-av">${(r.username||'?')[0].toUpperCase()}</div><div class="user-name">${esc(r.username||'Anonim')}</div></div></td>
         <td style="max-width:150px;"><div style="font-size:.83rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(r.content_name||'—')}</div><div style="font-size:.72rem;color:var(--text2);">${r.content_type||''}</div></td>
@@ -1710,7 +1710,7 @@ function filterReviews() {
 }
 
 async function deleteReviewAdmin(id) {
-    if (!confirm('Bu yorumu silmek istediğine emin misin?')) return;
+    if (!confirm('Are you sure you want to delete this review?')) return;
     const { error } = await sb.from('reviews').delete().eq('id', id);
     if (error) { toast('Hata: '+error.message,'error'); return; }
     toast('🗑 Yorum silindi','info');
@@ -1744,12 +1744,12 @@ async function executeBan() {
 }
 async function setBan(uid, ban, name, reason='Kural ihlali', duration='permanent') {
     const { data: row, error } = await sb.from('user_data').select('data').eq('user_id',uid).single();
-    if (error||!row) { toast('Kullanıcı bulunamadı','error'); return; }
+    if (error||!row) { toast('User not found','error'); return; }
     const banExpiry = (ban && duration!=='permanent') ? new Date(Date.now()+parseInt(duration)*86400000).toISOString() : null;
     const newData = {...row.data, banned:ban, ban_reason:ban?reason:null, ban_expiry:ban?banExpiry:null, ban_date:ban?new Date().toISOString():null};
     const { error: e2 } = await sb.from('user_data').update({data:newData, updated_at:new Date().toISOString()}).eq('user_id',uid);
-    if (e2) { toast('Güncelleme hatası: '+e2.message,'error'); return; }
-    toast(ban?`🚫 ${name} banlandı`:`✅ ${name} banı kaldırıldı`, ban?'error':'success');
+    if (e2) { toast('Update error: '+e2.message,'error'); return; }
+    toast(ban?`🚫 ${name} banned`:`✅ ${name} ban removed`, ban?'error':'success');
     loadUsers(); loadBans();
 }
 
@@ -1773,23 +1773,23 @@ function selectWarnChip(el, msg) {
 }
 async function executeWarn() {
     const msg=document.getElementById('warnMessage').value.trim();
-    if (!msg) { toast('Uyarı mesajı gerekli','error'); return; }
+    if (!msg) { toast('Warning message required','error'); return; }
     // Save warning in user data
     const { data: row } = await sb.from('user_data').select('data').eq('user_id',_warnUid).single();
-    if (!row) { toast('Kullanıcı bulunamadı','error'); return; }
+    if (!row) { toast('User not found','error'); return; }
     const warnings = (row.data?.warnings||[]);
     warnings.push({ msg, date: new Date().toISOString(), admin: currentAdmin.email });
     const newData = {...row.data, warnings};
     await sb.from('user_data').update({data:newData}).eq('user_id',_warnUid);
     document.getElementById('warnModalOverlay').classList.remove('open');
-    toast(`⚠️ ${_warnName} uyarıldı`, 'info');
+    toast(`⚠️ ${_warnName} warned`, 'info');
 }
 
 // ===== ANNOUNCEMENTS =====
 async function loadAnnouncements() {
     const { data } = await sb.from('announcements').select('*').order('created_at',{ascending:false}).catch(()=>({data:[]}));
     const tbody=document.getElementById('annBody');
-    if (!data?.length){tbody.innerHTML='<tr><td colspan="4"><div class="empty-state"><div class="ei">📢</div><h3>Henüz duyuru yok</h3></div></td></tr>';return;}
+    if (!data?.length){tbody.innerHTML='<tr><td colspan="4"><div class="empty-state"><div class="ei">📢</div><h3>No announcements yet</h3></div></td></tr>';return;}
     const bm={info:'bg-blue',success:'bg-green',warning:'bg-yellow',update:'bg-purple'};
     tbody.innerHTML=data.map(a=>`<tr>
         <td><strong>${esc(a.title)}</strong><div style="font-size:.78rem;color:var(--text2);margin-top:2px;">${esc((a.content||'').substring(0,60))}…</div></td>
@@ -1804,10 +1804,10 @@ async function sendAnnouncement() {
     const type=document.getElementById('annType').value;
     const target=document.getElementById('annTarget').value;
     const priority=document.getElementById('annPriority').value;
-    if(!title||!content){toast('Başlık ve mesaj gerekli!','error');return;}
+    if(!title||!content){toast('Title and message required!','error');return;}
     const {error}=await sb.from('announcements').insert({title,content,type,target,priority,created_by:currentAdmin.id}).catch(e=>({error:e}));
-    if(error){toast('Duyuru gönderilemedi: '+error.message,'error');}
-    else{toast('📢 Duyuru yayınlandı!','success');document.getElementById('annTitle').value='';document.getElementById('annContent').value='';loadAnnouncements();}
+    if(error){toast('Could not send announcement: '+error.message,'error');}
+    else{toast('📢 Announcement published!','success');document.getElementById('annTitle').value='';document.getElementById('annContent').value='';loadAnnouncements();}
 }
 async function delAnn(id) {
     await sb.from('announcements').delete().eq('id',id);
@@ -1823,12 +1823,12 @@ function toggleRestriction(el, key) {
     const restrictions = JSON.parse(localStorage.getItem('onilist_restrictions')||'{}');
     restrictions[key] = isOn;
     localStorage.setItem('onilist_restrictions', JSON.stringify(restrictions));
-    toast(`${isOn?'✅':'❌'} ${key} ${isOn?'aktif':'devre dışı'}`, isOn?'success':'info');
+    toast(`${isOn?'✅':'❌'} ${key} ${isOn?'active':'disabled'}`, isOn?'success':'info');
 }
 function saveMaintenanceMsg() {
     const msg = document.getElementById('maintenanceMsg').value;
     localStorage.setItem('onilist_maintenance_msg', msg);
-    toast('💾 Bakım mesajı kaydedildi','success');
+    toast('💾 Maintenance message saved','success');
 }
 
 // ===== LOGS =====
@@ -1842,19 +1842,19 @@ async function loadLogs() {
         rows=rows.filter(u=>u.updated_at>cutoff);
     }
     if (filter==='bans') { rows=rows.filter(u=>u.data?.banned); }
-    if (!rows.length){el.innerHTML='<div class="empty-state"><div class="ei">📋</div><h3>Log bulunamadı</h3></div>';return;}
+    if (!rows.length){el.innerHTML='<div class="empty-state"><div class="ei">📋</div><h3>No logs found</h3></div>';return;}
 
     const dotColor = (u) => u.data?.banned?'var(--red)':u.data?.warnings?.length?'var(--yellow)':'var(--green)';
     el.innerHTML=rows.map(u=>`<div class="act-item">
         <div class="act-dot" style="background:${dotColor(u)}"></div>
         <div>
             <div class="act-text">
-                <strong>${esc(u.data?.social?.name||'Kullanıcı')}</strong>
+                <strong>${esc(u.data?.social?.name||'User')}</strong>
                 ${u.data?.banned?'<span class="badge bg-red" style="font-size:.65rem;margin-left:.4rem;">🚫 Banlı</span>':''}
                 ${u.data?.warnings?.length?`<span class="badge bg-yellow" style="font-size:.65rem;margin-left:.4rem;">⚠️ ${u.data.warnings.length} uyarı</span>`:''}
                 — veri kaydedildi
             </div>
-            <div class="act-time">${new Date(u.updated_at).toLocaleString('tr-TR')} · <span class="mono">${u.user_id.substring(0,8)}…</span> · ${u.data?.items?.length||0} giriş · Lv.${u.data?.xp?.level||1}</div>
+            <div class="act-time">${new Date(u.updated_at).toLocaleString('en-GB')} · <span class="mono">${u.user_id.substring(0,8)}…</span> · ${u.data?.items?.length||0} entries · Lv.${u.data?.xp?.level||1}</div>
         </div>
     </div>`).join('');
 }
@@ -1878,11 +1878,11 @@ async function loadSettings() {
     try { const r = await sb.from('reviews').select('*',{count:'exact',head:true}); revCount = r.count||0; } catch(e){}
 
     document.getElementById('platformInfoEl').innerHTML = `
-        Toplam Kullanıcı: <strong>${userCount||0}</strong><br>
+        Total Users: <strong>${userCount||0}</strong><br>
         Toplam Yorum: <strong>${revCount}</strong><br>
         Admin: <strong>${currentAdmin?.email}</strong><br>
         Panel Versiyonu: <strong>v2.0</strong><br>
-        Son Güncelleme: <strong>${new Date().toLocaleString('tr-TR')}</strong>
+        Last Update: <strong>${new Date().toLocaleString('en-GB')}</strong>
     `;
 }
 
@@ -1890,8 +1890,8 @@ async function checkSupabase() {
     try {
         const {error}=await sb.from('user_data').select('user_id').limit(1);
         const el=document.getElementById('supaStatus');
-        if(error){el.className='badge bg-yellow';el.textContent='⚠️ Sınırlı';}
-        else{el.className='badge bg-green';el.textContent='✅ Bağlı';}
+        if(error){el.className='badge bg-yellow';el.textContent='⚠️ Limited';}
+        else{el.className='badge bg-green';el.textContent='✅ Connected';}
         const {count}=await sb.from('user_data').select('*',{count:'exact',head:true});
         document.getElementById('supaStats').innerHTML=`Toplam satır: <strong>${count||0}</strong><br>URL: <span class="mono" style="font-size:.73rem;">${SUPABASE_URL.substring(0,45)}…</span>`;
     } catch(e){
@@ -1903,20 +1903,20 @@ async function checkSupabase() {
 function changePassword() {
     const p1=document.getElementById('newPw').value;
     const p2=document.getElementById('confirmPw').value;
-    if(!p1||!p2){toast('Her iki alanı da doldur','error');return;}
-    if(p1!==p2){toast('Şifreler uyuşmuyor','error');return;}
-    if(p1.length<6){toast('Şifre en az 6 karakter olmalı','error');return;}
+    if(!p1||!p2){toast('Please fill in both fields','error');return;}
+    if(p1!==p2){toast('Passwords do not match','error');return;}
+    if(p1.length<6){toast('Password must be at least 6 characters','error');return;}
     sb.auth.updateUser({password:p1}).then(({error})=>{
         if(error) toast('Hata: '+error.message,'error');
-        else{toast('✅ Şifre güncellendi','success');document.getElementById('newPw').value='';document.getElementById('confirmPw').value='';}
+        else{toast('✅ Password updated','success');document.getElementById('newPw').value='';document.getElementById('confirmPw').value='';}
     });
 }
 
 function exportCSV() {
-    const rows=[['UserID','İsim','Email','Level','XP','Giriş Sayısı','Streak','Durum']];
+    const rows=[['UserID','Name','Email','Level','XP','Entry Count','Streak','Status']];
     allUsers.forEach(u=>{
         const d=u.data;
-        rows.push([u.user_id,d?.social?.name||'',d?.social?.email||'',d?.xp?.level||1,d?.xp?.total||0,d?.items?.length||0,d?.streak?.count||0,d?.banned?'Banlı':'Aktif']);
+        rows.push([u.user_id,d?.social?.name||'',d?.social?.email||'',d?.xp?.level||1,d?.xp?.total||0,d?.items?.length||0,d?.streak?.count||0,d?.banned?'Banned':'Active']);
     });
     const blob=new Blob([rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n')],{type:'text/csv;charset=utf-8;'});
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='onilist_users_'+new Date().toISOString().split('T')[0]+'.csv'; a.click();
@@ -2003,10 +2003,10 @@ function fmtRelative(s) {
     if (!s) return '—';
     const diff = Date.now() - new Date(s).getTime();
     const m=Math.floor(diff/60000), h=Math.floor(diff/3600000), d=Math.floor(diff/86400000);
-    if (m<1) return 'az önce';
-    if (m<60) return `${m} dakika önce`;
-    if (h<24) return `${h} saat önce`;
-    if (d<7)  return `${d} gün önce`;
+    if (m<1) return 'just now';
+    if (m<60) return `${m} minute${m>1?'s':''} ago`;
+    if (h<24) return `${h} hour${h>1?'s':''} ago`;
+    if (d<7)  return `${d} day${d>1?'s':''} ago`;
     return fmtDate(s);
 }
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
@@ -2024,37 +2024,37 @@ function avatarHtml(d, size) {
 let _adminLang = localStorage.getItem('admin_lang') || 'en';
 
 const adminTr = {
-    live: 'Canlı', refresh: '🔄 Yenile',
-    updated: 'Güncellendi: ',
-    pageTitle_dashboard: 'Dashboard', pageSub_dashboard: 'OniList platform genel bakışı',
-    pageTitle_users: 'Kullanıcılar', pageSub_users: 'Kayıtlı kullanıcı listesi ve detayları',
-    pageTitle_content: 'İçerik Yönetimi', pageSub_content: 'Anime, manga ve webtoon veritabanı',
-    pageTitle_announcements: 'Duyurular', pageSub_announcements: 'Kullanıcılara bildirim gönder',
-    pageTitle_restrictions: 'Kısıtlamalar', pageSub_restrictions: 'Bakım modu ve erişim kontrolü',
-    pageTitle_system: 'Sistem', pageSub_system: 'Sistem bilgisi ve bağlantı durumu',
-    nav_dashboard: 'Dashboard', nav_users: 'Kullanıcılar', nav_content: 'İçerik',
-    nav_announcements: 'Duyurular', nav_restrictions: 'Kısıtlamalar', nav_system: 'Sistem',
-    logout: 'Çıkış Yap',
+    live: 'Live', refresh: '🔄 Refresh',
+    updated: 'Updated: ',
+    pageTitle_dashboard: 'Dashboard', pageSub_dashboard: 'OniList platform overview',
+    pageTitle_users: 'Users', pageSub_users: 'Registered user list and details',
+    pageTitle_content: 'Content Management', pageSub_content: 'Anime, manga and webtoon database',
+    pageTitle_announcements: 'Announcements', pageSub_announcements: 'Send notifications to users',
+    pageTitle_restrictions: 'Restrictions', pageSub_restrictions: 'Maintenance mode and access control',
+    pageTitle_system: 'System', pageSub_system: 'System info and connection status',
+    nav_dashboard: 'Dashboard', nav_users: 'Users', nav_content: 'Content',
+    nav_announcements: 'Announcements', nav_restrictions: 'Restrictions', nav_system: 'System',
+    logout: 'Logout',
     // Genel arayüz
-    search_placeholder: 'Kullanıcı ara...', filter_all: 'Tümü', filter_active: 'Aktif', filter_banned: 'Banlı',
-    sort_newest: 'En Yeni', sort_oldest: 'En Eski', sort_xp: 'En Yüksek XP', sort_items: 'En Çok İçerik',
-    col_user: 'Kullanıcı', col_email: 'E-posta', col_date: 'Tarih', col_xp: 'XP', col_items: 'İçerik', col_streak: 'Seri', col_status: 'Durum', col_actions: 'İşlemler',
-    tab_info: '📊 Bilgiler', tab_stats: '📋 İstatistikler', tab_raw: '🔧 Ham Veri',
-    lbl_username: 'Kullanıcı Adı', lbl_email: 'E-posta', lbl_level: 'Level', lbl_total_xp: 'Toplam XP',
-    lbl_streak: 'Seri', lbl_longest_streak: 'En Uzun Seri', lbl_achievements: 'Başarımlar', lbl_status: 'Durum',
-    lbl_total: 'Toplam Giriş', lbl_completed: 'Tamamlanan', lbl_watching: 'İzleniyor',
-    lbl_planned: 'Planlanan', lbl_dropped: 'Bırakılan', lbl_avg_rating: 'Ort. Puan',
+    search_placeholder: 'Search users...', filter_all: 'All', filter_active: 'Active', filter_banned: 'Banned',
+    sort_newest: 'Newest', sort_oldest: 'Oldest', sort_xp: 'Highest XP', sort_items: 'Most Content',
+    col_user: 'User', col_email: 'Email', col_date: 'Date', col_xp: 'XP', col_items: 'Content', col_streak: 'Streak', col_status: 'Status', col_actions: 'Actions',
+    tab_info: '📊 Info', tab_stats: '📋 Stats', tab_raw: '🔧 Raw Data',
+    lbl_username: 'Username', lbl_email: 'Email', lbl_level: 'Level', lbl_total_xp: 'Total XP',
+    lbl_streak: 'Streak', lbl_longest_streak: 'Longest Streak', lbl_achievements: 'Achievements', lbl_status: 'Status',
+    lbl_total: 'Total Entries', lbl_completed: 'Completed', lbl_watching: 'Watching',
+    lbl_planned: 'Planned', lbl_dropped: 'Dropped', lbl_avg_rating: 'Avg. Rating',
     lbl_anime: 'Anime', lbl_manga_web: 'Manga+Webtoon',
-    status_active: '✅ Aktif', status_banned: '🚫 Banlı',
-    btn_add_content: '+ İçerik Ekle', btn_new_ann: '+ Yeni Duyuru', btn_save: 'Kaydet', btn_cancel: 'İptal',
-    ann_title: 'Başlık', ann_content: 'İçerik', ann_type: 'Tür', ann_priority: 'Öncelik',
-    maint_mode: 'Bakım Modu', maint_desc: 'Siteyi geçici olarak kapat',
-    reg_restrict: 'Kayıt Kısıtla', reg_desc: 'Yeni kayıtları engelle',
-    sys_supabase: 'Supabase Bağlantısı', sys_version: 'Versiyon', sys_env: 'Ortam',
-    online_users: 'kullanıcı online',
-    delete_confirm: 'Bu kullanıcıyı KALICI olarak silmek istediğinize emin misiniz?\n\nBu işlem GERİ ALINAMAZ!',
-    delete_success: 'Kullanıcı kalıcı olarak silindi.',
-    delete_error: 'Silme hatası: ',
+    status_active: '✅ Active', status_banned: '🚫 Banned',
+    btn_add_content: '+ Add Content', btn_new_ann: '+ New Announcement', btn_save: 'Save', btn_cancel: 'Cancel',
+    ann_title: 'Title', ann_content: 'Content', ann_type: 'Type', ann_priority: 'Priority',
+    maint_mode: 'Maintenance Mode', maint_desc: 'Temporarily close the site',
+    reg_restrict: 'Restrict Registration', reg_desc: 'Block new registrations',
+    sys_supabase: 'Supabase Connection', sys_version: 'Version', sys_env: 'Environment',
+    online_users: 'users online',
+    delete_confirm: 'Are you sure you want to PERMANENTLY delete this user?\n\nThis action CANNOT be undone!',
+    delete_success: 'User permanently deleted.',
+    delete_error: 'Delete error: ',
 };
 
 const adminEn = {
@@ -2168,16 +2168,16 @@ function applyAdminLang() {
 
 // ===== KALICI KULLANICI SİLME (Admin) =====
 async function permanentDeleteUser(uid, name) {
-    const confirmMsg = at('delete_confirm') + '\n\nKullanıcı: ' + name;
+    const confirmMsg = at('delete_confirm') + '\n\nUser: ' + name;
     if (!confirm(confirmMsg)) return;
 
     // sb admin.html'de global olarak tanımlı
-    if (!sb) { alert('Supabase bağlantısı yok! Lütfen sayfayı yenileyin.'); return; }
+    if (!sb) { alert('No Supabase connection! Please reload the page.'); return; }
 
     try {
         // 1. user_data tablosunu sil
         const { error: e1 } = await sb.from('user_data').delete().eq('user_id', uid);
-        if (e1) console.warn('user_data silme hatası:', e1.message);
+        if (e1) console.warn('user_data delete error:', e1.message);
 
         // 2. reviews ve comments sil (tablo yoksa hata vermesin)
         try { await sb.from('reviews').delete().eq('user_id', uid); } catch(e){}
@@ -2186,7 +2186,7 @@ async function permanentDeleteUser(uid, name) {
         // 3. auth.users'dan sil - önce RPC dene
         const { error: rpcErr } = await sb.rpc('admin_delete_user', { target_user_id: uid });
         if (rpcErr) {
-            console.warn('RPC hatası (normal - SQL eklenmediyse):', rpcErr.message);
+            console.warn('RPC error (normal - if SQL not added):', rpcErr.message);
             // RPC yoksa user_data silindi, auth silinmedi ama tekrar giriş yapamaz
             // çünkü user_data yoksa uygulama onu yeni kullanıcı gibi görür
         }
@@ -2196,9 +2196,9 @@ async function permanentDeleteUser(uid, name) {
             _allUsers = _allUsers.filter(u => u.user_id !== uid);
             renderUsers();
         }
-        alert('✅ ' + name + ' kullanıcısı silindi.');
+        alert('✅ ' + name + ' user deleted.');
     } catch(e) {
-        console.error('Silme hatası:', e);
+        console.error('Delete error:', e);
         alert('Hata: ' + e.message);
     }
 }
@@ -2212,13 +2212,13 @@ document.addEventListener('DOMContentLoaded', () => {
 let allChatData = [];
 
 function renderChatRow(msg) {
-    const date = new Date(msg.created_at).toLocaleString('tr-TR');
+    const date = new Date(msg.created_at).toLocaleString('en-GB');
     const avatarUrl = msg.avatar_url || '';
     const avatarEmoji = msg.avatar || '👤';
     const avatarHtml = avatarUrl
         ? `<img src="${avatarUrl}" alt="" style="width:32px;height:32px;border-radius:50%;object-fit:cover;flex-shrink:0;">`
         : `<span style="font-size:1.3rem;line-height:1;">${esc(avatarEmoji)}</span>`;
-    const name = esc(msg.display_name || 'Kullanıcı');
+    const name = esc(msg.display_name || 'User');
     const email = esc(msg.email || '—');
     const content = esc(msg.content || '');
     const msgId = String(msg.id || '');
@@ -2248,7 +2248,7 @@ function filterChatMessages() {
     const tbody = document.getElementById('chatMsgBody');
     if (!tbody) return;
     if (!filtered.length) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--text3);">Sonuç bulunamadı</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--text3);">No results found</td></tr>';
         return;
     }
     tbody.innerHTML = filtered.map(renderChatRow).join('');
@@ -2257,7 +2257,7 @@ function filterChatMessages() {
 async function loadChatMessages() {
     const tbody = document.getElementById('chatMsgBody');
     if (!tbody) return;
-    tbody.innerHTML = '<tr class="loading-td"><td colspan="4"><span class="spinner"></span>Yükleniyor…</td></tr>';
+    tbody.innerHTML = '<tr class="loading-td"><td colspan="4"><span class="spinner"></span>Loading…</td></tr>';
 
     const { data, error } = await sb
         .from('chat_messages')
@@ -2272,7 +2272,7 @@ async function loadChatMessages() {
 
     if (!data || data.length === 0) {
         allChatData = [];
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--text3);">Henüz mesaj yok</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--text3);">No messages yet</td></tr>';
         return;
     }
 
@@ -2286,7 +2286,7 @@ async function loadChatMessages() {
 }
 
 async function deleteChatMsg(id) {
-    if (!confirm('Bu mesajı silmek istediğine emin misin?')) return;
+    if (!confirm('Are you sure you want to delete this message?')) return;
     try {
         // Yöntem 1: Doğrudan DELETE
         const { error } = await sb.from('chat_messages').delete().eq('id', id);
@@ -2315,19 +2315,19 @@ async function deleteChatMsg(id) {
         if (!updateErr) {
             allChatData = allChatData.filter(m => String(m.id) !== String(id));
             filterChatMessages();
-            toast('🗑 Mesaj kaldırıldı', 'info');
+            toast('🗑 Message removed', 'info');
             return;
         }
 
         // Hiçbiri çalışmadı - Supabase'de politika eksik
-        const sqlPolicy = `-- Supabase SQL Editor'de bu komutu çalıştır:\n` +
+        const sqlPolicy = `-- Run this command in Supabase SQL Editor:\n` +
             `CREATE POLICY "admin_delete_chat" ON chat_messages\n` +
             `FOR DELETE USING (auth.email() = 'list086@gmail.com');`;
-        console.error('RLS politikası eksik. Çözüm:\n' + sqlPolicy);
+        console.error('RLS policy missing. Solution:\n' + sqlPolicy);
         alert('Silme yetkisi yok!\n\nSupabase Dashboard > SQL Editor > Yeni Query:\n\n' +
             'CREATE POLICY "admin_delete_chat"\nON chat_messages FOR DELETE\n' +
             'USING (auth.email() = \'list086@gmail.com\');\n\n' +
-            'Bu komutu çalıştırınca silme çalışacak.');
+            'Once you run this command, deletion will work.');
     } catch(e) {
         alert('Beklenmeyen hata: ' + e.message);
     }
@@ -2366,7 +2366,7 @@ function showChatRLSGuide() {
 }
 
 async function clearOldChatMessages() {
-    if (!confirm('7 günden eski tüm mesajları silmek istediğine emin misin?')) return;
+    if (!confirm('Are you sure you want to delete all messages older than 7 days?')) return;
     const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
     const { error } = await sb.from('chat_messages').delete().lt('created_at', weekAgo);
     if (error) { alert('Hata: ' + error.message); return; }

@@ -348,7 +348,7 @@
                     <div class="auth-field">
                         <label for="registerPassword">🔒 Password</label>
                         <div class="password-wrapper">
-                            <input type="password" id="registerPassword" name="password" placeholder="En az 6 karakter" required minlength="6" autocomplete="new-password" oninput="checkPasswordStrength(this.value)">
+                            <input type="password" id="registerPassword" name="password" placeholder="At least 6 characters" required minlength="6" autocomplete="new-password" oninput="checkPasswordStrength(this.value)">
                             <button type="button" class="toggle-pw" onclick="togglePassword('registerPassword', this)">👁️</button>
                         </div>
                         <div class="password-strength"><div class="strength-bar" id="strengthBar"></div></div>
@@ -556,7 +556,7 @@
                                     <textarea id="inlineChatInput" placeholder="Bir &#x15f;eyler yaz... (Enter = g&#xf6;nder)" rows="1" maxlength="300"></textarea>
                                     <button id="inlineChatSendBtn" disabled>&#x27A4;</button>
                                 </div>
-                                <div class="inline-chat-hint">Enter ile g&#xf6;nder &middot; Shift+Enter yeni sat&#x131;r &middot; Max 300 karakter</div>
+                                <div class="inline-chat-hint">Enter to send &middot; Shift+Enter new line &middot; Max 300 chars</div>
                             </div>
                         </div>
                     </div>
@@ -1177,7 +1177,7 @@
                             <div style="margin-bottom:0.9rem;">
                                 <label style="display:block;font-size:0.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.4rem;">Yeni Şifre</label>
                                 <div class="password-wrapper">
-                                    <input type="password" id="newPassword" placeholder="En az 8 karakter" style="width:100%;padding:0.8rem 2.8rem 0.8rem 1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;font-size:0.9rem;font-family:DM Sans,sans-serif;outline:none;box-sizing:border-box;transition:border-color 0.2s;" oninput="checkPasswordStrengthSettings(this.value)" onfocus="this.style.borderColor='rgba(255,51,102,0.7)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+                                    <input type="password" id="newPassword" placeholder="At least 8 characters" style="width:100%;padding:0.8rem 2.8rem 0.8rem 1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;font-size:0.9rem;font-family:DM Sans,sans-serif;outline:none;box-sizing:border-box;transition:border-color 0.2s;" oninput="checkPasswordStrengthSettings(this.value)" onfocus="this.style.borderColor='rgba(255,51,102,0.7)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
                                     <button type="button" class="toggle-pw" onclick="togglePwVisibility('newPassword',this)">👁</button>
                                 </div>
                                 <div class="password-strength" style="margin-top:0.5rem;"><div class="strength-bar" id="settingsPwStrengthBar"></div></div>

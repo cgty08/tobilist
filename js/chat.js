@@ -64,7 +64,7 @@ const OniChat = (function () {
         const el = document.createElement('div');
         el.innerHTML = `
         <!-- Floating Button -->
-        <button id="chatToggleBtn" title="Topluluk Sohbeti" aria-label="Sohbeti Aç" style="display:none!important">
+        <button id="chatToggleBtn" title="Community Chat" aria-label="Open Chat" style="display:none!important">
             💬
             <span id="chatBadge"></span>
         </button>
@@ -78,7 +78,7 @@ const OniChat = (function () {
                     <div class="chat-header-title">Topluluk Sohbeti</div>
                     <div class="chat-header-sub">
                         <span class="chat-online-dot"></span>
-                        <span id="chatOnlineText">Bağlanıyor...</span>
+                        <span id="chatOnlineText">Connecting...</span>
                     </div>
                 </div>
                 <button class="chat-close-btn" id="chatCloseBtn" title="Kapat">✕</button>
@@ -96,21 +96,21 @@ const OniChat = (function () {
             <!-- Guest Prompt (sadece giriş yapılmamışsa görünür) -->
             <div id="chatGuestPrompt" class="chat-guest-prompt" style="display:none;">
                 <div class="chat-guest-icon">🔐</div>
-                <h4>Sohbete Katıl</h4>
-                <p>Mesaj göndermek için giriş yapman gerekiyor. </p>
-                <button onclick="openAuthModal('login')">Giriş Yap →</button>
+                <h4>Join the Chat</h4>
+                <p>You need to sign in to send messages.</p>
+                <button onclick="openAuthModal('login')">Sign In →</button>
             </div>
 
             <!-- Input Area -->
             <div class="chat-input-area" id="chatInputArea">
                 <textarea
                     id="chatInput"
-                    placeholder="Bir şeyler yaz... (Enter = gönder)"
+                    placeholder="Write something... (Enter = send)"
                     rows="1"
                     maxlength="${MAX_LEN}"
                 ></textarea>
                 <span id="chatCharCount" class="chat-char-count" style="display:none;"></span>
-                <button id="chatSendBtn" disabled title="Gönder">➤</button>
+                <button id="chatSendBtn" disabled title="Send">➤</button>
             </div>
         </div>`;
         // Elementleri doğrudan body'ye ekle (diğer DOM'u bozmaz)
@@ -175,7 +175,7 @@ const OniChat = (function () {
         // Önce display_name alanı, sonra email'den ilk kısım
         if (row.display_name) return row.display_name;
         if (row.email) return row.email.split('@')[0];
-        return 'Kullanıcı';
+        return 'User';
     }
 
     function formatTime(isoStr) {
@@ -214,7 +214,7 @@ const OniChat = (function () {
         const text   = escapeHTML(row.content || '');
         const time   = formatTime(row.created_at);
         const canClick = !isOwn && row.user_id;
-        const clickAttr = canClick ? `onclick="openPublicProfile('${row.user_id}','${getDisplayName(row).replace(/'/g,"\\'")}')" style="cursor:pointer;" title="${getDisplayName(row)} profilini gör"` : '';
+        const clickAttr = canClick ? `onclick="openPublicProfile('${row.user_id}','${getDisplayName(row).replace(/'/g,"\\'")}')" style="cursor:pointer;" title="${getDisplayName(row)} profile"` : '';
 
         const div = document.createElement('div');
         div.className = 'chat-msg' + (isOwn ? ' own' : '');
@@ -253,7 +253,7 @@ const OniChat = (function () {
     async function loadMessages() {
         if (!window.supabaseClient) {
             clearMessages();
-            showSystemMsg('💡 Sohbet geçici olarak kullanılamıyor.');
+            showSystemMsg('💡 Chat is temporarily unavailable.');
             return;
         }
         showLoading();
@@ -270,21 +270,21 @@ const OniChat = (function () {
         clearMessages();
 
         if (error) {
-            showSystemMsg('⚠️ Mesajlar yüklenemedi. Tablo henüz oluşturulmamış olabilir.');
+            showSystemMsg('⚠️ Could not load messages. The table may not exist yet.');
             console.warn('Chat load error:', error.message);
-            setOnlineText('Bağlantı hatası');
+            setOnlineText('Connection error');
             return;
         }
 
         if (!data || data.length === 0) {
-            showSystemMsg('👋 Henüz mesaj yok. İlk mesajı sen gönder!');
+            showSystemMsg('👋 No messages yet. Be the first to send one!');
         } else {
             // En eskiden en yeniye sırala
             [...data].reverse().forEach(row => renderMessage(row));
         }
 
         scrollToBottom(true);
-        setOnlineText('Çevrimiçi · Canlı');
+        setOnlineText('Online · Live');
         subscribeRealtime();
     }
 
@@ -309,9 +309,9 @@ const OniChat = (function () {
             })
             .subscribe((status) => {
                 if (status === 'SUBSCRIBED') {
-                    setOnlineText('Çevrimiçi · Canlı');
+                    setOnlineText('Online · Live');
                 } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-                    setOnlineText('Yeniden bağlanıyor...');
+                    setOnlineText('Reconnecting...');
                 }
             });
     }
@@ -331,7 +331,7 @@ const OniChat = (function () {
         // Rate limit
         const now = Date.now();
         if (now - lastSentAt < RATE_LIMIT_MS) {
-            showSystemMsg(`⏱ Çok hızlı! ${Math.ceil((RATE_LIMIT_MS - (now - lastSentAt)) / 1000)}s bekle.`);
+            showSystemMsg(`⏱ Too fast! Wait ${Math.ceil((RATE_LIMIT_MS - (now - lastSentAt)) / 1000)}s.`);
             return;
         }
 
@@ -385,9 +385,9 @@ const OniChat = (function () {
                 if (error.code === '42703' || error.message?.includes('column')) {
                     const { error: err2 } = await window.supabaseClient
                         .from(TABLE).insert(insertData);
-                    if (err2) showSystemMsg('⚠️ Mesaj gönderilemedi: ' + err2.message);
+                    if (err2) showSystemMsg('⚠️ Could not send message: ' + err2.message);
                 } else {
-                    showSystemMsg('⚠️ Mesaj gönderilemedi: ' + error.message);
+                    showSystemMsg('⚠️ Could not send message: ' + error.message);
                 }
             }
         } catch(e) {
@@ -575,7 +575,7 @@ const InlineChat = (function () {
         const text = escapeHTML(row.content || '');
         const time = formatTime(row.created_at);
         const canClick = !isOwn && row.user_id;
-        const clickAttr = canClick ? `onclick="openPublicProfile('${row.user_id}','${((row.display_name||'Kullanıcı').trim()).replace(/'/g,"\\'")}')" style="cursor:pointer;" title="${name} profilini gör"` : '';
+        const clickAttr = canClick ? `onclick="openPublicProfile('${row.user_id}','${((row.display_name||'Kullanıcı').trim()).replace(/'/g,"\\'")}')" style="cursor:pointer;" title="${name} profile"` : '';
 
         const div = document.createElement('div');
         div.className = 'chat-msg' + (isOwn ? ' own' : '');
@@ -614,7 +614,7 @@ const InlineChat = (function () {
         if (error || !data || data.length === 0) {
             const div = document.createElement('div');
             div.className = 'chat-system';
-            div.textContent = error ? 'Mesajlar yüklenemedi.' : '👋 Henüz mesaj yok. İlk mesajı sen gönder!';
+            div.textContent = error ? 'Could not load messages.' : '👋 No messages yet. Be the first to send one!';
             container.appendChild(div);
         } else {
             [...data].reverse().forEach(row => renderMessage(row));
@@ -663,7 +663,7 @@ const InlineChat = (function () {
 
         const userData  = window.dataManager?.data;
         const social    = userData?.social || {};
-        const displayName = social.name || user.displayName || user.email?.split('@')[0] || 'Kullanıcı';
+        const displayName = social.name || user.displayName || user.email?.split('@')[0] || 'User';
         const avatar    = social.avatar || '👤';
         const avatarUrl = social.avatarUrl || '';
 
