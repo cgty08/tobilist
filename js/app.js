@@ -1,5 +1,9 @@
 // APP.JS v5.2 - OniList Ana Uygulama - Genişletilmiş İçerik
 
+// CSS class injection önlemi: type değeri her zaman bu listeden gelmeli
+const VALID_TYPES = ['anime', 'manga', 'webtoon'];
+function safeType(t) { return VALID_TYPES.includes(t) ? t : 'anime'; }
+
 let currentSection = 'home';
 let previousSection = 'home';
 let discoverScrollPosition = 0;
@@ -237,7 +241,7 @@ function renderContinueWatching() {
                     ? '<img src="' + item.poster + '" alt="' + _esc(item.name || '') + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
                       '<div class="media-poster-fallback" style="display:none">' + getTypeIcon(item.type) + '</div>'
                     : '<div class="media-poster-fallback">' + getTypeIcon(item.type) + '</div>') +
-                '<span class="media-type-badge ' + item.type + '">' + item.type + '</span>' +
+                '<span class="media-type-badge ' + safeType(item.type) + '">' + safeType(item.type) + '</span>' +
                 '<div class="media-score-badge">▶ ' + (item.currentEpisode || 0) + '/' + (item.totalEpisodes || '?') + '</div>' +
             '</div>' +
             '<div class="media-info">' +
@@ -287,7 +291,7 @@ function renderMediaRow(containerId, items) {
                     ? '<img src="' + item.poster + '" alt="' + _esc(item.name || '') + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
                       '<div class="media-poster-fallback" style="display:none">' + getTypeIcon(item.type) + '</div>'
                     : '<div class="media-poster-fallback">' + getTypeIcon(item.type) + '</div>') +
-                '<span class="media-type-badge ' + (item.type || 'anime') + '">' + (item.type || 'anime') + '</span>' +
+                '<span class="media-type-badge ' + safeType(item.type) + '">' + safeType(item.type) + '</span>' +
                 (rating ? '<div class="media-score-badge">' + rating + '</div>' : '') +
             '</div>' +
             '<div class="media-info">' +
@@ -375,7 +379,7 @@ function renderDiscoverGrid() {
                     ? '<img src="' + item.poster + '" alt="' + _esc(item.name || '') + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
                       '<div class="media-poster-fallback" style="display:none">' + getTypeIcon(item.type) + '</div>'
                     : '<div class="media-poster-fallback">' + getTypeIcon(item.type) + '</div>') +
-                '<span class="media-type-badge ' + (item.type || 'anime') + '">' + (item.type || 'anime') + '</span>' +
+                '<span class="media-type-badge ' + safeType(item.type) + '">' + safeType(item.type) + '</span>' +
                 (rating ? '<div class="media-score-badge">' + rating + '</div>' : '') +
             '</div>' +
             '<div class="media-info">' +

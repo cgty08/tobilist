@@ -1,5 +1,12 @@
 // AUTH.JS v5.1 - Supabase Auth - Tüm hatalar düzeltildi
 
+// ── ADMIN CONFIG ──────────────────────────────────────────────────────────────
+// NOT: Uzun vadede bu kontrolü Supabase'de is_admin sütunuyla sunucu tarafına taşı.
+// Şimdilik tek yerde tutmak için burada tanımlandı (client JS'de görünür kalır,
+// ancak dağınık hardcoded değerden daha güvenli ve bakımı kolaydır).
+const _ADMIN_EMAILS = ['list086@gmail.com'];
+// ─────────────────────────────────────────────────────────────────────────────
+
 let currentUser = null;
 let isGuest = true;
 
@@ -389,34 +396,6 @@ async function handleRegister(event) {
 }
 
 // ===== FORGOT PASSWORD =====
-async function handleForgotPassword() {
-    if (!window.supabaseClient) {
-        showError('forgotError', 'Sunucu bağlantısı kurulamadı.');
-        return;
-    }
-
-    const emailEl = document.getElementById('forgotEmail');
-    if (!emailEl) return;
-
-    const email = emailEl.value.trim();
-    if (!email) { showError('forgotError', 'E-posta adresinizi girin!'); return; }
-    clearAllErrors();
-
-    try {
-        const { error } = await window.supabaseClient.auth.resetPasswordForEmail(email, {
-            redirectTo: window.location.origin + '/index.html'
-        });
-        if (error) throw error;
-        const successEl = document.getElementById('forgotSuccess');
-        if (successEl) {
-            successEl.style.display = 'block';
-            successEl.textContent = '✅ ' + email + ' adresine şifre sıfırlama linki gönderildi!';
-        }
-    } catch(error) {
-        showError('forgotError', getSupabaseErrorMessage(error.message));
-    }
-}
-
 // ===== LOGOUT =====
 async function handleLogout() {
     if (document.getElementById('logoutConfirmBox')) return;
@@ -556,10 +535,9 @@ function updateUIForLoggedIn() {
 
     updateHeaderUser();
 
-    const adminEmails = ['list086@gmail.com'];
     const adminLink = document.getElementById('adminPanelLink');
     const adminShortcut = document.getElementById('adminShortcutBtn');
-    if (currentUser && adminEmails.includes(currentUser.email)) {
+    if (currentUser && _ADMIN_EMAILS.includes(currentUser.email)) {
         if (adminLink) adminLink.style.display = 'block';
         if (adminShortcut) adminShortcut.style.display = 'inline-flex';
     }
@@ -761,11 +739,15 @@ function getSupabaseErrorMessage(msg) {
 // Sayfa kapanmadan kaydet
 window.addEventListener('beforeunload', () => {
     if (dataManager && dataManager.currentUserId && dataManager.data) {
+        // 1. localStorage'a yaz (senkron, her zaman çalışır)
         try {
             const s = JSON.stringify(dataManager.data);
             localStorage.setItem('onilist_user_' + dataManager.currentUserId, s);
             localStorage.setItem('onilist_backup_' + dataManager.currentUserId, s);
         } catch(e) {}
+
+        // 2. Bekleyen Supabase zamanlayıcısını iptal edip anında gönder
+        dataManager.flushNow();
     }
 });
 

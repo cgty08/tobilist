@@ -1,14 +1,14 @@
 // ============================================================
-//  OniList Service Worker v1.0
+//  OniList Service Worker v1.1
 //  Strateji:
 //   - Shell dosyaları (HTML/CSS/JS): Cache-first
 //   - API istekleri (jikan/anilist): Network-first, cache fallback
 //   - Resimler: Cache-first, 7 gün TTL
 // ============================================================
 
-const CACHE_NAME    = 'onilist-v1.0';
-const API_CACHE     = 'onilist-api-v1.0';
-const IMG_CACHE     = 'onilist-img-v1.0';
+const CACHE_NAME    = 'onilist-v1.1';
+const API_CACHE     = 'onilist-api-v1.1';
+const IMG_CACHE     = 'onilist-img-v1.1';
 
 // Kurulumda önceden cache'e alınacak app shell dosyaları
 const SHELL_URLS = [
@@ -24,16 +24,36 @@ const SHELL_URLS = [
     '/chat.js',
     '/xp-system.js',
     '/data-manager.js',
-    '/manifest.json'
+    '/manifest.json',
+    '/privacy.html',
+    '/404.html',
+    '/icons/icon-192.png',
+    '/icons/icon-512.png',
+    '/icons/icon-96.png'
 ];
 
 // ===== INSTALL — shell dosyalarını önceden cache'e al =====
+// Zorunlu dosyalar (bunlar yoksa SW install olmaz):
+const SHELL_REQUIRED = ['/', '/index.html', '/style.css', '/app.js', '/auth.js', '/api.js',
+    '/ui.js', '/chat.js', '/xp-system.js', '/data-manager.js', '/manifest.json',
+    '/auth.css', '/chat.css'];
+// Opsiyonel dosyalar (bulunamazsa sessizce atla):
+const SHELL_OPTIONAL = ['/privacy.html', '/404.html', '/icons/icon-192.png',
+    '/icons/icon-512.png', '/icons/icon-96.png'];
+
 self.addEventListener('install', event => {
     event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then(cache => cache.addAll(SHELL_URLS))
-            .then(() => self.skipWaiting())
-            .catch(err => console.warn('[SW] Install cache hatası:', err))
+        caches.open(CACHE_NAME).then(async cache => {
+            // Zorunlu dosyaları cache'e al
+            await cache.addAll(SHELL_REQUIRED);
+            // Opsiyonel dosyaları tek tek dene, hata olursa atla
+            await Promise.allSettled(
+                SHELL_OPTIONAL.map(url =>
+                    cache.add(url).catch(() => console.log('[SW] Opsiyonel dosya bulunamadı (normal):', url))
+                )
+            );
+            return self.skipWaiting();
+        }).catch(err => console.warn('[SW] Install cache hatası:', err))
     );
 });
 

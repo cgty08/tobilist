@@ -256,7 +256,7 @@ const _AniList = {
     BASE: 'https://graphql.anilist.co',
     _last: 0,
 
-    async query(gql, vars = {}) {
+    async query(gql, vars = {}, _retries = 0) {
         const wait = Math.max(0, 600 - (Date.now() - this._last));
         if (wait) await new Promise(r => setTimeout(r, wait));
         const res = await fetch(this.BASE, {
@@ -265,7 +265,13 @@ const _AniList = {
             body: JSON.stringify({ query: gql, variables: vars })
         });
         this._last = Date.now();
-        if (res.status === 429) { await new Promise(r => setTimeout(r, 60000)); return this.query(gql, vars); }
+        if (res.status === 429) {
+            // Sonsuz özyineleme önlemi: max 3 deneme, exponential backoff
+            if (_retries >= 3) throw new Error('AniList rate limit: max retries exceeded');
+            const delay = 15000 * Math.pow(2, _retries); // 15s, 30s, 60s
+            await new Promise(r => setTimeout(r, delay));
+            return this.query(gql, vars, _retries + 1);
+        }
         if (!res.ok) throw new Error('AniList ' + res.status);
         const json = await res.json();
         if (json.errors) throw new Error(json.errors[0]?.message || 'AniList error');

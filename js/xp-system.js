@@ -455,14 +455,12 @@ function renderAchievements() {
             <h3 style="font-size:0.9rem;font-weight:700;margin-bottom:1rem;color:var(--text-primary);">⚡ ${isEn ? 'How to Earn XP' : 'XP Nasıl Kazanılır?'}</h3>
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.6rem;">
                 ${[
-                    [isEn?'Write a short review':'Kısa yorum yaz',           '+20 XP', '#10b981'],
-                    [isEn?'Write a detailed review':'Detaylı yorum yaz',     '+40 XP', '#10b981'],
-                    [isEn?'Complete a series':'Seri tamamla',                '+40 XP', '#3b82f6'],
-                    [isEn?'Add a note':'Not ekle',                           '+10 XP', '#8b5cf6'],
-                    [isEn?'Rate content':'Puan ver',                         '+8 XP',  '#f59e0b'],
-                    [isEn?'Daily login':'Günlük giriş',                      '+15 XP', '#ec4899'],
-                    [isEn?'Add content':'İçerik ekle',                       '+5 XP',  '#6b7280'],
-                    [isEn?'7-day streak':'7 gün streak',                     '+100 XP','#ff3366'],
+                    [isEn?'Write a short review':'Kısa yorum yaz',           '+' + XP_REWARDS.writeReview + ' XP',     '#10b981'],
+                    [isEn?'Write a detailed review':'Detaylı yorum yaz',     '+' + XP_REWARDS.writeLongReview + ' XP', '#10b981'],
+                    [isEn?'Daily login':'Günlük giriş',                      '+' + XP_REWARDS.dailyLogin + ' XP',      '#ec4899'],
+                    [isEn?'7-day streak':'7 gün streak',                     '+' + XP_REWARDS.weekStreak + ' XP',      '#ff3366'],
+                    [isEn?'30-day streak':'30 gün streak',                   '+' + XP_REWARDS.monthStreak + ' XP',     '#ff3366'],
+                    [isEn?'Rate content (with review)':'Puan + yorum ver',   '+' + XP_REWARDS.writeReview + ' XP',     '#f59e0b'],
                 ].map(([label,xp,color])=>`
                     <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:0.5rem 0.8rem;">
                         <span style="font-size:0.78rem;color:#9ca3af;">${label}</span>

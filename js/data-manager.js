@@ -64,7 +64,7 @@ const dataManager = {
             }
         }
 
-        // Sonra Supabase'e kaydet
+        // Sonra Supabase'e kaydet (800ms debounce — önceki 1500ms'den düşürüldü)
         clearTimeout(this.saveTimeout);
         const userId = this.currentUserId;
         const snapshot = JSON.parse(JSON.stringify(this.data));
@@ -75,8 +75,18 @@ const dataManager = {
                     .upsert({ user_id: userId, data: snapshot, updated_at: new Date().toISOString() }, { onConflict: 'user_id' })
                     .then(({ error }) => { if (error) console.warn('Supabase save error:', error.message); });
             }
-        }, 1500);
+        }, 800);
         return true;
+    },
+
+    // Sayfa kapanırken veya kritik anlarda beklemeden kaydet (keepalive fetch)
+    flushNow() {
+        if (!this.currentUserId || !this.data || !window.supabaseClient) return;
+        clearTimeout(this.saveTimeout);
+        window.supabaseClient
+            .from('user_data')
+            .upsert({ user_id: this.currentUserId, data: this.data, updated_at: new Date().toISOString() }, { onConflict: 'user_id' })
+            .then(({ error }) => { if (error) console.warn('Supabase flushNow error:', error.message); });
     },
 
     save() { return this.saveAll(); },
