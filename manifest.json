@@ -1,13 +1,13 @@
 {
-  "name": "OniList — Anime & Manga Takip",
+  "name": "OniList — Anime & Manga Tracker",
   "short_name": "OniList",
-  "description": "Anime, manga ve webtoon'larını ücretsiz takip et. Kişisel liste, puan sistemi ve çok daha fazlası!",
+  "description": "Track your anime, manga and webtoons for free. Personal list, rating system and much more!",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#07090f",
   "theme_color": "#ff3366",
   "orientation": "portrait-primary",
-  "lang": "tr",
+  "lang": "en",
   "categories": [
     "entertainment",
     "lifestyle"
@@ -68,21 +68,21 @@
       "sizes": "1280x720",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "Ana Sayfa"
+      "label": "Home"
     },
     {
       "src": "/screenshots/library.png",
       "sizes": "390x844",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Kütüphane"
+      "label": "Library"
     }
   ],
   "shortcuts": [
     {
-      "name": "Kütüphanem",
-      "short_name": "Kütüphane",
-      "description": "Anime listeni görüntüle",
+      "name": "My Library",
+      "short_name": "Library",
+      "description": "View your anime list",
       "url": "/#library",
       "icons": [
         {
@@ -92,9 +92,9 @@
       ]
     },
     {
-      "name": "Keşfet",
-      "short_name": "Keşfet",
-      "description": "Yeni içerikler keşfet",
+      "name": "Discover",
+      "short_name": "Discover",
+      "description": "Discover new content",
       "url": "/#discover",
       "icons": [
         {

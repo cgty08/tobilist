@@ -31,7 +31,7 @@ function initializeApp() {
         const themeEl = document.querySelector('.theme-' + theme);
         if (themeEl) themeEl.classList.add('active');
 
-        const lang = dataManager.data.settings?.language || 'tr';
+        const lang = dataManager.data.settings?.language || 'en';
         const langSel = document.getElementById('languageSelect');
         if (langSel) langSel.value = lang;
         changeLanguage();

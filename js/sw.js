@@ -141,7 +141,7 @@ async function cacheFirstStrategy(request, cacheName, maxAge) {
         return response;
     } catch (err) {
         // Network yok ve cache yok — boş 503
-        return new Response('Çevrimdışısınız ve önbellek bulunamadı.', {
+        return new Response('You are offline and no cache is available.', {
             status: 503,
             headers: { 'Content-Type': 'text/plain; charset=utf-8' }
         });
@@ -160,7 +160,7 @@ async function networkFirstStrategy(request, cacheName, maxAge) {
     } catch (err) {
         const cached = await cache.match(request);
         if (cached) return cached;
-        return new Response(JSON.stringify({ error: 'Çevrimdışısınız', offline: true }), {
+        return new Response(JSON.stringify({ error: 'Offline', offline: true }), {
             status: 503,
             headers: { 'Content-Type': 'application/json' }
         });
@@ -182,7 +182,7 @@ async function staleWhileRevalidate(request, cacheName) {
     const fresh = await fetchPromise;
     if (fresh) return fresh;
 
-    return new Response('Sayfa yüklenemedi. İnternet bağlantınızı kontrol edin.', {
+    return new Response('Page could not be loaded. Please check your internet connection.', {
         status: 503,
         headers: { 'Content-Type': 'text/plain; charset=utf-8' }
     });
@@ -217,4 +217,4 @@ self.addEventListener('notificationclick', event => {
     event.waitUntil(clients.openWindow(url));
 });
 
-console.log('[SW] OniList Service Worker v1.0 aktif');
+console.log('[SW] OniList Service Worker v1.0 active');

@@ -8,7 +8,7 @@ const dataManager = {
     defaultData() {
         return {
             items: [],
-            settings: { theme: 'dark', language: 'tr', notifications: true },
+            settings: { theme: 'dark', language: 'en', notifications: true },
             streak: { count: 0, lastVisit: null, longest: 0 },
             xp: { level: 1, current: 0, total: 0 },
             achievements: [],

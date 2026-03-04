@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1055,7 +1055,7 @@ function showPage(page) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById('page-' + page)?.classList.add('active');
     curPage = page;
-    const pageLang = (typeof _adminLang !== 'undefined' ? _adminLang : 'tr');
+    const pageLang = (typeof _adminLang !== 'undefined' ? _adminLang : 'en');
     const [title, sub] = (PAGE_META[page]?.[pageLang]) || PAGE_META[page]?.tr || ['—',''];
     document.getElementById('pageTitle').textContent = title;
     document.getElementById('pageSub').textContent = sub;
@@ -2021,7 +2021,7 @@ function avatarHtml(d, size) {
 }
 
 // ===== ADMIN LANGUAGE SYSTEM =====
-let _adminLang = localStorage.getItem('admin_lang') || 'tr';
+let _adminLang = localStorage.getItem('admin_lang') || 'en';
 
 const adminTr = {
     live: 'Canlı', refresh: '🔄 Yenile',

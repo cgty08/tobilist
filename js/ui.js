@@ -433,7 +433,7 @@ const translations = {
 };
 
 // Current language
-let _lang = 'tr';
+let _lang = 'en';
 
 function t(key) {
     return translations[_lang]?.[key] || translations['tr']?.[key] || key;
@@ -444,7 +444,7 @@ function getCurrentLang() { return _lang; }
 // ===== LANGUAGE CHANGE =====
 function changeLanguage() {
     const langSel = document.getElementById('languageSelect');
-    _lang = langSel ? langSel.value : 'tr';
+    _lang = langSel ? langSel.value : 'en';
     if (dataManager.data) {
         dataManager.data.settings.language = _lang;
         dataManager.saveAll();
