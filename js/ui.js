@@ -298,7 +298,7 @@ const translations = {
         joinBtn: '✨ Join Free', joinDiscoverBtn: '🔍 Explore Content',
         joinBadgeFree: '🆓 Free', joinBadgeSafe: '🔒 Secure', joinBadgeMobile: '📱 Mobile Friendly',
         // FOOTER
-        footerSub: 'Anime, Manga & Webtoon Tracking Platform · Free · 2025',
+        footerSub: 'Anime, Manga & Webtoon Tracking Platform · Free · 2026',
         footerDiscover: 'Discover', footerRegister: 'Sign Up', footerHome: 'Home',
         // PROFILE
         profileEditBtn: 'Edit Profile', profileShareBtn: 'Share',
