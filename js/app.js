@@ -129,20 +129,23 @@ function toSlug(str) {
 }
 
 // ===== BÖLÜM GEÇİŞİ =====
-function switchSection(section, pushHistory = true) {
-    previousSection = currentSection;
-    currentSection = section;
+// Section render işini tek yerde tutan yardımcı fonksiyon
+function _renderSection(section, scrollY = 0) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-
     const sEl = document.getElementById(section + 'Section');
     if (sEl) sEl.classList.add('active');
     const tabEl = document.querySelector('.nav-tab[data-section="' + section + '"]');
     if (tabEl) tabEl.classList.add('active');
 
+    if (section === 'discover') {
+        renderDiscoverGrid();
+        if (scrollY) setTimeout(() => window.scrollTo({ top: scrollY, behavior: 'instant' }), 80);
+        else window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+    }
     switch(section) {
         case 'home':         renderHomePage(); break;
-        case 'discover':     renderDiscoverGrid(); break;
         case 'profile':      if (!isGuest) renderProfilePage(); break;
         case 'calendar':     if (!isGuest) renderCalendar(); break;
         case 'analytics':    if (!isGuest) renderAnalytics(); break;
@@ -151,13 +154,18 @@ function switchSection(section, pushHistory = true) {
         case 'library':      if (!isGuest) filterItems(); break;
         case 'detail':       break;
     }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function switchSection(section, pushHistory = true) {
+    previousSection = currentSection;
+    currentSection = section;
+    _renderSection(section);
 
     if (pushHistory && section !== 'detail') {
         history.pushState({ section }, '', '#' + section);
     }
-
     closeUserDropdown();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // Tarayici geri/ileri butonlari
@@ -165,34 +173,11 @@ window.addEventListener('popstate', function(e) {
     const state = e.state || {};
     const section = state.section || 'home';
 
-    // Detail sayfasındayken geri gidiliyorsa
     if (currentSection === 'detail') {
         const fromSection = state.section || previousSection || 'discover';
         const savedScrollY = state.discoverScrollY || discoverScrollPosition || 0;
-
         currentSection = fromSection;
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-        const sEl = document.getElementById(fromSection + 'Section');
-        if (sEl) sEl.classList.add('active');
-        const tabEl = document.querySelector('.nav-tab[data-section="' + fromSection + '"]');
-        if (tabEl) tabEl.classList.add('active');
-
-        if (fromSection === 'discover') {
-            renderDiscoverGrid();
-            setTimeout(() => window.scrollTo({ top: savedScrollY, behavior: 'instant' }), 80);
-        } else {
-            switch(fromSection) {
-                case 'home':         renderHomePage(); break;
-                case 'profile':      if (!isGuest) renderProfilePage(); break;
-                case 'calendar':     if (!isGuest) renderCalendar(); break;
-                case 'analytics':    if (!isGuest) renderAnalytics(); break;
-                case 'achievements': if (!isGuest) renderAchievements(); break;
-                case 'ai':           if (!isGuest) renderAISection(); break;
-                case 'library':      if (!isGuest) filterItems(); break;
-            }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+        _renderSection(fromSection, savedScrollY);
         return;
     }
 
