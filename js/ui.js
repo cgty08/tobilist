@@ -908,23 +908,39 @@ function applyLanguage() {
         dpAddBtn.textContent = t('dpAddToList');
     }
 
-    // Discover stats loading text
+    // Discover stats text — update both loading and loaded states
     const discoverStatsEl = document.getElementById('discoverStats');
-    if (discoverStatsEl && discoverStatsEl.textContent === 'İçerik yükleniyor...' || discoverStatsEl?.textContent === 'Loading content...') {
-        discoverStatsEl.textContent = _lang === 'en' ? 'Loading content...' : 'İçerik yükleniyor...';
+    if (discoverStatsEl) {
+        const txt = discoverStatsEl.textContent || '';
+        // Loading state
+        if (txt === 'İçerik yükleniyor...' || txt === 'Loading content...') {
+            discoverStatsEl.textContent = _lang === 'en' ? 'Loading content...' : 'İçerik yükleniyor...';
+        }
+        // Loaded state: "786 results found" / "786 içerik bulundu"
+        const numMatch = txt.match(/^(\d+)\s/);
+        if (numMatch) {
+            discoverStatsEl.textContent = numMatch[1] + (_lang === 'en' ? ' results found' : ' içerik bulundu');
+        }
     }
-
-    // Discover "No results"
-    // Add/update button labels already handled by renderDiscoverGrid/renderMediaRow
 
     // Refresh current section content if needed
     if (typeof currentSection !== 'undefined') {
+        if (currentSection === 'home') {
+            if (typeof renderHomePage === 'function') renderHomePage();
+        }
         if (currentSection === 'library') filterItems();
         if (currentSection === 'discover') renderDiscoverGrid();
         if (currentSection === 'analytics') renderAnalytics();
         if (currentSection === 'ai') renderAISection();
         if (currentSection === 'profile') renderProfilePage();
     }
+    // Always update all visible add-to-list buttons (home media rows + discover)
+    document.querySelectorAll('.add-to-list-btn').forEach(btn => {
+        const inList = btn.classList.contains('in-library');
+        btn.textContent = inList
+            ? (_lang === 'en' ? '✓ In List' : '✓ Listende')
+            : (_lang === 'en' ? '+ Add' : '+ Ekle');
+    });
 }
 
 // ===== THEME =====

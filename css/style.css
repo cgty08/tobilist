@@ -88,12 +88,14 @@ header {
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(11,15,26,0.97);
+    background: var(--header-bg, rgba(11,15,26,0.97));
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
 }
 
 [data-theme="light"] header { background: rgba(240,242,248,0.97); }
+[data-theme="neon"] header { background: rgba(2,2,4,0.97); }
+[data-theme="pastel"] header { background: rgba(240,244,255,0.97); }
 
 .header-content {
     display: flex;

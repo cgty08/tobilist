@@ -113,7 +113,7 @@ function showLoadingPlaceholders() {
         if (el) el.innerHTML = skeleton;
     });
     const dg = document.getElementById('discoverGrid');
-    if (dg) dg.innerHTML = '<div class="discover-loading"><div class="loader"></div><p style="margin-top:1rem;color:var(--text-muted);">500+ içerik yükleniyor...</p></div>';
+    if (dg) dg.innerHTML = '<div class="discover-loading"><div class="loader"></div><p style="margin-top:1rem;color:var(--text-muted);">'+(_lang==='en'?'Loading 500+ content...':'500+ içerik yükleniyor...')+'</p></div>';
 }
 
 // ===== SLUG YARDIMCISI =====
@@ -208,7 +208,7 @@ function renderContinueWatching() {
     const watching = dataManager.data.items.filter(i => i.status === 'watching').slice(0, 8);
 
     if (watching.length === 0) {
-        container.innerHTML = '<div style="color:var(--text-muted);font-size:0.9rem;padding:1rem;">"İzliyorum" statüsünde içerik yok. <span style="color:var(--accent-secondary);cursor:pointer;" onclick="openAddModal()">İçerik ekle →</span></div>';
+        container.innerHTML = '<div style="color:var(--text-muted);font-size:0.9rem;padding:1rem;">'+(_lang==='en'?'No content with "Watching" status. <span style="color:var(--accent-secondary);cursor:pointer;" onclick="openAddModal()">Add content →</span>':'"İzliyorum" statüsünde içerik yok. <span style="color:var(--accent-secondary);cursor:pointer;" onclick="openAddModal()">İçerik ekle →</span>')+'</div>';
         return;
     }
 
@@ -268,7 +268,7 @@ function renderMediaRow(containerId, items) {
 
         const addBtn = isGuest
             ? '<button class="add-to-list-btn" onclick="openAuthModal(\'register\')">🔐 Kayıt ol & ekle</button>'
-            : '<button class="add-to-list-btn' + (inLibrary ? ' in-library' : '') + '" onclick="event.stopPropagation();quickAddFromJson(\'' + safeItem + '\')">' + (inLibrary ? '✓ Listende' : '+ Ekle') + '</button>';
+            : '<button class="add-to-list-btn' + (inLibrary ? ' in-library' : '') + '" onclick="event.stopPropagation();quickAddFromJson(\'' + safeItem + '\')">' + (inLibrary ? (_lang==='en'?'✓ In List':'✓ Listende') : (_lang==='en'?'+ Add':'+ Ekle')) + '</button>';
 
         return '<div class="media-card" style="cursor:pointer" onclick="openDetailPage(\'' + safeItem + '\')">' +
             '<div class="media-poster">' +
@@ -334,7 +334,7 @@ function renderDiscoverGrid() {
     const page  = filtered.slice(0, discoverPage * DISCOVER_PAGE_SIZE);
 
     const statsEl = document.getElementById('discoverStats');
-    if (statsEl) statsEl.textContent = total + ' içerik bulundu';
+    if (statsEl) statsEl.textContent = total + (_lang==='en' ? ' results found' : ' içerik bulundu');
 
     if (page.length === 0) {
         grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:3rem;font-size:1.1rem;">🔍 Sonuç bulunamadı</div>';
@@ -356,7 +356,7 @@ function renderDiscoverGrid() {
 
         const addBtn = isGuest
             ? '<button class="add-to-list-btn" onclick="openAuthModal(\'register\')">🔐 Kayıt ol & ekle</button>'
-            : '<button class="add-to-list-btn' + (inLibrary ? ' in-library' : '') + '" onclick="event.stopPropagation();quickAddFromJson(\'' + safeItem + '\')">' + (inLibrary ? '✓ Listende' : '+ Ekle') + '</button>';
+            : '<button class="add-to-list-btn' + (inLibrary ? ' in-library' : '') + '" onclick="event.stopPropagation();quickAddFromJson(\'' + safeItem + '\')">' + (inLibrary ? (_lang==='en'?'✓ In List':'✓ Listende') : (_lang==='en'?'+ Add':'+ Ekle')) + '</button>';
 
         return '<div class="media-card" style="cursor:pointer" onclick="openDetailPage(\'' + safeItem + '\')">' +
             '<div class="media-poster">' +
@@ -398,7 +398,7 @@ function quickAddFromJson(jsonStr) {
         quickAdd(item);
     } catch(e) {
         console.error('quickAddFromJson parse error:', e);
-        showNotification('Ekleme sırasında hata oluştu.', 'error');
+        showNotification(_lang==='en'?'Error while adding.':'Ekleme sırasında hata oluştu.', 'error');
     }
 }
 
@@ -430,7 +430,7 @@ function quickAdd(item) {
     dataManager.saveAll();
     checkAchievements();
     updateStats();
-    showNotification('✅ ' + _esc(newItem.name) + ' "İzlenecek" listesine eklendi!', 'success');
+    showNotification('✅ ' + _esc(newItem.name) + (_lang==='en'?' added to "Plan to Watch"!':' "İzlenecek" listesine eklendi!'), 'success');
     renderDiscoverGrid();
     renderHomePage();
 }
@@ -488,7 +488,7 @@ function addItem(event) {
     updateStats();
     filterItems();
     closeModal();
-    showNotification('✅ ' + _esc(newItem.name) + ' eklendi!', 'success');
+    showNotification('✅ ' + _esc(newItem.name) + (_lang==='en'?' added!':' eklendi!'), 'success');
 }
 
 // ===== JIKAN ARAMA (modal içi) =====
@@ -687,7 +687,7 @@ function showAnnouncementModal(ann) {
     // Duyuru içeriği _esc ile XSS'e karşı korunuyor
     const safeTitle   = _esc(ann.title || '');
     const safeContent = _esc(ann.content || '');
-    const safeDate    = new Date(ann.created_at).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'});
+    const safeDate    = new Date(ann.created_at).toLocaleDateString(_lang==='en'?'en-GB':'tr-TR',{day:'numeric',month:'long',year:'numeric'});
 
     const overlay = document.createElement('div');
     overlay.id = 'annModal';
@@ -907,12 +907,12 @@ function _fillDetailBasic(item) {
     const addBtn = document.getElementById('dpAddBtn');
     if (addBtn) {
         const inLib = !isGuest && dataManager.data?.items?.some(i => i.name?.toLowerCase() === item.name?.toLowerCase());
-        addBtn.textContent = inLib ? '✓ Listende' : '+ Listeye Ekle';
+        addBtn.textContent = inLib ? (_lang==='en'?'✓ In List':'✓ Listende') : (_lang==='en'?'+ Add to List':'+ Listeye Ekle');
         addBtn.className = 'dp-add-btn' + (inLib ? ' in-library' : '');
         addBtn.onclick = () => {
             if (isGuest) { openAuthModal('register'); return; }
             quickAdd(item);
-            addBtn.textContent = '✓ Listende';
+            addBtn.textContent = _lang==='en' ? '✓ In List' : '✓ Listende';
             addBtn.className = 'dp-add-btn in-library';
         };
     }
@@ -936,7 +936,7 @@ async function _fetchFullDetail(item) {
                     s('dpEpisodes', d.episodes ? d.episodes + ' Bölüm' : d.chapters ? d.chapters + ' Bölüm' : null);
                     s('dpStatus', d.status || null);
                     s('dpRank', d.rank ? '#' + d.rank : null);
-                    s('dpMembers', d.members ? d.members.toLocaleString('tr-TR') : null);
+                    s('dpMembers', d.members ? d.members.toLocaleString(_lang==='en'?'en-US':'tr-TR') : null);
                     s('dpStudio', (d.studios?.[0]?.name) || (d.authors?.[0]?.name) || null);
                     s('dpYear', d.year || (d.aired?.from ? new Date(d.aired.from).getFullYear() : null));
 
@@ -1178,7 +1178,7 @@ function loadSimilarContent(item) {
     }
 
     if (!similar.length) {
-        container.innerHTML = '<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;">Benzer içerik bulunamadı.</p>';
+        container.innerHTML = '<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;">'+(_lang==='en'?'No similar content found.':'Benzer içerik bulunamadı.')+'</p>';
         return;
     }
 
@@ -1223,7 +1223,7 @@ function _esc(str) {
 }
 function _fmtDate(iso) {
     if (!iso) return '';
-    return new Date(iso).toLocaleDateString('tr-TR', { day:'numeric', month:'short', year:'numeric' });
+    return new Date(iso).toLocaleDateString(_lang==='en'?'en-GB':'tr-TR', { day:'numeric', month:'short', year:'numeric' });
 }
 
 // Star hover effects

@@ -567,7 +567,7 @@ function updateUIForGuest() {
 
     const bannerActions = document.getElementById('bannerActions');
     if (bannerActions) {
-        bannerActions.innerHTML = '<button class="btn btn-primary btn-large" onclick="openAuthModal(\'register\')">✨ Ücretsiz Kayıt Ol</button><button class="btn btn-ghost btn-large" onclick="switchSection(\'discover\')">🔍 Keşfet</button>';
+        bannerActions.innerHTML = '<button class="btn btn-primary btn-large" onclick="openAuthModal(\'register\')">✨ ' + (typeof _lang !== 'undefined' && _lang === 'en' ? 'Sign Up Free' : 'Ücretsiz Kayıt Ol') + '</button><button class="btn btn-ghost btn-large" onclick="switchSection(\'discover\')">🔍 ' + (typeof _lang !== 'undefined' && _lang === 'en' ? 'Discover' : 'Keşfet') + '</button>';
     }
 }
 
@@ -599,7 +599,7 @@ function updateUIForBanned() {
     // Banner aksiyonları - sadece keşfet
     const bannerActions = document.getElementById('bannerActions');
     if (bannerActions) {
-        bannerActions.innerHTML = '<button class="btn btn-ghost btn-large" onclick="switchSection(\'discover\')">🔍 Keşfet</button>';
+        bannerActions.innerHTML = '<button class="btn btn-ghost btn-large" onclick="switchSection(\'discover\')">🔍 ' + (typeof _lang !== 'undefined' && _lang === 'en' ? 'Discover' : 'Keşfet') + '</button>';
     }
 
     const guestCTA = document.getElementById('guestCTA');
