@@ -1,11 +1,7 @@
 // APP.JS v5.2 - OniList Ana Uygulama - Genişletilmiş İçerik
 
-// CSS class injection önlemi: type değeri her zaman bu listeden gelmeli
-const VALID_TYPES = ['anime', 'manga', 'webtoon'];
-function safeType(t) { return VALID_TYPES.includes(t) ? t : 'anime'; }
-
 // =====================================================
-// PLATFORM SETTINGS — Supabase'den oku (maintenance, restrictions, vb.)
+// PLATFORM SETTINGS — Maintenance mode + restrictions
 // =====================================================
 window.platformSettings = {};
 
@@ -18,38 +14,18 @@ async function loadPlatformSettings() {
         if (error) { console.warn('platform_settings fetch error:', error.message); return; }
         window.platformSettings = {};
         (data || []).forEach(row => { window.platformSettings[row.key] = row.value; });
-
-        // Bakım modu aktifse kullanıcıyı engelle (admin hariç)
-        const isAdmin = window.currentUser?.isAdmin === true;
-        const maintenance = window.platformSettings['maintenance'];
-        if (maintenance?.enabled && !isAdmin) {
-            showMaintenancePage(maintenance.message || 'System is under maintenance. Please try again later.');
-        }
     } catch(e) { console.warn('loadPlatformSettings error:', e); }
 }
 
-function showMaintenancePage(msg) {
-    document.body.innerHTML = `
-        <div style="
-            min-height:100vh;display:flex;flex-direction:column;
-            align-items:center;justify-content:center;
-            background:#0a0f1e;color:#e2e8f0;font-family:system-ui,sans-serif;
-            text-align:center;padding:2rem;
-        ">
-            <div style="font-size:4rem;margin-bottom:1.5rem;">🔧</div>
-            <h1 style="font-size:1.8rem;font-weight:700;margin-bottom:0.75rem;color:#fff;">Under Maintenance</h1>
-            <p style="font-size:1rem;color:#94a3b8;max-width:400px;line-height:1.6;">${msg}</p>
-            <p style="margin-top:2rem;font-size:0.8rem;color:#475569;">© OniList — We'll be back soon</p>
-        </div>
-    `;
-}
-
-// Kısıtlama kontrolü — ilgili özellik Supabase'de kapalıysa false döner
 function isFeatureEnabled(key) {
     const restrictions = window.platformSettings['restrictions'];
     if (!restrictions || restrictions[key] === undefined) return true;
     return restrictions[key] !== false;
 }
+
+// CSS class injection önlemi: type değeri her zaman bu listeden gelmeli
+const VALID_TYPES = ['anime', 'manga', 'webtoon'];
+function safeType(t) { return VALID_TYPES.includes(t) ? t : 'anime'; }
 
 let currentSection = 'home';
 let previousSection = 'home';
@@ -102,13 +78,13 @@ function initializeApp() {
     setupPWA();
     setupNetworkListeners();
 
-    // Platform settings yükle (maintenance mode + restrictions)
+    // Platform settings yükle (restrictions)
     loadPlatformSettings();
 
-    // Duyuruları kontrol et (sadece giriş yapmış kullanıcılara)
-    if (!isGuest) {
-        setTimeout(() => checkAnnouncements(), 2000);
-    }
+    // Duyuruları kontrol et
+    setTimeout(function() {
+        if (typeof window._checkAnnouncements === 'function') window._checkAnnouncements();
+    }, 1500);
 }
 
 // ===== API İÇERİK YÜKLEME =====
@@ -723,131 +699,72 @@ async function checkAnnouncements() {
         showAnnouncementModal(visible[0]);
     } catch(e) { console.warn('Announcement check failed:', e); }
 }
+// auth.js'den erisim icin global
+window._checkAnnouncements = checkAnnouncements;
 
 function showAnnouncementModal(ann) {
     if (document.getElementById('annModal')) return;
 
-    const icons = { info: 'ℹ️', success: '✅', warning: '⚠️', update: '🚀' };
-    const themes = {
-        info:    { grad: 'linear-gradient(135deg,#00d4ff22,#00d4ff08)', accent: '#00d4ff', glow: 'rgba(0,212,255,0.3)', badge: '#00d4ff', badgeText: '#000' },
-        success: { grad: 'linear-gradient(135deg,#10b98122,#10b98108)', accent: '#10b981', glow: 'rgba(16,185,129,0.3)', badge: '#10b981', badgeText: '#000' },
-        warning: { grad: 'linear-gradient(135deg,#f59e0b22,#f59e0b08)', accent: '#f59e0b', glow: 'rgba(245,158,11,0.3)', badge: '#f59e0b', badgeText: '#000' },
-        update:  { grad: 'linear-gradient(135deg,#8b5cf622,#8b5cf608)', accent: '#8b5cf6', glow: 'rgba(139,92,246,0.3)', badge: '#8b5cf6', badgeText: '#fff' }
-    };
-    const t = themes[ann.type] || themes.info;
-    const icon = icons[ann.type] || 'ℹ️';
-    const typeLabels = { info: 'BİLGİ', success: 'BAŞARILI', warning: 'UYARI', update: 'GÜNCELLEME' };
-    const prioLabel = ann.priority === 'critical' ? '🔴 ACİL' : ann.priority === 'high' ? '🟠 ÖNEMLİ' : null;
+    var colorMap = { info: '#00d4ff', success: '#10b981', warning: '#f59e0b', update: '#8b5cf6' };
+    var accent = colorMap[ann.type] || colorMap.info;
 
-    // Duyuru içeriği _esc ile XSS'e karşı korunuyor
-    const safeTitle   = _esc(ann.title || '');
-    const safeContent = _esc(ann.content || '');
-    const safeDate    = new Date(ann.created_at).toLocaleDateString(_lang==='en'?'en-GB':'tr-TR',{day:'numeric',month:'long',year:'numeric'});
+    var banner = document.createElement('div');
+    banner.id = 'annModal';
+    banner.style.position       = 'fixed';
+    banner.style.top            = '0';
+    banner.style.left           = '0';
+    banner.style.right          = '0';
+    banner.style.zIndex         = '999999';
+    banner.style.background     = 'linear-gradient(135deg,#0f1420f0,#0a0f1ef0)';
+    banner.style.borderBottom   = '2px solid ' + accent + '88';
+    banner.style.boxShadow      = '0 4px 24px rgba(0,0,0,0.5)';
+    banner.style.backdropFilter = 'blur(12px)';
+    banner.style.padding        = '.8rem 1.5rem';
+    banner.style.display        = 'flex';
+    banner.style.alignItems     = 'center';
+    banner.style.gap            = '1rem';
+    banner.style.transform      = 'translateY(-100%)';
+    banner.style.transition     = 'transform 0.35s cubic-bezier(0.175,0.885,0.32,1.275)';
+    banner.style.fontFamily     = 'DM Sans,system-ui,sans-serif';
 
-    const overlay = document.createElement('div');
-    overlay.id = 'annModal';
-    overlay.style.cssText = `
-        position:fixed;inset:0;z-index:999999;
-        display:flex;align-items:center;justify-content:center;
-        padding:1rem;
-        background:rgba(0,0,0,0.7);
-        backdrop-filter:blur(6px);
-        -webkit-backdrop-filter:blur(6px);
-        animation:annFadeIn 0.3s ease;
-    `;
+    // Sol renkli bar
+    var bar = document.createElement('div');
+    bar.style.cssText = 'width:4px;height:38px;border-radius:4px;flex-shrink:0;background:' + accent + ';';
 
-    overlay.innerHTML = `
-        <div id="annBox" style="
-            background:#0f1420;
-            border:1px solid ${t.accent}44;
-            border-radius:20px;
-            padding:0;
-            width:100%;
-            max-width:460px;
-            overflow:hidden;
-            box-shadow:0 0 60px ${t.glow}, 0 20px 60px rgba(0,0,0,0.6);
-            animation:annSlideUp 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
-            position:relative;
-        ">
-            <div style="height:4px;background:linear-gradient(90deg,${t.accent},${t.accent}88);"></div>
-            <div style="padding:1.8rem 1.8rem 1.5rem;">
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;">
-                    <div style="display:flex;align-items:center;gap:0.5rem;">
-                        <span style="
-                            background:${t.badge};color:${t.badgeText};
-                            font-size:0.68rem;font-weight:800;letter-spacing:1.5px;
-                            padding:3px 10px;border-radius:20px;
-                            font-family:'DM Sans',sans-serif;
-                        ">${typeLabels[ann.type] || 'DUYURU'}</span>
-                        ${prioLabel ? `<span style="font-size:0.75rem;font-weight:700;color:${t.accent};">${prioLabel}</span>` : ''}
-                    </div>
-                    <button onclick="dismissAnnouncement('${_esc(String(ann.id))}')" style="
-                        background:rgba(255,255,255,0.07);
-                        border:1px solid rgba(255,255,255,0.12);
-                        border-radius:8px;color:#8892a4;
-                        cursor:pointer;width:30px;height:30px;
-                        display:flex;align-items:center;justify-content:center;
-                        font-size:0.85rem;transition:all 0.2s;
-                    " onmouseover="this.style.background='rgba(239,68,68,0.15)';this.style.color='#ef4444'"
-                       onmouseout="this.style.background='rgba(255,255,255,0.07)';this.style.color='#8892a4'">✕</button>
-                </div>
-                <div style="display:flex;align-items:flex-start;gap:1rem;margin-bottom:1rem;">
-                    <div style="
-                        width:48px;height:48px;border-radius:14px;
-                        background:${t.grad};
-                        border:1px solid ${t.accent}33;
-                        display:flex;align-items:center;justify-content:center;
-                        font-size:1.6rem;flex-shrink:0;
-                    ">${icon}</div>
-                    <div style="flex:1;min-width:0;">
-                        <h3 style="
-                            color:#fff;font-size:1.05rem;font-weight:700;
-                            margin:0 0 0.3rem;line-height:1.3;
-                            font-family:'DM Sans',sans-serif;
-                        ">${safeTitle}</h3>
-                        <div style="
-                            color:#8892a4;font-size:0.75rem;
-                            font-family:'DM Sans',sans-serif;
-                        ">${safeDate}</div>
-                    </div>
-                </div>
-                ${safeContent ? `
-                <div style="
-                    background:rgba(255,255,255,0.04);
-                    border:1px solid rgba(255,255,255,0.08);
-                    border-left:3px solid ${t.accent};
-                    border-radius:10px;
-                    padding:0.9rem 1rem;
-                    color:#c0c8d8;
-                    font-size:0.88rem;
-                    line-height:1.6;
-                    font-family:'DM Sans',sans-serif;
-                    margin-bottom:1.3rem;
-                ">${safeContent}</div>` : '<div style="margin-bottom:1.3rem;"></div>'}
-                <button onclick="dismissAnnouncement('${_esc(String(ann.id))}')" style="
-                    width:100%;padding:0.75rem;
-                    background:linear-gradient(135deg,${t.accent},${t.accent}cc);
-                    border:none;border-radius:10px;
-                    color:${t.badgeText};font-size:0.9rem;font-weight:700;
-                    font-family:'DM Sans',sans-serif;cursor:pointer;
-                    transition:all 0.2s;
-                    box-shadow:0 4px 20px ${t.glow};
-                " onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
-                    Anladım ✓
-                </button>
-            </div>
-        </div>
-        <style>
-            @keyframes annFadeIn { from{opacity:0} to{opacity:1} }
-            @keyframes annSlideUp { from{transform:scale(0.9) translateY(20px);opacity:0} to{transform:scale(1) translateY(0);opacity:1} }
-        </style>
-    `;
+    // Metin alani
+    var textEl = document.createElement('div');
+    textEl.style.cssText = 'flex:1;min-width:0;';
 
-    overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) dismissAnnouncement(String(ann.id));
+    var titleEl = document.createElement('div');
+    titleEl.style.cssText = 'color:#fff;font-size:.9rem;font-weight:700;line-height:1.3;';
+    titleEl.textContent = ann.title || '';
+    textEl.appendChild(titleEl);
+
+    if (ann.content) {
+        var msgEl = document.createElement('div');
+        msgEl.style.cssText = 'color:#94a3b8;font-size:.8rem;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:700px;';
+        msgEl.textContent = ann.content;
+        textEl.appendChild(msgEl);
+    }
+
+    // Kapat butonu
+    var annId = String(ann.id);
+    var closeBtn = document.createElement('button');
+    closeBtn.style.cssText = 'flex-shrink:0;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#8892a4;cursor:pointer;padding:6px 16px;font-size:.82rem;font-weight:600;transition:all .2s;white-space:nowrap;';
+    closeBtn.textContent = 'Kapat';
+    closeBtn.addEventListener('mouseenter', function() { this.style.background = 'rgba(239,68,68,0.15)'; this.style.color = '#ef4444'; });
+    closeBtn.addEventListener('mouseleave', function() { this.style.background = 'rgba(255,255,255,0.07)'; this.style.color = '#8892a4'; });
+    closeBtn.addEventListener('click', function() { dismissAnnouncement(annId); });
+
+    banner.appendChild(bar);
+    banner.appendChild(textEl);
+    banner.appendChild(closeBtn);
+    document.body.appendChild(banner);
+
+    // Yukaridan kayarak ac
+    requestAnimationFrame(function() {
+        requestAnimationFrame(function() { banner.style.transform = 'translateY(0)'; });
     });
-
-    document.body.appendChild(overlay);
 }
 
 function dismissAnnouncement(id) {
@@ -860,9 +777,9 @@ function dismissAnnouncement(id) {
     }
     const el = document.getElementById('annModal');
     if (el) {
-        el.style.transition = 'all 0.3s ease';
-        el.style.opacity = '0';
-        setTimeout(() => el.remove(), 300);
+        el.style.transition = 'transform 0.3s ease';
+        el.style.transform  = 'translateY(-100%)';
+        setTimeout(function() { el.remove(); }, 320);
     }
 }
 

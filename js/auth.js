@@ -27,6 +27,10 @@ async function initSupabaseSession() {
         return;
     }
 
+    // ── Sayfa açılır açılmaz maintenance + announcements kontrolü ──
+    checkMaintenanceMode();
+    checkAnnouncements();
+
     // Güvenlik timeout - 8 saniye içinde cevap gelmezse guest moda geç
     let sessionResolved = false;
     const sessionTimeout = setTimeout(() => {
@@ -851,5 +855,87 @@ async function handleForgotPassword() {
     } catch(e) {
         if (btn) { btn.disabled = false; btn.innerHTML = '<span>Sıfırlama Linki Gönder</span>'; }
         showError('forgotError', e.message || 'Bir hata oluştu.');
+    }
+}
+// =====================================================
+// MAINTENANCE MODE — Sayfa yüklenince hemen kontrol
+// =====================================================
+async function checkMaintenanceMode() {
+    if (!window.supabaseClient) return;
+    try {
+        const { data, error } = await window.supabaseClient
+            .from('platform_settings')
+            .select('value')
+            .eq('key', 'maintenance')
+            .single();
+
+        if (error || !data) return;
+
+        const maintenance = data.value;
+        if (!maintenance?.enabled) return;
+
+        // Admin paneldeyse veya admin kullanıcıysa gösterme
+        if (window.location.pathname.includes('admin')) return;
+
+        // Şu an giriş yapmış kullanıcı admin mi? (auth henüz tamamlanmamış olabilir)
+        // Kısa bekle, sonra tekrar kontrol et
+        await new Promise(r => setTimeout(r, 500));
+        if (window.currentUser?.isAdmin === true) return;
+
+        showMaintenanceScreen(maintenance.message || 'System is under maintenance. Please try again later.');
+    } catch(e) {
+        console.warn('Maintenance check error:', e);
+    }
+}
+
+function showMaintenanceScreen(msg) {
+    // Service worker cache'i bypass etmek için sayfayı yeniden yükle önlemi
+    document.documentElement.innerHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OniList — Maintenance</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{min-height:100vh;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;background:#0a0f1e;color:#e2e8f0;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    text-align:center;padding:2rem;}
+  .icon{font-size:5rem;margin-bottom:1.5rem;animation:spin 3s linear infinite;}
+  @keyframes spin{0%,100%{transform:rotate(0deg)}50%{transform:rotate(15deg)rotate(-15deg)}}
+  h1{font-size:2rem;font-weight:700;margin-bottom:1rem;
+    background:linear-gradient(135deg,#00d4ff,#8b5cf6);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+  p{font-size:1rem;color:#94a3b8;max-width:420px;line-height:1.7;margin-bottom:2rem;}
+  .badge{display:inline-block;padding:.4rem 1rem;border-radius:99px;
+    background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);
+    color:#a78bfa;font-size:.8rem;letter-spacing:.05em;}
+  footer{position:fixed;bottom:1.5rem;color:#334155;font-size:.75rem;}
+</style>
+</head>
+<body>
+  <div class="icon">🔧</div>
+  <h1>Under Maintenance</h1>
+  <p>${msg.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p>
+  <div class="badge">We'll be back soon</div>
+  <footer>© OniList</footer>
+</body>
+</html>`;
+}
+
+// =====================================================
+// ANNOUNCEMENTS — Supabase'den çek, modal göster
+// =====================================================
+async function checkAnnouncements() {
+    if (!window.supabaseClient) return;
+    // app.js yüklenene kadar bekle (max 5sn)
+    let waited = 0;
+    while (typeof window._checkAnnouncements !== 'function' && waited < 5000) {
+        await new Promise(r => setTimeout(r, 200));
+        waited += 200;
+    }
+    if (typeof window._checkAnnouncements === 'function') {
+        window._checkAnnouncements();
     }
 }
