@@ -319,7 +319,6 @@ async function handleLogin(event) {
         if (error) throw error;
 
         closeAuthModal();
-        showNotification('Hoş geldiniz! 🎉', 'success');
     } catch(error) {
         setButtonLoading(btn, false, '<span>Giriş Yap</span><span class="btn-arrow">→</span>');
         showError('loginError', getSupabaseErrorMessage(error.message));
