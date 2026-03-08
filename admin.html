@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -80,8 +80,6 @@
         .live-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
         .refresh-btn{padding:.42rem .9rem;background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:8px;color:var(--text2);font-size:.82rem;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;}
         .refresh-btn:hover{background:rgba(255,255,255,.08);color:var(--text);}
-        .admin-lang-toggle{display:flex;align-items:center;gap:.35rem;padding:.42rem .8rem;background:rgba(255,255,255,.05);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:.82rem;font-weight:700;cursor:pointer;transition:all .2s;user-select:none;}
-        .admin-lang-toggle:hover{background:rgba(255,51,102,.1);border-color:rgba(255,51,102,.3);color:var(--accent);}
 
         /* PAGES */
         .page{padding:2rem;display:none;}
@@ -329,7 +327,7 @@
             <span class="login-logo-text">OniList</span>
         </div>
         <p class="login-sub">Admin Panel — <span>RESTRICTED ACCESS</span></p>
-        <div class="lf"><label>Email Adresi</label><input type="email" id="adminEmail" placeholder="admin@onilist.com" autocomplete="email"></div>
+        <div class="lf"><label>Email Address</label><input type="email" id="adminEmail" placeholder="admin@onilist.com" autocomplete="email"></div>
         <div class="lf"><label>Password</label><input type="password" id="adminPassword" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')adminLogin()"></div>
         <div id="loginErr" class="login-err"></div>
         <button class="login-btn" id="loginBtn" onclick="adminLogin()">Login as Admin →</button>
@@ -363,7 +361,7 @@
 
         <div class="sb-section">Content</div>
         <div class="nav-item" onclick="showPage('content')"><span class="nav-icon">🎬</span> Content List</div>
-        <div class="nav-item" onclick="showPage('reviews')"><span class="nav-icon">💬</span> Yorumlar</div>
+        <div class="nav-item" onclick="showPage('reviews')"><span class="nav-icon">💬</span> Reviews</div>
         <div class="nav-item" onclick="showPage('announcements')"><span class="nav-icon">📢</span> Announcements</div>
         <div class="nav-item" onclick="showPage('chat')"><span class="nav-icon">💬</span> Chat Messages <span class="nav-badge" id="chatMsgBadge" style="background:var(--pink);display:none;">0</span></div>
 
@@ -390,11 +388,7 @@
         </div>
         <div class="top-actions">
             <div class="live-badge"><div class="live-dot"></div><span id="adminLiveTxt">Live</span></div>
-            <div class="admin-lang-toggle" id="adminLangToggle" onclick="adminToggleLang()" title="Switch Language">
-                <span id="adminLangFlag">🇹🇷</span>
-                <span id="adminLangLabel">TR</span>
-            </div>
-            <button class="refresh-btn" onclick="refreshCurrent()" id="adminRefreshBtn">🔄 Yenile</button>
+            <button class="refresh-btn" onclick="refreshCurrent()" id="adminRefreshBtn">🔄 Refresh</button>
             <span id="lastUpdated" style="font-size:.75rem;color:var(--text3);"></span>
         </div>
     </div>
@@ -446,8 +440,8 @@
         </div>
         <div class="table-card">
             <div class="table-header">
-                <h3>🏆 XP Liderlik Tablosu <span style="font-size:.75rem;font-weight:400;color:var(--text2);">— Tüm Kayıtlı Kullanıcılar</span></h3>
-                <span style="font-size:.78rem;color:var(--green);display:flex;align-items:center;gap:.4rem;"><span style="width:6px;height:6px;background:var(--green);border-radius:50%;display:inline-block;"></span>Gerçek zamanlı sıralama</span>
+                <h3>🏆 XP Leaderboard <span style="font-size:.75rem;font-weight:400;color:var(--text2);">— All Registered Users</span></h3>
+                <span style="font-size:.78rem;color:var(--green);display:flex;align-items:center;gap:.4rem;"><span style="width:6px;height:6px;background:var(--green);border-radius:50%;display:inline-block;"></span>Real-time ranking</span>
             </div>
             <table><thead><tr><th>#</th><th>User</th><th>XP</th><th>Level</th><th>Login</th><th>Streak</th><th>Completed</th></tr></thead>
             <tbody id="topUsersBody"><tr class="loading-td"><td colspan="7"><span class="spinner"></span>Loading…</td></tr></tbody></table>
@@ -463,12 +457,12 @@
                     <input class="search-inp" type="text" id="userSearch" placeholder="🔍 Search users…" oninput="filterUsers()">
                     <select class="fi" style="width:auto;padding:.38rem .8rem;" id="userStatusF" onchange="filterUsers()">
                         <option value="all">All Statuses</option>
-                        <option value="active">✅ Aktif</option>
+                        <option value="active">✅ Active</option>
                         <option value="banned">🚫 Banned</option>
                     </select>
                     <select class="fi" style="width:auto;padding:.38rem .8rem;" id="userSort" onchange="renderUsers()">
-                        <option value="newest">En Yeni</option>
-                        <option value="oldest">En Eski</option>
+                        <option value="newest">Newest</option>
+                        <option value="oldest">Oldest</option>
                         <option value="xp">By XP</option>
                         <option value="entries">By Entry Count</option>
                     </select>
@@ -489,23 +483,23 @@
             <div class="stat-card c-green"><div class="stat-icon">📅</div><div class="stat-label">Active today</div><div class="stat-value" id="o-today">—</div><div class="stat-change">users</div></div>
             <div class="stat-card c-purple"><div class="stat-icon">👥</div><div class="stat-label">Total Registered</div><div class="stat-value" id="o-total">—</div><div class="stat-change">all members</div></div>
         </div>
-        <!-- Online Kullanıcılar -->
+        <!-- Online Users -->
         <div class="table-card" style="margin-bottom:1.5rem;">
             <div class="table-header">
-                <h3>🟢 Online Kullanıcılar <span style="font-size:.75rem;font-weight:400;color:var(--text2);">(Son 15 dakika)</span></h3>
-                <button class="tbl-btn" onclick="loadOnline()">🔄 Yenile</button>
+                <h3>🟢 Online Users <span style="font-size:.75rem;font-weight:400;color:var(--text2);">(Last 15 minutes)</span></h3>
+                <button class="tbl-btn" onclick="loadOnline()">🔄 Refresh</button>
             </div>
             <table><thead><tr><th>User</th><th>Last Activity</th><th>Level</th><th>Login Count</th><th>Status</th></tr></thead>
             <tbody id="onlineBody"><tr class="loading-td"><td colspan="5"><span class="spinner"></span>Loading…</td></tr></tbody></table>
         </div>
-        <!-- TÜM Üyeler Tablosu -->
+        <!-- All Members Table -->
         <div class="table-card">
             <div class="table-header">
-                <h3>👥 Tüm Kayıtlı Üyeler <span style="font-size:.75rem;font-weight:400;color:var(--text2);">— Son aktiviteye göre sıralı</span></h3>
+                <h3>👥 All Registered Members <span style="font-size:.75rem;font-weight:400;color:var(--text2);">— Sorted by last activity</span></h3>
                 <div class="table-actions">
                     <input class="search-inp" type="text" id="allMembersSearch" placeholder="🔍 Search members…" oninput="filterAllMembers()">
                     <select class="fi" style="width:auto;padding:.38rem .8rem;" id="allMembersSort" onchange="renderAllMembers()">
-                        <option value="activity">Son Aktivite</option>
+                        <option value="activity">Last Activity</option>
                         <option value="xp">By XP</option>
                         <option value="entries">By Content Count</option>
                     </select>
@@ -523,7 +517,7 @@
             <div class="table-header">
                 <h3>🚫 Banned Users</h3>
                 <div class="table-actions">
-                    <input class="search-inp" type="text" id="banSearch" placeholder="🔍 Ara…" oninput="filterBans()">
+                    <input class="search-inp" type="text" id="banSearch" placeholder="🔍 Search…" oninput="filterBans()">
                 </div>
             </div>
             <table><thead><tr><th>User</th><th>Ban Date</th><th>Reason</th><th>Duration</th><th>Actions</th></tr></thead>
@@ -565,10 +559,10 @@
             <div class="table-header">
                 <h3>💬 User Reviews</h3>
                 <div class="table-actions">
-                    <input class="search-inp" type="text" id="reviewSearch" placeholder="🔍 Yorum ara…" oninput="filterReviews()">
+                    <input class="search-inp" type="text" id="reviewSearch" placeholder="🔍 Search reviews…" oninput="filterReviews()">
                     <select class="fi" style="width:auto;padding:.38rem .8rem;" id="reviewSort" onchange="loadReviews()">
-                        <option value="newest">En Yeni</option>
-                        <option value="oldest">En Eski</option>
+                        <option value="newest">Newest</option>
+                        <option value="oldest">Oldest</option>
                         <option value="rating_high">Highest Rating</option>
                         <option value="rating_low">Lowest Rating</option>
                     </select>
@@ -586,9 +580,9 @@
             <div class="table-header">
                 <h3>💬 Community Chat Messages</h3>
                 <input class="search-inp" type="text" id="chatSearch" placeholder="🔍 Search by username…" oninput="filterChatMessages()" style="margin-left:auto;">
-                <button class="tbl-btn" onclick="loadChatMessages()" style="margin-left:.5rem;">🔄 Yenile</button>
+                <button class="tbl-btn" onclick="loadChatMessages()" style="margin-left:.5rem;">🔄 Refresh</button>
                 <button class="tbl-btn" onclick="showChatRLSGuide()" title="Click if delete is not working" style="margin-left:.5rem;">🔧 RLS</button>
-                <button class="tbl-btn" onclick="clearOldChatMessages()" style="background:rgba(239,68,68,.1);color:#ef4444;border-color:rgba(239,68,68,.3);margin-left:.5rem;">🗑️ Eskileri Temizle</button>
+                <button class="tbl-btn" onclick="clearOldChatMessages()" style="background:rgba(239,68,68,.1);color:#ef4444;border-color:rgba(239,68,68,.3);margin-left:.5rem;">🗑️ Clear Old</button>
             </div>
             <div style="padding:.5rem 1rem;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border2);font-size:.78rem;color:var(--text2);">
                 Showing last 100 messages. Deletion cannot be undone.
@@ -597,8 +591,8 @@
                 <thead>
                     <tr>
                         <th>User</th>
-                        <th>Mesaj</th>
-                        <th>Tarih</th>
+                        <th>Message</th>
+                        <th>Date</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -617,7 +611,7 @@
                 <div class="fg"><label>Title</label><input type="text" class="fi" id="annTitle" placeholder="Announcement title…"></div>
                 <div class="fg"><label>Type</label>
                     <select class="fs" id="annType">
-                        <option value="info">ℹ️ Bilgi</option>
+                        <option value="info">ℹ️ Info</option>
                         <option value="success">✅ Success</option>
                         <option value="warning">⚠️ Warning</option>
                         <option value="update">🚀 Update</option>
@@ -626,7 +620,7 @@
             </div>
             <div class="fg"><label>Message</label><textarea class="fta" id="annContent" placeholder="Write your announcement…"></textarea></div>
             <div class="form-row">
-                <div class="fg"><label>Hedef</label>
+                <div class="fg"><label>Target</label>
                     <select class="fs" id="annTarget"><option value="all">All Users</option><option value="registered">Registered Only</option></select>
                 </div>
                 <div class="fg"><label>Priority</label>
@@ -645,42 +639,42 @@
     <!-- ===== RESTRICTIONS ===== -->
     <div class="page" id="page-restrictions">
         <div style="margin-bottom:1.5rem;">
-            <h2 style="font-size:1.3rem;font-weight:700;margin-bottom:.3rem;">🛡️ Platform Kısıtlamaları</h2>
-            <p style="color:var(--text2);font-size:.85rem;">Gerçek zamanlı platform kontrolleri. Değişiklikler anında uygulanır.</p>
+            <h2 style="font-size:1.3rem;font-weight:700;margin-bottom:.3rem;">🛡️ Platform Restrictions</h2>
+            <p style="color:var(--text2);font-size:.85rem;">Real-time platform controls. Changes apply instantly.</p>
         </div>
         <div class="restrict-grid">
             <div class="restrict-card">
                 <h4>👤 User Restrictions</h4>
-                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Yeni Kayıt</div><div style="font-size:.72rem;color:var(--text2);">Yeni hesap oluşturma</div></div><div class="toggle on" id="rt-registration" onclick="toggleRestriction(this,'registration')"></div></div>
-                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Misafir Erişimi</div><div style="font-size:.72rem;color:var(--text2);">Giriş yapmadan gezme</div></div><div class="toggle on" id="rt-guest" onclick="toggleRestriction(this,'guest')"></div></div>
-                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Profil Düzenleme</div><div style="font-size:.72rem;color:var(--text2);">Kullanıcı profil güncellemeleri</div></div><div class="toggle on" id="rt-profile-edit" onclick="toggleRestriction(this,'profile-edit')"></div></div>
-                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Şifre Değiştirme</div><div style="font-size:.72rem;color:var(--text2);">Hesap şifresi güncellemeleri</div></div><div class="toggle on" id="rt-password-change" onclick="toggleRestriction(this,'password-change')"></div></div>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">New Registration</div><div style="font-size:.72rem;color:var(--text2);">New account creation</div></div><div class="toggle on" id="rt-registration" onclick="toggleRestriction(this,'registration')"></div></div>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Guest Access</div><div style="font-size:.72rem;color:var(--text2);">Browse without login</div></div><div class="toggle on" id="rt-guest" onclick="toggleRestriction(this,'guest')"></div></div>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Profile Editing</div><div style="font-size:.72rem;color:var(--text2);">User profile updates</div></div><div class="toggle on" id="rt-profile-edit" onclick="toggleRestriction(this,'profile-edit')"></div></div>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Password Change</div><div style="font-size:.72rem;color:var(--text2);">Account password updates</div></div><div class="toggle on" id="rt-password-change" onclick="toggleRestriction(this,'password-change')"></div></div>
             </div>
             <div class="restrict-card">
                 <h4>🎬 Content Restrictions</h4>
-                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">İçerik Ekleme</div><div style="font-size:.72rem;color:var(--text2);">Listeye yeni öge ekleme</div></div><div class="toggle on" id="rt-add-content" onclick="toggleRestriction(this,'add-content')"></div></div>
-                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Yorum Yazma</div><div style="font-size:.72rem;color:var(--text2);">Kullanıcı yorumları</div></div><div class="toggle on" id="rt-reviews" onclick="toggleRestriction(this,'reviews')"></div></div>
-                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Puan Verme</div><div style="font-size:.72rem;color:var(--text2);">İçerik puanlama</div></div><div class="toggle on" id="rt-rating" onclick="toggleRestriction(this,'rating')"></div></div>
-                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">İçerik Silme</div><div style="font-size:.72rem;color:var(--text2);">Kullanıcı kendi içeriklerini silme</div></div><div class="toggle on" id="rt-delete-content" onclick="toggleRestriction(this,'delete-content')"></div></div>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Add Content</div><div style="font-size:.72rem;color:var(--text2);">Add new items to list</div></div><div class="toggle on" id="rt-add-content" onclick="toggleRestriction(this,'add-content')"></div></div>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Write Reviews</div><div style="font-size:.72rem;color:var(--text2);">User reviews</div></div><div class="toggle on" id="rt-reviews" onclick="toggleRestriction(this,'reviews')"></div></div>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Rating</div><div style="font-size:.72rem;color:var(--text2);">Content rating</div></div><div class="toggle on" id="rt-rating" onclick="toggleRestriction(this,'rating')"></div></div>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Delete Content</div><div style="font-size:.72rem;color:var(--text2);">Users delete their own content</div></div><div class="toggle on" id="rt-delete-content" onclick="toggleRestriction(this,'delete-content')"></div></div>
             </div>
             <div class="restrict-card">
                 <h4>⚙️ System Settings</h4>
-                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Bakım Modu</div><div style="font-size:.72rem;color:var(--text2);">Siteyi geçici olarak kapat</div></div><div class="toggle" id="rt-maintenance" onclick="toggleRestriction(this,'maintenance')"></div></div>
-                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">AI Önerileri</div><div style="font-size:.72rem;color:var(--text2);">AI bölümünü etkinleştir</div></div><div class="toggle on" id="rt-ai" onclick="toggleRestriction(this,'ai')"></div></div>
-                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Liderlik Tablosu</div><div style="font-size:.72rem;color:var(--text2);">Kullanıcı sıralamaları</div></div><div class="toggle on" id="rt-leaderboard" onclick="toggleRestriction(this,'leaderboard')"></div></div>
-                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Keşfet Bölümü</div><div style="font-size:.72rem;color:var(--text2);">Anime/manga keşfet sayfası</div></div><div class="toggle on" id="rt-discover" onclick="toggleRestriction(this,'discover')"></div></div>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Maintenance Mode</div><div style="font-size:.72rem;color:var(--text2);">Temporarily close the site</div></div><div class="toggle" id="rt-maintenance" onclick="toggleRestriction(this,'maintenance')"></div></div>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">AI Recommendations</div><div style="font-size:.72rem;color:var(--text2);">Enable AI section</div></div><div class="toggle on" id="rt-ai" onclick="toggleRestriction(this,'ai')"></div></div>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Leaderboard</div><div style="font-size:.72rem;color:var(--text2);">User rankings</div></div><div class="toggle on" id="rt-leaderboard" onclick="toggleRestriction(this,'leaderboard')"></div></div>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Discover Section</div><div style="font-size:.72rem;color:var(--text2);">Anime/manga discover page</div></div><div class="toggle on" id="rt-discover" onclick="toggleRestriction(this,'discover')"></div></div>
             </div>
             <div class="restrict-card">
-                <h4>🔔 Bildirim Kontrolleri</h4>
-                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Sistem Duyuruları</div><div style="font-size:.72rem;color:var(--text2);">Admin duyurularını göster</div></div><div class="toggle on" id="rt-announcements" onclick="toggleRestriction(this,'announcements')"></div></div>
-                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Streak Uyarıları</div><div style="font-size:.72rem;color:var(--text2);">Streak kaybı bildirimleri</div></div><div class="toggle on" id="rt-streak-notif" onclick="toggleRestriction(this,'streak-notif')"></div></div>
-                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">XP Bildirimleri</div><div style="font-size:.72rem;color:var(--text2);">XP kazanım bildirimleri</div></div><div class="toggle on" id="rt-xp-notif" onclick="toggleRestriction(this,'xp-notif')"></div></div>
-                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Level Atlama Modalı</div><div style="font-size:.72rem;color:var(--text2);">Level atlama popup'ı</div></div><div class="toggle on" id="rt-levelup-modal" onclick="toggleRestriction(this,'levelup-modal')"></div></div>
+                <h4>🔔 Notification Controls</h4>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">System Announcements</div><div style="font-size:.72rem;color:var(--text2);">Show admin announcements</div></div><div class="toggle on" id="rt-announcements" onclick="toggleRestriction(this,'announcements')"></div></div>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Streak Alerts</div><div style="font-size:.72rem;color:var(--text2);">Streak loss notifications</div></div><div class="toggle on" id="rt-streak-notif" onclick="toggleRestriction(this,'streak-notif')"></div></div>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">XP Notifications</div><div style="font-size:.72rem;color:var(--text2);">XP gain notifications</div></div><div class="toggle on" id="rt-xp-notif" onclick="toggleRestriction(this,'xp-notif')"></div></div>
+                <div class="restrict-row"><div><div style="font-size:.85rem;font-weight:500;">Level Up Modal</div><div style="font-size:.72rem;color:var(--text2);">Level up popup</div></div><div class="toggle on" id="rt-levelup-modal" onclick="toggleRestriction(this,'levelup-modal')"></div></div>
             </div>
         </div>
         <div class="form-card" style="margin-top:1rem;">
             <h3>⚠️ Restriction Message</h3>
-            <p style="font-size:.83rem;color:var(--text2);margin-bottom:1rem;">Bakım modu aktifken kullanıcılara gösterilecek mesaj.</p>
+            <p style="font-size:.83rem;color:var(--text2);margin-bottom:1rem;">Message shown to users when maintenance mode is active.</p>
             <div class="fg"><label>Maintenance Message</label><textarea class="fta" id="maintenanceMsg" placeholder="System is under maintenance, please try again later…" style="min-height:80px;"></textarea></div>
             <button class="submit-btn" onclick="saveMaintenanceMsg()" style="padding:.6rem 1.2rem;font-size:.85rem;">💾 Kaydet</button>
         </div>
@@ -710,24 +704,24 @@
                 <h3>📡 Supabase Durumu</h3>
                 <div class="fg"><label>Project URL</label><input type="text" class="fi mono" id="supaUrlEl" readonly></div>
                 <div class="fg"><label>Connection</label><div id="supaStatus" class="badge bg-yellow" style="display:inline-flex;">⏳ Checking…</div></div>
-                <div class="fg" style="margin-top:1rem;"><label>Hızlı İstatistikler</label><div id="supaStats" style="font-size:.83rem;color:var(--text2);line-height:2;">—</div></div>
+                <div class="fg" style="margin-top:1rem;"><label>Quick Statistics</label><div id="supaStats" style="font-size:.83rem;color:var(--text2);line-height:2;">—</div></div>
             </div>
             <div class="settings-card">
                 <h3>🔒 Security</h3>
                 <div class="fg"><label>New Admin Password</label><input type="password" class="fi" id="newPw" placeholder="New password…"></div>
                 <div class="fg"><label>Confirm Password</label><input type="password" class="fi" id="confirmPw" placeholder="Re-enter…"></div>
-                <button class="submit-btn" style="padding:.6rem 1.2rem;font-size:.85rem;" onclick="changePassword()">Şifreyi Güncelle</button>
+                <button class="submit-btn" style="padding:.6rem 1.2rem;font-size:.85rem;" onclick="changePassword()">Update Password</button>
             </div>
             <div class="settings-card">
                 <h3>📊 Database Management</h3>
                 <div style="display:flex;flex-direction:column;gap:.8rem;margin-top:.5rem;">
                     <button class="tbl-btn" style="width:100%;padding:.7rem;text-align:left;" onclick="exportAllData()">📥 Download All User Data (JSON)</button>
                     <button class="tbl-btn" style="width:100%;padding:.7rem;text-align:left;" onclick="exportCSV()">📥 Download User List (CSV)</button>
-                    <button class="tbl-btn" style="width:100%;padding:.7rem;text-align:left;" onclick="loadDashboard()">🔄 Dashboard Verilerini Yenile</button>
+                    <button class="tbl-btn" style="width:100%;padding:.7rem;text-align:left;" onclick="loadDashboard()">🔄 Refresh Dashboard Data</button>
                 </div>
             </div>
             <div class="settings-card">
-                <h3>ℹ️ Platform Bilgisi</h3>
+                <h3>ℹ️ Platform Info</h3>
                 <div style="font-size:.83rem;color:var(--text2);line-height:2.2;" id="platformInfoEl">Loading…</div>
             </div>
         </div>
@@ -764,7 +758,7 @@
         </div>
         <div class="ban-user-card">
             <div class="ban-user-av">👤</div>
-            <div><div style="font-weight:700;font-size:1rem;" id="banTargetName">Kullanıcı</div><div style="font-size:.78rem;color:var(--text2);margin-top:.1rem;" id="banTargetId">—</div></div>
+            <div><div style="font-weight:700;font-size:1rem;" id="banTargetName">User</div><div style="font-size:.78rem;color:var(--text2);margin-top:.1rem;" id="banTargetId">—</div></div>
         </div>
         <div class="ban-field">
             <label>⚡ Quick Reason</label>
@@ -803,12 +797,12 @@
 <div class="warn-modal-overlay" id="warnModalOverlay" onclick="closeWarnModal(event)">
     <div class="warn-modal">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;">
-            <div style="font-size:1.2rem;font-weight:800;color:var(--yellow);">⚠️ Uyarı Gönder</div>
+            <div style="font-size:1.2rem;font-weight:800;color:var(--yellow);">⚠️ Send Warning</div>
             <button class="ban-modal-close" onclick="closeWarnModal()" style="border-color:rgba(245,158,11,0.3);">✕</button>
         </div>
         <div class="ban-user-card" style="background:rgba(245,158,11,0.06);border-color:rgba(245,158,11,0.15);">
             <div class="ban-user-av" style="background:linear-gradient(135deg,var(--yellow),var(--orange));">👤</div>
-            <div><div style="font-weight:700;font-size:1rem;" id="warnTargetName">Kullanıcı</div><div style="font-size:.78rem;color:var(--text2);" id="warnTargetId">—</div></div>
+            <div><div style="font-weight:700;font-size:1rem;" id="warnTargetName">User</div><div style="font-size:.78rem;color:var(--text2);" id="warnTargetId">—</div></div>
         </div>
         <div class="ban-field">
             <label>⚡ Warning Type</label>
@@ -825,7 +819,7 @@
         </div>
         <div style="display:flex;gap:.8rem;margin-top:1rem;">
             <button class="btn-ban-cancel" onclick="closeWarnModal()" style="flex:1;">Cancel</button>
-            <button style="flex:1;background:linear-gradient(135deg,var(--yellow),var(--orange));color:#000;border:none;border-radius:10px;padding:.85rem;font-size:.95rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="executeWarn()">⚠️ Uyarı Gönder</button>
+            <button style="flex:1;background:linear-gradient(135deg,var(--yellow),var(--orange));color:#000;border:none;border-radius:10px;padding:.85rem;font-size:.95rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="executeWarn()">⚠️ Send Warning</button>
         </div>
     </div>
 </div>
@@ -835,7 +829,7 @@
     <div class="entries-modal">
         <div class="entries-modal-head">
             <div>
-                <div style="font-weight:700;font-size:1.1rem;" id="entriesModalTitle">Kullanıcı Girişleri</div>
+                <div style="font-weight:700;font-size:1.1rem;" id="entriesModalTitle">User Entries</div>
                 <div style="font-size:.78rem;color:var(--text2);margin-top:2px;" id="entriesModalSub">—</div>
             </div>
             <button class="ban-modal-close" onclick="closeEntriesModal()">✕</button>
@@ -858,12 +852,13 @@
 // ===== CONFIG =====
 const SUPABASE_URL  = 'https://qhfjpuwduuxzojurngte.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoZmpwdXdkdXV4em9qdXJuZ3RlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2NzU1MTksImV4cCI6MjA4NzI1MTUxOX0.lgtxEwGFW07P1vY9Soid2s_sM47jODk_nsUECznHSFA';
-const ADMIN_EMAILS  = ['list086@gmail.com'];
+// Admin access is controlled by the is_admin column in user_data (Supabase).
+// No emails are hardcoded here. Set is_admin: true for admin users in Supabase.
 
-// ===== BRUTE-FORCE KORUMA =====
-// Maksimum deneme sayısı ve kilit süresi (client-side katman)
+// ===== BRUTE-FORCE PROTECTION =====
+// Maximum attempt count and lock duration (client-side layer)
 const MAX_LOGIN_ATTEMPTS = 5;
-const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 dakika
+const LOCKOUT_DURATION_MS = 15 * 60 * 1000; // 15 minutes
 const LOCKOUT_KEY = 'onilist_admin_lockout';
 const ATTEMPTS_KEY = 'onilist_admin_attempts';
 
@@ -876,7 +871,7 @@ function isLockedOut() {
     try {
         const lockUntil = parseInt(sessionStorage.getItem(LOCKOUT_KEY) || '0');
         if (Date.now() < lockUntil) return lockUntil;
-        // Kilit süresi geçtiyse sıfırla
+        // Reset if lock duration has passed
         sessionStorage.removeItem(LOCKOUT_KEY);
         sessionStorage.removeItem(ATTEMPTS_KEY);
         return false;
@@ -901,8 +896,8 @@ function clearLoginAttempts() {
     sessionStorage.removeItem(LOCKOUT_KEY);
 }
 
-// ===== SESSION GÜVENLİĞİ =====
-// Admin oturumu için ek kontrol: session token her 30dk'da doğrulanır
+// ===== SESSION SECURITY =====
+// Admin session extra check: session token validated every 30minr
 const SESSION_VERIFY_INTERVAL_MS = 30 * 60 * 1000;
 let sessionVerifyTimer = null;
 
@@ -912,7 +907,8 @@ function startSessionVerify() {
         if (!sb || !currentAdmin) return;
         try {
             const { data: { session }, error } = await sb.auth.getSession();
-            if (error || !session || !isAdmin(session.user?.email)) {
+            const isAdm = !error && session ? await checkIsAdmin(session.user?.id) : false;
+            if (!isAdm) {
                 console.warn('[Admin] Session verification failed, logging out.');
                 await adminLogout();
             }
@@ -935,7 +931,7 @@ const charts = {};
 window.onload = async () => {
     sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-    // Kilit kontrolü — sayfa yüklenince göster
+    // Lock check — show on page load
     const lockUntil = isLockedOut();
     if (lockUntil) {
         const mins = Math.ceil((lockUntil - Date.now()) / 60000);
@@ -945,13 +941,13 @@ window.onload = async () => {
 
     try {
         const { data: { session } } = await sb.auth.getSession();
-        if (session?.user && isAdmin(session.user.email)) {
-            currentAdmin = session.user;
-            boot();
+        if (session?.user) {
+            const isAdm = await checkIsAdmin(session.user.id);
+            if (isAdm) { currentAdmin = session.user; boot(); }
         }
     } catch(e) { console.warn(e); }
 
-    // Auth state değişikliklerini izle (başka tab'da çıkış yapılırsa burası da kapansın)
+    // Monitor auth state changes (other tab logout also closes this session)
     try {
         sb.auth.onAuthStateChange((event, session) => {
             if (event === 'SIGNED_OUT' && currentAdmin) {
@@ -962,8 +958,12 @@ window.onload = async () => {
     } catch(e) {}
 };
 
-function isAdmin(email) {
-    return ADMIN_EMAILS.map(e=>e.toLowerCase()).includes((email||'').toLowerCase());
+// Server-side admin check — reads is_admin column from user_data
+async function checkIsAdmin(userId) {
+    try {
+        const { data, error } = await sb.from('user_data').select('is_admin').eq('user_id', userId).single();
+        return !error && data?.is_admin === true;
+    } catch(e) { return false; }
 }
 
 function boot() {
@@ -971,8 +971,8 @@ function boot() {
     document.getElementById('mainContent').style.display = 'block';
     document.getElementById('adminNameEl').textContent = currentAdmin.email.split('@')[0];
     document.getElementById('supaUrlEl').value = SUPABASE_URL;
-    clearLoginAttempts();      // Başarılı girişte sayacı sıfırla
-    startSessionVerify();      // Periyodik session doğrulamasını başlat
+    clearLoginAttempts();      // Reset counter on successful login
+    startSessionVerify();      // Start periodic session validation
     checkSupabase();
     loadDashboard();
     // Auto-refresh online every 30s
@@ -981,7 +981,7 @@ function boot() {
 
 // ===== LOGIN =====
 async function adminLogin() {
-    // Kilit kontrolü
+    // Lock check
     const lockUntil = isLockedOut();
     if (lockUntil) {
         const mins = Math.ceil((lockUntil - Date.now()) / 60000);
@@ -994,20 +994,18 @@ async function adminLogin() {
     document.getElementById('loginErr').style.display = 'none';
     if (!email || !pw) { showErr('Email and password required.'); return; }
 
-    // Email whitelist kontrolü (ağ isteği yapmadan önce hızlı ret)
-    if (!isAdmin(email)) {
-        recordFailedAttempt();
-        showErr('This account does not have admin access.');
-        return;
-    }
-
     const btn = document.getElementById('loginBtn');
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span>Logging in…';
     try {
         const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
         if (error) throw error;
-        if (!isAdmin(data.user.email)) throw new Error('Not an admin account.');
+        // Server-side admin verification — checks is_admin column in user_data
+        const isAdm = await checkIsAdmin(data.user.id);
+        if (!isAdm) {
+            await sb.auth.signOut();
+            throw new Error('This account does not have admin access.');
+        }
         currentAdmin = data.user;
         boot();
     } catch(e) {
@@ -1035,18 +1033,18 @@ async function adminLogout() { await sb.auth.signOut(); location.reload(); }
 
 // ===== NAVIGATION =====
 const PAGE_META = {
-    dashboard:    { tr:['Dashboard','Platform genel bakışı'],       en:['Dashboard','Platform overview'] },
-    analytics:    { tr:['Analitik','Derinlemesine içgörüler'],      en:['Analytics','Deep insights'] },
-    users:        { tr:['Tüm Kullanıcılar','Kayıtlı hesapları yönet'], en:['All Users','Manage registered accounts'] },
-    online:       { tr:['Online Kullanıcılar','Şu an aktif olanlar'],  en:['Online Users','Currently active'] },
-    bans:         { tr:['Banlı Kullanıcılar','Banlı hesapları yönet'], en:['Banned Users','Manage banned accounts'] },
-    content:      { tr:['İçerik Listesi','Kullanıcıların eklediği tüm içerik'], en:['Content List','All user-added content'] },
-    reviews:      { tr:['Yorumlar','Kullanıcı yorumları'],           en:['Reviews','User reviews'] },
-    announcements:{ tr:['Duyurular','Kullanıcılara duyuru gönder'], en:['Announcements','Send announcements to users'] },
-    restrictions: { tr:['Kısıtlamalar','Platform kısıtlamalarını yönet'], en:['Restrictions','Manage platform restrictions'] },
-    logs:         { tr:['Aktivite Logu','Sistem olay geçmişi'],     en:['Activity Log','System event history'] },
-    settings:     { tr:['Ayarlar','Site yapılandırması'],           en:['Settings','Site configuration'] },
-    chat:         { tr:['Sohbet Mesajları','Topluluk chat geçmişi'], en:['Chat Messages','Community chat history'] },
+    dashboard:    { tr:['Dashboard','Platform overview'],       en:['Dashboard','Platform overview'] },
+    analytics:    { tr:['Analytics','Deep insights'],      en:['Analytics','Deep insights'] },
+    users:        { tr:['All Users','Manage registered accounts'], en:['All Users','Manage registered accounts'] },
+    online:       { tr:['Online Users','Currently active'],  en:['Online Users','Currently active'] },
+    bans:         { tr:['Banned Users','Manage banned accounts'], en:['Banned Users','Manage banned accounts'] },
+    content:      { tr:['Content List','All user-added content'], en:['Content List','All user-added content'] },
+    reviews:      { tr:['Reviews','User reviews'],           en:['Reviews','User reviews'] },
+    announcements:{ tr:['Announcements','Send announcements to users'], en:['Announcements','Send announcements to users'] },
+    restrictions: { tr:['Restrictions','Manage platform restrictions'], en:['Restrictions','Manage platform restrictions'] },
+    logs:         { tr:['Activity Log','System event history'],     en:['Activity Log','System event history'] },
+    settings:     { tr:['Settings','Site configuration'],           en:['Settings','Site configuration'] },
+    chat:         { tr:['Chat Messages','Community chat history'], en:['Chat Messages','Community chat history'] },
 };
 
 function showPage(page) {
@@ -1062,7 +1060,7 @@ function showPage(page) {
     document.getElementById('pageTitle').textContent = title;
     document.getElementById('pageSub').textContent = sub;
     const locale = pageLang === 'en' ? 'en-GB' : 'tr-TR';
-    const updatedLabel = pageLang === 'en' ? 'Updated: ' : 'Güncellendi: ';
+    const updatedLabel = pageLang === 'en' ? 'Updated: ' : 'Updated: ';
     document.getElementById('lastUpdated').textContent = updatedLabel + new Date().toLocaleTimeString(locale);
     const loaders = {
         dashboard: loadDashboard, analytics: loadAnalytics,
@@ -1095,7 +1093,7 @@ async function updateOnlineCount() {
             <div class="online-user-row">
                 <div class="online-user-dot"></div>
                 <span>${esc(u.data?.social?.name || 'User')}</span>
-            </div>`).join('') + (count > 3 ? `<div class="online-user-row" style="color:var(--green);font-size:.7rem;">+${count-3} kişi daha…</div>` : '');
+            </div>`).join('') + (count > 3 ? `<div class="online-user-row" style="color:var(--green);font-size:.7rem;">+${count-3} more…</div>` : '');
     }
     return { data, online };
 }
@@ -1125,7 +1123,7 @@ async function loadDashboard() {
     banBadge.textContent = banned.length;
     banBadge.style.display = banned.length > 0 ? '' : 'none';
 
-    document.getElementById('s-users-change').textContent = `⬆ ${active7.length} bu hafta aktif`;
+    document.getElementById('s-users-change').textContent = `⬆ ${active7.length} active this week`;
 
     // Online mini list
     const listEl = document.getElementById('dashOnlineList');
@@ -1134,7 +1132,7 @@ async function loadDashboard() {
             <div class="online-user-row">
                 <div class="online-user-dot"></div>
                 <span>${esc(u.data?.social?.name||'User')}</span>
-            </div>`).join('') + (online15.length > 3 ? `<div class="online-user-row" style="color:var(--green);font-size:.7rem;">+${online15.length-3} kişi daha…</div>` : '');
+            </div>`).join('') + (online15.length > 3 ? `<div class="online-user-row" style="color:var(--green);font-size:.7rem;">+${online15.length-3} more…</div>` : '');
     }
 
     let entries=0, xpTotal=0, completed=0;
@@ -1270,11 +1268,11 @@ async function loadAnalytics() {
     const xpK=Object.keys(xpBuckets);
     drawBar('chartXP', xpK, xpK.map(k=>xpBuckets[k]), ['#8b5cf6']);
 
-    // Top users — TÜM kayıtlı kullanıcılar, XP'ye göre sıralı (online olma şartı yok)
+    // Top users — ALL registered users, sorted by XP (no online requirement)
     const allSorted = rows
         .map(r => r.data)
         .filter(Boolean)
-        .filter(d => (d?.xp?.total || 0) > 0 || (d?.items?.length || 0) > 0) // en az 1 işlem yapmış
+        .filter(d => (d?.xp?.total || 0) > 0 || (d?.items?.length || 0) > 0) // at least 1 action performed
         .sort((a, b) => (b?.xp?.total || 0) - (a?.xp?.total || 0));
 
     document.getElementById('topUsersBody').innerHTML = allSorted.length === 0
@@ -1300,7 +1298,7 @@ async function loadAnalytics() {
                 <td><strong style="color:var(--yellow);font-size:1rem;">${(d?.xp?.total || 0).toLocaleString('en-GB')}</strong> <span style="font-size:.7rem;color:var(--text2);">XP</span></td>
                 <td><span class="badge bg-purple">Lv.${d?.xp?.level || 1}</span></td>
                 <td><span style="font-weight:600;">${d?.items?.length || 0}</span></td>
-                <td>🔥 <strong>${d?.streak?.count || 0}</strong> <span style="font-size:.7rem;color:var(--text2);">gün</span></td>
+                <td>🔥 <strong>${d?.streak?.count || 0}</strong> <span style="font-size:.7rem;color:var(--text2);">days</span></td>
                 <td><span style="color:var(--green);font-weight:600;">${completedN}</span></td>
             </tr>`;
         }).join('');
@@ -1309,12 +1307,12 @@ async function loadAnalytics() {
 // ===== USERS =====
 async function loadUsers() {
     document.getElementById('usersBody').innerHTML = '<tr class="loading-td"><td colspan="8"><span class="spinner"></span>Loading…</td></tr>';
-    // get_all_user_data RPC — SECURITY DEFINER ile RLS bypass, tüm kullanıcılar görünür
+    // get_all_user_data RPC — RLS bypass via SECURITY DEFINER, all users visible
     let data = [], error = null;
     try {
         const rpc = await sb.rpc('get_all_user_data');
         if (rpc.error) {
-            // RPC henüz kurulmadıysa doğrudan sorgu dene
+            // If RPC not set up yet, use direct query dene
             const fb = await sb.from('user_data').select('user_id,data,updated_at').order('updated_at',{ascending:false});
             data = fb.data || []; error = fb.error;
         } else {
@@ -1324,7 +1322,7 @@ async function loadUsers() {
         const fb = await sb.from('user_data').select('user_id,data,updated_at').order('updated_at',{ascending:false});
         data = fb.data || []; error = fb.error;
     }
-    if (error) { toast('Hata: '+error.message,'error'); return; }
+    if (error) { toast('Error: '+error.message,'error'); return; }
     allUsers = data;
     usersPage=1;
     renderUsers();
@@ -1398,7 +1396,7 @@ function viewUser(u) {
 
     document.getElementById('userModalContent').innerHTML=`
         <div class="detail-tabs">
-            <button class="detail-tab active" onclick="switchDetailTab('info')">📊 Bilgiler</button>
+            <button class="detail-tab active" onclick="switchDetailTab('info')">📊 Info</button>
             <button class="detail-tab" onclick="switchDetailTab('items')">📋 Stats</button>
             <button class="detail-tab" onclick="switchDetailTab('raw')">🔧 Ham Veri</button>
         </div>
@@ -1409,7 +1407,7 @@ function viewUser(u) {
                 <div class="detail-item"><label>Level</label><strong>Lv.${d?.xp?.level||1}</strong></div>
                 <div class="detail-item"><label>Toplam XP</label><strong style="color:var(--yellow)">${(d?.xp?.total||0).toLocaleString()}</strong></div>
                 <div class="detail-item"><label>Streak</label><strong>🔥 ${d?.streak?.count||0} days</strong></div>
-                <div class="detail-item"><label>En Uzun Streak</label><strong>${d?.streak?.longest||0} days</strong></div>
+                <div class="detail-item"><label>Longest Streak</label><strong>${d?.streak?.longest||0} days</strong></div>
                 <div class="detail-item"><label>Achievements</label><strong>🏆 ${d?.achievements?.length||0}</strong></div>
                 <div class="detail-item"><label>Status</label><strong>${d?.banned?'🚫 Banned':'✅ Active'}</strong></div>
             </div>
@@ -1462,7 +1460,7 @@ function filterEntries(type) {
     _entriesFiltered = items;
     const body = document.getElementById('entriesModalBody');
     if (!items.length) { body.innerHTML='<div class="empty-state"><div class="ei">📋</div><h3>No entries in this category</h3></div>'; return; }
-    const sm={watching:'<span class="badge bg-blue" style="font-size:.65rem;">▶ İzleniyor</span>',completed:'<span class="badge bg-green" style="font-size:.65rem;">✅ Tamamlandı</span>',plantowatch:'<span class="badge bg-purple" style="font-size:.65rem;">📋 Planlı</span>',onhold:'<span class="badge bg-yellow" style="font-size:.65rem;">⏸ Beklemede</span>',dropped:'<span class="badge bg-red" style="font-size:.65rem;">❌ Bırakıldı</span>'};
+    const sm={watching:'<span class="badge bg-blue" style="font-size:.65rem;">▶ Watching</span>',completed:'<span class="badge bg-green" style="font-size:.65rem;">✅ Completed</span>',plantowatch:'<span class="badge bg-purple" style="font-size:.65rem;">📋 Planned</span>',onhold:'<span class="badge bg-yellow" style="font-size:.65rem;">⏸ On Hold</span>',dropped:'<span class="badge bg-red" style="font-size:.65rem;">❌ Dropped</span>'};
     const typeIcons={anime:'🎬',manga:'📚',webtoon:'🌐'};
     body.innerHTML = items.map(i=>`
         <div class="entries-item">
@@ -1492,7 +1490,7 @@ async function loadOnline() {
     document.getElementById('onlineBody').innerHTML='<tr class="loading-td"><td colspan="5"><span class="spinner"></span>Loading…</td></tr>';
     document.getElementById('allMembersBody').innerHTML='<tr class="loading-td"><td colspan="6"><span class="spinner"></span>Loading…</td></tr>';
 
-    // RPC ile tüm kullanıcıları çek (RLS bypass)
+    // Fetch all users via RPC (RLS bypasss)
     let _raw = [];
     try {
         const rpc = await sb.rpc('get_all_user_data');
@@ -1534,7 +1532,7 @@ async function loadOnline() {
         }).join('');
     }
 
-    // Tüm üyeler tablosu
+    // All members table
     _allMembersData = users;
     _allMembersPage = 1;
     renderAllMembers();
@@ -1697,7 +1695,7 @@ function filterReviews() {
     const total=filtered.length, pages=Math.ceil(total/PER_PAGE)||1;
     if (reviewsPage>pages) reviewsPage=1;
     const slice=filtered.slice((reviewsPage-1)*PER_PAGE,reviewsPage*PER_PAGE);
-    document.getElementById('reviewsPageInfo').textContent=`${total} yorum • Sayfa ${reviewsPage}/${pages}`;
+    document.getElementById('reviewsPageInfo').textContent=`${total} reviews • Page ${reviewsPage}/${pages}`;
     renderPag('reviewsPageBtns', pages, reviewsPage, p=>{reviewsPage=p;filterReviews();});
     const tbody=document.getElementById('reviewsBody');
     if (!slice.length){tbody.innerHTML='<tr><td colspan="6"><div class="empty-state"><div class="ei">💬</div><h3>Review not found</h3></div></td></tr>';return;}
@@ -1714,8 +1712,8 @@ function filterReviews() {
 async function deleteReviewAdmin(id) {
     if (!confirm('Are you sure you want to delete this review?')) return;
     const { error } = await sb.from('reviews').delete().eq('id', id);
-    if (error) { toast('Hata: '+error.message,'error'); return; }
-    toast('🗑 Yorum silindi','info');
+    if (error) { toast('Error: '+error.message,'error'); return; }
+    toast('🗑 Review deleted','info');
     loadReviews();
 }
 
@@ -1813,7 +1811,7 @@ async function sendAnnouncement() {
 }
 async function delAnn(id) {
     await sb.from('announcements').delete().eq('id',id);
-    toast('🗑 Duyuru silindi','info');
+    toast('🗑 Announcement deleted','info');
     loadAnnouncements();
 }
 
@@ -1852,8 +1850,8 @@ async function loadLogs() {
         <div>
             <div class="act-text">
                 <strong>${esc(u.data?.social?.name||'User')}</strong>
-                ${u.data?.banned?'<span class="badge bg-red" style="font-size:.65rem;margin-left:.4rem;">🚫 Banlı</span>':''}
-                ${u.data?.warnings?.length?`<span class="badge bg-yellow" style="font-size:.65rem;margin-left:.4rem;">⚠️ ${u.data.warnings.length} uyarı</span>`:''}
+                ${u.data?.banned?'<span class="badge bg-red" style="font-size:.65rem;margin-left:.4rem;">🚫 Banned</span>':''}
+                ${u.data?.warnings?.length?`<span class="badge bg-yellow" style="font-size:.65rem;margin-left:.4rem;">⚠️ ${u.data.warnings.length} warnings</span>`:''}
                 — veri kaydedildi
             </div>
             <div class="act-time">${new Date(u.updated_at).toLocaleString('en-GB')} · <span class="mono">${u.user_id.substring(0,8)}…</span> · ${u.data?.items?.length||0} entries · Lv.${u.data?.xp?.level||1}</div>
@@ -1881,7 +1879,7 @@ async function loadSettings() {
 
     document.getElementById('platformInfoEl').innerHTML = `
         Total Users: <strong>${userCount||0}</strong><br>
-        Toplam Yorum: <strong>${revCount}</strong><br>
+        Total Reviews: <strong>${revCount}</strong><br>
         Admin: <strong>${currentAdmin?.email}</strong><br>
         Panel Versiyonu: <strong>v2.0</strong><br>
         Last Update: <strong>${new Date().toLocaleString('en-GB')}</strong>
@@ -1895,10 +1893,10 @@ async function checkSupabase() {
         if(error){el.className='badge bg-yellow';el.textContent='⚠️ Limited';}
         else{el.className='badge bg-green';el.textContent='✅ Connected';}
         const {count}=await sb.from('user_data').select('*',{count:'exact',head:true});
-        document.getElementById('supaStats').innerHTML=`Toplam satır: <strong>${count||0}</strong><br>URL: <span class="mono" style="font-size:.73rem;">${SUPABASE_URL.substring(0,45)}…</span>`;
+        document.getElementById('supaStats').innerHTML=`Total rows: <strong>${count||0}</strong><br>URL: <span class="mono" style="font-size:.73rem;">${SUPABASE_URL.substring(0,45)}…</span>`;
     } catch(e){
         const el=document.getElementById('supaStatus');
-        if(el){el.className='badge bg-red';el.textContent='❌ Hata';}
+        if(el){el.className='badge bg-red';el.textContent='❌ Error';}
     }
 }
 
@@ -1909,7 +1907,7 @@ function changePassword() {
     if(p1!==p2){toast('Passwords do not match','error');return;}
     if(p1.length<6){toast('Password must be at least 6 characters','error');return;}
     sb.auth.updateUser({password:p1}).then(({error})=>{
-        if(error) toast('Hata: '+error.message,'error');
+        if(error) toast('Error: '+error.message,'error');
         else{toast('✅ Password updated','success');document.getElementById('newPw').value='';document.getElementById('confirmPw').value='';}
     });
 }
@@ -1942,7 +1940,7 @@ function drawLineChart(id, {labels,data}) {
     if(charts[id]) charts[id].destroy();
     charts[id]=new Chart(document.getElementById(id).getContext('2d'),{
         type:'line',
-        data:{labels,datasets:[{label:'Aktif',data,borderColor:'#ff3366',backgroundColor:'rgba(255,51,102,.1)',tension:.4,fill:true,pointBackgroundColor:'#ff3366',pointRadius:3}]},
+        data:{labels,datasets:[{label:'Active',data,borderColor:'#ff3366',backgroundColor:'rgba(255,51,102,.1)',tension:.4,fill:true,pointBackgroundColor:'#ff3366',pointRadius:3}]},
         options:{...CHART_DEF,plugins:{legend:{display:false}}}
     });
 }
@@ -2037,7 +2035,7 @@ const adminTr = {
     nav_dashboard: 'Dashboard', nav_users: 'Users', nav_content: 'Content',
     nav_announcements: 'Announcements', nav_restrictions: 'Restrictions', nav_system: 'System',
     logout: 'Logout',
-    // Genel arayüz
+    // General UI
     search_placeholder: 'Search users...', filter_all: 'All', filter_active: 'Active', filter_banned: 'Banned',
     sort_newest: 'Newest', sort_oldest: 'Oldest', sort_xp: 'Highest XP', sort_items: 'Most Content',
     col_user: 'User', col_email: 'Email', col_date: 'Date', col_xp: 'XP', col_items: 'Content', col_streak: 'Streak', col_status: 'Status', col_actions: 'Actions',
@@ -2097,12 +2095,6 @@ function at(key) {
     return (_adminLang === 'en' ? adminEn : adminTr)[key] || key;
 }
 
-function adminToggleLang() {
-    _adminLang = _adminLang === 'tr' ? 'en' : 'tr';
-    localStorage.setItem('admin_lang', _adminLang);
-    applyAdminLang();
-}
-
 function applyAdminLang() {
     const flag = document.getElementById('adminLangFlag');
     const label = document.getElementById('adminLangLabel');
@@ -2136,7 +2128,7 @@ function applyAdminLang() {
     const logoutBtn = document.querySelector('.logout-btn');
     if (logoutBtn) logoutBtn.textContent = at('logout');
 
-    // data-i18n attribute'lu tüm elementleri güncelle
+    // Update all elements with data-i18n attribute
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         const val = at(key);
@@ -2147,7 +2139,7 @@ function applyAdminLang() {
         }
     });
 
-    // Online kullanıcı sayısı
+    // Online user count
     const onlineEl = document.getElementById('sideOnlineCount');
     if (onlineEl) {
         const match = onlineEl.textContent.match(/\d+/);
@@ -2168,32 +2160,32 @@ function applyAdminLang() {
     }
 }
 
-// ===== KALICI KULLANICI SİLME (Admin) =====
+// ===== PERMANENT USER DELETE (Admin) =====
 async function permanentDeleteUser(uid, name) {
     const confirmMsg = at('delete_confirm') + '\n\nUser: ' + name;
     if (!confirm(confirmMsg)) return;
 
-    // sb admin.html'de global olarak tanımlı
+    // sb is defined globally in admin.html
     if (!sb) { alert('No Supabase connection! Please reload the page.'); return; }
 
     try {
-        // 1. user_data tablosunu sil
+        // 1. Delete user_data table
         const { error: e1 } = await sb.from('user_data').delete().eq('user_id', uid);
         if (e1) console.warn('user_data delete error:', e1.message);
 
-        // 2. reviews ve comments sil (tablo yoksa hata vermesin)
+        // 2. Delete reviews and comments (ignore if table doesn't exist)
         try { await sb.from('reviews').delete().eq('user_id', uid); } catch(e){}
         try { await sb.from('comments').delete().eq('user_id', uid); } catch(e){}
 
-        // 3. auth.users'dan sil - önce RPC dene
+        // 3. Delete from auth.users - try RPC first
         const { error: rpcErr } = await sb.rpc('admin_delete_user', { target_user_id: uid });
         if (rpcErr) {
             console.warn('RPC error (normal - if SQL not added):', rpcErr.message);
-            // RPC yoksa user_data silindi, auth silinmedi ama tekrar giriş yapamaz
-            // çünkü user_data yoksa uygulama onu yeni kullanıcı gibi görür
+            // If no RPC: user_data deleted, auth not removed but user can't login
+            // because user_data otherwise app treats them as a new user
         }
 
-        // 4. UI'dan kaldır
+        // 4. Remove from UI
         if (typeof _allUsers !== 'undefined') {
             _allUsers = _allUsers.filter(u => u.user_id !== uid);
             renderUsers();
@@ -2201,7 +2193,7 @@ async function permanentDeleteUser(uid, name) {
         alert('✅ ' + name + ' user deleted.');
     } catch(e) {
         console.error('Delete error:', e);
-        alert('Hata: ' + e.message);
+        alert('Error: ' + e.message);
     }
 }
 
@@ -2268,7 +2260,7 @@ async function loadChatMessages() {
         .limit(100);
 
     if (error) {
-        tbody.innerHTML = `<tr><td colspan="4" style="color:var(--red);padding:1rem;">Hata: ${esc(error.message)}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" style="color:var(--red);padding:1rem;">Error: ${esc(error.message)}</td></tr>`;
         return;
     }
 
@@ -2280,7 +2272,7 @@ async function loadChatMessages() {
 
     allChatData = data;
 
-    // Badge güncelle
+    // Badge dayscelle
     const badge = document.getElementById('chatMsgBadge');
     if (badge) { badge.textContent = data.length; badge.style.display = 'inline-flex'; }
 
@@ -2290,29 +2282,29 @@ async function loadChatMessages() {
 async function deleteChatMsg(id) {
     if (!confirm('Are you sure you want to delete this message?')) return;
     try {
-        // Yöntem 1: Doğrudan DELETE
+        // Method 1: Direct DELETE
         const { error } = await sb.from('chat_messages').delete().eq('id', id);
         if (!error) {
             allChatData = allChatData.filter(m => String(m.id) !== String(id));
             filterChatMessages();
-            toast('🗑 Mesaj silindi', 'info');
+            toast('🗑 Message deleted', 'info');
             return;
         }
 
-        // Yöntem 2: RPC ile sil (admin_delete_chat_message fonksiyonu varsa)
+        // Method 2: Delete via RPC (admin_delete_chat_message funcksiyonu varsa)
         if (error.code === '42501' || error.message?.includes('policy') || error.message?.includes('permission')) {
             const { error: rpcErr } = await sb.rpc('admin_delete_chat_message', { msg_id: id });
             if (!rpcErr) {
                 allChatData = allChatData.filter(m => String(m.id) !== String(id));
                 filterChatMessages();
-                toast('🗑 Mesaj silindi', 'info');
+                toast('🗑 Message deleted', 'info');
                 return;
             }
         }
 
-        // Yöntem 3: Soft delete - içeriği temizle (RLS bypass)
+        // Method 3: Soft delete - clear content (RLS bypass)
         const { error: updateErr } = await sb.from('chat_messages')
-            .update({ content: '[Mesaj silindi]', display_name: '—', avatar: '🗑️' })
+            .update({ content: '[Message deleted]', display_name: '—', avatar: '🗑️' })
             .eq('id', id);
         if (!updateErr) {
             allChatData = allChatData.filter(m => String(m.id) !== String(id));
@@ -2321,32 +2313,32 @@ async function deleteChatMsg(id) {
             return;
         }
 
-        // Hiçbiri çalışmadı - Supabase'de politika eksik
+        // None worked - missing policy in Supabase
         const sqlPolicy = `-- Run this command in Supabase SQL Editor:\n` +
             `CREATE POLICY "admin_delete_chat" ON chat_messages\n` +
-            `FOR DELETE USING (auth.email() = 'list086@gmail.com');`;
+            `FOR DELETE USING (EXISTS (SELECT 1 FROM user_data WHERE user_id = auth.uid() AND is_admin = true));`;
         console.error('RLS policy missing. Solution:\n' + sqlPolicy);
-        alert('Silme yetkisi yok!\n\nSupabase Dashboard > SQL Editor > Yeni Query:\n\n' +
+        alert('No delete permission!\n\nSupabase Dashboard > SQL Editor > New Query:\n\n' +
             'CREATE POLICY "admin_delete_chat"\nON chat_messages FOR DELETE\n' +
-            'USING (auth.email() = \'list086@gmail.com\');\n\n' +
+            'USING (EXISTS (SELECT 1 FROM user_data WHERE user_id = auth.uid() AND is_admin = true));\n\n' +
             'Once you run this command, deletion will work.');
     } catch(e) {
-        alert('Beklenmeyen hata: ' + e.message);
+        alert('Unexpected error: ' + e.message);
     }
 }
 
 
 // ===== CHAT RLS GUIDE =====
 function showChatRLSGuide() {
-    var sql = '-- Supabase SQL Editor\'de bu uc komutu calistir:\n\n' +
-        '-- 1) Admin mesaj silebilsin:\n' +
+    var sql = '-- Run these commands in Supabase SQL Editor:\n\n' +
+        '-- 1) Allow admin to delete messages:\n' +
         'CREATE POLICY "admin_can_delete_chat"\n' +
         'ON public.chat_messages FOR DELETE\n' +
-        'USING (auth.email() = \'list086@gmail.com\');\n\n' +
-        '-- 2) avatar_url kolonu yoksa ekle:\n' +
+        'USING (EXISTS (SELECT 1 FROM user_data WHERE user_id = auth.uid() AND is_admin = true));\n\n' +
+        '-- 2) Add avatar_url column if missing:\n' +
         'ALTER TABLE public.chat_messages\n' +
         'ADD COLUMN IF NOT EXISTS avatar_url TEXT DEFAULT \'\';\n\n' +
-        '-- 3) email kolonu yoksa ekle:\n' +
+        '-- 3) Add email column if missing:\n' +
         'ALTER TABLE public.chat_messages\n' +
         'ADD COLUMN IF NOT EXISTS email TEXT DEFAULT \'\';';
 
@@ -2371,7 +2363,7 @@ async function clearOldChatMessages() {
     if (!confirm('Are you sure you want to delete all messages older than 7 days?')) return;
     const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
     const { error } = await sb.from('chat_messages').delete().lt('created_at', weekAgo);
-    if (error) { alert('Hata: ' + error.message); return; }
+    if (error) { alert('Error: ' + error.message); return; }
     alert('Eski mesajlar temizlendi!');
     loadChatMessages();
 }

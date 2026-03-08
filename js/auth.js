@@ -1,10 +1,8 @@
 // AUTH.JS v5.1 - Supabase Auth - Tüm hatalar düzeltildi
 
 // ── ADMIN CONFIG ──────────────────────────────────────────────────────────────
-// NOT: Uzun vadede bu kontrolü Supabase'de is_admin sütunuyla sunucu tarafına taşı.
-// Şimdilik tek yerde tutmak için burada tanımlandı (client JS'de görünür kalır,
-// ancak dağınık hardcoded değerden daha güvenli ve bakımı kolaydır).
-const _ADMIN_EMAILS = ['list086@gmail.com'];
+// Admin status is read from the is_admin column in user_data (set server-side in Supabase).
+// No admin emails are hardcoded here. To grant admin access: set is_admin = true in Supabase.
 // ─────────────────────────────────────────────────────────────────────────────
 
 let currentUser = null;
@@ -24,7 +22,7 @@ async function initSupabaseSession() {
     }
 
     if (!window.supabaseClient) {
-        console.warn('Supabase yüklenemedi, misafir moduna geçiliyor');
+        console.warn('Supabase failed to load, switching to guest mode');
         guestMode();
         return;
     }
@@ -33,7 +31,7 @@ async function initSupabaseSession() {
     let sessionResolved = false;
     const sessionTimeout = setTimeout(() => {
         if (!sessionResolved) {
-            console.warn('Session zaman aşımı, misafir moduna geçiliyor');
+            console.warn('Session timeout, switching to guest mode');
             guestMode();
         }
     }, 8000);
@@ -109,41 +107,41 @@ async function loginSuccess(user) {
             .single();
 
         if (!error && data && data.data) {
-            // Supabase'de veri var - hangisi daha güncel?
+            // Data exists in Supabase - which is newer?
             const remoteItems = data.data.items || [];
             const localItems = dataManager.data.items || [];
             if (remoteItems.length >= localItems.length) {
-                dataManager.setUser(user.id, data.data); // Remote daha dolu, onu kullan
+                dataManager.setUser(user.id, data.data); // Remote is fuller, use it
             } else {
-                dataManager.saveAll(); // Local daha dolu, Supabase'i güncelle
+                dataManager.saveAll(); // Local is fuller, update Supabase
             }
         } else if (error && error.code === 'PGRST116') {
-            // Supabase'de kayıt yok (yeni kullanıcı)
+            // No record in Supabase (new user)
             if (!dataManager.data.items.length) {
-                // Gerçekten yeni - social bilgilerini doldur
+                // Truly new - populate social info
                 dataManager.data.social.name = currentUser.displayName;
                 dataManager.data.social.email = currentUser.email;
             }
             dataManager.saveAll(); // Supabase'e ilk kaydı yap
         } else if (error) {
             console.warn('Supabase fetch error:', error.message);
-            // localStorage verisi zaten yüklü, sorun yok
+            // localStorage data already loaded, no problem
         }
     } catch(e) {
         console.warn('Could not sync with Supabase, using localStorage:', e.message);
     }
 
-    // ── BAN KONTROLÜ ──────────────────────────────────────
+    // ── BAN CHECK ────────────────────────────────────────────
     const userData = dataManager.data;
     if (userData && userData.banned === true) {
-        // Ban süresi dolmuş mu kontrol et
+        // Check if ban has expired
         const banExpiry = userData.ban_expiry;
         const isExpired = banExpiry && new Date(banExpiry) < new Date();
 
         if (!isExpired) {
-            // Banlı kullanıcı - kısıtlı mod
+            // Banned user - restricted mode
             currentUser.isBanned = true;
-            currentUser.banReason = userData.ban_reason || 'Kural ihlali';
+            currentUser.banReason = userData.ban_reason || 'Rule violation';
             currentUser.banExpiry = banExpiry;
             window.currentUser = currentUser;
 
@@ -152,27 +150,27 @@ async function loginSuccess(user) {
             hideLoadingScreen();
             document.dispatchEvent(new Event('onilist:authChange'));
 
-            // Ban bildirimini göster
+            // Show ban notification
             setTimeout(() => {
                 const expiryText = banExpiry
-                    ? new Date(banExpiry).toLocaleDateString('tr-TR')
-                    : 'kalıcı';
+                    ? new Date(banExpiry).toLocaleDateString('en-US')
+                    : 'permanent';
                 showNotification(
-                    '🚫 Hesabın kısıtlanmış. Sebep: ' + currentUser.banReason +
-                    (banExpiry ? ' | Bitiş: ' + expiryText : ' | Kalıcı ban'),
+                    '🚫 Your account has been restricted. Reason: ' + currentUser.banReason +
+                    (banExpiry ? ' | Expires: ' + expiryText : ' | Permanent ban'),
                     'error'
                 );
             }, 1500);
             return;
         } else {
-            // Ban süresi dolmuş - otomatik kaldır
+            // Ban expired - remove automatically
             userData.banned = false;
             userData.ban_reason = null;
             userData.ban_expiry = null;
             dataManager.saveAll();
         }
     }
-    // ── BAN KONTROLÜ SONU ─────────────────────────────────
+    // ── BAN CHECK END ───────────────────────────────────────
 
     updateUIForLoggedIn();
     if (typeof initializeApp === 'function') initializeApp();
@@ -447,7 +445,7 @@ async function handleLogout() {
 }
 
 
-// ===== DELETE ACCOUNT (Kalıcı Silme) =====
+// ===== DELETE ACCOUNT (Permanent) =====
 async function deleteAccount() {
     if (!currentUser) return;
     
@@ -470,7 +468,7 @@ async function deleteAccount() {
             try { await window.supabaseClient.from('reviews').delete().eq('user_id', userId); } catch(e){}
             try { await window.supabaseClient.from('comments').delete().eq('user_id', userId); } catch(e){}
 
-            // 2. RPC ile auth.users'dan kalıcı sil
+            // 2. Permanently delete from auth.users via RPC
             // Supabase'e SUPABASE_DELETE_USER_SQL.sql dosyasındaki fonksiyonu eklediyseniz çalışır
             const { error: rpcErr } = await window.supabaseClient.rpc('delete_user');
             if (rpcErr) {
@@ -537,7 +535,7 @@ function updateUIForLoggedIn() {
 
     const adminLink = document.getElementById('adminPanelLink');
     const adminShortcut = document.getElementById('adminShortcutBtn');
-    if (currentUser && _ADMIN_EMAILS.includes(currentUser.email)) {
+    if (currentUser && currentUser.isAdmin) {
         if (adminLink) adminLink.style.display = 'block';
         if (adminShortcut) adminShortcut.style.display = 'inline-flex';
     }
@@ -611,15 +609,15 @@ function updateUIForBanned() {
 }
 
 function showBanNotice() {
-    const reason = window.currentUser?.banReason || 'Kural ihlali';
+    const reason = window.currentUser?.banReason || 'Rule violation';
     const expiry = window.currentUser?.banExpiry;
     const expiryText = expiry
-        ? new Date(expiry).toLocaleDateString('tr-TR') + ' tarihine kadar'
-        : 'kalıcı olarak';
+        ? new Date(expiry).toLocaleDateString('en-US') + ' until'
+        : 'permanently';
     showNotification('🚫 Hesabın ' + expiryText + ' kısıtlı. Sebep: ' + reason, 'error');
 }
 
-// Banlı kullanıcının chat yazmasını engelle - chat.js'den çağrılır
+// Prevent banned user from writing in chat - called from chat.js
 function isBannedUser() {
     return !!(window.currentUser?.isBanned);
 }
@@ -801,7 +799,7 @@ async function changePasswordSettings() {
         const { error: updateErr } = await window.supabaseClient.auth.updateUser({ password: newPw });
         if (updateErr) throw updateErr;
 
-        if (sucEl) { sucEl.textContent = '✅ Şifreniz başarıyla güncellendi!'; sucEl.style.display = 'block'; }
+        if (sucEl) { sucEl.textContent = '✅ Password updated successfully!'; sucEl.style.display = 'block'; }
         ['currentPassword','newPassword','confirmNewPassword'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
         const bar = document.getElementById('settingsPwStrengthBar');
         if (bar) bar.style.width = '0%';
