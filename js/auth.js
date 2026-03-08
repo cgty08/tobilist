@@ -27,10 +27,6 @@ async function initSupabaseSession() {
         return;
     }
 
-    // ── Sayfa açılır açılmaz maintenance + announcements kontrolü ──
-    checkMaintenanceMode();
-    checkAnnouncements();
-
     // Güvenlik timeout - 8 saniye içinde cevap gelmezse guest moda geç
     let sessionResolved = false;
     const sessionTimeout = setTimeout(() => {
@@ -103,58 +99,22 @@ async function loginSuccess(user) {
     // Önce localStorage'dan yükle (anında, kayıp riski yok)
     dataManager.setUser(user.id);
 
+    // Admin emails fallback — works without is_admin column in Supabase
+    const ADMIN_EMAILS_FALLBACK = ['list086@gmail.com'];
+
     try {
         const { data, error } = await window.supabaseClient
             .from('user_data')
-            .select('data')
+            .select('data,is_admin')
             .eq('user_id', user.id)
             .single();
 
-        // Admin flag: data JSONB içinden oku
-        if (data?.data?.is_admin === true) {
+        // Set admin flag: DB column (primary) OR email fallback
+        if (data?.is_admin === true) {
+            currentUser.isAdmin = true;
+        } else if (ADMIN_EMAILS_FALLBACK.map(e => e.toLowerCase()).includes((currentUser.email || '').toLowerCase())) {
             currentUser.isAdmin = true;
         }
-
-        // ── BAN CHECK — Supabase data JSONB'den oku (localStorage bypass'a kapalı) ──
-        const remoteData = data?.data;
-        if (remoteData?.banned === true) {
-            const banExpiry = remoteData.ban_expiry;
-            const isExpired = banExpiry && new Date(banExpiry) < new Date();
-
-            if (!isExpired) {
-                currentUser.isBanned = true;
-                currentUser.banReason = remoteData.ban_reason || 'Rule violation';
-                currentUser.banExpiry = banExpiry;
-                window.currentUser = currentUser;
-
-                dataManager.setUser(user.id, remoteData);
-
-                updateUIForBanned();
-                if (typeof initializeApp === 'function') initializeApp();
-                hideLoadingScreen();
-                document.dispatchEvent(new Event('onilist:authChange'));
-
-                setTimeout(() => {
-                    const expiryText = banExpiry
-                        ? new Date(banExpiry).toLocaleDateString('en-US')
-                        : 'permanent';
-                    showNotification(
-                        '🚫 Your account has been restricted. Reason: ' + currentUser.banReason +
-                        (banExpiry ? ' | Expires: ' + expiryText : ' | Permanent ban'),
-                        'error'
-                    );
-                }, 1500);
-                return;
-            } else {
-                // Ban süresi dolmuş — Supabase'de JSONB içini temizle
-                const cleanedData = { ...remoteData, banned: false, ban_reason: null, ban_expiry: null };
-                await window.supabaseClient
-                    .from('user_data')
-                    .update({ data: cleanedData })
-                    .eq('user_id', user.id);
-            }
-        }
-        // ── BAN CHECK END ────────────────────────────────────────────────────────
 
         if (!error && data && data.data) {
             // Data exists in Supabase - which is newer?
@@ -168,16 +128,59 @@ async function loginSuccess(user) {
         } else if (error && error.code === 'PGRST116') {
             // No record in Supabase (new user)
             if (!dataManager.data.items.length) {
+                // Truly new - populate social info
                 dataManager.data.social.name = currentUser.displayName;
                 dataManager.data.social.email = currentUser.email;
             }
-            dataManager.saveAll();
+            dataManager.saveAll(); // Supabase'e ilk kaydı yap
         } else if (error) {
             console.warn('Supabase fetch error:', error.message);
+            // localStorage data already loaded, no problem
         }
     } catch(e) {
         console.warn('Could not sync with Supabase, using localStorage:', e.message);
     }
+
+    // ── BAN CHECK ────────────────────────────────────────────
+    const userData = dataManager.data;
+    if (userData && userData.banned === true) {
+        // Check if ban has expired
+        const banExpiry = userData.ban_expiry;
+        const isExpired = banExpiry && new Date(banExpiry) < new Date();
+
+        if (!isExpired) {
+            // Banned user - restricted mode
+            currentUser.isBanned = true;
+            currentUser.banReason = userData.ban_reason || 'Rule violation';
+            currentUser.banExpiry = banExpiry;
+            window.currentUser = currentUser;
+
+            updateUIForBanned();
+            if (typeof initializeApp === 'function') initializeApp();
+            hideLoadingScreen();
+            document.dispatchEvent(new Event('onilist:authChange'));
+
+            // Show ban notification
+            setTimeout(() => {
+                const expiryText = banExpiry
+                    ? new Date(banExpiry).toLocaleDateString('en-US')
+                    : 'permanent';
+                showNotification(
+                    '🚫 Your account has been restricted. Reason: ' + currentUser.banReason +
+                    (banExpiry ? ' | Expires: ' + expiryText : ' | Permanent ban'),
+                    'error'
+                );
+            }, 1500);
+            return;
+        } else {
+            // Ban expired - remove automatically
+            userData.banned = false;
+            userData.ban_reason = null;
+            userData.ban_expiry = null;
+            dataManager.saveAll();
+        }
+    }
+    // ── BAN CHECK END ───────────────────────────────────────
 
     updateUIForLoggedIn();
     if (typeof initializeApp === 'function') initializeApp();
@@ -319,6 +322,7 @@ async function handleLogin(event) {
         if (error) throw error;
 
         closeAuthModal();
+        showNotification('Hoş geldiniz! 🎉', 'success');
     } catch(error) {
         setButtonLoading(btn, false, '<span>Giriş Yap</span><span class="btn-arrow">→</span>');
         showError('loginError', getSupabaseErrorMessage(error.message));
@@ -854,87 +858,5 @@ async function handleForgotPassword() {
     } catch(e) {
         if (btn) { btn.disabled = false; btn.innerHTML = '<span>Sıfırlama Linki Gönder</span>'; }
         showError('forgotError', e.message || 'Bir hata oluştu.');
-    }
-}
-// =====================================================
-// MAINTENANCE MODE — Sayfa yüklenince hemen kontrol
-// =====================================================
-async function checkMaintenanceMode() {
-    if (!window.supabaseClient) return;
-    try {
-        const { data, error } = await window.supabaseClient
-            .from('platform_settings')
-            .select('value')
-            .eq('key', 'maintenance')
-            .single();
-
-        if (error || !data) return;
-
-        const maintenance = data.value;
-        if (!maintenance?.enabled) return;
-
-        // Admin paneldeyse veya admin kullanıcıysa gösterme
-        if (window.location.pathname.includes('admin')) return;
-
-        // Şu an giriş yapmış kullanıcı admin mi? (auth henüz tamamlanmamış olabilir)
-        // Kısa bekle, sonra tekrar kontrol et
-        await new Promise(r => setTimeout(r, 500));
-        if (window.currentUser?.isAdmin === true) return;
-
-        showMaintenanceScreen(maintenance.message || 'System is under maintenance. Please try again later.');
-    } catch(e) {
-        console.warn('Maintenance check error:', e);
-    }
-}
-
-function showMaintenanceScreen(msg) {
-    // Service worker cache'i bypass etmek için sayfayı yeniden yükle önlemi
-    document.documentElement.innerHTML = `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OniList — Maintenance</title>
-<style>
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{min-height:100vh;display:flex;flex-direction:column;align-items:center;
-    justify-content:center;background:#0a0f1e;color:#e2e8f0;
-    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-    text-align:center;padding:2rem;}
-  .icon{font-size:5rem;margin-bottom:1.5rem;animation:spin 3s linear infinite;}
-  @keyframes spin{0%,100%{transform:rotate(0deg)}50%{transform:rotate(15deg)rotate(-15deg)}}
-  h1{font-size:2rem;font-weight:700;margin-bottom:1rem;
-    background:linear-gradient(135deg,#00d4ff,#8b5cf6);
-    -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-  p{font-size:1rem;color:#94a3b8;max-width:420px;line-height:1.7;margin-bottom:2rem;}
-  .badge{display:inline-block;padding:.4rem 1rem;border-radius:99px;
-    background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);
-    color:#a78bfa;font-size:.8rem;letter-spacing:.05em;}
-  footer{position:fixed;bottom:1.5rem;color:#334155;font-size:.75rem;}
-</style>
-</head>
-<body>
-  <div class="icon">🔧</div>
-  <h1>Under Maintenance</h1>
-  <p>${msg.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</p>
-  <div class="badge">We'll be back soon</div>
-  <footer>© OniList</footer>
-</body>
-</html>`;
-}
-
-// =====================================================
-// ANNOUNCEMENTS — Supabase'den çek, modal göster
-// =====================================================
-async function checkAnnouncements() {
-    if (!window.supabaseClient) return;
-    // app.js yüklenene kadar bekle (max 5sn)
-    let waited = 0;
-    while (typeof window._checkAnnouncements !== 'function' && waited < 5000) {
-        await new Promise(r => setTimeout(r, 200));
-        waited += 200;
-    }
-    if (typeof window._checkAnnouncements === 'function') {
-        window._checkAnnouncements();
     }
 }

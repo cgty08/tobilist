@@ -732,9 +732,11 @@
                 </p>
                 <div style="background:#0b0f1a;border:1px solid var(--border2);border-radius:8px;padding:.9rem 1rem;font-family:monospace;font-size:.78rem;color:#a5f3fc;line-height:1.8;position:relative;">
                     <button onclick="copyAdminSQL()" style="position:absolute;top:.5rem;right:.5rem;background:rgba(255,255,255,.07);border:1px solid var(--border2);border-radius:6px;color:var(--text2);font-size:.7rem;padding:.2rem .6rem;cursor:pointer;">Copy</button>
-                    <span id="adminSQLBlock">-- Step 1: Register on the site with the new email<br>-- Step 2: Run this in SQL Editor:<br><br>UPDATE user_data<br>SET data = data || '{"is_admin": true}'<br>WHERE data->>'email' = 'YOUREMAIL@DOMAIN.COM';<br><br>-- Step 3: Visit /admin.html and log in</span>
+                    <span id="adminSQLBlock">-- Step 1: Register on the site with the new email<br>-- Step 2: Run this query:<br><br>UPDATE user_data<br>SET is_admin = true<br>WHERE data->>'email' = '<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="93ddd6c4dcc4ddd6c1d3d6ded2dadfbdd0dcde">[email&#160;protected]</a>';<br><br>-- Step 3: Visit /admin.html and log in</span>
                 </div>
-
+                <p style="font-size:.75rem;color:var(--text3);margin-top:.7rem;">
+                    ⚠️ Also update <code style="background:rgba(255,255,255,.07);padding:.1rem .3rem;border-radius:4px;">ADMIN_EMAILS_FALLBACK</code> in admin.html with the new email.
+                </p>
             </div>
         </div>
     </div>
