@@ -4,6 +4,53 @@
 const VALID_TYPES = ['anime', 'manga', 'webtoon'];
 function safeType(t) { return VALID_TYPES.includes(t) ? t : 'anime'; }
 
+// =====================================================
+// PLATFORM SETTINGS — Supabase'den oku (maintenance, restrictions, vb.)
+// =====================================================
+window.platformSettings = {};
+
+async function loadPlatformSettings() {
+    if (!window.supabaseClient) return;
+    try {
+        const { data, error } = await window.supabaseClient
+            .from('platform_settings')
+            .select('key,value');
+        if (error) { console.warn('platform_settings fetch error:', error.message); return; }
+        window.platformSettings = {};
+        (data || []).forEach(row => { window.platformSettings[row.key] = row.value; });
+
+        // Bakım modu aktifse kullanıcıyı engelle (admin hariç)
+        const isAdmin = window.currentUser?.isAdmin === true;
+        const maintenance = window.platformSettings['maintenance'];
+        if (maintenance?.enabled && !isAdmin) {
+            showMaintenancePage(maintenance.message || 'System is under maintenance. Please try again later.');
+        }
+    } catch(e) { console.warn('loadPlatformSettings error:', e); }
+}
+
+function showMaintenancePage(msg) {
+    document.body.innerHTML = `
+        <div style="
+            min-height:100vh;display:flex;flex-direction:column;
+            align-items:center;justify-content:center;
+            background:#0a0f1e;color:#e2e8f0;font-family:system-ui,sans-serif;
+            text-align:center;padding:2rem;
+        ">
+            <div style="font-size:4rem;margin-bottom:1.5rem;">🔧</div>
+            <h1 style="font-size:1.8rem;font-weight:700;margin-bottom:0.75rem;color:#fff;">Under Maintenance</h1>
+            <p style="font-size:1rem;color:#94a3b8;max-width:400px;line-height:1.6;">${msg}</p>
+            <p style="margin-top:2rem;font-size:0.8rem;color:#475569;">© OniList — We'll be back soon</p>
+        </div>
+    `;
+}
+
+// Kısıtlama kontrolü — ilgili özellik Supabase'de kapalıysa false döner
+function isFeatureEnabled(key) {
+    const restrictions = window.platformSettings['restrictions'];
+    if (!restrictions || restrictions[key] === undefined) return true;
+    return restrictions[key] !== false;
+}
+
 let currentSection = 'home';
 let previousSection = 'home';
 let discoverScrollPosition = 0;
@@ -54,6 +101,14 @@ function initializeApp() {
     if (!isGuest) renderProfilePage();
     setupPWA();
     setupNetworkListeners();
+
+    // Platform settings yükle (maintenance mode + restrictions)
+    loadPlatformSettings();
+
+    // Duyuruları kontrol et (sadece giriş yapmış kullanıcılara)
+    if (!isGuest) {
+        setTimeout(() => checkAnnouncements(), 2000);
+    }
 }
 
 // ===== API İÇERİK YÜKLEME =====

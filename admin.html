@@ -972,20 +972,13 @@ window.onload = async () => {
     } catch(e) {}
 };
 
-// Server-side admin check — reads is_admin column from user_data
-// Admin emails fallback — used only if is_admin column is not yet set in Supabase.
-// To permanently grant admin access: UPDATE user_data SET is_admin=true WHERE data->>'email'='youremail@x.com'
-const ADMIN_EMAILS_FALLBACK = ['list086@gmail.com'];
+// Server-side admin check — data JSONB içindeki is_admin alanını okur
+// Admin vermek için: UPDATE user_data SET data = data || '{"is_admin": true}' WHERE data->>'email' = 'admin@x.com';
 
 async function checkIsAdmin(userId, userEmail) {
-    // Email fallback — works even without is_admin column in Supabase
-    const ADMIN_FALLBACK = ADMIN_EMAILS_FALLBACK.map(e => e.toLowerCase());
-    // Quick check by email first (no DB needed)
-    if (userEmail && ADMIN_FALLBACK.includes(userEmail.toLowerCase())) return true;
     try {
-        const { data, error } = await sb.from('user_data').select('is_admin, data').eq('user_id', userId).single();
-        if (!error && data?.is_admin === true) return true;
-        if (!error && data?.data?.email && ADMIN_FALLBACK.includes(data.data.email.toLowerCase())) return true;
+        const { data, error } = await sb.from('user_data').select('data').eq('user_id', userId).single();
+        if (!error && data?.data?.is_admin === true) return true;
         return false;
     } catch(e) { return false; }
 }
@@ -999,6 +992,7 @@ function boot() {
     startSessionVerify();      // Start periodic session validation
     checkSupabase();
     loadDashboard();
+    loadRestrictionsFromDB();  // Restriction toggle'larını Supabase'den yükle
     // Auto-refresh online every 30s
     setInterval(updateOnlineCount, 30000);
 }
@@ -1845,19 +1839,57 @@ async function delAnn(id) {
 }
 
 // ===== RESTRICTIONS =====
-function toggleRestriction(el, key) {
+async function toggleRestriction(el, key) {
     el.classList.toggle('on');
     const isOn = el.classList.contains('on');
-    // Store in localStorage (production: store in Supabase settings table)
-    const restrictions = JSON.parse(localStorage.getItem('onilist_restrictions')||'{}');
-    restrictions[key] = isOn;
-    localStorage.setItem('onilist_restrictions', JSON.stringify(restrictions));
-    toast(`${isOn?'✅':'❌'} ${key} ${isOn?'active':'disabled'}`, isOn?'success':'info');
+
+    if (key === 'maintenance') {
+        // Bakım modu: platform_settings tablosuna yaz
+        const msg = document.getElementById('maintenanceMsg')?.value || 'System is under maintenance. Please try again later.';
+        const { error } = await sb.from('platform_settings')
+            .upsert({ key: 'maintenance', value: { enabled: isOn, message: msg }, updated_at: new Date().toISOString() });
+        if (error) { toast('❌ Could not save: ' + error.message, 'error'); el.classList.toggle('on'); return; }
+        toast(isOn ? '🔧 Maintenance mode ACTIVE — site is closed to users' : '✅ Maintenance mode OFF — site is open', isOn ? 'error' : 'success');
+    } else {
+        // Diğer kısıtlamalar: platform_settings restrictions anahtarına yaz
+        const { data: existing } = await sb.from('platform_settings').select('value').eq('key','restrictions').single().catch(()=>({data:null}));
+        const restrictions = existing?.value || {};
+        restrictions[key] = isOn;
+        const { error } = await sb.from('platform_settings')
+            .upsert({ key: 'restrictions', value: restrictions, updated_at: new Date().toISOString() });
+        if (error) { toast('❌ Could not save: ' + error.message, 'error'); el.classList.toggle('on'); return; }
+        toast(`${isOn ? '✅' : '❌'} ${key} ${isOn ? 'active' : 'disabled'}`, isOn ? 'success' : 'info');
+    }
 }
-function saveMaintenanceMsg() {
+
+async function saveMaintenanceMsg() {
     const msg = document.getElementById('maintenanceMsg').value;
-    localStorage.setItem('onilist_maintenance_msg', msg);
-    toast('💾 Maintenance message saved','success');
+    const maintEl = document.getElementById('rt-maintenance');
+    const isEnabled = maintEl?.classList.contains('on') || false;
+    const { error } = await sb.from('platform_settings')
+        .upsert({ key: 'maintenance', value: { enabled: isEnabled, message: msg }, updated_at: new Date().toISOString() });
+    if (error) { toast('❌ Could not save: ' + error.message, 'error'); return; }
+    toast('💾 Maintenance message saved', 'success');
+}
+
+async function loadRestrictionsFromDB() {
+    const { data } = await sb.from('platform_settings').select('key,value').in('key',['restrictions','maintenance']).catch(()=>({data:[]}));
+    if (!data?.length) return;
+    data.forEach(row => {
+        if (row.key === 'restrictions') {
+            const r = row.value || {};
+            Object.entries(r).forEach(([k, v]) => {
+                const el = document.getElementById('rt-' + k);
+                if (el) { el.classList.toggle('on', v !== false); }
+            });
+        }
+        if (row.key === 'maintenance') {
+            const el = document.getElementById('rt-maintenance');
+            if (el) el.classList.toggle('on', row.value?.enabled === true);
+            const msgEl = document.getElementById('maintenanceMsg');
+            if (msgEl && row.value?.message) msgEl.value = row.value.message;
+        }
+    });
 }
 
 // ===== LOGS =====

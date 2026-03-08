@@ -99,22 +99,58 @@ async function loginSuccess(user) {
     // Önce localStorage'dan yükle (anında, kayıp riski yok)
     dataManager.setUser(user.id);
 
-    // Admin emails fallback — works without is_admin column in Supabase
-    const ADMIN_EMAILS_FALLBACK = ['list086@gmail.com'];
-
     try {
         const { data, error } = await window.supabaseClient
             .from('user_data')
-            .select('data,is_admin')
+            .select('data')
             .eq('user_id', user.id)
             .single();
 
-        // Set admin flag: DB column (primary) OR email fallback
-        if (data?.is_admin === true) {
-            currentUser.isAdmin = true;
-        } else if (ADMIN_EMAILS_FALLBACK.map(e => e.toLowerCase()).includes((currentUser.email || '').toLowerCase())) {
+        // Admin flag: data JSONB içinden oku
+        if (data?.data?.is_admin === true) {
             currentUser.isAdmin = true;
         }
+
+        // ── BAN CHECK — Supabase data JSONB'den oku (localStorage bypass'a kapalı) ──
+        const remoteData = data?.data;
+        if (remoteData?.banned === true) {
+            const banExpiry = remoteData.ban_expiry;
+            const isExpired = banExpiry && new Date(banExpiry) < new Date();
+
+            if (!isExpired) {
+                currentUser.isBanned = true;
+                currentUser.banReason = remoteData.ban_reason || 'Rule violation';
+                currentUser.banExpiry = banExpiry;
+                window.currentUser = currentUser;
+
+                dataManager.setUser(user.id, remoteData);
+
+                updateUIForBanned();
+                if (typeof initializeApp === 'function') initializeApp();
+                hideLoadingScreen();
+                document.dispatchEvent(new Event('onilist:authChange'));
+
+                setTimeout(() => {
+                    const expiryText = banExpiry
+                        ? new Date(banExpiry).toLocaleDateString('en-US')
+                        : 'permanent';
+                    showNotification(
+                        '🚫 Your account has been restricted. Reason: ' + currentUser.banReason +
+                        (banExpiry ? ' | Expires: ' + expiryText : ' | Permanent ban'),
+                        'error'
+                    );
+                }, 1500);
+                return;
+            } else {
+                // Ban süresi dolmuş — Supabase'de JSONB içini temizle
+                const cleanedData = { ...remoteData, banned: false, ban_reason: null, ban_expiry: null };
+                await window.supabaseClient
+                    .from('user_data')
+                    .update({ data: cleanedData })
+                    .eq('user_id', user.id);
+            }
+        }
+        // ── BAN CHECK END ────────────────────────────────────────────────────────
 
         if (!error && data && data.data) {
             // Data exists in Supabase - which is newer?
@@ -128,59 +164,16 @@ async function loginSuccess(user) {
         } else if (error && error.code === 'PGRST116') {
             // No record in Supabase (new user)
             if (!dataManager.data.items.length) {
-                // Truly new - populate social info
                 dataManager.data.social.name = currentUser.displayName;
                 dataManager.data.social.email = currentUser.email;
             }
-            dataManager.saveAll(); // Supabase'e ilk kaydı yap
+            dataManager.saveAll();
         } else if (error) {
             console.warn('Supabase fetch error:', error.message);
-            // localStorage data already loaded, no problem
         }
     } catch(e) {
         console.warn('Could not sync with Supabase, using localStorage:', e.message);
     }
-
-    // ── BAN CHECK ────────────────────────────────────────────
-    const userData = dataManager.data;
-    if (userData && userData.banned === true) {
-        // Check if ban has expired
-        const banExpiry = userData.ban_expiry;
-        const isExpired = banExpiry && new Date(banExpiry) < new Date();
-
-        if (!isExpired) {
-            // Banned user - restricted mode
-            currentUser.isBanned = true;
-            currentUser.banReason = userData.ban_reason || 'Rule violation';
-            currentUser.banExpiry = banExpiry;
-            window.currentUser = currentUser;
-
-            updateUIForBanned();
-            if (typeof initializeApp === 'function') initializeApp();
-            hideLoadingScreen();
-            document.dispatchEvent(new Event('onilist:authChange'));
-
-            // Show ban notification
-            setTimeout(() => {
-                const expiryText = banExpiry
-                    ? new Date(banExpiry).toLocaleDateString('en-US')
-                    : 'permanent';
-                showNotification(
-                    '🚫 Your account has been restricted. Reason: ' + currentUser.banReason +
-                    (banExpiry ? ' | Expires: ' + expiryText : ' | Permanent ban'),
-                    'error'
-                );
-            }, 1500);
-            return;
-        } else {
-            // Ban expired - remove automatically
-            userData.banned = false;
-            userData.ban_reason = null;
-            userData.ban_expiry = null;
-            dataManager.saveAll();
-        }
-    }
-    // ── BAN CHECK END ───────────────────────────────────────
 
     updateUIForLoggedIn();
     if (typeof initializeApp === 'function') initializeApp();
