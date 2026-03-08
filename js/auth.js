@@ -99,12 +99,22 @@ async function loginSuccess(user) {
     // Önce localStorage'dan yükle (anında, kayıp riski yok)
     dataManager.setUser(user.id);
 
+    // Admin emails fallback — works without is_admin column in Supabase
+    const ADMIN_EMAILS_FALLBACK = ['list086@gmail.com'];
+
     try {
         const { data, error } = await window.supabaseClient
             .from('user_data')
-            .select('data')
+            .select('data,is_admin')
             .eq('user_id', user.id)
             .single();
+
+        // Set admin flag: DB column (primary) OR email fallback
+        if (data?.is_admin === true) {
+            currentUser.isAdmin = true;
+        } else if (ADMIN_EMAILS_FALLBACK.map(e => e.toLowerCase()).includes((currentUser.email || '').toLowerCase())) {
+            currentUser.isAdmin = true;
+        }
 
         if (!error && data && data.data) {
             // Data exists in Supabase - which is newer?
