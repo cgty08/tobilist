@@ -701,7 +701,7 @@
     <div class="page" id="page-settings">
         <div class="settings-grid">
             <div class="settings-card">
-                <h3>📡 Supabase Durumu</h3>
+                <h3>📡 Supabase Status</h3>
                 <div class="fg"><label>Project URL</label><input type="text" class="fi mono" id="supaUrlEl" readonly></div>
                 <div class="fg"><label>Connection</label><div id="supaStatus" class="badge bg-yellow" style="display:inline-flex;">⏳ Checking…</div></div>
                 <div class="fg" style="margin-top:1rem;"><label>Quick Statistics</label><div id="supaStats" style="font-size:.83rem;color:var(--text2);line-height:2;">—</div></div>
@@ -724,6 +724,20 @@
                 <h3>ℹ️ Platform Info</h3>
                 <div style="font-size:.83rem;color:var(--text2);line-height:2.2;" id="platformInfoEl">Loading…</div>
             </div>
+            <div class="settings-card" style="border-color:rgba(251,191,36,.25);background:rgba(251,191,36,.04);">
+                <h3>🔑 Transfer Admin Access</h3>
+                <p style="font-size:.82rem;color:var(--text2);line-height:1.7;margin-bottom:1rem;">
+                    To grant admin access to a new owner, run this SQL once in
+                    <strong>Supabase Dashboard → SQL Editor</strong>:
+                </p>
+                <div style="background:#0b0f1a;border:1px solid var(--border2);border-radius:8px;padding:.9rem 1rem;font-family:monospace;font-size:.78rem;color:#a5f3fc;line-height:1.8;position:relative;">
+                    <button onclick="copyAdminSQL()" style="position:absolute;top:.5rem;right:.5rem;background:rgba(255,255,255,.07);border:1px solid var(--border2);border-radius:6px;color:var(--text2);font-size:.7rem;padding:.2rem .6rem;cursor:pointer;">Copy</button>
+                    <span id="adminSQLBlock">-- Step 1: Register on the site with the new email<br>-- Step 2: Run this query:<br><br>UPDATE user_data<br>SET is_admin = true<br>WHERE data->>'email' = '<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="93ddd6c4dcc4ddd6c1d3d6ded2dadfbdd0dcde">[email&#160;protected]</a>';<br><br>-- Step 3: Visit /admin.html and log in</span>
+                </div>
+                <p style="font-size:.75rem;color:var(--text3);margin-top:.7rem;">
+                    ⚠️ Also update <code style="background:rgba(255,255,255,.07);padding:.1rem .3rem;border-radius:4px;">ADMIN_EMAILS_FALLBACK</code> in admin.html with the new email.
+                </p>
+            </div>
         </div>
     </div>
 </div>
@@ -731,11 +745,11 @@
 <!-- CONFIRM MODAL -->
 <div class="modal-ov" id="confirmModal">
     <div class="modal-box">
-        <h3 id="confirmTitle">Emin misin?</h3>
+        <h3 id="confirmTitle">Are you sure?</h3>
         <p id="confirmText" style="color:var(--text2);font-size:.87rem;line-height:1.6;"></p>
         <div class="modal-actions">
             <button class="btn-cancel" onclick="closeModal('confirmModal')">Cancel</button>
-            <button class="btn-confirm" id="confirmBtn">Onayla</button>
+            <button class="btn-confirm" id="confirmBtn">Confirm</button>
         </div>
     </div>
 </div>
@@ -745,7 +759,7 @@
     <div class="modal-box" style="max-width:600px;">
         <h3>👤 User Details</h3>
         <div id="userModalContent" style="margin-top:1rem;"></div>
-        <div class="modal-actions"><button class="btn-cancel" onclick="closeModal('userModal')">Kapat</button></div>
+        <div class="modal-actions"><button class="btn-cancel" onclick="closeModal('userModal')">Close</button></div>
     </div>
 </div>
 
@@ -848,7 +862,7 @@
 
 <div id="toast"></div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ===== CONFIG =====
 const SUPABASE_URL  = 'https://qhfjpuwduuxzojurngte.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFoZmpwdXdkdXV4em9qdXJuZ3RlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2NzU1MTksImV4cCI6MjA4NzI1MTUxOX0.lgtxEwGFW07P1vY9Soid2s_sM47jODk_nsUECznHSFA';
@@ -907,7 +921,7 @@ function startSessionVerify() {
         if (!sb || !currentAdmin) return;
         try {
             const { data: { session }, error } = await sb.auth.getSession();
-            const isAdm = !error && session ? await checkIsAdmin(session.user?.id) : false;
+            const isAdm = !error && session ? await checkIsAdmin(session.user?.id, session.user?.email) : false;
             if (!isAdm) {
                 console.warn('[Admin] Session verification failed, logging out.');
                 await adminLogout();
@@ -942,7 +956,7 @@ window.onload = async () => {
     try {
         const { data: { session } } = await sb.auth.getSession();
         if (session?.user) {
-            const isAdm = await checkIsAdmin(session.user.id);
+            const isAdm = await checkIsAdmin(session.user.id, session.user.email);
             if (isAdm) { currentAdmin = session.user; boot(); }
         }
     } catch(e) { console.warn(e); }
@@ -959,10 +973,20 @@ window.onload = async () => {
 };
 
 // Server-side admin check — reads is_admin column from user_data
-async function checkIsAdmin(userId) {
+// Admin emails fallback — used only if is_admin column is not yet set in Supabase.
+// To permanently grant admin access: UPDATE user_data SET is_admin=true WHERE data->>'email'='youremail@x.com'
+const ADMIN_EMAILS_FALLBACK = ['list086@gmail.com'];
+
+async function checkIsAdmin(userId, userEmail) {
+    // Email fallback — works even without is_admin column in Supabase
+    const ADMIN_FALLBACK = ADMIN_EMAILS_FALLBACK.map(e => e.toLowerCase());
+    // Quick check by email first (no DB needed)
+    if (userEmail && ADMIN_FALLBACK.includes(userEmail.toLowerCase())) return true;
     try {
-        const { data, error } = await sb.from('user_data').select('is_admin').eq('user_id', userId).single();
-        return !error && data?.is_admin === true;
+        const { data, error } = await sb.from('user_data').select('is_admin, data').eq('user_id', userId).single();
+        if (!error && data?.is_admin === true) return true;
+        if (!error && data?.data?.email && ADMIN_FALLBACK.includes(data.data.email.toLowerCase())) return true;
+        return false;
     } catch(e) { return false; }
 }
 
@@ -1001,7 +1025,7 @@ async function adminLogin() {
         const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
         if (error) throw error;
         // Server-side admin verification — checks is_admin column in user_data
-        const isAdm = await checkIsAdmin(data.user.id);
+        const isAdm = await checkIsAdmin(data.user.id, data.user.email);
         if (!isAdm) {
             await sb.auth.signOut();
             throw new Error('This account does not have admin access.');
@@ -1030,6 +1054,11 @@ function showErr(msg) {
 }
 
 async function adminLogout() { await sb.auth.signOut(); location.reload(); }
+
+function copyAdminSQL() {
+    const text = "UPDATE user_data\nSET is_admin = true\nWHERE data->>'email' = 'NEWOWNER@EMAIL.COM';";
+    navigator.clipboard.writeText(text).then(() => toast('SQL copied to clipboard', 'success'));
+}
 
 // ===== NAVIGATION =====
 const PAGE_META = {
@@ -2364,7 +2393,7 @@ async function clearOldChatMessages() {
     const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
     const { error } = await sb.from('chat_messages').delete().lt('created_at', weekAgo);
     if (error) { alert('Error: ' + error.message); return; }
-    alert('Eski mesajlar temizlendi!');
+    alert('Old messages cleared!');
     loadChatMessages();
 }
 
