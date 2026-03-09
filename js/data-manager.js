@@ -1,7 +1,7 @@
 // DATA MANAGER v5.2 - Supabase + localStorage
 
 const dataManager = {
-    version: '5.2.0',
+    version: '5.3.0',
     currentUserId: null,
     saveTimeout: null,
 
@@ -32,10 +32,29 @@ const dataManager = {
         this.currentUserId = userId;
         if (!userId) { this.data = this.defaultData(); return; }
 
+        const SAFE_ITEM_KEYS = [
+            'id','name','nameEn','type','status','poster','rating',
+            'currentEpisode','totalEpisodes','chapters','genre','genres',
+            'synopsis','addedDate','year','malId','anilistId','kitsuId',
+            'source','review','notes'
+        ];
+        function sanitizeItems(items) {
+            if (!Array.isArray(items)) return [];
+            return items.map(item => {
+                if (!item || typeof item !== 'object' || Array.isArray(item)) return null;
+                const safe = {};
+                for (const key of SAFE_ITEM_KEYS) {
+                    if (Object.prototype.hasOwnProperty.call(item, key)) safe[key] = item[key];
+                }
+                return safe.name ? safe : null;
+            }).filter(Boolean);
+        }
+
         const localKey = 'onilist_user_' + userId;
         const backupKey = 'onilist_backup_' + userId;
         if (remoteData) {
             this.data = this.deepMerge(this.defaultData(), remoteData);
+            this.data.items = sanitizeItems(this.data.items);
             try {
                 const s = JSON.stringify(this.data);
                 localStorage.setItem(localKey, s);
@@ -45,6 +64,7 @@ const dataManager = {
             try {
                 const stored = localStorage.getItem(localKey) || localStorage.getItem(backupKey);
                 this.data = stored ? this.deepMerge(this.defaultData(), JSON.parse(stored)) : this.defaultData();
+                this.data.items = sanitizeItems(this.data.items);
             } catch(e) { this.data = this.defaultData(); }
         }
     },
@@ -126,9 +146,11 @@ const dataManager = {
         return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
     },
 
-    // importData — prototype pollution + alan whitelist koruması eklendi
+    // importData — prototype pollution + alan whitelist + boyut limiti koruması
     importData(rawData) {
         try {
+            // DoS koruması: 5MB üstü JSON'u reddet
+            if (!rawData || rawData.length > 5_000_000) return false;
             const imported = JSON.parse(rawData);
             if (!this.data) return false;
 
@@ -178,4 +200,4 @@ const dataManager = {
     }
 };
 
-console.log('✅ Data Manager v5.2 loaded');
+console.log('✅ Data Manager v5.3 loaded (secure)');

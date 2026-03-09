@@ -37,11 +37,15 @@ const APICache = {
             try {
                 Object.keys(localStorage)
                     .filter(k => k.startsWith('at6_'))
-                    .sort((a, b) => {
-                        try { return JSON.parse(localStorage.getItem(a)).ts - JSON.parse(localStorage.getItem(b)).ts; } catch { return 0; }
+                    .map(k => {
+                        try {
+                            const parsed = JSON.parse(localStorage.getItem(k));
+                            return { key: k, ts: (parsed && typeof parsed.ts === 'number') ? parsed.ts : 0 };
+                        } catch { return { key: k, ts: 0 }; }
                     })
+                    .sort((a, b) => a.ts - b.ts)
                     .slice(0, 5)
-                    .forEach(k => localStorage.removeItem(k));
+                    .forEach(({ key: k }) => localStorage.removeItem(k));
                 localStorage.setItem(this.PREFIX + key, JSON.stringify({ data, ts }));
             } catch {}
         }

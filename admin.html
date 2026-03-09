@@ -735,7 +735,7 @@
                     <span id="adminSQLBlock">-- Step 1: Register on the site with the new email<br>-- Step 2: Run this query:<br><br>UPDATE user_data<br>SET is_admin = true<br>WHERE data->>'email' = '<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="93ddd6c4dcc4ddd6c1d3d6ded2dadfbdd0dcde">[email&#160;protected]</a>';<br><br>-- Step 3: Visit /admin.html and log in</span>
                 </div>
                 <p style="font-size:.75rem;color:var(--text3);margin-top:.7rem;">
-                    ⚠️ Also update <code style="background:rgba(255,255,255,.07);padding:.1rem .3rem;border-radius:4px;">ADMIN_EMAILS_FALLBACK</code> in admin.html with the new email.
+                    ✅ Admin access is now fully controlled via Supabase. No code changes needed after running the SQL above.
                 </p>
             </div>
         </div>

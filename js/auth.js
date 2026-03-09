@@ -99,8 +99,8 @@ async function loginSuccess(user) {
     // Önce localStorage'dan yükle (anında, kayıp riski yok)
     dataManager.setUser(user.id);
 
-    // Admin emails fallback — works without is_admin column in Supabase
-    const ADMIN_EMAILS_FALLBACK = ['list086@gmail.com'];
+    // Admin status is controlled exclusively by is_admin column in Supabase user_data.
+    // To grant admin: UPDATE user_data SET data = data || '{"is_admin": true}' WHERE data->>'email' = 'owner@email.com';
 
     try {
         const { data, error } = await window.supabaseClient
@@ -109,10 +109,8 @@ async function loginSuccess(user) {
             .eq('user_id', user.id)
             .single();
 
-        // Set admin flag: DB column (primary) OR email fallback
-        if (data?.is_admin === true) {
-            currentUser.isAdmin = true;
-        } else if (ADMIN_EMAILS_FALLBACK.map(e => e.toLowerCase()).includes((currentUser.email || '').toLowerCase())) {
+        // Set admin flag: DB column only — no email fallback (secure)
+        if (data?.data?.is_admin === true || data?.is_admin === true) {
             currentUser.isAdmin = true;
         }
 
@@ -408,32 +406,62 @@ async function handleRegister(event) {
 async function handleLogout() {
     if (document.getElementById('logoutConfirmBox')) return;
 
-    var box = document.createElement('div');
+    // DOM tabanlı oluşturma — innerHTML/XSS riski yok
+    const box = document.createElement('div');
     box.id = 'logoutConfirmBox';
-    box.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);z-index:999999;background:#141824;border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:1.4rem 1.6rem;width:320px;box-shadow:0 20px 60px rgba(0,0,0,0.6),0 0 0 1px rgba(255,51,102,0.15);font-family:DM Sans,sans-serif;opacity:0;transition:all 0.3s cubic-bezier(0.175,0.885,0.32,1.275);';
+    box.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-8px);z-index:999999;background:#141824;border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:1.4rem 1.6rem;width:320px;box-shadow:0 20px 60px rgba(0,0,0,0.6),0 0 0 1px rgba(255,51,102,0.15);font-family:DM Sans,sans-serif;opacity:0;transition:all 0.3s cubic-bezier(0.175,0.885,0.32,1.275);';
 
-    box.innerHTML = '<div style="display:flex;align-items:center;gap:0.7rem;margin-bottom:1rem;">'
-        + '<div style="width:36px;height:36px;background:rgba(255,51,102,0.12);border:1px solid rgba(255,51,102,0.25);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">&#128075;</div>'
-        + '<div>'
-        + '<div style="color:#fff;font-weight:700;font-size:0.95rem;">&#199;&#305;k&#305;&#351; Yap</div>'
-        + '<div style="color:#8892a4;font-size:0.78rem;margin-top:1px;">Hesab&#305;ndan &#231;&#305;kmak istiyor musun?</div>'
-        + '</div></div>'
-        + '<div style="display:flex;gap:0.6rem;">'
-        + '<button id="logoutCancelBtn" style="flex:1;padding:0.6rem;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#a0a8b9;font-size:0.85rem;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;">&#304;ptal</button>'
-        + '<button id="logoutConfirmBtn" style="flex:1;padding:0.6rem;background:linear-gradient(135deg,#ff3366,#ff5580);border:none;border-radius:10px;color:#fff;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:DM Sans,sans-serif;box-shadow:0 4px 15px rgba(255,51,102,0.35);">&#199;&#305;k&#305;&#351; Yap</button>'
-        + '</div>';
+    const iconDiv = document.createElement('div');
+    iconDiv.style.cssText = 'width:36px;height:36px;background:rgba(255,51,102,0.12);border:1px solid rgba(255,51,102,0.25);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;';
+    iconDiv.textContent = '👋';
 
+    const titleDiv = document.createElement('div');
+    titleDiv.style.cssText = 'color:#fff;font-weight:700;font-size:0.95rem;';
+    titleDiv.textContent = 'Çıkış Yap';
+
+    const subDiv = document.createElement('div');
+    subDiv.style.cssText = 'color:#8892a4;font-size:0.78rem;margin-top:1px;';
+    subDiv.textContent = 'Hesabından çıkmak istiyor musun?';
+
+    const textWrap = document.createElement('div');
+    textWrap.appendChild(titleDiv);
+    textWrap.appendChild(subDiv);
+
+    const headerRow = document.createElement('div');
+    headerRow.style.cssText = 'display:flex;align-items:center;gap:0.7rem;margin-bottom:1rem;';
+    headerRow.appendChild(iconDiv);
+    headerRow.appendChild(textWrap);
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.style.cssText = 'flex:1;padding:0.6rem;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#a0a8b9;font-size:0.85rem;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;';
+    cancelBtn.textContent = 'İptal';
+
+    const confirmBtn = document.createElement('button');
+    confirmBtn.style.cssText = 'flex:1;padding:0.6rem;background:linear-gradient(135deg,#ff3366,#ff5580);border:none;border-radius:10px;color:#fff;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:DM Sans,sans-serif;box-shadow:0 4px 15px rgba(255,51,102,0.35);';
+    confirmBtn.textContent = 'Çıkış Yap';
+
+    const btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;gap:0.6rem;';
+    btnRow.appendChild(cancelBtn);
+    btnRow.appendChild(confirmBtn);
+
+    box.appendChild(headerRow);
+    box.appendChild(btnRow);
     document.body.appendChild(box);
-    setTimeout(function() { box.style.opacity = '1'; box.style.transform = 'translateX(-50%) translateY(0)'; }, 10);
+
+    setTimeout(function() {
+        box.style.opacity = '1';
+        box.style.transform = 'translateX(-50%) translateY(0)';
+    }, 10);
 
     function closeBox() {
         box.style.opacity = '0';
         setTimeout(function() { if (box.parentNode) box.parentNode.removeChild(box); }, 250);
     }
 
-    document.getElementById('logoutCancelBtn').onclick = closeBox;
+    cancelBtn.onclick = closeBox;
 
-    document.getElementById('logoutConfirmBtn').onclick = async function() {
+    confirmBtn.onclick = async function() {
         closeBox();
         try {
             if (window.supabaseClient) await window.supabaseClient.auth.signOut();
@@ -444,7 +472,7 @@ async function handleLogout() {
         dataManager.currentUserId = null;
         updateUIForGuest();
         switchSection('home');
-        showNotification('&#199;&#305;k&#305;&#351; yap&#305;ld&#305;. G&#246;r&#252;&#351;&#252;r&#252;z! &#128075;', 'info');
+        showNotification('Çıkış yapıldı. Görüşürüz! 👋', 'info');
     };
 
     setTimeout(function() {
@@ -759,7 +787,7 @@ window.addEventListener('beforeunload', () => {
     }
 });
 
-console.log('✅ Auth v5.1 - Supabase loaded');
+console.log('✅ Auth v5.2 - Supabase loaded (secure)');
 
 
 // ===== ŞİFRE DEĞİŞTİRME (Ayarlar sayfası) =====
