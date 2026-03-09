@@ -109,8 +109,9 @@ async function loginSuccess(user) {
             .eq('user_id', user.id)
             .single();
 
-        // Set admin flag: DB column only — no email fallback (secure)
-        if (data?.data?.is_admin === true || data?.is_admin === true) {
+        // Set admin flag: DB column OR owner ID fallback
+        const OWNER_ID = '174cb52b-38d5-4b66-8096-889289b24dcb';
+        if (data?.data?.is_admin === true || data?.is_admin === true || currentUser.uid === OWNER_ID) {
             currentUser.isAdmin = true;
         }
 
