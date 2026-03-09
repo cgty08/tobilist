@@ -133,7 +133,7 @@ async function loadContentFromAPI() {
         contentLoaded = true; // Tekrar denemeyi önle
         renderHomePage();
         renderDiscoverGrid();
-        showNotification(_lang === 'en' ? 'Error loading content.' : 'İçerik yüklenirken hata oluştu.', 'error');
+        showNotification(_lang === 'en' ? 'Error loading content.' : 'Error loading content.', 'error');
     }
 }
 
@@ -144,7 +144,7 @@ function showLoadingPlaceholders() {
         if (el) el.innerHTML = skeleton;
     });
     const dg = document.getElementById('discoverGrid');
-    if (dg) dg.innerHTML = '<div class="discover-loading"><div class="loader"></div><p style="margin-top:1rem;color:var(--text-muted);">'+(_lang==='en'?'Loading 500+ content...':'500+ içerik yükleniyor...')+'</p></div>';
+    if (dg) dg.innerHTML = '<div class="discover-loading"><div class="loader"></div><p style="margin-top:1rem;color:var(--text-muted);">'+(_lang==='en'?'Loading content...':'Loading content...')+'</p></div>';
 }
 
 // ===== SLUG YARDIMCISI =====
@@ -239,7 +239,7 @@ function renderContinueWatching() {
     const watching = dataManager.data.items.filter(i => i.status === 'watching').slice(0, 8);
 
     if (watching.length === 0) {
-        container.innerHTML = '<div style="color:var(--text-muted);font-size:0.9rem;padding:1rem;">'+(_lang==='en'?'No content with "Watching" status. <span style="color:var(--accent-secondary);cursor:pointer;" onclick="openAddModal()">Add content →</span>':'"İzliyorum" statüsünde içerik yok. <span style="color:var(--accent-secondary);cursor:pointer;" onclick="openAddModal()">İçerik ekle →</span>')+'</div>';
+        container.innerHTML = '<div style="color:var(--text-muted);font-size:0.9rem;padding:1rem;">'+(_lang==='en'?'No content with "Watching" status. <span style="color:var(--accent-secondary);cursor:pointer;" onclick="openAddModal()">Add content →</span>':'No content with \"Watching\" status. <span style=\"color:var(--accent-secondary);cursor:pointer;\" onclick=\"openAddModal()\">Add content →</span>')+'</div>';
         return;
     }
 
@@ -261,7 +261,7 @@ function renderContinueWatching() {
                 '<div class="media-score-badge">▶ ' + (item.currentEpisode || 0) + '/' + (item.totalEpisodes || '?') + '</div>' +
             '</div>' +
             '<div class="media-info">' +
-                '<div class="media-title">' + _esc(item.name || 'İsimsiz') + '</div>' +
+                '<div class="media-title">' + _esc(item.name || 'Unknown') + '</div>' +
                 '<div style="background:var(--bg-secondary);height:3px;border-radius:3px;margin:0.4rem 0;overflow:hidden;">' +
                     '<div style="width:' + pct + '%;height:100%;background:var(--accent-primary);"></div>' +
                 '</div>' +
@@ -275,7 +275,7 @@ function renderMediaRow(containerId, items) {
     if (!container) return;
 
     if (!items || items.length === 0) {
-        container.innerHTML = '<div style="color:var(--text-muted);font-size:0.9rem;padding:1rem;text-align:center;grid-column:1/-1;">Yükleniyor...</div>';
+        container.innerHTML = '<div style="color:var(--text-muted);font-size:0.9rem;padding:1rem;text-align:center;grid-column:1/-1;">Loading...</div>';
         return;
     }
 
@@ -311,7 +311,7 @@ function renderMediaRow(containerId, items) {
                 (rating ? '<div class="media-score-badge">' + rating + '</div>' : '') +
             '</div>' +
             '<div class="media-info">' +
-                '<div class="media-title">' + _esc(item.name || 'İsimsiz') + '</div>' +
+                '<div class="media-title">' + _esc(item.name || 'Unknown') + '</div>' +
                 '<div class="media-meta">' + meta + '</div>' +
                 addBtn +
             '</div>' +
@@ -341,7 +341,7 @@ function renderDiscoverGrid() {
     if (!grid) return;
 
     if (!contentLoaded) {
-        grid.innerHTML = '<div class="discover-loading"><div class="loader"></div><p style="margin-top:1rem;color:var(--text-muted);">İçerikler yükleniyor...</p></div>';
+        grid.innerHTML = '<div class="discover-loading"><div class="loader"></div><p style="margin-top:1rem;color:var(--text-muted);">Loading content...</p></div>';
         return;
     }
 
@@ -365,10 +365,10 @@ function renderDiscoverGrid() {
     const page  = filtered.slice(0, discoverPage * DISCOVER_PAGE_SIZE);
 
     const statsEl = document.getElementById('discoverStats');
-    if (statsEl) statsEl.textContent = total + (_lang==='en' ? ' results found' : ' içerik bulundu');
+    if (statsEl) statsEl.textContent = total + (_lang==='en' ? ' results found' : ' results found');
 
     if (page.length === 0) {
-        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:3rem;font-size:1.1rem;">🔍 Sonuç bulunamadı</div>';
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:3rem;font-size:1.1rem;">🔍 No results found</div>';
         return;
     }
 
@@ -399,13 +399,13 @@ function renderDiscoverGrid() {
                 (rating ? '<div class="media-score-badge">' + rating + '</div>' : '') +
             '</div>' +
             '<div class="media-info">' +
-                '<div class="media-title">' + _esc(item.name || 'İsimsiz') + '</div>' +
+                '<div class="media-title">' + _esc(item.name || 'Unknown') + '</div>' +
                 '<div class="media-meta">' + meta + '</div>' +
                 addBtn +
             '</div>' +
         '</div>';
     }).join('') + (page.length < total
-        ? '<div style="grid-column:1/-1;text-align:center;padding:2rem;"><button class="btn btn-secondary" onclick="loadMoreDiscover()">Daha Fazla Yükle (' + (total - page.length) + ' kaldı)</button></div>'
+        ? '<div style="grid-column:1/-1;text-align:center;padding:2rem;"><button class="btn btn-secondary" onclick="loadMoreDiscover()">Load More (' + (total - page.length) + ' remaining)</button></div>'
         : '');
 }
 
@@ -429,7 +429,7 @@ function quickAddFromJson(jsonStr) {
         quickAdd(item);
     } catch(e) {
         console.error('quickAddFromJson parse error:', e);
-        showNotification(_lang==='en'?'Error while adding.':'Ekleme sırasında hata oluştu.', 'error');
+        showNotification(_lang==='en'?'Error while adding.':'Error while adding.', 'error');
     }
 }
 
@@ -461,7 +461,7 @@ function quickAdd(item) {
     dataManager.saveAll();
     checkAchievements();
     updateStats();
-    showNotification('✅ ' + _esc(newItem.name) + (_lang==='en'?' added to "Plan to Watch"!':' "İzlenecek" listesine eklendi!'), 'success');
+    showNotification('✅ ' + _esc(newItem.name) + (_lang==='en'?' added to "Plan to Watch"!':' added to "Plan to Watch"!'), 'success');
     renderDiscoverGrid();
     renderHomePage();
 }
@@ -497,7 +497,7 @@ function addItem(event) {
     const notesEl  = document.getElementById('itemNotes');
 
     const name = nameEl ? nameEl.value.trim() : '';
-    if (!name) { showNotification('Lütfen bir isim girin!', 'error'); return; }
+    if (!name) { showNotification('Please enter a name!', 'error'); return; }
 
     const newItem = {
         id: Date.now() + '_' + Math.random().toString(36).substr(2, 5),
@@ -557,10 +557,10 @@ async function searchAPI() {
                     '</div>';
                 }).join('');
             } else {
-                resultsDiv.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:0.8rem;font-size:0.85rem;">Sonuç bulunamadı</div>';
+                resultsDiv.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:0.8rem;font-size:0.85rem;">No results found</div>';
             }
         } catch {
-            resultsDiv.innerHTML = '<div style="color:var(--danger);text-align:center;padding:0.8rem;font-size:0.85rem;">API bağlantı hatası</div>';
+            resultsDiv.innerHTML = '<div style="color:var(--danger);text-align:center;padding:0.8rem;font-size:0.85rem;">API connection error</div>';
         }
     }, 500);
 }
@@ -596,7 +596,7 @@ function toggleNotifications() {
     if (!el) return;
     if (el.checked && 'Notification' in window) {
         Notification.requestPermission().then(p => {
-            if (p === 'granted') showNotification('Bildirimler etkinleştirildi! 🔔', 'success');
+            if (p === 'granted') showNotification('Notifications enabled! 🔔', 'success');
             else el.checked = false;
         });
     }
@@ -649,7 +649,7 @@ function setupNetworkListeners() {
     window.addEventListener('online', () => {
         const ob = document.getElementById('offlineBanner');
         if (ob) ob.classList.remove('show');
-        showNotification('İnternet bağlantısı yeniden sağlandı! 🌐', 'success');
+        showNotification('Connection restored! 🌐', 'success');
     });
     window.addEventListener('offline', () => {
         const ob = document.getElementById('offlineBanner');
@@ -858,9 +858,9 @@ function _fillDetailBasic(item) {
     s('dpTitle', item.name);
     s('dpYear', item.year);
     s('dpScore', item.rating ? '⭐ ' + item.rating : '—');
-    s('dpEpisodes', item.episodes ? item.episodes + ' Bölüm' : item.chapters ? item.chapters + ' Bölüm' : '—');
+    s('dpEpisodes', item.episodes ? item.episodes + ' Episodes' : item.chapters ? item.chapters + ' Episodes' : '—');
     window._detailSynopsis = { en: null, tr: null };
-    const synopsisText = item.synopsis || ((typeof getCurrentLang === 'function' && getCurrentLang() === 'en') ? 'Loading description...' : 'Açıklama yükleniyor...');
+    const synopsisText = item.synopsis || ((typeof getCurrentLang === 'function' && getCurrentLang() === 'en') ? 'Loading description...' : 'Loading description...');
     s('dpSynopsis', synopsisText);
     s('dpStatus', '—');
     s('dpRank', '—');
@@ -873,7 +873,7 @@ function _fillDetailBasic(item) {
     // Genres — API'den gelen veriler, _esc ile korunuyor
     const genresEl = document.getElementById('dpGenres');
     if (genresEl) {
-        genresEl.innerHTML = (item.genres || []).map(g => `<span class="dp-genre-tag">${_esc(g)}</span>`).join('') || '<span style="color:var(--text-muted)">Yükleniyor...</span>';
+        genresEl.innerHTML = (item.genres || []).map(g => `<span class="dp-genre-tag">${_esc(g)}</span>`).join('') || '<span style="color:var(--text-muted)">Loading...</span>';
     }
 
     const addBtn = document.getElementById('dpAddBtn');
@@ -905,7 +905,7 @@ async function _fetchFullDetail(item) {
                 if (d) {
                     const s = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
                     s('dpScore', d.score ? '⭐ ' + d.score.toFixed(1) : null);
-                    s('dpEpisodes', d.episodes ? d.episodes + ' Bölüm' : d.chapters ? d.chapters + ' Bölüm' : null);
+                    s('dpEpisodes', d.episodes ? d.episodes + ' Episodes' : d.chapters ? d.chapters + ' Episodes' : null);
                     s('dpStatus', d.status || null);
                     s('dpRank', d.rank ? '#' + d.rank : null);
                     s('dpMembers', d.members ? d.members.toLocaleString(_lang==='en'?'en-US':'tr-TR') : null);
@@ -954,7 +954,7 @@ async function _fetchFullDetail(item) {
             if (m) {
                 const s = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
                 s('dpScore', m.averageScore ? '⭐ ' + (m.averageScore/10).toFixed(1) : null);
-                s('dpEpisodes', m.episodes ? m.episodes + ' Bölüm' : null);
+                s('dpEpisodes', m.episodes ? m.episodes + ' Episodes' : null);
                 s('dpStatus', m.status || null);
                 s('dpStudio', m.studios?.nodes?.[0]?.name || null);
                 s('dpYear', m.startDate?.year || null);
@@ -1010,9 +1010,9 @@ function _applyDetailSynopsis() {
 async function loadReviews(contentId) {
     const container = document.getElementById('reviewsList');
     if (!container) return;
-    container.innerHTML = '<div class="reviews-loading"><div class="mini-spinner"></div> Yorumlar yükleniyor...</div>';
+    container.innerHTML = '<div class="reviews-loading"><div class="mini-spinner"></div> Loading reviews...</div>';
 
-    if (!window.supabaseClient) { container.innerHTML = '<p style="color:var(--text-muted);text-align:center;">Yorumlar yüklenemedi.</p>'; return; }
+    if (!window.supabaseClient) { container.innerHTML = '<p style="color:var(--text-muted);text-align:center;">Could not load reviews.</p>'; return; }
 
     const { data, error } = await window.supabaseClient
         .from('reviews')
@@ -1022,7 +1022,7 @@ async function loadReviews(contentId) {
         .limit(30);
 
     if (error || !data?.length) {
-        container.innerHTML = '<div class="no-reviews"><div style="font-size:2.5rem;">💬</div><p>Henüz yorum yok. İlk yorumu sen yaz!</p></div>';
+        container.innerHTML = '<div class="no-reviews"><div style="font-size:2.5rem;">💬</div><p>No reviews yet. Be the first!</p></div>';
         return;
     }
 
@@ -1062,7 +1062,7 @@ async function loadUserReview(contentId) {
         const commentEl = document.getElementById('reviewComment');
         if (commentEl) commentEl.value = data.comment || '';
         const submitBtn = document.getElementById('reviewSubmitBtn');
-        if (submitBtn) submitBtn.textContent = '✏️ Yorumu Güncelle';
+        if (submitBtn) submitBtn.textContent = '✏️ Update Review';
     } else {
         setStarRating(0);
     }
@@ -1075,12 +1075,12 @@ function setStarRating(rating) {
         btn.classList.toggle('active', i < rating);
     });
     const ratingText = document.getElementById('ratingText');
-    if (ratingText) ratingText.textContent = rating > 0 ? rating + ' / 10' : 'Puan seç';
+    if (ratingText) ratingText.textContent = rating > 0 ? rating + ' / 10' : 'Select rating';
 }
 
 async function submitReview() {
     if (isGuest) { openAuthModal('register'); return; }
-    if (!selectedRating) { showNotification('Lütfen bir puan seç!', 'error'); return; }
+    if (!selectedRating) { showNotification('Please select a rating!', 'error'); return; }
     if (!currentDetailItem) return;
 
     const comment = document.getElementById('reviewComment')?.value?.trim() || '';
@@ -1150,7 +1150,7 @@ function loadSimilarContent(item) {
     }
 
     if (!similar.length) {
-        container.innerHTML = '<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;">'+(_lang==='en'?'No similar content found.':'Benzer içerik bulunamadı.')+'</p>';
+        container.innerHTML = '<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;">'+(_lang==='en'?'No similar content found.':'No similar content found.')+'</p>';
         return;
     }
 
