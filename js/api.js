@@ -1,19 +1,17 @@
-// API.JS v7.0 - Jikan + AniList + Kitsu — ~5000+ içerik hedefi
-// AniList: popularity+score sorguları, Jikan+Kitsu genişletildi
+// API.JS v7.0 - Jikan + AniList + Kitsu — ~5000+ içerik
+// Cache stratejisi: sadece final "all_v7" sonucu localStorage'a yazılır,
+// ara sorgular sadece memory cache'te tutulur → localStorage taşmaz.
 
 // ===== CACHE =====
 const APICache = {
-    PREFIX: 'at6_',
+    PREFIX: 'at7_',
     HOURS: 72,
-    // Bellek içi cache - aynı oturumda tab yenilenirse tekrar API'ye gitme
     _mem: {},
 
     get(key) {
-        // 1. Önce bellek cache'i (en hızlı)
         if (this._mem[key] && (Date.now() - this._mem[key].ts) / 3.6e6 < this.HOURS) {
             return this._mem[key].data;
         }
-        // 2. localStorage (tarayıcı kapanıp açılsa bile)
         try {
             const raw = localStorage.getItem(this.PREFIX + key);
             if (!raw) return null;
@@ -22,46 +20,43 @@ const APICache = {
                 localStorage.removeItem(this.PREFIX + key);
                 return null;
             }
-            this._mem[key] = { data, ts }; // Belleğe al
+            this._mem[key] = { data, ts };
             return data;
         } catch { return null; }
     },
 
-    set(key, data) {
+    // mem=true => sadece belleğe yaz (localStorage'a değil)
+    set(key, data, memOnly = false) {
         const ts = Date.now();
-        this._mem[key] = { data, ts }; // Belleğe yaz
+        this._mem[key] = { data, ts };
+        if (memOnly) return;
         try {
             localStorage.setItem(this.PREFIX + key, JSON.stringify({ data, ts }));
         } catch {
-            // localStorage doluysa eski at6_ kayıtlarını (en eskiden başlayarak) temizle
             try {
                 Object.keys(localStorage)
-                    .filter(k => k.startsWith('at6_'))
+                    .filter(k => k.startsWith(this.PREFIX))
                     .map(k => {
-                        try {
-                            const parsed = JSON.parse(localStorage.getItem(k));
-                            return { key: k, ts: (parsed && typeof parsed.ts === 'number') ? parsed.ts : 0 };
-                        } catch { return { key: k, ts: 0 }; }
+                        try { const p = JSON.parse(localStorage.getItem(k)); return { key: k, ts: p?.ts || 0 }; }
+                        catch { return { key: k, ts: 0 }; }
                     })
                     .sort((a, b) => a.ts - b.ts)
-                    .slice(0, 5)
+                    .slice(0, 10)
                     .forEach(({ key: k }) => localStorage.removeItem(k));
                 localStorage.setItem(this.PREFIX + key, JSON.stringify({ data, ts }));
             } catch {}
         }
     },
 
-    // Belirli bir key'i sil (takvim sync gibi durumlarda)
     clear(key) {
         delete this._mem[key];
         try { localStorage.removeItem(this.PREFIX + key); } catch {}
     },
 
-    // Tüm cache'i sil
     clearAll() {
         this._mem = {};
         try {
-            Object.keys(localStorage).filter(k => k.startsWith('at6_')).forEach(k => localStorage.removeItem(k));
+            Object.keys(localStorage).filter(k => k.startsWith(this.PREFIX)).forEach(k => localStorage.removeItem(k));
         } catch {}
     }
 };
@@ -126,7 +121,7 @@ function deduplicateContent(items) {
     return result;
 }
 
-// ===== JIKAN API =====
+// ===== JIKAN API (MAL) =====
 const _Jikan = {
     BASE: 'https://api.jikan.moe/v4',
     _last: 0, _queue: [], _busy: false,
@@ -185,56 +180,43 @@ const _Jikan = {
         };
     },
 
-    async topAnime(pages = 16) {
-        const ck = 'jk_a_' + pages; const c = APICache.get(ck); if (c) return c;
+    async _fetchPages(urlFn, mapper, pages, ckKey) {
+        const c = APICache.get(ckKey); if (c) return c;
         const out = [];
         for (let p = 1; p <= pages; p++) {
             try {
-                const d = await this.fetch(`${this.BASE}/top/anime?page=${p}&limit=25&filter=bypopularity`);
-                if (d.data) out.push(...d.data.map(i => this._na(i)));
+                const d = await this.fetch(urlFn(p));
+                if (d.data) out.push(...d.data.map(mapper));
                 if (!d.pagination?.has_next_page) break;
             } catch { break; }
         }
-        APICache.set(ck, out); return out;
+        APICache.set(ckKey, out, true); // memOnly
+        return out;
     },
 
-    async topManga(pages = 12) {
-        const ck = 'jk_m_' + pages; const c = APICache.get(ck); if (c) return c;
-        const out = [];
-        for (let p = 1; p <= pages; p++) {
-            try {
-                const d = await this.fetch(`${this.BASE}/top/manga?page=${p}&limit=25&filter=bypopularity`);
-                if (d.data) out.push(...d.data.map(i => this._nm(i)));
-                if (!d.pagination?.has_next_page) break;
-            } catch { break; }
-        }
-        APICache.set(ck, out); return out;
+    topAnime(pages = 16) {
+        return this._fetchPages(
+            p => `${this.BASE}/top/anime?page=${p}&limit=25&filter=bypopularity`,
+            i => this._na(i), pages, 'jk_a_' + pages
+        );
     },
-
-    async topWebtoon(pages = 12) {
-        const ck = 'jk_w_' + pages; const c = APICache.get(ck); if (c) return c;
-        const out = [];
-        for (let p = 1; p <= pages; p++) {
-            try {
-                const d = await this.fetch(`${this.BASE}/manga?type=manhwa&order_by=score&sort=desc&page=${p}&limit=25&sfw=true`);
-                if (d.data) out.push(...d.data.map(i => this._nm(i)));
-                if (!d.pagination?.has_next_page) break;
-            } catch { break; }
-        }
-        APICache.set(ck, out); return out;
+    topManga(pages = 12) {
+        return this._fetchPages(
+            p => `${this.BASE}/top/manga?page=${p}&limit=25&filter=bypopularity`,
+            i => this._nm(i), pages, 'jk_m_' + pages
+        );
     },
-
-    async topManhua(pages = 8) {
-        const ck = 'jk_mh_' + pages; const c = APICache.get(ck); if (c) return c;
-        const out = [];
-        for (let p = 1; p <= pages; p++) {
-            try {
-                const d = await this.fetch(`${this.BASE}/manga?type=manhua&order_by=score&sort=desc&page=${p}&limit=25&sfw=true`);
-                if (d.data) out.push(...d.data.map(i => this._nm(i)));
-                if (!d.pagination?.has_next_page) break;
-            } catch { break; }
-        }
-        APICache.set(ck, out); return out;
+    topWebtoon(pages = 12) {
+        return this._fetchPages(
+            p => `${this.BASE}/manga?type=manhwa&order_by=score&sort=desc&page=${p}&limit=25&sfw=true`,
+            i => this._nm(i), pages, 'jk_w_' + pages
+        );
+    },
+    topManhua(pages = 8) {
+        return this._fetchPages(
+            p => `${this.BASE}/manga?type=manhua&order_by=score&sort=desc&page=${p}&limit=25&sfw=true`,
+            i => this._nm(i), pages, 'jk_mh_' + pages
+        );
     },
 
     async seasonNow() {
@@ -242,14 +224,14 @@ const _Jikan = {
         try {
             const d = await this.fetch(`${this.BASE}/seasons/now?limit=25&sfw=true`);
             const out = (d.data || []).map(i => this._na(i));
-            APICache.set(ck, out); return out;
+            APICache.set(ck, out, true);
+            return out;
         } catch { return []; }
     },
 
     async searchAnime(q, limit = 8) {
         try { const d = await this.fetch(`${this.BASE}/anime?q=${encodeURIComponent(q)}&limit=${limit}&sfw=true&order_by=score&sort=desc`); return (d.data||[]).map(i=>this._na(i)); } catch { return []; }
     },
-
     async searchManga(q, limit = 8) {
         try { const d = await this.fetch(`${this.BASE}/manga?q=${encodeURIComponent(q)}&limit=${limit}&sfw=true&order_by=score&sort=desc`); return (d.data||[]).map(i=>this._nm(i)); } catch { return []; }
     }
@@ -270,9 +252,8 @@ const _AniList = {
         });
         this._last = Date.now();
         if (res.status === 429) {
-            // Sonsuz özyineleme önlemi: max 3 deneme, exponential backoff
             if (_retries >= 3) throw new Error('AniList rate limit: max retries exceeded');
-            const delay = 15000 * Math.pow(2, _retries); // 15s, 30s, 60s
+            const delay = 15000 * Math.pow(2, _retries);
             await new Promise(r => setTimeout(r, delay));
             return this.query(gql, vars, _retries + 1);
         }
@@ -309,60 +290,71 @@ const _AniList = {
 
     FRAG: `id title{romaji english native} format coverImage{extraLarge large} averageScore seasonYear startDate{year} episodes chapters description genres countryOfOrigin`,
 
-    async topAnime(pages = 16) {
-        const ck = 'al_a_' + pages; const c = APICache.get(ck); if (c) return c;
-        const gql = `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:ANIME,sort:[POPULARITY_DESC],isAdult:false){${this.FRAG}}}}`;
+    // Helper: pages yükle, memOnly cache
+    async _pages(ck, gql, mapper, pages) {
+        const c = APICache.get(ck); if (c) return c;
         const out = [];
         for (let p = 1; p <= pages; p++) {
             try {
                 const d = await this.query(gql, { p });
-                out.push(...(d?.Page?.media || []).map(i => this._norm(i, 'anime')));
+                const media = d?.Page?.media || [];
+                out.push(...media.map(mapper));
                 if (!d?.Page?.pageInfo?.hasNextPage) break;
-            } catch(e) { console.warn('AniList anime p' + p, e.message); await new Promise(r=>setTimeout(r,2000)); continue; }
+            } catch(e) { console.warn(ck + ' p' + p, e.message); await new Promise(r=>setTimeout(r,2000)); continue; }
         }
-        APICache.set(ck, out); return out;
+        APICache.set(ck, out, true); // memOnly
+        return out;
     },
 
-    async topManga(pages = 14) {
-        const ck = 'al_m_' + pages; const c = APICache.get(ck); if (c) return c;
-        const gql = `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:MANGA,sort:[POPULARITY_DESC],isAdult:false,countryOfOrigin:"JP"){${this.FRAG}}}}`;
-        const out = [];
-        for (let p = 1; p <= pages; p++) {
-            try {
-                const d = await this.query(gql, { p });
-                out.push(...(d?.Page?.media || []).map(i => this._norm(i, 'manga')));
-                if (!d?.Page?.pageInfo?.hasNextPage) break;
-            } catch(e) { console.warn('AniList manga p' + p, e.message); await new Promise(r=>setTimeout(r,2000)); continue; }
-        }
-        APICache.set(ck, out); return out;
+    topAnime(pages = 15) {
+        return this._pages('al_a_pop_' + pages,
+            `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:ANIME,sort:[POPULARITY_DESC],isAdult:false){${this.FRAG}}}}`,
+            i => this._norm(i, 'anime'), pages);
     },
-
-    async topWebtoon(pages = 20) {
-        const ck = 'al_w_' + pages; const c = APICache.get(ck); if (c) return c;
-        const gql = `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:MANGA,sort:[POPULARITY_DESC],isAdult:false,countryOfOrigin:"KR"){${this.FRAG}}}}`;
-        const out = [];
-        for (let p = 1; p <= pages; p++) {
-            try {
-                const d = await this.query(gql, { p });
-                out.push(...(d?.Page?.media || []).map(i => this._norm(i, 'webtoon')));
-                if (!d?.Page?.pageInfo?.hasNextPage) break;
-            } catch(e) { console.warn('AniList webtoon p' + p, e.message); await new Promise(r=>setTimeout(r,2000)); continue; }
-        }
-        APICache.set(ck, out); return out;
+    topManga(pages = 14) {
+        return this._pages('al_m_pop_' + pages,
+            `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:MANGA,sort:[POPULARITY_DESC],isAdult:false,countryOfOrigin:"JP"){${this.FRAG}}}}`,
+            i => this._norm(i, 'manga'), pages);
     },
-
-    async topManhua(pages = 10) {
-        const ck = 'al_mh_' + pages; const c = APICache.get(ck); if (c) return c;
-        const gql = `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:MANGA,sort:[POPULARITY_DESC],isAdult:false,countryOfOrigin:"CN"){${this.FRAG}}}}`;
-        const out = [];
-        for (let p = 1; p <= pages; p++) {
-            try {
-                const d = await this.query(gql, { p });
-                out.push(...(d?.Page?.media || []).map(i => this._norm(i, 'webtoon')));
-                if (!d?.Page?.pageInfo?.hasNextPage) break;
-            } catch(e) { console.warn('AniList manhua p' + p, e.message); await new Promise(r=>setTimeout(r,2000)); continue; }
-        }
-        APICache.set(ck, out); return out;
+    topWebtoon(pages = 20) {
+        return this._pages('al_w_pop_' + pages,
+            `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:MANGA,sort:[POPULARITY_DESC],isAdult:false,countryOfOrigin:"KR"){${this.FRAG}}}}`,
+            i => this._norm(i, 'webtoon'), pages);
+    },
+    topManhua(pages = 10) {
+        return this._pages('al_mh_pop_' + pages,
+            `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:MANGA,sort:[POPULARITY_DESC],isAdult:false,countryOfOrigin:"CN"){${this.FRAG}}}}`,
+            i => this._norm(i, 'webtoon'), pages);
+    },
+    topAnimeByScore(pages = 10) {
+        return this._pages('al_a_score_' + pages,
+            `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:ANIME,sort:[SCORE_DESC],isAdult:false,averageScore_greater:60){${this.FRAG}}}}`,
+            i => this._norm(i, 'anime'), pages);
+    },
+    topMangaByScore(pages = 8) {
+        return this._pages('al_m_score_' + pages,
+            `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:MANGA,sort:[SCORE_DESC],isAdult:false,countryOfOrigin:"JP",averageScore_greater:60){${this.FRAG}}}}`,
+            i => this._norm(i, 'manga'), pages);
+    },
+    topWebtoonByScore(pages = 10) {
+        return this._pages('al_w_score_' + pages,
+            `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:MANGA,sort:[SCORE_DESC],isAdult:false,countryOfOrigin:"KR"){${this.FRAG}}}}`,
+            i => this._norm(i, 'webtoon'), pages);
+    },
+    topManhuaByScore(pages = 6) {
+        return this._pages('al_mh_score_' + pages,
+            `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:MANGA,sort:[SCORE_DESC],isAdult:false,countryOfOrigin:"CN"){${this.FRAG}}}}`,
+            i => this._norm(i, 'webtoon'), pages);
+    },
+    topAnimeTrending(pages = 5) {
+        return this._pages('al_a_trend_' + pages,
+            `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:ANIME,sort:[TRENDING_DESC],isAdult:false){${this.FRAG}}}}`,
+            i => this._norm(i, 'anime'), pages);
+    },
+    topMangaTrending(pages = 5) {
+        return this._pages('al_m_trend_' + pages,
+            `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:MANGA,sort:[TRENDING_DESC],isAdult:false){${this.FRAG}}}}`,
+            i => this._norm(i), pages);
     },
 
     async seasonal() {
@@ -373,93 +365,9 @@ const _AniList = {
         try {
             const d = await this.query(gql, { s: season, y: year });
             const out = (d?.Page?.media || []).map(i => this._norm(i, 'anime'));
-            APICache.set(ck, out); return out;
+            APICache.set(ck, out, true);
+            return out;
         } catch { return []; }
-    },
-
-
-    async topAnimeByScore(pages = 10) {
-        const ck = 'al_a_score_' + pages; const c = APICache.get(ck); if (c) return c;
-        const gql = `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:ANIME,sort:[SCORE_DESC],isAdult:false,averageScore_greater:60){${this.FRAG}}}}`;
-        const out = [];
-        for (let p = 1; p <= pages; p++) {
-            try {
-                const d = await this.query(gql, { p });
-                out.push(...(d?.Page?.media || []).map(i => this._norm(i, 'anime')));
-                if (!d?.Page?.pageInfo?.hasNextPage) break;
-            } catch(e) { await new Promise(r=>setTimeout(r,2000)); continue; }
-        }
-        APICache.set(ck, out); return out;
-    },
-
-    async topMangaByScore(pages = 8) {
-        const ck = 'al_m_score_' + pages; const c = APICache.get(ck); if (c) return c;
-        const gql = `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:MANGA,sort:[SCORE_DESC],isAdult:false,countryOfOrigin:"JP",averageScore_greater:60){${this.FRAG}}}}`;
-        const out = [];
-        for (let p = 1; p <= pages; p++) {
-            try {
-                const d = await this.query(gql, { p });
-                out.push(...(d?.Page?.media || []).map(i => this._norm(i, 'manga')));
-                if (!d?.Page?.pageInfo?.hasNextPage) break;
-            } catch(e) { await new Promise(r=>setTimeout(r,2000)); continue; }
-        }
-        APICache.set(ck, out); return out;
-    },
-
-    async topWebtoonByScore(pages = 10) {
-        const ck = 'al_w_score_' + pages; const c = APICache.get(ck); if (c) return c;
-        const gql = `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:MANGA,sort:[SCORE_DESC],isAdult:false,countryOfOrigin:"KR"){${this.FRAG}}}}`;
-        const out = [];
-        for (let p = 1; p <= pages; p++) {
-            try {
-                const d = await this.query(gql, { p });
-                out.push(...(d?.Page?.media || []).map(i => this._norm(i, 'webtoon')));
-                if (!d?.Page?.pageInfo?.hasNextPage) break;
-            } catch(e) { await new Promise(r=>setTimeout(r,2000)); continue; }
-        }
-        APICache.set(ck, out); return out;
-    },
-
-    async topManhuaByScore(pages = 6) {
-        const ck = 'al_mh_score_' + pages; const c = APICache.get(ck); if (c) return c;
-        const gql = `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:MANGA,sort:[SCORE_DESC],isAdult:false,countryOfOrigin:"CN"){${this.FRAG}}}}`;
-        const out = [];
-        for (let p = 1; p <= pages; p++) {
-            try {
-                const d = await this.query(gql, { p });
-                out.push(...(d?.Page?.media || []).map(i => this._norm(i, 'webtoon')));
-                if (!d?.Page?.pageInfo?.hasNextPage) break;
-            } catch(e) { await new Promise(r=>setTimeout(r,2000)); continue; }
-        }
-        APICache.set(ck, out); return out;
-    },
-
-    async topAnimeTrending(pages = 5) {
-        const ck = 'al_a_trend_' + pages; const c = APICache.get(ck); if (c) return c;
-        const gql = `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:ANIME,sort:[TRENDING_DESC],isAdult:false){${this.FRAG}}}}`;
-        const out = [];
-        for (let p = 1; p <= pages; p++) {
-            try {
-                const d = await this.query(gql, { p });
-                out.push(...(d?.Page?.media || []).map(i => this._norm(i, 'anime')));
-                if (!d?.Page?.pageInfo?.hasNextPage) break;
-            } catch(e) { await new Promise(r=>setTimeout(r,2000)); continue; }
-        }
-        APICache.set(ck, out); return out;
-    },
-
-    async topMangaTrending(pages = 5) {
-        const ck = 'al_m_trend_' + pages; const c = APICache.get(ck); if (c) return c;
-        const gql = `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:MANGA,sort:[TRENDING_DESC],isAdult:false){${this.FRAG}}}}`;
-        const out = [];
-        for (let p = 1; p <= pages; p++) {
-            try {
-                const d = await this.query(gql, { p });
-                out.push(...(d?.Page?.media || []).map(i => this._norm(i)));
-                if (!d?.Page?.pageInfo?.hasNextPage) break;
-            } catch(e) { await new Promise(r=>setTimeout(r,2000)); continue; }
-        }
-        APICache.set(ck, out); return out;
     },
 
     async search(q, limit = 10) {
@@ -522,7 +430,8 @@ const _Kitsu = {
                 await new Promise(r => setTimeout(r, 400));
             } catch(e) { break; }
         }
-        APICache.set(ck, out); return out;
+        APICache.set(ck, out, true); // memOnly
+        return out;
     },
 
     async topManga(pages = 8) {
@@ -535,7 +444,8 @@ const _Kitsu = {
                 await new Promise(r => setTimeout(r, 400));
             } catch(e) { break; }
         }
-        APICache.set(ck, out); return out;
+        APICache.set(ck, out, true); // memOnly
+        return out;
     },
 
     async search(q, type = 'anime', limit = 5) {
@@ -551,12 +461,13 @@ const _Kitsu = {
 const JikanAPI = {
 
     async fetchSeasonNow(limit = 25) {
-        const ck = 'season_v6'; const c = APICache.get(ck); if (c) return c;
+        const ck = 'season_v7'; const c = APICache.get(ck); if (c) return c;
         let results = [];
         try { results = await _AniList.seasonal(); } catch {}
         if (results.length < 10) { try { results = [...results, ...await _Jikan.seasonNow()]; } catch {} }
         const out = deduplicateContent(results).slice(0, limit);
-        APICache.set(ck, out); return out;
+        APICache.set(ck, out, true);
+        return out;
     },
 
     async searchAll(query, limit = 8) {
@@ -576,63 +487,49 @@ const JikanAPI = {
     },
 
     async loadAllContent(onProgress) {
-        const ck = 'all_v7'; const c = APICache.get(ck);
+        const ck = 'all_v7';
+        const c = APICache.get(ck);
         if (c) { if (onProgress) onProgress(c.length, c.length); return c; }
 
-        // ── AŞAMA 1: HIZLI ÖN YÜKLEMİ (3-5 saniye) ──────────────────────────
+        // ── AŞAMA 1: HIZLI ÖN YÜKLEMİ (3-5 saniye) ─────────────────────────
         const ckFast = 'all_v7_fast';
         const cached_fast = APICache.get(ckFast);
 
         if (!cached_fast) {
             if (onProgress) onProgress(0, 500);
             console.log('⚡ API: Hızlı ön yükleme başlıyor...');
-
             const [fastA, fastM, fastW] = await Promise.allSettled([
                 _AniList.topAnime(2),
                 _AniList.topManga(2),
                 _AniList.topWebtoon(2),
             ]);
-
             const fastAll = [
                 ...(fastA.status === 'fulfilled' ? fastA.value : []),
                 ...(fastM.status === 'fulfilled' ? fastM.value : []),
                 ...(fastW.status === 'fulfilled' ? fastW.value : []),
             ];
             const fastDeduped = deduplicateContent(fastAll);
-            APICache.set(ckFast, fastDeduped);
+            APICache.set(ckFast, fastDeduped, true); // memOnly
             if (onProgress) onProgress(fastDeduped.length, fastDeduped.length);
-            console.log(`⚡ Hızlı yükleme tamamlandı: ${fastDeduped.length} içerik`);
-
-            // UI'ya hızlı sonuçları custom event ile bildir (window global kirliliği önlenir)
+            console.log(`⚡ Hızlı yükleme: ${fastDeduped.length} içerik`);
             document.dispatchEvent(new CustomEvent('onilist:fastContentReady', { detail: fastDeduped }));
         } else {
             if (onProgress) onProgress(cached_fast.length, cached_fast.length);
             document.dispatchEvent(new CustomEvent('onilist:fastContentReady', { detail: cached_fast }));
         }
 
-        // ── AŞAMA 2: ARKA PLANDA TAM YÜKLEMİ ──────────────────────────────────
-        if (onProgress) onProgress(0, 2000);
-        console.log('🚀 API v6: Tam yükleme arka planda başlıyor...');
+        // ── AŞAMA 2: TAM YÜKLEMİ — 3 Batch paralel ─────────────────────────
+        console.log('🚀 API v7: Tam yükleme başlıyor...');
 
-        // Batch 1: AniList popularity sorguları (ana kaynaklar)
-        const [alA, alM, alW, alMH, ktA, ktM] = await Promise.allSettled([
+        // Batch 1: AniList popularity (ana kaynak, en güvenilir)
+        const [alA, alM, alW, alMH] = await Promise.allSettled([
             _AniList.topAnime(15),
             _AniList.topManga(14),
             _AniList.topWebtoon(20),
             _AniList.topManhua(10),
-            _Kitsu.topAnime(10),
-            _Kitsu.topManga(8),
         ]);
 
-        // Batch 2: Jikan (MAL) sorguları
-        const [jkA, jkM, jkW, jkMH] = await Promise.allSettled([
-            _Jikan.topAnime(16),
-            _Jikan.topManga(12),
-            _Jikan.topWebtoon(12),
-            _Jikan.topManhua(8),
-        ]);
-
-        // Batch 3: AniList score bazlı sorgular (ek içerik - farklı sıralama = farklı başlıklar)
+        // Batch 2: AniList score + trending (popularity'de olmayan içerikler)
         const [alAS, alMS, alWS, alMHS, alAT, alMT] = await Promise.allSettled([
             _AniList.topAnimeByScore(10),
             _AniList.topMangaByScore(8),
@@ -642,23 +539,33 @@ const JikanAPI = {
             _AniList.topMangaTrending(5),
         ]);
 
+        // Batch 3: Jikan + Kitsu (MAL tabanlı farklı içerikler)
+        const [jkA, jkM, jkW, jkMH, ktA, ktM] = await Promise.allSettled([
+            _Jikan.topAnime(16),
+            _Jikan.topManga(12),
+            _Jikan.topWebtoon(12),
+            _Jikan.topManhua(8),
+            _Kitsu.topAnime(10),
+            _Kitsu.topManga(8),
+        ]);
+
         const all = [
             ...(alA.status   === 'fulfilled' ? alA.value   : []),
             ...(alM.status   === 'fulfilled' ? alM.value   : []),
             ...(alW.status   === 'fulfilled' ? alW.value   : []),
             ...(alMH.status  === 'fulfilled' ? alMH.value  : []),
-            ...(ktA.status   === 'fulfilled' ? ktA.value   : []),
-            ...(ktM.status   === 'fulfilled' ? ktM.value   : []),
-            ...(jkA.status   === 'fulfilled' ? jkA.value   : []),
-            ...(jkM.status   === 'fulfilled' ? jkM.value   : []),
-            ...(jkW.status   === 'fulfilled' ? jkW.value   : []),
-            ...(jkMH.status  === 'fulfilled' ? jkMH.value  : []),
             ...(alAS.status  === 'fulfilled' ? alAS.value  : []),
             ...(alMS.status  === 'fulfilled' ? alMS.value  : []),
             ...(alWS.status  === 'fulfilled' ? alWS.value  : []),
             ...(alMHS.status === 'fulfilled' ? alMHS.value : []),
             ...(alAT.status  === 'fulfilled' ? alAT.value  : []),
             ...(alMT.status  === 'fulfilled' ? alMT.value  : []),
+            ...(jkA.status   === 'fulfilled' ? jkA.value   : []),
+            ...(jkM.status   === 'fulfilled' ? jkM.value   : []),
+            ...(jkW.status   === 'fulfilled' ? jkW.value   : []),
+            ...(jkMH.status  === 'fulfilled' ? jkMH.value  : []),
+            ...(ktA.status   === 'fulfilled' ? ktA.value   : []),
+            ...(ktM.status   === 'fulfilled' ? ktM.value   : []),
         ];
 
         const deduped = deduplicateContent(all);
@@ -667,10 +574,11 @@ const JikanAPI = {
         const wc = deduped.filter(i => i.type === 'webtoon').length;
         console.log(`✅ ${deduped.length} içerik — Anime:${ac} Manga:${mc} Webtoon:${wc}`);
 
-        APICache.set(ck, deduped);
+        // Sadece final sonucu localStorage'a yaz (~2-3MB max)
+        APICache.set(ck, deduped); // localStorage'a yaz
         if (onProgress) onProgress(deduped.length, deduped.length);
         return deduped;
     }
 };
 
-console.log('✅ API v7.0 — ~5000+ içerik hedefi');
+console.log('✅ API v7.0 — ~5000+ içerik, tek cache key');
