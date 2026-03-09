@@ -2230,3 +2230,101 @@ select {
     animation: spin 0.8s linear infinite;
     display: inline-block;
 }
+/* =====================================================
+   MOBILE IMPROVEMENTS v5.2 — ADDITIVE ONLY
+   ===================================================== */
+
+/* Header: streak/total badge'leri küçük ekranda gizle */
+@media (max-width: 480px) {
+    #streakBadge,
+    #totalBadge {
+        display: none !important;
+    }
+
+    /* Level badge: XP bar'ı gizle, sadece level numarası kalsın */
+    .xp-container .xp-bar,
+    .xp-container .xp-text {
+        display: none;
+    }
+    .level-badge {
+        padding: 0.3rem 0.6rem;
+        gap: 0.3rem;
+    }
+
+    /* Language selector küçülsün */
+    .language-selector {
+        font-size: 0.75rem;
+        padding: 0.28rem 0.4rem;
+    }
+
+    /* Admin butonu küçülsün */
+    #adminShortcutBtn {
+        font-size: 0.72rem !important;
+        padding: .28rem .5rem !important;
+    }
+
+    /* Header actions wrap yerine scroll */
+    .header-actions {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        max-width: calc(100vw - 140px);
+    }
+    .header-actions::-webkit-scrollbar { display: none; }
+
+    /* Banner başlık font küçük ekranda oku */
+    .banner-title { font-size: 1.5rem !important; }
+    .banner-sub { font-size: 0.82rem; }
+
+    /* Detail page poster küçülsün */
+    .dp-poster {
+        width: 90px !important;
+        min-width: 90px !important;
+    }
+
+    /* Chat section tam genişlik */
+    .inline-chat-box {
+        border-radius: 12px;
+    }
+
+    /* Modal padding azalt */
+    .modal-content {
+        padding: 1rem 0.85rem !important;
+        margin: 0.5rem;
+        max-height: 92vh;
+        overflow-y: auto;
+    }
+
+    /* Nav tab text küçük ekranda daha küçük */
+    .nav-tab {
+        font-size: 0.72rem !important;
+        padding: 0.4rem 0.6rem !important;
+    }
+
+    /* Quick stats 2 kolon */
+    .quick-stats-row {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+/* Orta ekran (tablet) iyileştirmeleri */
+@media (max-width: 768px) {
+    /* Detail page banner dikey hizala */
+    .dp-banner-content {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 1.5rem 1rem;
+    }
+
+    /* Detail page iki kolon layout tek kolona */
+    .dp-layout {
+        flex-direction: column;
+    }
+
+    .dp-right-col {
+        width: 100% !important;
+        min-width: unset !important;
+    }
+}
