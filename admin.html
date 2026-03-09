@@ -314,7 +314,16 @@
 
         @media(max-width:1200px){.chart-grid-3{grid-template-columns:1fr 1fr;}}
         @media(max-width:1024px){.chart-grid-2,.chart-grid-eq,.settings-grid,.restrict-grid{grid-template-columns:1fr;}}
-        @media(max-width:768px){#sidebar{transform:translateX(-100%);}#mainContent{margin-left:0;}.form-row{grid-template-columns:1fr;}}
+        @media(max-width:768px){
+            #sidebar{transform:translateX(-100%);transition:transform .3s ease;z-index:1000;}
+            #sidebar.open{transform:translateX(0);}
+            #mainContent{margin-left:0;}
+            .form-row{grid-template-columns:1fr;}
+            #sidebarOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:999;}
+            #sidebarOverlay.open{display:block;}
+            #hamburgerBtn{display:flex;align-items:center;justify-content:center;width:38px;height:38px;background:rgba(255,51,102,0.15);border:1px solid rgba(255,51,102,0.3);border-radius:9px;cursor:pointer;font-size:1.1rem;margin-right:0.75rem;}
+        }
+        @media(min-width:769px){#hamburgerBtn{display:none;}#sidebarOverlay{display:none!important;}}
     </style>
 </head>
 <body>
@@ -335,6 +344,7 @@
 </div>
 
 <!-- SIDEBAR -->
+<div id="sidebarOverlay" onclick="toggleSidebar()"></div>
 <nav id="sidebar">
     <div class="sb-logo">
         <div class="sb-logo-row">
@@ -383,6 +393,7 @@
 <div id="mainContent">
     <div class="top-bar">
         <div class="page-title-bar">
+            <button id="hamburgerBtn" onclick="toggleSidebar()">☰</button>
             <h1 id="pageTitle">Dashboard</h1>
             <p id="pageSub">OniList platform overview</p>
         </div>
@@ -1072,7 +1083,17 @@ const PAGE_META = {
     chat:         { tr:['Chat Messages','Community chat history'], en:['Chat Messages','Community chat history'] },
 };
 
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+
 function showPage(page) {
+    // Mobilde sidebar'ı kapat
+    if (window.innerWidth <= 768) {
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('sidebarOverlay').classList.remove('open');
+    }
     document.querySelectorAll('.nav-item').forEach(n => {
         const oc = n.getAttribute('onclick') || '';
         n.classList.toggle('active', oc.includes(`'${page}'`));

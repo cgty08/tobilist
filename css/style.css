@@ -88,6 +88,7 @@ header {
     position: sticky;
     top: 0;
     z-index: 100;
+    overflow: visible;
     background: var(--header-bg, rgba(11,15,26,0.97));
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
@@ -230,7 +231,7 @@ header {
     border-radius: 14px;
     box-shadow: var(--shadow);
     display: none;
-    z-index: 200;
+    z-index: 9999;
     overflow: hidden;
     animation: dropdownIn 0.2s ease;
 }
@@ -2267,6 +2268,7 @@ select {
     .header-actions {
         flex-wrap: nowrap;
         overflow-x: auto;
+        overflow-y: visible;
         -ms-overflow-style: none;
         scrollbar-width: none;
         max-width: calc(100vw - 140px);

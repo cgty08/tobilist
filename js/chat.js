@@ -133,12 +133,12 @@ const ChatCore = (function () {
     }
 
     // ── Mesaj yükleme ────────────────────────────────────────
-    async function loadMessages(containerId, onDone, silent = false) {
+    async function loadMessages(containerId, onDone) {
         if (!window.supabaseClient) {
             _systemMsg(containerId, '💡 Chat is temporarily unavailable.');
             return;
         }
-        if (!silent) _loadingHTML(containerId);
+        _loadingHTML(containerId);
         await loadAvatarCache();
 
         const { data, error } = await window.supabaseClient
@@ -165,25 +165,24 @@ const ChatCore = (function () {
     function subscribeRealtime(channelName, containerId, onNewMsg, onStatusChange) {
         if (!window.supabaseClient) return null;
 
-        let lastMsgId = null; // duplicate önleme
-
         const ch = window.supabaseClient
             .channel(channelName)
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: TABLE }, (payload) => {
+                const container = document.getElementById(containerId);
+                if (!container) { renderMessage(payload.new, containerId, onNewMsg); return; }
+                // Gerçek ID ile zaten var mı?
+                const existing = container.querySelector(`[data-msg-id="${payload.new.id}"]`);
+                if (existing) return;
+                // Aynı kullanıcının optimistic mesajını bul ve replace et
                 const myId = getMyUserId();
-                if (myId && payload.new.user_id === myId) return; // kendi mesajını tekrar gösterme
-                if (payload.new.id && payload.new.id === lastMsgId) return; // duplicate önle
-                lastMsgId = payload.new.id;
+                if (myId && payload.new.user_id === myId) {
+                    const optEl = container.querySelector('[data-msg-id^="opt_"]');
+                    if (optEl) { optEl.dataset.msgId = payload.new.id; return; }
+                }
                 renderMessage(payload.new, containerId, onNewMsg);
             })
             .subscribe((status) => {
                 if (typeof onStatusChange === 'function') onStatusChange(status);
-                // Bağlantı kopunca 3 saniye sonra son mesajları çek (fallback)
-                if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-                    setTimeout(() => {
-                        loadMessages(containerId, null, true); // silent reload
-                    }, 3000);
-                }
             });
         return ch;
     }
