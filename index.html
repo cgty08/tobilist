@@ -458,7 +458,7 @@
                         <div class="user-menu-wrapper" id="userMenuWrapper" style="display:none;">
                             <div class="user-avatar-btn" onclick="toggleUserDropdown()">
                                 <span id="headerAvatar" style="display:none;"></span>
-                                <span id="headerUsername">Kullanıcı</span>
+                                <span id="headerUsername">User</span>
                                 <span class="dropdown-arrow">▾</span>
                             </div>
                             <div class="user-dropdown" id="userDropdown">
@@ -536,15 +536,15 @@
                     <div class="inline-chat-section">
                         <div class="inline-chat-box">
                             <div class="inline-chat-header">
-                                <span class="inline-chat-title">&#x1F4AC; Canl&#x131; Topluluk Sohbeti</span>
-                                <span class="inline-chat-online"><span class="chat-online-dot"></span> Canl&#x131;</span>
+                                <span class="inline-chat-title">💬 Community Chat</span>
+                                <span class="inline-chat-online"><span class="chat-online-dot"></span> Live</span>
                             </div>
                             <div class="inline-chat-messages" id="inlineChatMessages">
                                 <div class="chat-loading"><span class="chat-loading-dots"><span></span><span></span><span></span></span></div>
                             </div>
                             <div class="inline-chat-guest" id="inlineChatGuest" style="display:flex;">
                                 <div class="icg-inner">
-                                    <p class="icg-label">Sohbete katılmak için giriş yap</p>
+                                    <p class="icg-label">Log in to join the chat</p>
                                     <div class="icg-btns">
                                         <button class="icg-btn-login" onclick="openAuthModal('login')">Sign In</button>
                                         <button class="icg-btn-register" onclick="openAuthModal('register')">Sign Up</button>
@@ -554,7 +554,7 @@
                             <div class="inline-chat-input-area" id="inlineChatInputArea" style="display:none;">
                                 <div class="inline-chat-input-row">
                                     <span class="inline-chat-my-avatar" id="inlineChatMyAvatar">&#x1F464;</span>
-                                    <textarea id="inlineChatInput" placeholder="Write something... (Enter = send)" rows="1" maxlength="300"></textarea>
+                                    <textarea id="inlineChatInput" placeholder="Bir &#x15f;eyler yaz... (Enter = g&#xf6;nder)" rows="1" maxlength="300"></textarea>
                                     <button id="inlineChatSendBtn" disabled>&#x27A4;</button>
                                 </div>
                                 <div class="inline-chat-hint">Enter to send &middot; Shift+Enter new line &middot; Max 300 chars</div>
@@ -737,7 +737,7 @@
                     <!-- COMMUNITY SECTION -->
                     <div class="community-section">
                         <div class="community-header">
-                            <h3 class="features-title">🌍 <span class="gradient-text">Topluluk</span></h3>
+                            <h3 class="features-title">🌍 <span class="gradient-text">Community</span></h3>
                             <p class="features-sub">OniList büyüyor — seninle büyüyor</p>
                         </div>
                         <div class="community-grid">
@@ -912,7 +912,7 @@
                                 <button class="avatar-cam-btn" onclick="editProfile()" title="Fotoğraf yükle">＋</button>
                             </div>
                             <div class="profile-info">
-                                <h2 class="profile-username" id="profileUsername">Kullanıcı</h2>
+                                <h2 class="profile-username" id="profileUsername">User</h2>
                                 <p class="profile-email-display" id="profileEmailDisplay"></p>
                                 <p class="profile-bio-text" id="profileBioText">Anime, manga ve webtoon takipçisi</p>
                                 <div class="profile-badges">
@@ -1428,7 +1428,7 @@
             const lb = document.getElementById('leaderboardList');
             if (lb) {
                 if (lbErr || !leaders || !leaders.length) {
-                    lb.innerHTML = '<div class="lb-loading">Henüz kullanıcı yok</div>';
+                    lb.innerHTML = '<div class="lb-loading">No users yet</div>';
                     return;
                 }
                 const rankClass = ['gold','silver','bronze'];
@@ -1443,7 +1443,7 @@
                     <div class="lb-item ${clickable}">
                         <span class="lb-rank ${rankClass[i]||''}">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)}</span>
                         <div class="lb-av" style="display:flex;align-items:center;justify-content:center;overflow:hidden;">${avatarHtml}</div>
-                        <span class="lb-name">${u.name||'Kullanıcı'}</span>
+                        <span class="lb-name">${u.name||'User'}</span>
                         <span class="lb-xp">⭐${fmt(u.xp_total||0)} XP</span>
                     </div>`;
                 }).join('');
@@ -1495,7 +1495,7 @@
         var labels = { info:'INFO', success:'SUCCESS', warning:'WARNING', update:'UPDATE' };
         var prio = ann.priority === 'critical' ? '🔴 CRITICAL' : ann.priority === 'high' ? '🟠 IMPORTANT' : '';
         var dateStr = '';
-        try { dateStr = new Date(ann.created_at).toLocaleDateString('en-US',{day:'numeric',month:'long',year:'numeric'}); } catch(e){}
+        try { dateStr = new Date(ann.created_at).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'}); } catch(e){}
 
         var style = document.createElement('style');
         style.textContent = '@keyframes annFadeIn{from{opacity:0}to{opacity:1}} @keyframes annSlideUp{from{transform:scale(0.88) translateY(30px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}';
@@ -1570,7 +1570,7 @@
         <div id="publicProfileBody">
             <div style="display:flex;align-items:center;justify-content:center;padding:3rem;flex-direction:column;gap:0.8rem;">
                 <div class="chat-loading-dots"><span></span><span></span><span></span></div>
-                <span style="color:#8892a4;font-size:0.85rem;">Profil yükleniyor...</span>
+                <span style="color:#8892a4;font-size:0.85rem;">Loading profile...</span>
             </div>
         </div>
     </div>
@@ -1615,7 +1615,7 @@ window.openPublicProfile = async function(userId, fallbackName) {
     body.innerHTML = `
         <div style="display:flex;align-items:center;justify-content:center;padding:3rem;flex-direction:column;gap:0.8rem;">
             <div class="chat-loading-dots"><span></span><span></span><span></span></div>
-            <span style="color:#8892a4;font-size:0.85rem;">Profil yükleniyor...</span>
+            <span style="color:#8892a4;font-size:0.85rem;">Loading profile...</span>
         </div>`;
 
     try {
@@ -1670,8 +1670,8 @@ window.openPublicProfile = async function(userId, fallbackName) {
         body.innerHTML = `
             <div style="padding:2.5rem;text-align:center;">
                 <div style="font-size:2.5rem;margin-bottom:0.8rem;">😕</div>
-                <h3 style="color:#fff;font-size:1.1rem;margin-bottom:0.4rem;">${fallbackName || 'Kullanıcı'}</h3>
-                <p style="color:#8892a4;font-size:0.88rem;">Bu profil şu an görüntülenemiyor.</p>
+                <h3 style="color:#fff;font-size:1.1rem;margin-bottom:0.4rem;">${fallbackName || 'User'}</h3>
+                <p style="color:#8892a4;font-size:0.88rem;">This profile cannot be displayed right now.</p>
             </div>`;
     }
 };
@@ -1725,7 +1725,7 @@ function renderPublicProfile(d, updatedAt, fallbackName) {
     const pct = (n) => Math.round(n/total*100);
 
     // Son başarımlar
-    let achHtml = '<span style="color:#6b7280;font-size:0.82rem;">Henüz başarım yok</span>';
+    let achHtml = '<span style="color:#6b7280;font-size:0.82rem;">No achievements yet</span>';
     if (typeof ACHIEVEMENTS !== 'undefined') {
         const unlocked = ACHIEVEMENTS.filter(a => achs.includes(a.id)).slice(-6).reverse();
         if (unlocked.length > 0) {
@@ -1758,7 +1758,7 @@ function renderPublicProfile(d, updatedAt, fallbackName) {
         `</div>`;
     }
 
-    const joinDate = social.joinDate ? new Date(social.joinDate).toLocaleDateString('en-US', {year:'numeric',month:'long'}) : '—';
+    const joinDate = social.joinDate ? new Date(social.joinDate).toLocaleDateString('tr-TR', {year:'numeric',month:'long'}) : '—';
 
     body.innerHTML = `
         <!-- Kapak — siteyle uyumlu koyu header -->
