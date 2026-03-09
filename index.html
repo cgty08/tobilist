@@ -554,7 +554,7 @@
                             <div class="inline-chat-input-area" id="inlineChatInputArea" style="display:none;">
                                 <div class="inline-chat-input-row">
                                     <span class="inline-chat-my-avatar" id="inlineChatMyAvatar">&#x1F464;</span>
-                                    <textarea id="inlineChatInput" placeholder="Bir &#x15f;eyler yaz... (Enter = g&#xf6;nder)" rows="1" maxlength="300"></textarea>
+                                    <textarea id="inlineChatInput" placeholder="Write something... (Enter = send)" rows="1" maxlength="300"></textarea>
                                     <button id="inlineChatSendBtn" disabled>&#x27A4;</button>
                                 </div>
                                 <div class="inline-chat-hint">Enter to send &middot; Shift+Enter new line &middot; Max 300 chars</div>
@@ -937,7 +937,7 @@
                     </div>
 
                     <div class="profile-section-block" style="margin-bottom:1.2rem;">
-                        <div class="psb-title" data-i18n="profileStatusTitle">İzleme Durumu</div>
+                        <div class="psb-title" data-i18n="profileStatusTitle">Watch Status</div>
                         <div id="profileStatusBars"></div>
                     </div>
 
@@ -1495,7 +1495,7 @@
         var labels = { info:'INFO', success:'SUCCESS', warning:'WARNING', update:'UPDATE' };
         var prio = ann.priority === 'critical' ? '🔴 CRITICAL' : ann.priority === 'high' ? '🟠 IMPORTANT' : '';
         var dateStr = '';
-        try { dateStr = new Date(ann.created_at).toLocaleDateString('tr-TR',{day:'numeric',month:'long',year:'numeric'}); } catch(e){}
+        try { dateStr = new Date(ann.created_at).toLocaleDateString('en-US',{day:'numeric',month:'long',year:'numeric'}); } catch(e){}
 
         var style = document.createElement('style');
         style.textContent = '@keyframes annFadeIn{from{opacity:0}to{opacity:1}} @keyframes annSlideUp{from{transform:scale(0.88) translateY(30px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}';
@@ -1745,7 +1745,7 @@ function renderPublicProfile(d, updatedAt, fallbackName) {
     const statusColors = { watching:'#00d4ff', completed:'#10b981', plantowatch:'#a78bfa', onhold:'#fbbf24', dropped:'#f87171' };
     const statusLabels = { watching:'Watching', completed:'Completed', plantowatch:'Planning', onhold:'On Hold', dropped:'Dropped' };
 
-    let listHtml = '<span style="color:#6b7280;font-size:0.82rem;">Liste boş</span>';
+    let listHtml = '<span style="color:#6b7280;font-size:0.82rem;">List is empty</span>';
     if (recentItems.length > 0) {
         listHtml = `<div style="display:flex;flex-direction:column;gap:0.4rem;">` +
         recentItems.map(i => `
@@ -1758,7 +1758,7 @@ function renderPublicProfile(d, updatedAt, fallbackName) {
         `</div>`;
     }
 
-    const joinDate = social.joinDate ? new Date(social.joinDate).toLocaleDateString('tr-TR', {year:'numeric',month:'long'}) : '—';
+    const joinDate = social.joinDate ? new Date(social.joinDate).toLocaleDateString('en-US', {year:'numeric',month:'long'}) : '—';
 
     body.innerHTML = `
         <!-- Kapak — siteyle uyumlu koyu header -->
@@ -1772,7 +1772,7 @@ function renderPublicProfile(d, updatedAt, fallbackName) {
                     <h3 style="font-size:1.2rem;font-weight:700;color:#fff;margin:0 0 0.1rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${name}</h3>
                     <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
                         <span style="font-size:0.78rem;background:rgba(255,51,102,0.15);color:#ff3366;padding:0.15rem 0.5rem;border-radius:5px;font-weight:700;">Lv.${level} ${lvlInfo.icon} ${lvlInfo.title}</span>
-                        <span style="font-size:0.72rem;color:#6b7280;">${joinDate} katıldı</span>
+                        <span style="font-size:0.72rem;color:#6b7280;">${joinDate} joined</span>
                     </div>
                 </div>
             </div>
@@ -1793,7 +1793,7 @@ function renderPublicProfile(d, updatedAt, fallbackName) {
 
             <!-- Durum dağılımı -->
             <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:0.9rem;margin-bottom:1rem;">
-                <div style="font-size:0.8rem;font-weight:700;color:#a0a8b9;margin-bottom:0.6rem;text-transform:uppercase;letter-spacing:0.5px;">İzleme Durumu</div>
+                <div style="font-size:0.8rem;font-weight:700;color:#a0a8b9;margin-bottom:0.6rem;text-transform:uppercase;letter-spacing:0.5px;">Watch Status</div>
                 ${[
                     ['Watching',watching,'#00d4ff'],['Completed',completed,'#10b981'],
                     ['Planning',plantowatch,'#a78bfa'],['Dropped',dropped,'#f87171']
@@ -1815,7 +1815,7 @@ function renderPublicProfile(d, updatedAt, fallbackName) {
 
             <!-- İçerik Listesi -->
             <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:0.9rem;">
-                <div style="font-size:0.8rem;font-weight:700;color:#a0a8b9;margin-bottom:0.6rem;text-transform:uppercase;letter-spacing:0.5px;">📋 Son İçerikler</div>
+                <div style="font-size:0.8rem;font-weight:700;color:#a0a8b9;margin-bottom:0.6rem;text-transform:uppercase;letter-spacing:0.5px;">📋 Recent Content</div>
                 ${listHtml}
             </div>
         </div>`;
