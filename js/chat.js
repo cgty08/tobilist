@@ -133,12 +133,12 @@ const ChatCore = (function () {
     }
 
     // ── Mesaj yükleme ────────────────────────────────────────
-    async function loadMessages(containerId, onDone) {
+    async function loadMessages(containerId, onDone, silent = false) {
         if (!window.supabaseClient) {
             _systemMsg(containerId, '💡 Chat is temporarily unavailable.');
             return;
         }
-        _loadingHTML(containerId);
+        if (!silent) _loadingHTML(containerId);
         await loadAvatarCache();
 
         const { data, error } = await window.supabaseClient
@@ -165,15 +165,25 @@ const ChatCore = (function () {
     function subscribeRealtime(channelName, containerId, onNewMsg, onStatusChange) {
         if (!window.supabaseClient) return null;
 
+        let lastMsgId = null; // duplicate önleme
+
         const ch = window.supabaseClient
             .channel(channelName)
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: TABLE }, (payload) => {
                 const myId = getMyUserId();
                 if (myId && payload.new.user_id === myId) return; // kendi mesajını tekrar gösterme
+                if (payload.new.id && payload.new.id === lastMsgId) return; // duplicate önle
+                lastMsgId = payload.new.id;
                 renderMessage(payload.new, containerId, onNewMsg);
             })
             .subscribe((status) => {
                 if (typeof onStatusChange === 'function') onStatusChange(status);
+                // Bağlantı kopunca 3 saniye sonra son mesajları çek (fallback)
+                if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+                    setTimeout(() => {
+                        loadMessages(containerId, null, true); // silent reload
+                    }, 3000);
+                }
             });
         return ch;
     }

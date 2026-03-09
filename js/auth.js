@@ -116,7 +116,7 @@ async function loginSuccess(user) {
         }
 
         if (!error && data && data.data) {
-            // Data exists in Supabase - which is newer?
+            // Data exists in Supabase — always prefer remote on mobile (localStorage may be empty)
             const remoteItems = data.data.items || [];
             const localItems = dataManager.data.items || [];
             if (remoteItems.length >= localItems.length) {
@@ -124,6 +124,11 @@ async function loginSuccess(user) {
             } else {
                 dataManager.saveAll(); // Local is fuller, update Supabase
             }
+            // ✅ Force UI refresh after Supabase data loads (fixes mobile blank state)
+            if (typeof updateUIForLoggedIn === 'function') updateUIForLoggedIn();
+            if (typeof renderLibrary === 'function') renderLibrary();
+            if (typeof renderProfile === 'function') renderProfile();
+            if (typeof updateXPDisplay === 'function') updateXPDisplay();
         } else if (error && error.code === 'PGRST116') {
             // No record in Supabase (new user)
             if (!dataManager.data.items.length) {
