@@ -314,16 +314,7 @@
 
         @media(max-width:1200px){.chart-grid-3{grid-template-columns:1fr 1fr;}}
         @media(max-width:1024px){.chart-grid-2,.chart-grid-eq,.settings-grid,.restrict-grid{grid-template-columns:1fr;}}
-        @media(max-width:768px){
-            #sidebar{transform:translateX(-100%);transition:transform .3s ease;z-index:1000;}
-            #sidebar.open{transform:translateX(0);}
-            #mainContent{margin-left:0;}
-            .form-row{grid-template-columns:1fr;}
-            #sidebarOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:999;}
-            #sidebarOverlay.open{display:block;}
-            #hamburgerBtn{display:flex;align-items:center;justify-content:center;width:38px;height:38px;background:rgba(255,51,102,0.15);border:1px solid rgba(255,51,102,0.3);border-radius:9px;cursor:pointer;font-size:1.1rem;margin-right:0.75rem;}
-        }
-        @media(min-width:769px){#hamburgerBtn{display:none;}#sidebarOverlay{display:none!important;}}
+        @media(max-width:768px){#sidebar{transform:translateX(-100%);}#mainContent{margin-left:0;}.form-row{grid-template-columns:1fr;}}
     </style>
 </head>
 <body>
@@ -344,7 +335,6 @@
 </div>
 
 <!-- SIDEBAR -->
-<div id="sidebarOverlay" onclick="toggleSidebar()"></div>
 <nav id="sidebar">
     <div class="sb-logo">
         <div class="sb-logo-row">
@@ -376,6 +366,7 @@
         <div class="nav-item" onclick="showPage('chat')"><span class="nav-icon">💬</span> Chat Messages <span class="nav-badge" id="chatMsgBadge" style="background:var(--pink);display:none;">0</span></div>
 
         <div class="sb-section">System</div>
+        <div class="nav-item" onclick="showPage('feedback')"><span class="nav-icon">💬</span> Feedback <span class="nav-badge" id="feedbackBadge" style="background:#a855f7;display:none;">0</span></div>
         <div class="nav-item" onclick="showPage('restrictions')"><span class="nav-icon">🛡️</span> Restrictions</div>
         <div class="nav-item" onclick="showPage('logs')"><span class="nav-icon">📋</span> Activity Log</div>
         <div class="nav-item" onclick="showPage('settings')"><span class="nav-icon">⚙️</span> Settings</div>
@@ -393,7 +384,6 @@
 <div id="mainContent">
     <div class="top-bar">
         <div class="page-title-bar">
-            <button id="hamburgerBtn" onclick="toggleSidebar()">☰</button>
             <h1 id="pageTitle">Dashboard</h1>
             <p id="pageSub">OniList platform overview</p>
         </div>
@@ -644,6 +634,31 @@
             <div class="table-header"><h3>📜 Announcement History</h3></div>
             <table><thead><tr><th>Title</th><th>Type</th><th>Date</th><th>Action</th></tr></thead>
             <tbody id="annBody"><tr class="loading-td"><td colspan="4"><span class="spinner"></span>Loading…</td></tr></tbody></table>
+        </div>
+    </div>
+
+    <!-- ===== FEEDBACK ===== -->
+    <div class="page" id="page-feedback">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;">
+            <h2 style="margin:0;font-size:1.3rem;">💬 User Feedback</h2>
+            <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+                <select id="fbFilterCat" onchange="loadFeedback()" style="background:var(--bg-card);border:1px solid var(--border);color:var(--text-primary);padding:0.4rem 0.8rem;border-radius:8px;font-size:0.85rem;cursor:pointer;">
+                    <option value="">All Categories</option>
+                    <option value="bug">🐛 Bug</option>
+                    <option value="suggestion">💡 Suggestion</option>
+                    <option value="other">📌 Other</option>
+                </select>
+                <select id="fbFilterStatus" onchange="loadFeedback()" style="background:var(--bg-card);border:1px solid var(--border);color:var(--text-primary);padding:0.4rem 0.8rem;border-radius:8px;font-size:0.85rem;cursor:pointer;">
+                    <option value="">All Status</option>
+                    <option value="new">🆕 New</option>
+                    <option value="seen">👁️ Seen</option>
+                    <option value="resolved">✅ Resolved</option>
+                </select>
+                <button onclick="loadFeedback()" style="background:var(--pink);border:none;color:white;padding:0.4rem 1rem;border-radius:8px;cursor:pointer;font-size:0.85rem;">🔄 Refresh</button>
+            </div>
+        </div>
+        <div id="feedbackTableWrap">
+            <p style="color:var(--text-muted);text-align:center;padding:2rem;">Loading...</p>
         </div>
     </div>
 
@@ -1083,17 +1098,7 @@ const PAGE_META = {
     chat:         { tr:['Chat Messages','Community chat history'], en:['Chat Messages','Community chat history'] },
 };
 
-function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('open');
-    document.getElementById('sidebarOverlay').classList.toggle('open');
-}
-
 function showPage(page) {
-    // Mobilde sidebar'ı kapat
-    if (window.innerWidth <= 768) {
-        document.getElementById('sidebar').classList.remove('open');
-        document.getElementById('sidebarOverlay').classList.remove('open');
-    }
     document.querySelectorAll('.nav-item').forEach(n => {
         const oc = n.getAttribute('onclick') || '';
         n.classList.toggle('active', oc.includes(`'${page}'`));
@@ -1115,6 +1120,7 @@ function showPage(page) {
         announcements: loadAnnouncements, logs: loadLogs,
         restrictions: ()=>{}, settings: loadSettings,
         chat: loadChatMessages,
+        feedback: loadFeedback,
     };
     loaders[page]?.();
 }
@@ -1168,6 +1174,12 @@ async function loadDashboard() {
     const banBadge = document.getElementById('banCountBadge');
     banBadge.textContent = banned.length;
     banBadge.style.display = banned.length > 0 ? '' : 'none';
+
+    // Feedback badge - new feedback count
+    sb.from('feedback').select('id', { count: 'exact' }).or('status.is.null,status.eq.new').then(({ count }) => {
+        const fbBadge = document.getElementById('feedbackBadge');
+        if (fbBadge && count > 0) { fbBadge.textContent = count; fbBadge.style.display = ''; }
+    });
 
     document.getElementById('s-users-change').textContent = `⬆ ${active7.length} active this week`;
 
@@ -2330,6 +2342,75 @@ function filterChatMessages() {
         return;
     }
     tbody.innerHTML = filtered.map(renderChatRow).join('');
+}
+
+// ===== FEEDBACK =====
+async function loadFeedback() {
+    const wrap = document.getElementById('feedbackTableWrap');
+    if (!wrap) return;
+    wrap.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:2rem;">Loading...</p>';
+
+    const cat = document.getElementById('fbFilterCat')?.value || '';
+    const status = document.getElementById('fbFilterStatus')?.value || '';
+
+    let query = sb.from('feedback').select('*').order('created_at', { ascending: false }).limit(100);
+    if (cat) query = query.eq('category', cat);
+    if (status) query = query.eq('status', status);
+
+    const { data, error } = await query;
+    if (error) { wrap.innerHTML = `<p style="color:var(--danger);text-align:center;padding:2rem;">Error: ${error.message}</p>`; return; }
+
+    // Update badge
+    const newCount = (data || []).filter(f => !f.status || f.status === 'new').length;
+    const badge = document.getElementById('feedbackBadge');
+    if (badge) { badge.textContent = newCount; badge.style.display = newCount > 0 ? '' : 'none'; }
+
+    if (!data || data.length === 0) {
+        wrap.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:2rem;">No feedback yet.</p>';
+        return;
+    }
+
+    const catEmoji = { bug: '🐛', suggestion: '💡', other: '📌' };
+    const statusColor = { new: '#a855f7', seen: '#60a5fa', resolved: '#4ade80' };
+
+    wrap.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:0.8rem;">
+        ${data.map(f => `
+        <div id="fb-${f.id}" style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:1rem 1.2rem;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.5rem;flex-wrap:wrap;">
+                        <span style="background:rgba(168,85,247,0.15);color:#a855f7;border-radius:6px;padding:0.2rem 0.6rem;font-size:0.78rem;font-weight:600;">${catEmoji[f.category] || '📌'} ${f.category || 'other'}</span>
+                        <span style="background:rgba(0,0,0,0.3);color:${statusColor[f.status || 'new']};border-radius:6px;padding:0.2rem 0.6rem;font-size:0.78rem;font-weight:600;">${f.status || 'new'}</span>
+                        <span style="color:var(--text-muted);font-size:0.78rem;">${new Date(f.created_at).toLocaleString('en-GB')}</span>
+                        ${f.page ? `<span style="color:var(--text-muted);font-size:0.78rem;">📍 ${f.page}</span>` : ''}
+                    </div>
+                    <p style="margin:0 0 0.5rem;font-size:0.92rem;line-height:1.5;word-break:break-word;">${_escAdmin(f.message)}</p>
+                    <p style="margin:0;font-size:0.78rem;color:var(--text-muted);">${f.user_email ? '👤 ' + _escAdmin(f.user_email) : '👤 Anonymous'}</p>
+                </div>
+                <div style="display:flex;gap:0.4rem;flex-shrink:0;">
+                    <button onclick="setFbStatus('${f.id}','seen')" title="Mark Seen" style="background:rgba(96,165,250,0.15);border:1px solid rgba(96,165,250,0.3);color:#60a5fa;border-radius:7px;padding:0.3rem 0.6rem;font-size:0.8rem;cursor:pointer;">👁️</button>
+                    <button onclick="setFbStatus('${f.id}','resolved')" title="Mark Resolved" style="background:rgba(74,222,128,0.15);border:1px solid rgba(74,222,128,0.3);color:#4ade80;border-radius:7px;padding:0.3rem 0.6rem;font-size:0.8rem;cursor:pointer;">✅</button>
+                    <button onclick="deleteFeedback('${f.id}')" title="Delete" style="background:rgba(248,113,113,0.15);border:1px solid rgba(248,113,113,0.3);color:#f87171;border-radius:7px;padding:0.3rem 0.6rem;font-size:0.8rem;cursor:pointer;">🗑️</button>
+                </div>
+            </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+async function setFbStatus(id, status) {
+    const { error } = await sb.from('feedback').update({ status }).eq('id', id);
+    if (!error) loadFeedback();
+}
+
+async function deleteFeedback(id) {
+    if (!confirm('Delete this feedback?')) return;
+    const { error } = await sb.from('feedback').delete().eq('id', id);
+    if (!error) document.getElementById('fb-' + id)?.remove();
+}
+
+function _escAdmin(s) {
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 async function loadChatMessages() {

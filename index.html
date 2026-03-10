@@ -310,8 +310,8 @@
                     <div class="auth-field">
                         <label for="loginPassword">🔒 Password</label>
                         <div class="password-wrapper">
-                            <input type="password" id="loginPassword" name="password" placeholder="Password" required autocomplete="current-password">
-                            <button type="button" class="toggle-pw" onclick="togglePassword('loginPassword', this)" title="Show/hide password">👁️</button>
+                            <input type="password" id="loginPassword" name="password" placeholder="Şifreniz" required autocomplete="current-password">
+                            <button type="button" class="toggle-pw" onclick="togglePassword('loginPassword', this)" title="Şifreyi göster/gizle">👁️</button>
                         </div>
                     </div>
                     <div class="auth-options">
@@ -358,16 +358,16 @@
                     <div class="auth-field">
                         <label for="registerPasswordConfirm">🔒 Confirm Password</label>
                         <div class="password-wrapper">
-                            <input type="password" id="registerPasswordConfirm" name="confirm" placeholder="Confirm password" required autocomplete="new-password">
+                            <input type="password" id="registerPasswordConfirm" name="confirm" placeholder="Şifrenizi tekrar girin" required autocomplete="new-password">
                             <button type="button" class="toggle-pw" onclick="togglePassword('registerPasswordConfirm', this)">👁️</button>
                         </div>
                     </div>
                     <div id="registerError" class="auth-error"></div>
                     <button type="submit" class="auth-btn auth-btn-primary" id="registerBtn">
-                        <span>Sign Up</span><span class="btn-arrow">→</span>
+                        <span>Hesap Oluştur</span><span class="btn-arrow">→</span>
                     </button>
                 </form>
-                <div class="auth-switch">Already have an account? <span onclick="showModalLogin()">Sign in →</span></div>
+                <div class="auth-switch">Zaten hesabın var mı? <span onclick="showModalLogin()">Giriş yap →</span></div>
             </div>
 
             <!-- Forgot Password -->
@@ -509,9 +509,9 @@
                             <div class="banner-particle p3"></div>
                         </div>
                         <div class="banner-left">
-                            <div class="banner-greeting" id="bannerGreeting">Welcome 👋</div>
+                            <div class="banner-greeting" id="bannerGreeting">Hoş geldiniz 👋</div>
                             <h2 class="banner-title">Your Anime World<br><span class="gradient-text">Track & Discover</span></h2>
-                            <p class="banner-sub">Choose from 500+ anime, manga & webtoon. Build your list, rate, level up.</p>
+                            <p class="banner-sub">500+ anime, manga ve webtoon arasından seç. Listeni oluştur, puan ver, level atla.</p>
                             <div class="banner-actions" id="bannerActions"></div>
                             <!-- Feature chips -->
                             <div class="hero-chips">
@@ -586,7 +586,7 @@
                         </div>
                         <div class="psb-divider"></div>
                         <div class="psb-item">
-                            <span class="psb-num">5000+</span>
+                            <span class="psb-num">500+</span>
                             <span class="psb-label" data-i18n="liveContentLabel">Content</span>
                         </div>
                     </div>
@@ -594,8 +594,8 @@
                     <!-- TRENDING -->
                     <div class="home-section-block">
                         <div class="section-header-row">
-                            <h3 class="sh-title">🔥 Trending Now</h3>
-                            <button class="sh-more" onclick="switchSection('discover')">View All →</button>
+                            <h3 class="sh-title">🔥 Şu An Trend</h3>
+                            <button class="sh-more" onclick="switchSection('discover')">Tümünü Gör →</button>
                         </div>
                         <div class="media-row" id="trendingGrid"></div>
                     </div>
@@ -636,7 +636,7 @@
                     <!-- SEASONAL -->
                     <div class="home-section-block">
                         <div class="section-header-row">
-                            <h3 class="sh-title">🌸 Popular This Season</h3>
+                            <h3 class="sh-title">🌸 Bu Sezon Popüler</h3>
                             <button class="sh-more" onclick="switchSection('discover')">Hepsi →</button>
                         </div>
                         <div class="media-row" id="seasonPopularGrid"></div>
@@ -646,22 +646,22 @@
                     <div class="features-section">
                         <div class="features-header">
                             <h3 class="features-title">Neden <span class="gradient-text">OniList?</span></h3>
-                            <p class="features-sub">Features that take your anime tracking to the next level</p>
+                            <p class="features-sub">Anime takibini bir üst seviyeye taşıyan özellikler</p>
                         </div>
                         <div class="features-grid">
                             <div class="feature-card" onclick="requireAuth('ai')">
                                 <div class="feature-icon">🤖</div>
                                 <div class="feature-content">
-                                    <div class="feature-title">AI Recommendation Engine</div>
-                                    <div class="feature-desc">Analyzes your watch habits to generate personalized anime & manga recommendations.</div>
+                                    <div class="feature-title">AI Öneri Motoru</div>
+                                    <div class="feature-desc">İzleme alışkanlıklarını analiz ederek sana özel anime ve manga önerileri üretir.</div>
                                 </div>
                                 <div class="feature-arrow">→</div>
                             </div>
                             <div class="feature-card" onclick="requireAuth('achievements')">
                                 <div class="feature-icon">🏆</div>
                                 <div class="feature-content">
-                                    <div class="feature-title">XP & Achievement System</div>
-                                    <div class="feature-desc">Earn XP every time you add, complete, or rate content. Level up, collect badges.</div>
+                                    <div class="feature-title">XP & Başarım Sistemi</div>
+                                    <div class="feature-desc">Her eklediğinde, tamamladığında ve puan verdiğinde XP kazan. Seviyeleri geç, rozetler topla.</div>
                                 </div>
                                 <div class="feature-arrow">→</div>
                             </div>
@@ -676,15 +676,15 @@
                             <div class="feature-card" onclick="requireAuth('analytics')">
                                 <div class="feature-icon">📊</div>
                                 <div class="feature-content">
-                                    <div class="feature-title">Personal Analytics</div>
-                                    <div class="feature-desc">How many anime watched, what's your average score? Discover your habits with detailed charts.</div>
+                                    <div class="feature-title">Kişisel Analitik</div>
+                                    <div class="feature-desc">Kaç anime izledin, ortalama puanın ne? Detaylı grafiklerle izleme alışkanlıklarını keşfet.</div>
                                 </div>
                                 <div class="feature-arrow">→</div>
                             </div>
                             <div class="feature-card">
                                 <div class="feature-icon">🔥</div>
                                 <div class="feature-content">
-                                    <div class="feature-title">Daily Streak</div>
+                                    <div class="feature-title">Günlük Streak</div>
                                     <div class="feature-desc">Log in every day, keep your streak! Bonus XP for 7 consecutive days.</div>
                                 </div>
                                 <div class="feature-arrow">→</div>
@@ -693,7 +693,7 @@
                                 <div class="feature-icon">📥</div>
                                 <div class="feature-content">
                                     <div class="feature-title">Import & Export</div>
-                                    <div class="feature-desc">Download your data as JSON or CSV. Easily import your list from other platforms.</div>
+                                    <div class="feature-desc">Verilerini JSON veya CSV olarak indir. Başka platformlardan listenizi kolayca aktar.</div>
                                 </div>
                                 <div class="feature-arrow">→</div>
                             </div>
@@ -716,8 +716,8 @@
                     <!-- HIGH RATED -->
                     <div class="home-section-block">
                         <div class="section-header-row">
-                            <h3 class="sh-title">💡 Top Rated</h3>
-                            <button class="sh-more" onclick="requireAuth('ai')">AI Recs →</button>
+                            <h3 class="sh-title">💡 Yüksek Puanlı</h3>
+                            <button class="sh-more" onclick="requireAuth('ai')">AI Önerileri →</button>
                         </div>
                         <div class="media-row" id="homeRecommendationsGrid"></div>
                     </div>
@@ -738,7 +738,7 @@
                     <div class="community-section">
                         <div class="community-header">
                             <h3 class="features-title">🌍 <span class="gradient-text">Community</span></h3>
-                            <p class="features-sub">OniList is growing — growing with you</p>
+                            <p class="features-sub">OniList büyüyor — seninle büyüyor</p>
                         </div>
                         <div class="community-grid">
                             <!-- Top users leaderboard -->
@@ -786,7 +786,7 @@
                                 </p>
                                 <div style="display:flex;flex-direction:column;gap:0.6rem;">
                                     <button class="btn btn-primary" onclick="openAuthModal('register')" style="width:100%;" data-i18n="joinBtn">✨ Join Free</button>
-                                    <button class="btn btn-ghost" onclick="switchSection('discover')" style="width:100%;" data-i18n="joinDiscoverBtn">🔍 Discover Content</button>
+                                    <button class="btn btn-ghost" onclick="switchSection('discover')" style="width:100%;" data-i18n="joinDiscoverBtn">🔍 İçerikleri Keşfet</button>
                                 </div>
                                 <div class="join-badges">
                                     <span class="jb" data-i18n="joinBadgeFree">🆓 Ücretsiz</span>
@@ -821,7 +821,7 @@
                         <div class="discover-hero-bg"></div>
                         <div class="discover-hero-content">
                             <div class="discover-hero-left">
-                                <div class="discover-hero-badge" data-i18n="discoverBadge">🔥 5000+ Content</div>
+                                <div class="discover-hero-badge" data-i18n="discoverBadge">🔥 500+ İçerik</div>
                                 <h1 class="discover-hero-title" data-i18n="discoverHeroTitle">Discover</h1>
                                 <p class="discover-hero-sub" data-i18n="discoverHeroSub">Anime, manga ve webtoon dünyasını keşfet. Favori serini bul.</p>
                             </div>
@@ -830,7 +830,7 @@
                                     <span class="dsn-icon">🔍</span>
                                     <input type="text" id="discoverSearch" placeholder="Anime, manga veya webtoon ara..." data-i18n-placeholder="discoverSearchPlaceholder" oninput="onDiscoverSearch()">
                                 </div>
-                                <span id="discoverStats" class="discover-stat-text">Loading content...</span>
+                                <span id="discoverStats" class="discover-stat-text">İçerik yükleniyor...</span>
                             </div>
                         </div>
                     </div>
@@ -876,7 +876,7 @@
                     <div class="page-header"><h2 class="page-title" data-i18n="libraryTitle">📚 Kütüphanem</h2></div>
                     <div class="filter-bar">
                         <div class="search-box">
-                            <input type="text" id="searchInput" placeholder="Search content..." oninput="filterItems()">
+                            <input type="text" id="searchInput" placeholder="İçerik ara..." oninput="filterItems()">
                         </div>
                         <select id="typeFilter" onchange="filterItems()">
                             <option value="all" data-i18n="allTypesOpt">Tüm Tipler</option>
@@ -908,8 +908,8 @@
                         <div class="profile-cover" id="profileCoverBg"></div>
                         <div class="profile-main">
                             <div class="profile-avatar-wrap">
-                                <div class="profile-avatar-large" id="profileAvatarLarge" onclick="editProfile()" title="Change photo">👤</div>
-                                <button class="avatar-cam-btn" onclick="editProfile()" title="Upload photo">＋</button>
+                                <div class="profile-avatar-large" id="profileAvatarLarge" onclick="editProfile()" title="Fotoğraf değiştir">👤</div>
+                                <button class="avatar-cam-btn" onclick="editProfile()" title="Fotoğraf yükle">＋</button>
                             </div>
                             <div class="profile-info">
                                 <h2 class="profile-username" id="profileUsername">User</h2>
@@ -1166,7 +1166,7 @@
                         </div>
                         
                         <div class="chart-container" id="passwordChangeCard">
-                            <h3 class="chart-title">🔐 Change Password</h3>
+                            <h3 class="chart-title">🔐 Şifre Değiştir</h3>
                             <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:1.2rem;">Hesap güvenliğiniz için güçlü bir şifre kullanın.</p>
                             <div style="margin-bottom:0.9rem;">
                                 <label style="display:block;font-size:0.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.4rem;">Mevcut Şifre</label>
@@ -1271,10 +1271,10 @@
                     </div>
                     <div class="form-group">
                         <label>Notlar</label>
-                        <textarea id="itemNotes" rows="2" placeholder="Write your thoughts..."></textarea>
+                        <textarea id="itemNotes" rows="2" placeholder="Düşüncelerinizi yazın..."></textarea>
                     </div>
                     <div class="modal-actions">
-                        <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">İptal</button>
                         <button type="submit" class="btn btn-primary">✨ Ekle</button>
                     </div>
                 </form>
@@ -1285,7 +1285,7 @@
         <div id="editProfileModal" class="modal" style="display:none;">
             <div class="modal-content" style="max-width:500px;">
                 <div class="modal-top">
-                    <h2 class="modal-title">Edit Profile</h2>
+                    <h2 class="modal-title">Profili Düzenle</h2>
                     <button class="modal-close" onclick="closeEditProfile()">✕</button>
                 </div>
                 <form id="editProfileForm" onsubmit="saveProfile(event)">
@@ -1351,7 +1351,7 @@
                         <input type="hidden" id="selectedCoverColor" value="gradient1">
                     </div>
                     <div class="modal-actions">
-                        <button type="button" class="btn btn-secondary" onclick="closeEditProfile()">Cancel</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeEditProfile()">İptal</button>
                         <button type="submit" class="btn btn-primary">Kaydet</button>
                     </div>
                 </form>
@@ -1842,6 +1842,159 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+</script>
+
+<!-- ===== FEEDBACK SYSTEM ===== -->
+<!-- Floating Button -->
+<button id="feedbackFloatBtn" onclick="openFeedbackModal()" title="Send Feedback">
+    💬
+</button>
+
+<!-- Feedback Modal -->
+<div id="feedbackModal" class="modal" onclick="if(event.target===this)closeFeedbackModal()">
+    <div class="modal-box" style="max-width:440px;width:100%;">
+        <div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;">
+            <h2 style="font-size:1.2rem;font-weight:700;margin:0;">💬 Send Feedback</h2>
+            <button onclick="closeFeedbackModal()" style="background:none;border:none;color:var(--text-muted);font-size:1.4rem;cursor:pointer;line-height:1;">×</button>
+        </div>
+
+        <p style="color:var(--text-secondary);font-size:0.88rem;margin-bottom:1.2rem;">Found a bug or have a suggestion? Let us know!</p>
+
+        <!-- Category -->
+        <div style="display:flex;gap:0.6rem;margin-bottom:1.1rem;">
+            <button class="fb-cat-btn active" data-cat="bug" onclick="selectFbCat(this)">🐛 Bug</button>
+            <button class="fb-cat-btn" data-cat="suggestion" onclick="selectFbCat(this)">💡 Suggestion</button>
+            <button class="fb-cat-btn" data-cat="other" onclick="selectFbCat(this)">📌 Other</button>
+        </div>
+
+        <!-- Message -->
+        <textarea id="feedbackText" placeholder="Describe the issue or suggestion in detail..." rows="5"
+            style="width:100%;background:var(--bg-tertiary,#1a1f2e);border:1px solid var(--border);border-radius:10px;padding:0.85rem;color:var(--text-primary);font-size:0.9rem;resize:vertical;outline:none;font-family:inherit;box-sizing:border-box;"></textarea>
+
+        <div style="display:flex;align-items:center;gap:0.7rem;margin-top:1rem;">
+            <button id="feedbackSubmitBtn" onclick="submitFeedback()" class="btn btn-primary" style="flex:1;">Send →</button>
+            <button onclick="closeFeedbackModal()" class="btn btn-ghost" style="flex:0 0 auto;">Cancel</button>
+        </div>
+
+        <p id="feedbackStatus" style="font-size:0.82rem;text-align:center;margin-top:0.8rem;display:none;"></p>
+    </div>
+</div>
+
+<style>
+/* ===== FEEDBACK FLOAT BTN ===== */
+#feedbackFloatBtn {
+    position: fixed;
+    bottom: 5.5rem;
+    right: 1.5rem;
+    z-index: 7900;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    border: none;
+    color: white;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 18px rgba(124,58,237,0.45);
+    transition: all 0.3s cubic-bezier(0.175,0.885,0.32,1.275);
+}
+#feedbackFloatBtn:hover { transform: scale(1.12); box-shadow: 0 6px 24px rgba(124,58,237,0.6); }
+
+/* ===== FEEDBACK CATEGORY BUTTONS ===== */
+.fb-cat-btn {
+    flex: 1;
+    padding: 0.5rem 0.6rem;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.18s;
+    font-family: inherit;
+}
+.fb-cat-btn:hover { border-color: #a855f7; color: #a855f7; }
+.fb-cat-btn.active { border-color: #a855f7; background: rgba(168,85,247,0.15); color: #a855f7; font-weight: 600; }
+
+@media (max-width: 480px) {
+    #feedbackFloatBtn { bottom: 4.8rem; right: 0.9rem; width: 42px; height: 42px; font-size: 1rem; }
+}
+</style>
+
+<script>
+// ===== FEEDBACK LOGIC =====
+let _fbCat = 'bug';
+
+function openFeedbackModal() {
+    document.getElementById('feedbackModal').style.display = 'flex';
+    document.getElementById('feedbackText').focus();
+    document.getElementById('feedbackStatus').style.display = 'none';
+    document.getElementById('feedbackSubmitBtn').disabled = false;
+    document.getElementById('feedbackSubmitBtn').textContent = 'Send →';
+}
+
+function closeFeedbackModal() {
+    document.getElementById('feedbackModal').style.display = 'none';
+    document.getElementById('feedbackText').value = '';
+    _fbCat = 'bug';
+    document.querySelectorAll('.fb-cat-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.fb-cat-btn[data-cat="bug"]').classList.add('active');
+}
+
+function selectFbCat(btn) {
+    _fbCat = btn.dataset.cat;
+    document.querySelectorAll('.fb-cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+}
+
+async function submitFeedback() {
+    const text = (document.getElementById('feedbackText').value || '').trim();
+    if (!text) { showFbStatus('Please enter a message.', '#f87171'); return; }
+    if (text.length < 5) { showFbStatus('Please write at least 5 characters.', '#f87171'); return; }
+
+    const btn = document.getElementById('feedbackSubmitBtn');
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+
+    try {
+        const sb = window.supabaseClient;
+        if (!sb) throw new Error('No connection');
+
+        const user = sb.auth?.user ? sb.auth.user() : (await sb.auth.getUser())?.data?.user;
+        const userId = user?.id || null;
+        const userEmail = user?.email || null;
+        const page = window.location.hash || '#home';
+
+        const { error } = await sb.from('feedback').insert([{
+            category: _fbCat,
+            message: text,
+            user_id: userId,
+            user_email: userEmail,
+            page: page,
+            created_at: new Date().toISOString()
+        }]);
+
+        if (error) throw error;
+
+        showFbStatus('✅ Feedback sent! Thank you.', '#4ade80');
+        setTimeout(closeFeedbackModal, 1800);
+    } catch(e) {
+        console.error('Feedback error:', e);
+        showFbStatus('Failed to send. Please try again.', '#f87171');
+        btn.disabled = false;
+        btn.textContent = 'Send →';
+    }
+}
+
+function showFbStatus(msg, color) {
+    const el = document.getElementById('feedbackStatus');
+    el.textContent = msg;
+    el.style.color = color;
+    el.style.display = 'block';
+}
 </script>
 </body>
 </html>
