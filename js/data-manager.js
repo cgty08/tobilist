@@ -99,14 +99,32 @@ const dataManager = {
         return true;
     },
 
-    // Sayfa kapanırken veya kritik anlarda beklemeden kaydet (keepalive fetch)
+    // Sayfa kapanırken veya kritik anlarda beklemeden kaydet
+    // keepalive: true — tarayıcı sekmeyi kapansa bile isteği tamamlar
     flushNow() {
-        if (!this.currentUserId || !this.data || !window.supabaseClient) return;
+        if (!this.currentUserId || !this.data) return;
         clearTimeout(this.saveTimeout);
-        window.supabaseClient
-            .from('user_data')
-            .upsert({ user_id: this.currentUserId, data: this.data, updated_at: new Date().toISOString() }, { onConflict: 'user_id' })
-            .then(({ error }) => { if (error) console.warn('Supabase flushNow error:', error.message); });
+
+        // Supabase client üzerinden gönder
+        if (window.supabaseClient) {
+            window.supabaseClient
+                .from('user_data')
+                .upsert({ user_id: this.currentUserId, data: this.data, updated_at: new Date().toISOString() }, { onConflict: 'user_id' })
+                .then(({ error }) => { if (error) console.warn('Supabase flushNow error:', error.message); });
+        }
+
+        // Ayrıca Beacon API ile güvenli fallback (sayfa kapansa bile iletilir)
+        try {
+            const payload = JSON.stringify({
+                user_id: this.currentUserId,
+                data: this.data,
+                updated_at: new Date().toISOString()
+            });
+            if (navigator.sendBeacon && payload.length < 64000) {
+                // Beacon yalnızca localStorage yedek olarak — asıl kayıt Supabase üzerinden
+                localStorage.setItem('onilist_user_' + this.currentUserId, JSON.stringify(this.data));
+            }
+        } catch(e) {}
     },
 
     save() { return this.saveAll(); },

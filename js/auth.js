@@ -59,9 +59,12 @@ async function initSupabaseSession() {
         guestMode();
     }
 
-    // Auth state değişikliklerini dinle
+    // Auth state değişikliklerini dinle (subscription saklanıyor, memory leak önlenir)
     try {
-        window.supabaseClient.auth.onAuthStateChange(async (event, session) => {
+        if (window._authSubscription) {
+            window._authSubscription.unsubscribe();
+        }
+        const { data: { subscription } } = window.supabaseClient.auth.onAuthStateChange(async (event, session) => {
             if (event === 'SIGNED_IN' && session && session.user) {
                 if (!currentUser || currentUser.uid !== session.user.id) {
                     await loginSuccess(session.user);
@@ -75,6 +78,7 @@ async function initSupabaseSession() {
                 switchSection('home');
             }
         });
+        window._authSubscription = subscription;
     } catch(e) {
         console.warn('Auth state listener error:', e);
     }
@@ -109,9 +113,8 @@ async function loginSuccess(user) {
             .eq('user_id', user.id)
             .single();
 
-        // Set admin flag: DB column OR owner ID fallback
-        const OWNER_ID = '174cb52b-38d5-4b66-8096-889289b24dcb';
-        if (data?.data?.is_admin === true || data?.is_admin === true || currentUser.uid === OWNER_ID) {
+        // Set admin flag: DB column only (no hardcoded IDs)
+        if (data?.data?.is_admin === true || data?.is_admin === true) {
             currentUser.isAdmin = true;
         }
 
@@ -124,8 +127,7 @@ async function loginSuccess(user) {
             } else {
                 dataManager.saveAll(); // Local is fuller, update Supabase
             }
-            // ✅ Force UI refresh after Supabase data loads (fixes mobile blank state)
-            if (typeof updateUIForLoggedIn === 'function') updateUIForLoggedIn();
+            // Supabase verisi yüklendi, library/profile render edilecek (UI updateUIForLoggedIn fonksiyon sonunda çağrılıyor)
             if (typeof renderLibrary === 'function') renderLibrary();
             if (typeof renderProfile === 'function') renderProfile();
             if (typeof updateXPDisplay === 'function') updateXPDisplay();
@@ -364,6 +366,10 @@ async function handleRegister(event) {
         showError('registerError', 'E-posta adresi giriniz!');
         return;
     }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showError('registerError', 'Geçerli bir e-posta adresi giriniz!');
+        return;
+    }
     if (!password || password.length < 6) {
         showError('registerError', 'Şifre en az 6 karakter olmalı!');
         return;
@@ -513,16 +519,11 @@ async function deleteAccount() {
             try { await window.supabaseClient.from('comments').delete().eq('user_id', userId); } catch(e){}
 
             // 2. Permanently delete from auth.users via RPC
-            // Supabase'e SUPABASE_DELETE_USER_SQL.sql dosyasındaki fonksiyonu eklediyseniz çalışır
             const { error: rpcErr } = await window.supabaseClient.rpc('delete_user');
             if (rpcErr) {
-                // RPC çalışmadıysa: kullanıcıyı devre dışı bırakmak için email'i değiştir
-                // Bu sayede aynı email ile giriş yapılamaz
-                const randomSuffix = Date.now();
-                await window.supabaseClient.auth.updateUser({
-                    email: 'deleted_' + randomSuffix + '_' + email
-                });
-                console.warn('RPC yok, email değiştirildi:', rpcErr.message);
+                // RPC çalışmadıysa kullanıcıyı bilgilendir - hesap auth tablosunda kalıyor
+                console.warn('RPC yok, hesap auth tablosundan silinemedi:', rpcErr.message);
+                showNotification('⚠️ Hesap verileri silindi ancak kimlik doğrulama kaydı tam silinemedi. Destek ekibiyle iletişime geçin.', 'warning');
             }
 
             // 3. localStorage temizle
@@ -586,7 +587,17 @@ function updateUIForLoggedIn() {
 
     const bannerActions = document.getElementById('bannerActions');
     if (bannerActions) {
-        bannerActions.innerHTML = '<button class="btn btn-primary btn-large" onclick="openAddModal()">' + (typeof _lang !== 'undefined' && _lang === 'en' ? '✨ Add Content' : '✨ İçerik Ekle') + '</button><button class="btn btn-ghost btn-large" onclick="switchSection(\'discover\')">🔍 ' + (typeof _lang !== 'undefined' && _lang === 'en' ? 'Discover' : 'Keşfet') + '</button>';
+        bannerActions.textContent = '';
+        const addBtn = document.createElement('button');
+        addBtn.className = 'btn btn-primary btn-large';
+        addBtn.onclick = () => openAddModal();
+        addBtn.textContent = (typeof _lang !== 'undefined' && _lang === 'en') ? '✨ Add Content' : '✨ İçerik Ekle';
+        const discBtn = document.createElement('button');
+        discBtn.className = 'btn btn-ghost btn-large';
+        discBtn.onclick = () => switchSection('discover');
+        discBtn.textContent = (typeof _lang !== 'undefined' && _lang === 'en') ? '🔍 Discover' : '🔍 Keşfet';
+        bannerActions.appendChild(addBtn);
+        bannerActions.appendChild(discBtn);
     }
 }
 
@@ -611,7 +622,17 @@ function updateUIForGuest() {
 
     const bannerActions = document.getElementById('bannerActions');
     if (bannerActions) {
-        bannerActions.innerHTML = '<button class="btn btn-primary btn-large" onclick="openAuthModal(\'register\')">✨ ' + (typeof _lang !== 'undefined' && _lang === 'en' ? 'Sign Up Free' : 'Ücretsiz Kayıt Ol') + '</button><button class="btn btn-ghost btn-large" onclick="switchSection(\'discover\')">🔍 ' + (typeof _lang !== 'undefined' && _lang === 'en' ? 'Discover' : 'Keşfet') + '</button>';
+        bannerActions.textContent = '';
+        const regBtn = document.createElement('button');
+        regBtn.className = 'btn btn-primary btn-large';
+        regBtn.onclick = () => openAuthModal('register');
+        regBtn.textContent = (typeof _lang !== 'undefined' && _lang === 'en') ? '✨ Sign Up Free' : '✨ Ücretsiz Kayıt Ol';
+        const discBtn = document.createElement('button');
+        discBtn.className = 'btn btn-ghost btn-large';
+        discBtn.onclick = () => switchSection('discover');
+        discBtn.textContent = (typeof _lang !== 'undefined' && _lang === 'en') ? '🔍 Discover' : '🔍 Keşfet';
+        bannerActions.appendChild(regBtn);
+        bannerActions.appendChild(discBtn);
     }
 }
 
@@ -643,7 +664,12 @@ function updateUIForBanned() {
     // Banner aksiyonları - sadece keşfet
     const bannerActions = document.getElementById('bannerActions');
     if (bannerActions) {
-        bannerActions.innerHTML = '<button class="btn btn-ghost btn-large" onclick="switchSection(\'discover\')">🔍 ' + (typeof _lang !== 'undefined' && _lang === 'en' ? 'Discover' : 'Keşfet') + '</button>';
+        bannerActions.textContent = '';
+        const discBtn = document.createElement('button');
+        discBtn.className = 'btn btn-ghost btn-large';
+        discBtn.onclick = () => switchSection('discover');
+        discBtn.textContent = (typeof _lang !== 'undefined' && _lang === 'en') ? '🔍 Discover' : '🔍 Keşfet';
+        bannerActions.appendChild(discBtn);
     }
 
     const guestCTA = document.getElementById('guestCTA');
@@ -843,7 +869,12 @@ async function changePasswordSettings() {
         const { error: updateErr } = await window.supabaseClient.auth.updateUser({ password: newPw });
         if (updateErr) throw updateErr;
 
-        if (sucEl) { sucEl.textContent = '✅ Password updated successfully!'; sucEl.style.display = 'block'; }
+        if (sucEl) {
+            sucEl.textContent = (typeof _lang !== 'undefined' && _lang === 'en')
+                ? '✅ Password updated successfully!'
+                : '✅ Şifre başarıyla güncellendi!';
+            sucEl.style.display = 'block';
+        }
         ['currentPassword','newPassword','confirmNewPassword'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
         const bar = document.getElementById('settingsPwStrengthBar');
         if (bar) bar.style.width = '0%';
@@ -886,7 +917,19 @@ async function handleForgotPassword() {
         const successEl = document.getElementById('forgotSuccess');
         if (successEl) {
             successEl.style.display = 'block';
-            successEl.innerHTML = '✅ <strong>' + email + '</strong> adresine sıfırlama linki gönderildi!<br><small style="opacity:0.8;">Gelmezse spam klasörünü kontrol edin. Link 1 saat geçerlidir.</small>';
+            successEl.textContent = '';
+            const checkmark = document.createTextNode('✅ ');
+            const strong = document.createElement('strong');
+            strong.textContent = email;
+            const rest = document.createTextNode(' adresine sıfırlama linki gönderildi!');
+            const small = document.createElement('small');
+            small.style.opacity = '0.8';
+            small.style.display = 'block';
+            small.textContent = 'Gelmezse spam klasörünü kontrol edin. Link 1 saat geçerlidir.';
+            successEl.appendChild(checkmark);
+            successEl.appendChild(strong);
+            successEl.appendChild(rest);
+            successEl.appendChild(small);
         }
         if (btn) btn.style.display = 'none';
     } catch(e) {

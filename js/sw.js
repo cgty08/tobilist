@@ -237,4 +237,4 @@ self.addEventListener('notificationclick', event => {
     event.waitUntil(clients.openWindow(url));
 });
 
-console.log('[SW] OniList Service Worker v1.0 active');
+console.log('[SW] OniList Service Worker v1.1 active');
