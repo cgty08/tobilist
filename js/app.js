@@ -298,7 +298,7 @@ function renderMediaRow(containerId, items) {
         const safeItem = itemJson.replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
         const addBtn = isGuest
-            ? '<button class="add-to-list-btn" onclick="openAuthModal(\'register\')">🔐 Kayıt ol & ekle</button>'
+            ? '<button class="add-to-list-btn" onclick="openAuthModal(\'register\')">🔐 Sign up & add</button>'
             : '<button class="add-to-list-btn' + (inLibrary ? ' in-library' : '') + '" onclick="event.stopPropagation();quickAddFromJson(\'' + safeItem + '\')">' + (inLibrary ? (_lang==='en'?'✓ In List':'✓ Listende') : (_lang==='en'?'+ Add':'+ Ekle')) + '</button>';
 
         return '<div class="media-card" style="cursor:pointer" onclick="openDetailPage(\'' + safeItem + '\')">' +
@@ -386,7 +386,7 @@ function renderDiscoverGrid() {
         const safeItem = itemJson.replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
         const addBtn = isGuest
-            ? '<button class="add-to-list-btn" onclick="openAuthModal(\'register\')">🔐 Kayıt ol & ekle</button>'
+            ? '<button class="add-to-list-btn" onclick="openAuthModal(\'register\')">🔐 Sign up & add</button>'
             : '<button class="add-to-list-btn' + (inLibrary ? ' in-library' : '') + '" onclick="event.stopPropagation();quickAddFromJson(\'' + safeItem + '\')">' + (inLibrary ? (_lang==='en'?'✓ In List':'✓ Listende') : (_lang==='en'?'+ Add':'+ Ekle')) + '</button>';
 
         return '<div class="media-card" style="cursor:pointer" onclick="openDetailPage(\'' + safeItem + '\')">' +

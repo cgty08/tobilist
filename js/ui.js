@@ -240,7 +240,7 @@ const translations = {
         heroChipCal: '📅 Airing Calendar', heroChipAnalytics: '📊 Analytics',
         heroXPLabel: 'Total XP', streakDaysLabel: 'days',
         // PLATFORM STATS
-        liveUsersLabel: 'Registered Users', liveTotalLabel: 'Total Tracking',
+        liveUsersLabel: 'Users', liveTotalLabel: 'Total Tracking',
         liveCompletedLabel: 'Completed', liveXPLabel: 'XP Earned', liveContentLabel: 'Content',
         // HOME SECTION TITLES
         trendingMore: 'See All →', continueMore: 'Library →',
@@ -276,10 +276,10 @@ const translations = {
         discoverAllTab: '✨ All', discoverAnimeTab: '🎬 Anime',
         discoverMangaTab: '📖 Manga', discoverWebtoonTab: '📱 Webtoon',
         // GENRE FILTERS
-        genreAll: 'All', genreAction: '⚔️ Action', genreAdventure: '🗺️ Adventure',
-        genreComedy: '😂 Comedy', genreDrama: '🎭 Drama', genreFantasy: '🔮 Fantasy',
-        genreRomance: '💕 Romance', genreScifi: '🚀 Sci-Fi', genreHorror: '👻 Horror',
-        genreMystery: '🔍 Mystery', genrePsych: '🧠 Psychological', genreSports: '⚽ Sports',
+        genreAll: 'All', genreAction: 'Action', genreAdventure: 'Adventure',
+        genreComedy: 'Comedy', genreDrama: 'Drama', genreFantasy: 'Fantasy',
+        genreRomance: 'Romance', genreScifi: 'Sci-Fi', genreHorror: 'Horror',
+        genreMystery: 'Mystery', genrePsych: 'Psychological', genreSports: 'Sports',
         // LIBRARY FILTERS
         allTypesOpt: 'All Types', allStatusesOpt: 'All Statuses',
         statusWatching: '▶️ Watching', statusCompleted: '✅ Completed',

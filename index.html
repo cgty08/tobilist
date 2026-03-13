@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    <title>OniList — Anime, Manga & Webtoon Tracking Platform </title>
+    <title>OniList — Anime, Manga & Webtoon Tracking Platform | Free</title>
 
     <meta name="description" content="Track your anime, manga and webtoons easily with OniList. Create personal lists, rate series, view your stats. Completely free anime tracking app.">
     <meta name="keywords" content="anime tracker, manga tracker, webtoon tracker, anime list, mal alternative, anime tracking app, anime watch list, anilist alternative, free anime tracker">
@@ -304,14 +304,14 @@
                 </div>
                 <form id="loginForm" onsubmit="handleLogin(event)" autocomplete="on">
                     <div class="auth-field">
-                        <label for="loginEmail">📧 E-posta</label>
-                        <input type="email" id="loginEmail" name="email" placeholder="ornek@mail.com" required autocomplete="email">
+                        <label for="loginEmail">📧 Email</label>
+                        <input type="email" id="loginEmail" name="email" placeholder="example@mail.com" required autocomplete="email">
                     </div>
                     <div class="auth-field">
                         <label for="loginPassword">🔒 Password</label>
                         <div class="password-wrapper">
-                            <input type="password" id="loginPassword" name="password" placeholder="Şifreniz" required autocomplete="current-password">
-                            <button type="button" class="toggle-pw" onclick="togglePassword('loginPassword', this)" title="Şifreyi göster/gizle">👁️</button>
+                            <input type="password" id="loginPassword" name="password" placeholder="Your password" required autocomplete="current-password">
+                            <button type="button" class="toggle-pw" onclick="togglePassword('loginPassword', this)" title="Show/hide password">👁️</button>
                         </div>
                     </div>
                     <div class="auth-options">
@@ -326,8 +326,8 @@
                         <span>Sign In</span><span class="btn-arrow">→</span>
                     </button>
                 </form>
-                <div class="auth-divider"><span>veya</span></div>
-                <div class="auth-switch">Hesabın yok mu? <span onclick="showModalRegister()">Kayıt ol →</span></div>
+                <div class="auth-divider"><span>or</span></div>
+                <div class="auth-switch">Don't have an account? <span onclick="showModalRegister()">Sign up →</span></div>
             </div>
 
             <!-- Register -->
@@ -343,8 +343,8 @@
                         <input type="text" id="registerUsername" name="username" placeholder="anime_hunter" required minlength="3" maxlength="20" autocomplete="username">
                     </div>
                     <div class="auth-field">
-                        <label for="registerEmail">📧 E-posta</label>
-                        <input type="email" id="registerEmail" name="email" placeholder="ornek@mail.com" required autocomplete="email">
+                        <label for="registerEmail">📧 Email</label>
+                        <input type="email" id="registerEmail" name="email" placeholder="example@mail.com" required autocomplete="email">
                     </div>
                     <div class="auth-field">
                         <label for="registerPassword">🔒 Password</label>
@@ -358,16 +358,16 @@
                     <div class="auth-field">
                         <label for="registerPasswordConfirm">🔒 Confirm Password</label>
                         <div class="password-wrapper">
-                            <input type="password" id="registerPasswordConfirm" name="confirm" placeholder="Şifrenizi tekrar girin" required autocomplete="new-password">
+                            <input type="password" id="registerPasswordConfirm" name="confirm" placeholder="Confirm your password" required autocomplete="new-password">
                             <button type="button" class="toggle-pw" onclick="togglePassword('registerPasswordConfirm', this)">👁️</button>
                         </div>
                     </div>
                     <div id="registerError" class="auth-error"></div>
                     <button type="submit" class="auth-btn auth-btn-primary" id="registerBtn">
-                        <span>Hesap Oluştur</span><span class="btn-arrow">→</span>
+                        <span>Create Account</span><span class="btn-arrow">→</span>
                     </button>
                 </form>
-                <div class="auth-switch">Zaten hesabın var mı? <span onclick="showModalLogin()">Giriş yap →</span></div>
+                <div class="auth-switch">Already have an account? <span onclick="showModalLogin()">Sign in →</span></div>
             </div>
 
             <!-- Forgot Password -->
@@ -378,8 +378,8 @@
                     <p>A reset link will be sent to your email</p>
                 </div>
                 <div class="auth-field">
-                    <label for="forgotEmail">📧 E-posta</label>
-                    <input type="email" id="forgotEmail" placeholder="ornek@mail.com" autocomplete="email">
+                    <label for="forgotEmail">📧 Email</label>
+                    <input type="email" id="forgotEmail" placeholder="example@mail.com" autocomplete="email">
                 </div>
                 <div id="forgotError" class="auth-error"></div>
                 <div id="forgotSuccess" class="auth-success"></div>
@@ -567,7 +567,7 @@
                         <div class="psb-item">
                             <span class="psb-dot"></span>
                             <span class="psb-num" id="liveUserCount">—</span>
-                            <span class="psb-label" data-i18n="liveUsersLabel">Registered Users</span>
+                            <span class="psb-label" data-i18n="liveUsersLabel">Users</span>
                         </div>
                         <div class="psb-divider"></div>
                         <div class="psb-item">
@@ -854,18 +854,18 @@
 
                     <!-- Tür Filtreleri -->
                     <div class="genre-filters">
-                        <button class="genre-tag active" onclick="filterByGenre('all', this)" data-i18n="genreAll">Tümü</button>
-                        <button class="genre-tag" onclick="filterByGenre('action', this)" data-i18n="genreAction">⚔️ Aksiyon</button>
-                        <button class="genre-tag" onclick="filterByGenre('adventure', this)" data-i18n="genreAdventure">🗺️ Macera</button>
-                        <button class="genre-tag" onclick="filterByGenre('comedy', this)" data-i18n="genreComedy">😂 Komedi</button>
-                        <button class="genre-tag" onclick="filterByGenre('drama', this)" data-i18n="genreDrama">🎭 Drama</button>
-                        <button class="genre-tag" onclick="filterByGenre('fantasy', this)" data-i18n="genreFantasy">🔮 Fantastik</button>
-                        <button class="genre-tag" onclick="filterByGenre('romance', this)" data-i18n="genreRomance">💕 Romantik</button>
-                        <button class="genre-tag" onclick="filterByGenre('scifi', this)" data-i18n="genreScifi">🚀 Sci-Fi</button>
-                        <button class="genre-tag" onclick="filterByGenre('horror', this)" data-i18n="genreHorror">👻 Korku</button>
-                        <button class="genre-tag" onclick="filterByGenre('mystery', this)" data-i18n="genreMystery">🔍 Gizem</button>
-                        <button class="genre-tag" onclick="filterByGenre('psychological', this)" data-i18n="genrePsych">🧠 Psikolojik</button>
-                        <button class="genre-tag" onclick="filterByGenre('sports', this)" data-i18n="genreSports">⚽ Spor</button>
+                        <button class="genre-tag active" onclick="filterByGenre('all', this)" data-i18n="genreAll">All</button>
+                        <button class="genre-tag" onclick="filterByGenre('action', this)" data-i18n="genreAction">Action</button>
+                        <button class="genre-tag" onclick="filterByGenre('adventure', this)" data-i18n="genreAdventure">Adventure</button>
+                        <button class="genre-tag" onclick="filterByGenre('comedy', this)" data-i18n="genreComedy">Comedy</button>
+                        <button class="genre-tag" onclick="filterByGenre('drama', this)" data-i18n="genreDrama">Drama</button>
+                        <button class="genre-tag" onclick="filterByGenre('fantasy', this)" data-i18n="genreFantasy">Fantasy</button>
+                        <button class="genre-tag" onclick="filterByGenre('romance', this)" data-i18n="genreRomance">Romance</button>
+                        <button class="genre-tag" onclick="filterByGenre('scifi', this)" data-i18n="genreScifi">Sci-Fi</button>
+                        <button class="genre-tag" onclick="filterByGenre('horror', this)" data-i18n="genreHorror">Horror</button>
+                        <button class="genre-tag" onclick="filterByGenre('mystery', this)" data-i18n="genreMystery">Mystery</button>
+                        <button class="genre-tag" onclick="filterByGenre('psychological', this)" data-i18n="genrePsych">Psychological</button>
+                        <button class="genre-tag" onclick="filterByGenre('sports', this)" data-i18n="genreSports">Sports</button>
                     </div>
 
                     <div class="discover-grid" id="discoverGrid"></div>
@@ -1187,7 +1187,7 @@
                             <div style="margin-bottom:1.2rem;">
                                 <label style="display:block;font-size:0.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.4rem;">Yeni Şifre (Tekrar)</label>
                                 <div class="password-wrapper">
-                                    <input type="password" id="confirmNewPassword" placeholder="Şifreyi tekrar girin" style="width:100%;padding:0.8rem 2.8rem 0.8rem 1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;font-size:0.9rem;font-family:DM Sans,sans-serif;outline:none;box-sizing:border-box;transition:border-color 0.2s;" onfocus="this.style.borderColor='rgba(255,51,102,0.7)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+                                    <input type="password" id="confirmNewPassword" placeholder="Confirm your password" style="width:100%;padding:0.8rem 2.8rem 0.8rem 1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;font-size:0.9rem;font-family:DM Sans,sans-serif;outline:none;box-sizing:border-box;transition:border-color 0.2s;" onfocus="this.style.borderColor='rgba(255,51,102,0.7)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
                                     <button type="button" class="toggle-pw" onclick="togglePwVisibility('confirmNewPassword',this)">👁</button>
                                 </div>
                             </div>
@@ -1255,23 +1255,23 @@
                             <label>Type</label>
                             <select id="itemGenre">
                                 <option value="">Select...</option>
-                                <option value="action">Aksiyon</option>
-                                <option value="adventure">Macera</option>
-                                <option value="comedy">Komedi</option>
+                                <option value="action">Action</option>
+                                <option value="adventure">Adventure</option>
+                                <option value="comedy">Comedy</option>
                                 <option value="drama">Drama</option>
-                                <option value="fantasy">Fantastik</option>
-                                <option value="romance">Romantik</option>
+                                <option value="fantasy">Fantasy</option>
+                                <option value="romance">Romance</option>
                                 <option value="scifi">Sci-Fi</option>
-                                <option value="horror">Korku</option>
-                                <option value="mystery">Gizem</option>
-                                <option value="sports">Spor</option>
-                                <option value="psychological">Psikolojik</option>
+                                <option value="horror">Horror</option>
+                                <option value="mystery">Mystery</option>
+                                <option value="sports">Sports</option>
+                                <option value="psychological">Psychological</option>
                             </select>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Notlar</label>
-                        <textarea id="itemNotes" rows="2" placeholder="Düşüncelerinizi yazın..."></textarea>
+                        <label>Notes</label>
+                        <textarea id="itemNotes" rows="2" placeholder="Write your thoughts..."></textarea>
                     </div>
                     <div class="modal-actions">
                         <button type="button" class="btn btn-secondary" onclick="closeModal()">İptal</button>

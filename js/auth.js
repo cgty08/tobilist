@@ -316,11 +316,11 @@ async function handleLogin(event) {
     const email = emailEl.value.trim();
     const password = passwordEl.value;
 
-    if (!email) { showError('loginError', 'E-posta adresi giriniz!'); return; }
-    if (!password) { showError('loginError', 'Şifre giriniz!'); return; }
+    if (!email) { showError('loginError', 'Please enter your email address!'); return; }
+    if (!password) { showError('loginError', 'Please enter your password!'); return; }
 
     const btn = document.getElementById('loginBtn');
-    setButtonLoading(btn, true, 'Giriş yapılıyor...');
+    setButtonLoading(btn, true, 'Signing in...');
     clearAllErrors();
 
     try {
@@ -328,9 +328,9 @@ async function handleLogin(event) {
         if (error) throw error;
 
         closeAuthModal();
-        showNotification('Hoş geldiniz! 🎉', 'success');
+        showNotification('Welcome back! 🎉', 'success');
     } catch(error) {
-        setButtonLoading(btn, false, '<span>Giriş Yap</span><span class="btn-arrow">→</span>');
+        setButtonLoading(btn, false, '<span>Sign In</span><span class="btn-arrow">→</span>');
         showError('loginError', getSupabaseErrorMessage(error.message));
     }
 }
@@ -363,7 +363,7 @@ async function handleRegister(event) {
         return;
     }
     if (!email) {
-        showError('registerError', 'E-posta adresi giriniz!');
+        showError('registerError', 'Please enter your email address!');
         return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -371,11 +371,11 @@ async function handleRegister(event) {
         return;
     }
     if (!password || password.length < 6) {
-        showError('registerError', 'Şifre en az 6 karakter olmalı!');
+        showError('registerError', 'Password must be at least 6 characters!');
         return;
     }
     if (password !== confirm) {
-        showError('registerError', 'Şifreler eşleşmiyor!');
+        showError('registerError', 'Passwords do not match!');
         return;
     }
 
@@ -397,18 +397,18 @@ async function handleRegister(event) {
             throw new Error('User already registered');
         }
 
-        setButtonLoading(btn, false, '<span>Hesap Oluştur</span><span class="btn-arrow">→</span>');
+        setButtonLoading(btn, false, '<span>Create Account</span><span class="btn-arrow">→</span>');
         closeAuthModal();
 
         if (data.session) {
             // Email doğrulama kapalı - direkt giriş
-            showNotification('Hesabınız oluşturuldu! Hoş geldiniz, ' + username + '! 🎉', 'success');
+            showNotification('Account created! Welcome, ' + username + '! 🎉', 'success');
         } else {
             // Email doğrulama açık
-            showNotification('Hesabınız oluşturuldu! Lütfen e-posta adresinizi doğrulayın. 📧', 'info');
+            showNotification('Account created! Please verify your email address. 📧', 'info');
         }
     } catch(error) {
-        setButtonLoading(btn, false, '<span>Hesap Oluştur</span><span class="btn-arrow">→</span>');
+        setButtonLoading(btn, false, '<span>Create Account</span><span class="btn-arrow">→</span>');
         showError('registerError', getSupabaseErrorMessage(error.message));
     }
 }
@@ -505,7 +505,7 @@ async function deleteAccount() {
 
     const typed = prompt('Onaylamak için e-posta adresinizi yazın:\n' + email);
     if (!typed || typed.trim().toLowerCase() !== email.toLowerCase()) {
-        showNotification('E-posta adresi eşleşmedi. İşlem iptal edildi.', 'error');
+        showNotification('Email address did not match. Operation cancelled.', 'error');
         return;
     }
 
@@ -793,14 +793,14 @@ function setButtonLoading(btn, loading, html) {
 
 function getSupabaseErrorMessage(msg) {
     if (!msg) return 'Bir hata oluştu.';
-    if (msg.includes('Invalid login credentials')) return 'E-posta veya şifre hatalı!';
-    if (msg.includes('Email not confirmed')) return 'E-postanızı doğrulayın! Gelen kutunuzu kontrol edin.';
-    if (msg.includes('User already registered')) return 'Bu e-posta zaten kayıtlı! Giriş yapmayı deneyin.';
-    if (msg.includes('Password should be')) return 'Şifre en az 6 karakter olmalı!';
+    if (msg.includes('Invalid login credentials')) return 'Invalid email or password!';
+    if (msg.includes('Email not confirmed')) return 'Please verify your email! Check your inbox.';
+    if (msg.includes('User already registered')) return 'This email is already registered! Try signing in.';
+    if (msg.includes('Password should be')) return 'Password must be at least 6 characters!';
     if (msg.includes('Unable to validate')) return 'Geçersiz e-posta adresi!';
     if (msg.includes('Email rate limit')) return 'Çok fazla deneme. Lütfen birkaç dakika bekleyin.';
     if (msg.includes('network') || msg.includes('fetch')) return 'İnternet bağlantınızı kontrol edin.';
-    if (msg.includes('signup')) return 'Kayıt işlemi başarısız. Lütfen tekrar deneyin.';
+    if (msg.includes('signup')) return 'Registration failed. Please try again.';
     return msg;
 }
 
@@ -856,7 +856,7 @@ async function changePasswordSettings() {
     if (newPw !== confirmPw) { if (errEl) { errEl.textContent = '⚠️ Yeni şifreler eşleşmiyor!'; errEl.style.display = 'block'; } return; }
     if (currentPw === newPw) { if (errEl) { errEl.textContent = '⚠️ Yeni şifre mevcut şifreyle aynı olamaz.'; errEl.style.display = 'block'; } return; }
 
-    if (btn) { btn.disabled = true; btn.textContent = '⏳ Güncelleniyor...'; }
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Updating...'; }
 
     try {
         if (!window.supabaseClient || !currentUser) throw new Error('Oturum bulunamadı.');
@@ -872,16 +872,16 @@ async function changePasswordSettings() {
         if (sucEl) {
             sucEl.textContent = (typeof _lang !== 'undefined' && _lang === 'en')
                 ? '✅ Password updated successfully!'
-                : '✅ Şifre başarıyla güncellendi!';
+                : '✅ Password updated successfully!';
             sucEl.style.display = 'block';
         }
         ['currentPassword','newPassword','confirmNewPassword'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
         const bar = document.getElementById('settingsPwStrengthBar');
         if (bar) bar.style.width = '0%';
-        if (btn) { btn.disabled = false; btn.textContent = '🔐 Şifreyi Güncelle'; }
+        if (btn) { btn.disabled = false; btn.textContent = '🔐 Update Password'; }
         setTimeout(() => { if (sucEl) sucEl.style.display = 'none'; }, 4000);
     } catch(e) {
-        if (btn) { btn.disabled = false; btn.textContent = '🔐 Şifreyi Güncelle'; }
+        if (btn) { btn.disabled = false; btn.textContent = '🔐 Update Password'; }
         if (errEl) { errEl.textContent = '❌ ' + (e.message || 'Bir hata oluştu.'); errEl.style.display = 'block'; }
     }
 }
@@ -902,7 +902,7 @@ async function handleForgotPassword() {
     if (!emailEl) return;
 
     const email = emailEl.value.trim();
-    if (!email) { showError('forgotError', 'E-posta adresinizi girin!'); return; }
+    if (!email) { showError('forgotError', 'Please enter your email address!'); return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('forgotError', 'Geçerli bir e-posta adresi girin.'); return; }
 
     clearAllErrors();
