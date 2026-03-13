@@ -1,14 +1,14 @@
 // ============================================================
-//  OniList Service Worker v1.1
+//  OniList Service Worker v1.2
 //  Strateji:
 //   - Shell dosyaları (HTML/CSS/JS): Cache-first
 //   - API istekleri (jikan/anilist): Network-first, cache fallback
 //   - Resimler: Cache-first, 7 gün TTL
 // ============================================================
 
-const CACHE_NAME    = 'onilist-v1.1';
-const API_CACHE     = 'onilist-api-v1.1';
-const IMG_CACHE     = 'onilist-img-v1.1';
+const CACHE_NAME    = 'onilist-v1.2';
+const API_CACHE     = 'onilist-api-v1.2';
+const IMG_CACHE     = 'onilist-img-v1.2';
 
 // Kurulumda önceden cache'e alınacak app shell dosyaları
 const SHELL_URLS = [
@@ -93,7 +93,7 @@ self.addEventListener('fetch', event => {
         url.hostname.includes('graphql.anilist.co') ||
         url.hostname.includes('kitsu.io')
     ) {
-        event.respondWith(networkFirstStrategy(request, API_CACHE, 60 * 60 * 3)); // 3 saatlik cache
+        event.respondWith(networkFirstStrategy(request, API_CACHE, 60 * 60 * 24)); // 24 saatlik cache
         return;
     }
 
@@ -169,10 +169,26 @@ async function cacheFirstStrategy(request, cacheName, maxAge) {
 }
 
 /**
- * Network-First: Önce network'e git, hata varsa cache'ten dön.
+ * Network-First: Önce cache'e bak — süresi dolmamışsa direkt dön.
+ * Süresi dolmuşsa veya cache yoksa network'e git, hata varsa cache'ten dön.
  */
 async function networkFirstStrategy(request, cacheName, maxAge) {
     const cache = await caches.open(cacheName);
+
+    // Cache'de var mı ve süresi geçerli mi?
+    if (maxAge) {
+        const cached = await cache.match(request);
+        if (cached) {
+            const dateHeader = cached.headers.get('date');
+            if (dateHeader) {
+                const age = (Date.now() - new Date(dateHeader).getTime()) / 1000;
+                if (age < maxAge) {
+                    return cached; // Cache geçerli, network'e gitme
+                }
+            }
+        }
+    }
+
     try {
         const response = await fetch(request);
         if (response.ok) await cache.put(request, response.clone());
@@ -237,4 +253,4 @@ self.addEventListener('notificationclick', event => {
     event.waitUntil(clients.openWindow(url));
 });
 
-console.log('[SW] OniList Service Worker v1.1 active');
+console.log('[SW] OniList Service Worker v1.2 active');
