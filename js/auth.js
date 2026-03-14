@@ -132,16 +132,25 @@ async function loginSuccess(user) {
             if (typeof renderProfile === 'function') renderProfile();
             if (typeof updateXPDisplay === 'function') updateXPDisplay();
         } else if (error && error.code === 'PGRST116') {
-            // No record in Supabase (new user)
-            if (!dataManager.data.items.length) {
-                // Truly new - populate social info
-                dataManager.data.social.name = currentUser.displayName;
+            // Supabase'de kayıt yok — YENİ KULLANICI KONTROLÜ
+            // ÖNEMLİ: localStorage'da veri varsa (eski kullanıcı, Supabase pause/silindi)
+            // kesinlikle sıfırlama yapma, mevcut lokal veriyi Supabase'e yükle.
+            const hasLocalData = dataManager.data.items && dataManager.data.items.length > 0;
+            const hasLocalXP   = dataManager.data.xp && dataManager.data.xp.total > 0;
+
+            if (hasLocalData || hasLocalXP) {
+                // Eski kullanıcı — Supabase kaydı kaybolmuş, lokal veri sağlam
+                console.warn('[Auth] Supabase kaydı bulunamadı ama localStorage verisi var — Supabase\'e yükleniyor (veri korunuyor).');
+                dataManager.saveAll();
+            } else {
+                // Gerçekten yeni kullanıcı — sosyal bilgileri doldur
+                dataManager.data.social.name  = currentUser.displayName;
                 dataManager.data.social.email = currentUser.email;
+                dataManager.saveAll();
             }
-            dataManager.saveAll(); // Supabase'e ilk kaydı yap
         } else if (error) {
             console.warn('Supabase fetch error:', error.message);
-            // localStorage data already loaded, no problem
+            // localStorage verisi zaten yüklü, sorun yok
         }
     } catch(e) {
         console.warn('Could not sync with Supabase, using localStorage:', e.message);

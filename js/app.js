@@ -254,7 +254,7 @@ function renderContinueWatching() {
         return '<div class="media-card" style="cursor:pointer" onclick="openDetailPage(\'' + safeItem + '\')">' +
             '<div class="media-poster">' +
                 (item.poster
-                    ? '<img src="' + item.poster + '" alt="' + _esc(item.name || '') + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
+                    ? '<img src="' + _esc(item.poster) + '" alt="' + _esc(item.name || '') + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
                       '<div class="media-poster-fallback" style="display:none">' + getTypeIcon(item.type) + '</div>'
                     : '<div class="media-poster-fallback">' + getTypeIcon(item.type) + '</div>') +
                 '<span class="media-type-badge ' + safeType(item.type) + '">' + safeType(item.type) + '</span>' +
@@ -304,7 +304,7 @@ function renderMediaRow(containerId, items) {
         return '<div class="media-card" style="cursor:pointer" onclick="openDetailPage(\'' + safeItem + '\')">' +
             '<div class="media-poster">' +
                 (item.poster
-                    ? '<img src="' + item.poster + '" alt="' + _esc(item.name || '') + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
+                    ? '<img src="' + _esc(item.poster) + '" alt="' + _esc(item.name || '') + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
                       '<div class="media-poster-fallback" style="display:none">' + getTypeIcon(item.type) + '</div>'
                     : '<div class="media-poster-fallback">' + getTypeIcon(item.type) + '</div>') +
                 '<span class="media-type-badge ' + safeType(item.type) + '">' + safeType(item.type) + '</span>' +
@@ -392,7 +392,7 @@ function renderDiscoverGrid() {
         return '<div class="media-card" style="cursor:pointer" onclick="openDetailPage(\'' + safeItem + '\')">' +
             '<div class="media-poster">' +
                 (item.poster
-                    ? '<img src="' + item.poster + '" alt="' + _esc(item.name || '') + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
+                    ? '<img src="' + _esc(item.poster) + '" alt="' + _esc(item.name || '') + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
                       '<div class="media-poster-fallback" style="display:none">' + getTypeIcon(item.type) + '</div>'
                     : '<div class="media-poster-fallback">' + getTypeIcon(item.type) + '</div>') +
                 '<span class="media-type-badge ' + safeType(item.type) + '">' + safeType(item.type) + '</span>' +
@@ -548,7 +548,7 @@ async function searchAPI() {
 
                     return '<div class="api-result-item" onclick="fillFromAPI(\'' + safeData.replace(/'/g, "\\'") + '\')">' +
                         (item.poster
-                            ? '<img src="' + item.poster + '" alt="' + _esc(item.name || '') + '">'
+                            ? '<img src="' + _esc(item.poster) + '" alt="' + _esc(item.name || '') + '">'
                             : '<div style="width:40px;height:55px;background:var(--bg-card);border-radius:4px;display:flex;align-items:center;justify-content:center;">' + getTypeIcon(item.type) + '</div>') +
                         '<div>' +
                             '<div class="api-result-title">' + _esc(item.name || '') + '</div>' +
@@ -853,7 +853,7 @@ function _fillDetailBasic(item) {
     const s = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '—'; };
 
     const posterEl = document.getElementById('dpPoster');
-    if (posterEl) { posterEl.src = item.poster || ''; posterEl.onerror = () => posterEl.style.display = 'none'; }
+    if (posterEl) { posterEl.src = _esc(item.poster || ''); posterEl.onerror = () => posterEl.style.display = 'none'; }
 
     s('dpTitle', item.name);
     s('dpYear', item.year);
