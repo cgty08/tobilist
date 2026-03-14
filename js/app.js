@@ -853,7 +853,7 @@ function _fillDetailBasic(item) {
     const s = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '—'; };
 
     const posterEl = document.getElementById('dpPoster');
-    if (posterEl) { posterEl.src = _esc(item.poster || ''); posterEl.onerror = () => posterEl.style.display = 'none'; }
+    if (posterEl) { posterEl.src = item.poster || ''; posterEl.onerror = () => posterEl.style.display = 'none'; }
 
     s('dpTitle', item.name);
     s('dpYear', item.year);
