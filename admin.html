@@ -328,6 +328,10 @@
             <span class="login-logo-text">OniList</span>
         </div>
         <p class="login-sub">Admin Panel — <span>RESTRICTED ACCESS</span></p>
+        <div id="sessionCheckMsg" style="background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.25);border-radius:10px;padding:.7rem 1rem;margin-bottom:1rem;font-size:.82rem;color:#a78bfa;display:flex;align-items:center;gap:.5rem;">
+            <span style="display:inline-block;width:14px;height:14px;border:2px solid rgba(124,58,237,.4);border-top-color:#a78bfa;border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0;"></span>
+            Checking existing session…
+        </div>
         <div class="lf"><label>Email Address</label><input type="email" id="adminEmail" placeholder="admin@onilist.com" autocomplete="email"></div>
         <div class="lf"><label>Password</label><input type="password" id="adminPassword" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')adminLogin()"></div>
         <div id="loginErr" class="login-err"></div>
@@ -1038,6 +1042,15 @@ window.onload = async () => {
         }
     } catch(e) { console.warn(e); }
 
+    // Aktif admin oturumu yok — login formunu göster
+    const _scmEl = document.getElementById('sessionCheckMsg');
+    if (_scmEl) {
+        _scmEl.innerHTML = '🔐 Please sign in with your admin account.';
+        _scmEl.style.background = 'rgba(255,255,255,.04)';
+        _scmEl.style.borderColor = 'rgba(255,255,255,.08)';
+        _scmEl.style.color = '#8892a4';
+    }
+
     // Monitor auth state changes (other tab logout also closes this session)
     try {
         sb.auth.onAuthStateChange((event, session) => {
@@ -1067,6 +1080,8 @@ async function checkIsAdmin(userId, userEmail) {
 
 function boot() {
     document.getElementById('loginScreen').style.display = 'none';
+    const _scm = document.getElementById('sessionCheckMsg');
+    if (_scm) _scm.style.display = 'none';
     document.getElementById('mainContent').style.display = 'block';
     document.getElementById('adminNameEl').textContent = currentAdmin.email.split('@')[0];
     document.getElementById('supaUrlEl').value = SUPABASE_URL;
