@@ -253,7 +253,8 @@ const _AniList = {
         this._last = Date.now();
         if (res.status === 429) {
             if (_retries >= 3) throw new Error('AniList rate limit: max retries exceeded');
-            const delay = 15000 * Math.pow(2, _retries);
+            // Üstel bekleme, ancak maksimum 15 saniye ile sınırlı (yoksa UI donmuş görünür)
+            const delay = Math.min(15000, 3000 * Math.pow(2, _retries));
             await new Promise(r => setTimeout(r, delay));
             return this.query(gql, vars, _retries + 1);
         }

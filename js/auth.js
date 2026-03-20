@@ -106,6 +106,10 @@ async function loginSuccess(user) {
     // Admin status is controlled exclusively by is_admin column in Supabase user_data.
     // To grant admin: UPDATE user_data SET data = data || '{"is_admin": true}' WHERE data->>'email' = 'owner@email.com';
 
+    // ── BAN CHECK: Supabase'den gelen remote data kullanılır.
+    // localStorage manipüle edilerek ban atlanamaz. ────────────
+    let _remoteDataForBan = null;
+
     try {
         const { data, error } = await window.supabaseClient
             .from('user_data')
@@ -116,6 +120,11 @@ async function loginSuccess(user) {
         // Set admin flag: DB column only (no hardcoded IDs)
         if (data?.data?.is_admin === true || data?.is_admin === true) {
             currentUser.isAdmin = true;
+        }
+
+        // Ban kontrolü için remote data'yı sakla
+        if (!error && data && data.data) {
+            _remoteDataForBan = data.data;
         }
 
         if (!error && data && data.data) {
@@ -157,16 +166,18 @@ async function loginSuccess(user) {
     }
 
     // ── BAN CHECK ────────────────────────────────────────────
-    const userData = dataManager.data;
-    if (userData && userData.banned === true) {
+    // GÜVENLIK: Ban durumu YALNIZCA Supabase'den gelen _remoteDataForBan üzerinden kontrol edilir.
+    // dataManager.data (localStorage kaynaklı) kullanılmaz — kullanıcı tarafından manipüle edilebilir.
+    const _banSource = _remoteDataForBan;
+    if (_banSource && _banSource.banned === true) {
         // Check if ban has expired
-        const banExpiry = userData.ban_expiry;
+        const banExpiry = _banSource.ban_expiry;
         const isExpired = banExpiry && new Date(banExpiry) < new Date();
 
         if (!isExpired) {
             // Banned user - restricted mode
             currentUser.isBanned = true;
-            currentUser.banReason = userData.ban_reason || 'Rule violation';
+            currentUser.banReason = _banSource.ban_reason || 'Rule violation';
             currentUser.banExpiry = banExpiry;
             window.currentUser = currentUser;
 
@@ -188,11 +199,21 @@ async function loginSuccess(user) {
             }, 1500);
             return;
         } else {
-            // Ban expired - remove automatically
-            userData.banned = false;
-            userData.ban_reason = null;
-            userData.ban_expiry = null;
-            dataManager.saveAll();
+            // Ban expired - remove automatically from Supabase
+            if (window.supabaseClient) {
+                window.supabaseClient
+                    .from('user_data')
+                    .update({ data: { ..._banSource, banned: false, ban_reason: null, ban_expiry: null } })
+                    .eq('user_id', user.id)
+                    .then(({ error: e }) => { if (e) console.warn('Ban expiry clear error:', e.message); });
+            }
+            // Local kopyayı da temizle
+            if (dataManager.data) {
+                dataManager.data.banned = false;
+                dataManager.data.ban_reason = null;
+                dataManager.data.ban_expiry = null;
+                dataManager.saveAll();
+            }
         }
     }
     // ── BAN CHECK END ───────────────────────────────────────
@@ -505,56 +526,173 @@ async function handleLogout() {
 
 
 // ===== DELETE ACCOUNT (Permanent) =====
-async function deleteAccount() {
+// DOM tabanlı iki adımlı onay — native confirm/prompt kullanılmaz (mobil uyumsuzluk, engellenme riski)
+function deleteAccount() {
     if (!currentUser) return;
-    
-    const email = currentUser.email || '';
-    const confirm1 = confirm('Hesabınızı KALICI olarak silmek istediğinize emin misiniz?\n\nBu işlem GERİ ALINAMAZ! Tüm verileriniz silinecek.');
-    if (!confirm1) return;
+    if (document.getElementById('deleteAccountBox')) return;
 
-    const typed = prompt('Onaylamak için e-posta adresinizi yazın:\n' + email);
-    if (!typed || typed.trim().toLowerCase() !== email.toLowerCase()) {
-        showNotification('Email address did not match. Operation cancelled.', 'error');
-        return;
+    const email = currentUser.email || '';
+
+    // ── ADIM 1: İlk onay kutusu ──────────────────────────────
+    const box = document.createElement('div');
+    box.id = 'deleteAccountBox';
+    box.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:999999;background:#141824;border:1px solid rgba(239,68,68,0.35);border-radius:16px;padding:1.6rem;width:340px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,0.7);font-family:DM Sans,sans-serif;opacity:0;transition:opacity 0.25s;';
+
+    function _closeBox() {
+        box.style.opacity = '0';
+        setTimeout(() => { if (box.parentNode) box.parentNode.removeChild(box); }, 250);
     }
 
-    try {
-        if (window.supabaseClient) {
-            const userId = currentUser.id || currentUser.uid;
+    function _buildStep1() {
+        box.textContent = '';
+        // İkon + Başlık
+        const iconDiv = document.createElement('div');
+        iconDiv.style.cssText = 'width:40px;height:40px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:0.9rem;';
+        iconDiv.textContent = '⚠️';
 
-            // 1. Tüm verileri sil
-            await window.supabaseClient.from('user_data').delete().eq('user_id', userId);
-            try { await window.supabaseClient.from('reviews').delete().eq('user_id', userId); } catch(e){}
-            try { await window.supabaseClient.from('comments').delete().eq('user_id', userId); } catch(e){}
+        const title = document.createElement('div');
+        title.style.cssText = 'color:#fff;font-weight:700;font-size:1rem;margin-bottom:0.4rem;';
+        title.textContent = 'Hesabı Kalıcı Sil';
 
-            // 2. Permanently delete from auth.users via RPC
-            const { error: rpcErr } = await window.supabaseClient.rpc('delete_user');
-            if (rpcErr) {
-                // RPC çalışmadıysa kullanıcıyı bilgilendir - hesap auth tablosunda kalıyor
-                console.warn('RPC yok, hesap auth tablosundan silinemedi:', rpcErr.message);
-                showNotification('⚠️ Hesap verileri silindi ancak kimlik doğrulama kaydı tam silinemedi. Destek ekibiyle iletişime geçin.', 'warning');
+        const desc = document.createElement('div');
+        desc.style.cssText = 'color:#8892a4;font-size:0.82rem;line-height:1.5;margin-bottom:1.2rem;';
+        desc.textContent = 'Bu işlem GERİ ALINAMAZ. Tüm verileriniz, listeniz ve başarımlarınız kalıcı olarak silinecek.';
+
+        const btnRow = document.createElement('div');
+        btnRow.style.cssText = 'display:flex;gap:0.6rem;';
+
+        const cancelBtn = document.createElement('button');
+        cancelBtn.style.cssText = 'flex:1;padding:0.6rem;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#a0a8b9;font-size:0.85rem;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;';
+        cancelBtn.textContent = 'İptal';
+        cancelBtn.onclick = _closeBox;
+
+        const nextBtn = document.createElement('button');
+        nextBtn.style.cssText = 'flex:1;padding:0.6rem;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);border-radius:10px;color:#ef4444;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:DM Sans,sans-serif;';
+        nextBtn.textContent = 'Devam Et →';
+        nextBtn.onclick = _buildStep2;
+
+        btnRow.appendChild(cancelBtn);
+        btnRow.appendChild(nextBtn);
+        box.appendChild(iconDiv);
+        box.appendChild(title);
+        box.appendChild(desc);
+        box.appendChild(btnRow);
+    }
+
+    function _buildStep2() {
+        box.textContent = '';
+
+        const title = document.createElement('div');
+        title.style.cssText = 'color:#ef4444;font-weight:700;font-size:0.95rem;margin-bottom:0.5rem;';
+        title.textContent = '📧 E-posta adresinizi girin';
+
+        const desc = document.createElement('div');
+        desc.style.cssText = 'color:#8892a4;font-size:0.8rem;margin-bottom:0.8rem;';
+        desc.textContent = 'Onaylamak için kayıtlı e-posta adresinizi yazın:';
+
+        const emailHint = document.createElement('div');
+        emailHint.style.cssText = 'color:#ff3366;font-size:0.8rem;font-weight:600;margin-bottom:0.6rem;background:rgba(255,51,102,0.08);border-radius:6px;padding:0.4rem 0.6rem;word-break:break-all;';
+        emailHint.textContent = email;
+
+        const input = document.createElement('input');
+        input.type = 'email';
+        input.placeholder = 'E-posta adresiniz...';
+        input.style.cssText = 'width:100%;padding:0.7rem 0.9rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;font-size:0.88rem;font-family:DM Sans,sans-serif;outline:none;box-sizing:border-box;margin-bottom:0.5rem;';
+        input.addEventListener('focus', () => { input.style.borderColor = 'rgba(239,68,68,0.5)'; });
+        input.addEventListener('blur', () => { input.style.borderColor = 'rgba(255,255,255,0.1)'; });
+
+        const errMsg = document.createElement('div');
+        errMsg.style.cssText = 'color:#ef4444;font-size:0.78rem;min-height:1rem;margin-bottom:0.5rem;display:none;';
+        errMsg.textContent = '❌ E-posta eşleşmedi!';
+
+        const btnRow = document.createElement('div');
+        btnRow.style.cssText = 'display:flex;gap:0.6rem;margin-top:0.3rem;';
+
+        const backBtn = document.createElement('button');
+        backBtn.style.cssText = 'flex:1;padding:0.6rem;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#a0a8b9;font-size:0.85rem;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;';
+        backBtn.textContent = '← Geri';
+        backBtn.onclick = _buildStep1;
+
+        const confirmBtn = document.createElement('button');
+        confirmBtn.style.cssText = 'flex:1;padding:0.6rem;background:linear-gradient(135deg,#dc2626,#ef4444);border:none;border-radius:10px;color:#fff;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:DM Sans,sans-serif;';
+        confirmBtn.textContent = '🗑️ Hesabı Sil';
+        confirmBtn.onclick = async () => {
+            const typed = input.value.trim().toLowerCase();
+            if (typed !== email.toLowerCase()) {
+                errMsg.style.display = 'block';
+                input.style.borderColor = 'rgba(239,68,68,0.6)';
+                return;
+            }
+            errMsg.style.display = 'none';
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = '⏳ Siliniyor...';
+            await _doDelete();
+        };
+
+        input.addEventListener('keydown', (e) => { if (e.key === 'Enter') confirmBtn.click(); });
+
+        btnRow.appendChild(backBtn);
+        btnRow.appendChild(confirmBtn);
+        box.appendChild(title);
+        box.appendChild(desc);
+        box.appendChild(emailHint);
+        box.appendChild(input);
+        box.appendChild(errMsg);
+        box.appendChild(btnRow);
+        setTimeout(() => input.focus(), 50);
+    }
+
+    async function _doDelete() {
+        try {
+            if (window.supabaseClient) {
+                const userId = currentUser.id || currentUser.uid;
+
+                // 1. Tüm verileri sil
+                await window.supabaseClient.from('user_data').delete().eq('user_id', userId);
+                try { await window.supabaseClient.from('reviews').delete().eq('user_id', userId); } catch(e){}
+                try { await window.supabaseClient.from('comments').delete().eq('user_id', userId); } catch(e){}
+
+                // 2. Permanently delete from auth.users via RPC
+                const { error: rpcErr } = await window.supabaseClient.rpc('delete_user');
+                if (rpcErr) {
+                    console.warn('RPC yok, hesap auth tablosundan silinemedi:', rpcErr.message);
+                    showNotification('⚠️ Hesap verileri silindi ancak kimlik doğrulama kaydı tam silinemedi. Destek ekibiyle iletişime geçin.', 'warning');
+                }
+
+                // 3. localStorage temizle
+                Object.keys(localStorage)
+                    .filter(k => k.includes(userId) || k.includes('onilist'))
+                    .forEach(k => localStorage.removeItem(k));
+
+                // 4. Oturumu kapat
+                await window.supabaseClient.auth.signOut();
             }
 
-            // 3. localStorage temizle
-            Object.keys(localStorage)
-                .filter(k => k.includes(userId) || k.includes('onilist'))
-                .forEach(k => localStorage.removeItem(k));
-
-            // 4. Oturumu kapat
-            await window.supabaseClient.auth.signOut();
+            _closeBox();
+            currentUser = null;
+            isGuest = true;
+            dataManager.data = dataManager.defaultData();
+            dataManager.currentUserId = null;
+            updateUIForGuest();
+            switchSection('home');
+            showNotification('Hesabınız silindi. Görüşürüz!', 'info');
+        } catch(e) {
+            console.error('Hesap silme hatası:', e);
+            showNotification('Hata oluştu: ' + e.message, 'error');
+            _closeBox();
         }
-
-        currentUser = null;
-        isGuest = true;
-        dataManager.data = dataManager.defaultData();
-        dataManager.currentUserId = null;
-        updateUIForGuest();
-        switchSection('home');
-        showNotification('Hesabınız silindi. Görüşürüz!', 'info');
-    } catch(e) {
-        console.error('Hesap silme hatası:', e);
-        showNotification('Hata oluştu: ' + e.message, 'error');
     }
+
+    _buildStep1();
+    document.body.appendChild(box);
+    setTimeout(() => { box.style.opacity = '1'; }, 10);
+
+    // Dışarıya tıklayınca kapat
+    setTimeout(() => {
+        document.addEventListener('click', function _handler(e) {
+            if (!box.contains(e.target)) { _closeBox(); document.removeEventListener('click', _handler); }
+        });
+    }, 100);
 }
 
 // ===== UI STATE =====

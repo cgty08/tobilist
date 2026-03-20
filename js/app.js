@@ -130,10 +130,32 @@ async function loadContentFromAPI() {
     } catch(e) {
         console.error('API yüklenemedi:', e);
         contentLoading = false;
-        contentLoaded = true; // Tekrar denemeyi önle
+        contentLoaded = false; // Tekrar denemeye izin ver (geçici ağ hatası olabilir)
         renderHomePage();
         renderDiscoverGrid();
-        showNotification(_lang === 'en' ? 'Error loading content.' : 'Error loading content.', 'error');
+        showNotification('İçerik yüklenemedi. Bağlantınızı kontrol edip tekrar deneyin.', 'error');
+
+        // Discover grid'e yeniden deneme butonu göster
+        const dg = document.getElementById('discoverGrid');
+        if (dg) {
+            dg.innerHTML = '';
+            const retryWrap = document.createElement('div');
+            retryWrap.style.cssText = 'text-align:center;padding:3rem 1rem;color:var(--text-muted);';
+            const retryIcon = document.createElement('div');
+            retryIcon.style.cssText = 'font-size:2.5rem;margin-bottom:0.7rem;';
+            retryIcon.textContent = '📡';
+            const retryMsg = document.createElement('p');
+            retryMsg.style.cssText = 'margin-bottom:1rem;font-size:0.9rem;';
+            retryMsg.textContent = 'İçerik yüklenemedi. İnternet bağlantınızı kontrol edin.';
+            const retryBtn = document.createElement('button');
+            retryBtn.className = 'btn btn-primary';
+            retryBtn.textContent = '🔄 Tekrar Dene';
+            retryBtn.onclick = () => loadContentFromAPI();
+            retryWrap.appendChild(retryIcon);
+            retryWrap.appendChild(retryMsg);
+            retryWrap.appendChild(retryBtn);
+            dg.appendChild(retryWrap);
+        }
     }
 }
 
@@ -1111,7 +1133,7 @@ async function submitReview() {
             const reviewXP = comment.length >= 200
                 ? XP_REWARDS.writeLongReview
                 : XP_REWARDS.writeReview;
-            xpSystem.addXP(reviewXP, _lang === 'en'
+            xpSystem.addXP(reviewXP, (typeof _lang !== 'undefined' && _lang === 'en')
                 ? (comment.length >= 200 ? 'Detailed review! ✍️' : 'Review written!')
                 : (comment.length >= 200 ? 'Detaylı yorum! ✍️' : 'Yorum yazıldı!'));
             reviewedItems.push(contentKey);

@@ -104,7 +104,8 @@ const ChatCore = (function () {
         const text      = escapeHTML(row.content || '');
         const time      = formatTime(row.created_at);
         const canClick  = !isOwn && row.user_id;
-        const safeName  = getDisplayName(row).replace(/'/g, "\\'");
+        // safeName: escapeHTML ile tüm özel karakterler kaçırılır (onclick injection önlenir)
+        const safeName  = escapeHTML(getDisplayName(row));
         const clickAttr = canClick
             ? `onclick="openPublicProfile('${row.user_id}','${safeName}')" style="cursor:pointer;" title="${name} profile"`
             : '';
