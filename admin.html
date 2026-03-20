@@ -1234,7 +1234,7 @@ async function updateOnlineCount() {
         listEl.innerHTML = online.slice(0,3).map(u => `
             <div class="online-user-row">
                 <div class="online-user-dot"></div>
-                <span>${esc(u.data?.social?.name || 'User')}</span>
+                <span>${esc((u.data?.social?.name && u.data?.social?.name !== 'User' ? u.data.social.name : (u.data?.social?.email ? u.data.social.email.split('@')[0] : 'Anonymous')))}</span>
             </div>`).join('') + (count > 3 ? `<div class="online-user-row" style="color:var(--green);font-size:.7rem;">+${count-3} more…</div>` : '');
     }
     return { data, online };
@@ -1281,7 +1281,7 @@ async function loadDashboard() {
         listEl.innerHTML = online15.slice(0,3).map(u => `
             <div class="online-user-row">
                 <div class="online-user-dot"></div>
-                <span>${esc(u.data?.social?.name||'User')}</span>
+                <span>${esc((u.data?.social?.name && u.data?.social?.name !== 'User' ? u.data.social.name : (u.data?.social?.email ? u.data.social.email.split('@')[0] : 'Anonymous')))}</span>
             </div>`).join('') + (online15.length > 3 ? `<div class="online-user-row" style="color:var(--green);font-size:.7rem;">+${online15.length-3} more…</div>` : '');
     }
 
@@ -1334,7 +1334,7 @@ async function loadDashboard() {
         return `<tr>
             <td><div class="user-cell">
                 <div style="position:relative;">${avatarHtml(d,'32px')}${isOnline?'<div style="position:absolute;bottom:0;right:0;width:9px;height:9px;background:var(--green);border-radius:50%;border:2px solid var(--card);"></div>':''}</div>
-                <div><div class="user-name">${esc(d?.social?.name||'User')}</div><div class="user-email">${esc(d?.social?.email||'')}</div></div>
+                <div><div class="user-name">${esc(d?.social?.name && d?.social?.name !== 'User' ? d.social.name : (d?.social?.email ? d.social.email.split('@')[0] : 'Anonymous'))}</div><div class="user-email">${esc(d?.social?.email||'')}</div></div>
             </div></td>
             <td style="color:var(--text2);font-size:.82rem;">${fmtRelative(u.updated_at)}</td>
             <td><span style="font-weight:600;">${d?.items?.length||0}</span> <span style="font-size:.72rem;color:var(--text2);">(${d?.items?.filter(i=>i.status==='completed').length||0}✓)</span></td>
@@ -1472,7 +1472,7 @@ async function loadAnalytics() {
                 <td><div class="user-cell">
                     ${avatarHtml(d,'32px')}
                     <div>
-                        <div class="user-name">${esc(d?.social?.name || 'User')}</div>
+                        <div class="user-name">${esc(d?.social?.name && d.social.name !== 'User' ? d.social.name : (d?.social?.email ? d.social.email.split('@')[0] : 'Anonymous'))}</div>
                         <div class="user-email" style="font-size:.7rem;color:var(--text3);">⭐ Ort: ${avgRating} · ${esc(d?.social?.email || '')}</div>
                     </div>
                 </div></td>
@@ -1540,7 +1540,7 @@ function renderUsers() {
     if (!slice.length){tbody.innerHTML='<tr><td colspan="8"><div class="empty-state"><div class="ei">👤</div><h3>User not found</h3></div></td></tr>';return;}
     tbody.innerHTML=slice.map(u=>{
         const d=u.data, banned=d?.banned;
-        const name=d?.social?.name||'User';
+        const name=(d?.social?.name && d?.social?.name !== 'User' ? d.social.name : (d?.social?.email ? d.social.email.split('@')[0] : 'Anonymous'));
         const isOnline = u.updated_at > now15;
         const completedCount = d?.items?.filter(i=>i.status==='completed').length||0;
         return `<tr>
@@ -1625,7 +1625,7 @@ function switchDetailTab(tab) {
 // ===== USER ENTRIES MODAL =====
 function openUserEntries(u) {
     const d = u.data;
-    const name = d?.social?.name || 'User';
+    const name = (d?.social?.name && d?.social?.name !== 'User' ? d.social.name : (d?.social?.email ? d.social.email.split('@')[0] : 'Anonymous'));
     const items = d?.items || [];
     _entriesAll = items;
     document.getElementById('entriesModalTitle').textContent = `${name} — Content List`;
@@ -1705,7 +1705,7 @@ async function loadOnline() {
             return `<tr>
                 <td><div class="user-cell">
                     <div style="position:relative;">${avatarHtml(d,'32px')}<div style="position:absolute;bottom:0;right:0;width:9px;height:9px;background:var(--green);border-radius:50%;border:2px solid var(--card);animation:pulse 2s infinite;"></div></div>
-                    <div><div class="user-name">${esc(d?.social?.name||'User')}</div><div class="user-email">${esc(d?.social?.email||'')}</div></div>
+                    <div><div class="user-name">${esc(d?.social?.name && d?.social?.name !== 'User' ? d.social.name : (d?.social?.email ? d.social.email.split('@')[0] : 'Anonymous'))}</div><div class="user-email">${esc(d?.social?.email||'')}</div></div>
                 </div></td>
                 <td style="color:var(--green);font-size:.82rem;">🟢 ${fmtRelative(u.updated_at)}</td>
                 <td><span class="badge bg-purple">Lv.${d?.xp?.level||1}</span></td>
@@ -1756,7 +1756,7 @@ function renderAllMembers() {
         const d = u.data;
         const isOnline  = u.updated_at > now15;
         const isBanned  = d?.banned;
-        const name      = d?.social?.name || 'User';
+        const name      = (d?.social?.name && d?.social?.name !== 'User' ? d.social.name : (d?.social?.email ? d.social.email.split('@')[0] : 'Anonymous'));
         const completed = d?.items?.filter(i => i.status === 'completed').length || 0;
         const statusBadge = isBanned
             ? '<span class="badge bg-red">🚫 Banned</span>'
@@ -1795,7 +1795,7 @@ function filterBans() {
     const tbody=document.getElementById('bansBody');
     if (!filtered.length){tbody.innerHTML='<tr><td colspan="5"><div class="empty-state"><div class="ei">✅</div><h3>No banned users</h3><p>All users are currently active.</p></div></td></tr>';return;}
     tbody.innerHTML=filtered.map(u=>{
-        const d=u.data, name=esc(d?.social?.name||'User');
+        const d=u.data, name=esc(d?.social?.name && d?.social?.name !== 'User' ? d.social.name : (d?.social?.email ? d.social.email.split('@')[0] : 'Anonymous'));
         const reason=d?.ban_reason||'Kural ihlali';
         const isPermanent = !d?.ban_expiry;
         const expiry = isPermanent ? '<span class="badge bg-red">♾️ Permanent</span>' : `<span class="badge bg-yellow">⏱ until ${fmtDate(d.ban_expiry)}</span>`;
@@ -1822,7 +1822,7 @@ async function loadContent() {
     (data||[]).forEach(u=>{
         (u.data?.items||[]).forEach(item=>{
             if(typeF==='all'||item.type===typeF)
-                allContent.push({...item, _uid:u.user_id, _uname:u.data?.social?.name||'User', _email:u.data?.social?.email||''});
+                allContent.push({...item, _uid:u.user_id, _uname:(u.data?.social?.name && u.data?.social?.name !== 'User' ? u.data.social.name : (u.data?.social?.email ? u.data.social.email.split('@')[0] : 'Anonymous')), _email:u.data?.social?.email||''});
         });
     });
     contentPage=1;
@@ -2081,7 +2081,7 @@ async function loadLogs() {
         <div class="act-dot" style="background:${dotColor(u)}"></div>
         <div>
             <div class="act-text">
-                <strong>${esc(u.data?.social?.name||'User')}</strong>
+                <strong>${esc((u.data?.social?.name && u.data?.social?.name !== 'User' ? u.data.social.name : (u.data?.social?.email ? u.data.social.email.split('@')[0] : 'Anonymous')))}</strong>
                 ${u.data?.banned?'<span class="badge bg-red" style="font-size:.65rem;margin-left:.4rem;">🚫 Banned</span>':''}
                 ${u.data?.warnings?.length?`<span class="badge bg-yellow" style="font-size:.65rem;margin-left:.4rem;">⚠️ ${u.data.warnings.length} warnings</span>`:''}
                 — veri kaydedildi
@@ -2625,8 +2625,44 @@ async function loadChatMessages() {
 }
 
 async function deleteChatMsg(id) {
-    if (!confirm('Are you sure you want to delete this message?')) return;
-    try {
+    // Native confirm yerine inline onay kutusu
+    // Mesaj içeriğini DOM'dan al
+    const rowEl = document.querySelector(`tr[data-msg-id="${id}"]`);
+    const msgText = rowEl ? rowEl.querySelector('td:nth-child(2)')?.textContent?.trim() : '';
+    if (rowEl && rowEl.dataset.confirming) return;
+
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);z-index:99998;display:flex;align-items:center;justify-content:center;padding:1rem;';
+
+    const box = document.createElement('div');
+    box.style.cssText = 'background:#161d2b;border:1px solid rgba(239,68,68,.3);border-radius:16px;padding:1.5rem;max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.7);';
+
+    const preview = msgText ? `<div style="background:rgba(255,255,255,.04);border-radius:8px;padding:.6rem .9rem;margin:.7rem 0;font-size:.82rem;color:var(--text2);border-left:3px solid rgba(239,68,68,.4);max-height:60px;overflow:hidden;">${esc(String(msgText).substring(0,80))}${msgText.length>80?'…':''}</div>` : '';
+
+    box.innerHTML = `
+        <div style="display:flex;align-items:center;gap:.7rem;margin-bottom:.8rem;">
+            <div style="width:36px;height:36px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">🗑️</div>
+            <div>
+                <div style="font-weight:700;font-size:.95rem;color:#fff;">Delete Message</div>
+                <div style="font-size:.78rem;color:var(--text2);margin-top:1px;">This action cannot be undone.</div>
+            </div>
+        </div>
+        ${preview}
+        <div style="display:flex;gap:.6rem;margin-top:1rem;">
+            <button id="_delCancel" style="flex:1;padding:.6rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#a0a8b9;font-size:.85rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">Cancel</button>
+            <button id="_delConfirm" style="flex:1;padding:.6rem;background:linear-gradient(135deg,#dc2626,#ef4444);border:none;border-radius:10px;color:#fff;font-size:.85rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 4px 12px rgba(239,68,68,.3);">🗑️ Delete</button>
+        </div>`;
+
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+    setTimeout(() => overlay.style.opacity = '1', 10);
+
+    box.querySelector('#_delCancel').onclick = () => overlay.remove();
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+
+    box.querySelector('#_delConfirm').onclick = async () => {
+        overlay.remove();
+        try {
         // Method 1: Direct DELETE
         const { error } = await sb.from('chat_messages').delete().eq('id', id);
         if (!error) {
@@ -2663,13 +2699,11 @@ async function deleteChatMsg(id) {
             `CREATE POLICY "admin_delete_chat" ON chat_messages\n` +
             `FOR DELETE USING (EXISTS (SELECT 1 FROM user_data WHERE user_id = auth.uid() AND is_admin = true));`;
         console.error('RLS policy missing. Solution:\n' + sqlPolicy);
-        alert('No delete permission!\n\nSupabase Dashboard > SQL Editor > New Query:\n\n' +
-            'CREATE POLICY "admin_delete_chat"\nON chat_messages FOR DELETE\n' +
-            'USING (EXISTS (SELECT 1 FROM user_data WHERE user_id = auth.uid() AND is_admin = true));\n\n' +
-            'Once you run this command, deletion will work.');
+        toast('❌ No delete permission! Click RLS button to fix.', 'error');
     } catch(e) {
-        alert('Unexpected error: ' + e.message);
-    }
+            toast('Error: ' + e.message, 'error');
+        }
+    }; // overlay confirm click end
 }
 
 

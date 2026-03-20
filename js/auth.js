@@ -118,7 +118,6 @@ async function loginSuccess(user) {
             .single();
 
         // Admin kontrolü: Supabase DB kolonu VEYA owner email whitelist
-        // Owner email değişirse sadece burası güncellenir
         const OWNER_EMAILS = ['list086@gmail.com'];
         const isOwner = OWNER_EMAILS.includes(currentUser.email?.toLowerCase());
         if (isOwner || data?.data?.is_admin === true || data?.is_admin === true) {
@@ -156,7 +155,9 @@ async function loginSuccess(user) {
                 dataManager.saveAll();
             } else {
                 // Gerçekten yeni kullanıcı — sosyal bilgileri doldur
-                dataManager.data.social.name  = currentUser.displayName;
+                // user_metadata.username varsa onu kullan (kayıt formundaki isim)
+                const _regUsername = user.user_metadata?.username || currentUser.displayName;
+                dataManager.data.social.name  = _regUsername;
                 dataManager.data.social.email = currentUser.email;
                 dataManager.saveAll();
             }
@@ -435,6 +436,15 @@ async function handleRegister(event) {
 
         if (data.session) {
             // Email doğrulama kapalı - direkt giriş
+            // Kullanıcı adını social.name olarak kaydet (loginSuccess'te user_metadata henüz boş olabilir)
+            setTimeout(() => {
+                if (dataManager.data?.social && (!dataManager.data.social.name || dataManager.data.social.name === 'User')) {
+                    dataManager.data.social.name  = username;
+                    dataManager.data.social.email = email;
+                    dataManager.saveAll();
+                    if (typeof updateHeaderUser === 'function') updateHeaderUser();
+                }
+            }, 800);
             showNotification('Account created! Welcome, ' + username + '! 🎉', 'success');
         } else {
             // Email doğrulama açık
