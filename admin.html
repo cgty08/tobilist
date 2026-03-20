@@ -89,6 +89,7 @@
         .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:2rem;}
         .stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.4rem;position:relative;overflow:hidden;transition:all .25s;}
         .stat-card:hover{border-color:var(--border2);transform:translateY(-2px);}
+        .stat-card[onclick]:hover{border-color:var(--accent);box-shadow:0 4px 20px rgba(255,51,102,.12);}
         .stat-card::before{content:'';position:absolute;top:0;right:0;width:80px;height:80px;border-radius:50%;opacity:.08;transform:translate(20px,-20px);}
         .stat-card.c-blue::before{background:var(--accent2);}
         .stat-card.c-pink::before{background:var(--accent);}
@@ -351,7 +352,7 @@
 
     <div class="sb-nav">
         <div class="sb-section">Overview</div>
-        <div class="nav-item active" onclick="showPage('dashboard')"><span class="nav-icon">📊</span> Dashboard</div>
+        <div class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')"><span class="nav-icon">📊</span> Dashboard</div>
         <div class="nav-item" onclick="showPage('analytics')"><span class="nav-icon">📈</span> Analytics</div>
 
         <div class="sb-section">Users</div>
@@ -373,8 +374,8 @@
     </div>
     <div class="sb-footer">
         <div class="admin-info">
-            <div class="admin-av"></div>
-            <div><div class="admin-name" id="adminNameEl">Admin</div><div class="admin-role">Super Admin</div></div>
+            <div class="admin-av">👑</div>
+            <div><div class="admin-name" id="adminNameEl">Admin</div><div class="admin-role">Super Admin · <span id="adminSessionTime" style="color:#10b981;font-size:.68rem;">Active</span></div></div>
         </div>
         <button class="logout-btn" onclick="adminLogout()">🚪 Logout</button>
     </div>
@@ -389,6 +390,7 @@
         </div>
         <div class="top-actions">
             <div class="live-badge"><div class="live-dot"></div><span id="adminLiveTxt">Live</span></div>
+            <button class="refresh-btn" onclick="showKeyboardShortcuts()" title="Keyboard shortcuts (Ctrl+1-9)">⌨️ Shortcuts</button>
             <button class="refresh-btn" onclick="refreshCurrent()" id="adminRefreshBtn">🔄 Refresh</button>
             <span id="lastUpdated" style="font-size:.75rem;color:var(--text3);"></span>
         </div>
@@ -396,15 +398,27 @@
 
     <!-- ===== DASHBOARD ===== -->
     <div class="page active" id="page-dashboard">
+
+        <!-- Quick Actions -->
+        <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1.5rem;align-items:center;">
+            <span style="font-size:.78rem;color:var(--text2);font-weight:600;letter-spacing:1px;text-transform:uppercase;">Quick Actions</span>
+            <button onclick="showPage('announcements')" style="padding:.45rem 1rem;background:rgba(255,51,102,.12);border:1px solid rgba(255,51,102,.3);border-radius:8px;color:#ff3366;font-size:.82rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;" onmouseover="this.style.background='rgba(255,51,102,.22)'" onmouseout="this.style.background='rgba(255,51,102,.12)'">📢 Send Announcement</button>
+            <button onclick="showPage('users')" style="padding:.45rem 1rem;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.25);border-radius:8px;color:#00d4ff;font-size:.82rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;" onmouseover="this.style.background='rgba(0,212,255,.2)'" onmouseout="this.style.background='rgba(0,212,255,.1)'">👥 Manage Users</button>
+            <button onclick="showPage('bans')" style="padding:.45rem 1rem;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:8px;color:#ef4444;font-size:.82rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;" onmouseover="this.style.background='rgba(239,68,68,.2)'" onmouseout="this.style.background='rgba(239,68,68,.1)'">🚫 View Bans</button>
+            <button onclick="showPage('chat')" style="padding:.45rem 1rem;background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.25);border-radius:8px;color:#a78bfa;font-size:.82rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;" onmouseover="this.style.background='rgba(124,58,237,.2)'" onmouseout="this.style.background='rgba(124,58,237,.1)'">💬 Moderate Chat</button>
+            <button onclick="showPage('restrictions')" style="padding:.45rem 1rem;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:8px;color:#f59e0b;font-size:.82rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;" onmouseover="this.style.background='rgba(245,158,11,.2)'" onmouseout="this.style.background='rgba(245,158,11,.1)'">⚙️ Platform Settings</button>
+            <button onclick="loadDashboard()" style="margin-left:auto;padding:.45rem .9rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:var(--text2);font-size:.82rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='rgba(255,255,255,.05)'">🔄 Refresh</button>
+        </div>
+
         <div class="stat-grid" id="dashStatGrid">
-            <div class="stat-card c-blue"><div class="stat-icon">👥</div><div class="stat-label">Total Registered</div><div class="stat-value" id="s-total-users">—</div><div class="stat-change up" id="s-users-change">Loading…</div></div>
-            <div class="stat-card online-card"><div class="stat-icon">🟢</div><div class="stat-label">Currently Online</div><div class="stat-value" id="s-online">—</div><div class="stat-change">Active last 15 minutes</div><div class="online-users-list" id="dashOnlineList"></div></div>
+            <div class="stat-card c-blue" onclick="showPage('users')" style="cursor:pointer;"><div class="stat-icon">👥</div><div class="stat-label">Total Registered</div><div class="stat-value" id="s-total-users">—</div><div class="stat-change up" id="s-users-change">Loading…</div></div>
+            <div class="stat-card online-card" onclick="showPage('online')" style="cursor:pointer;"><div class="stat-icon">🟢</div><div class="stat-label">Currently Online</div><div class="stat-value" id="s-online">—</div><div class="stat-change">Active last 15 min · click to view</div><div class="online-users-list" id="dashOnlineList"></div></div>
             <div class="stat-card c-green"><div class="stat-icon">👤</div><div class="stat-label">Active (7 days)</div><div class="stat-value" id="s-active">—</div><div class="stat-change">Logged in last week</div></div>
             <div class="stat-card c-pink"><div class="stat-icon">🎬</div><div class="stat-label">Total Content Entries</div><div class="stat-value" id="s-entries">—</div><div class="stat-change">Sum of all users</div></div>
             <div class="stat-card c-purple"><div class="stat-icon">⭐</div><div class="stat-label">Total XP</div><div class="stat-value" id="s-xp">—</div><div class="stat-change">Earned by all users</div></div>
             <div class="stat-card c-yellow"><div class="stat-icon">✅</div><div class="stat-label">Total Completed</div><div class="stat-value" id="s-completed">—</div><div class="stat-change">Finished by all users</div></div>
-            <div class="stat-card c-orange"><div class="stat-icon">💬</div><div class="stat-label">Total Reviews</div><div class="stat-value" id="s-reviews">—</div><div class="stat-change">Reviews written on platform</div></div>
-            <div class="stat-card c-red"><div class="stat-icon">🚫</div><div class="stat-label">Banned Accounts</div><div class="stat-value" id="s-banned">—</div><div class="stat-change">Active bans</div></div>
+            <div class="stat-card c-orange" onclick="showPage('reviews')" style="cursor:pointer;"><div class="stat-icon">💬</div><div class="stat-label">Total Reviews</div><div class="stat-value" id="s-reviews">—</div><div class="stat-change">Reviews written · click to view</div></div>
+            <div class="stat-card c-red" onclick="showPage('bans')" style="cursor:pointer;"><div class="stat-icon">🚫</div><div class="stat-label">Banned Accounts</div><div class="stat-value" id="s-banned">—</div><div class="stat-change">Active bans · click to view</div></div>
         </div>
         <div class="chart-grid-2">
             <div class="chart-card"><h3>📈 User Activity</h3><p>Daily activity last 14 days</p><canvas id="chartUsers" height="180"></canvas></div>
@@ -416,8 +430,37 @@
         </div>
         <div class="table-card">
             <div class="table-header"><h3>🕐 Recently Active Users</h3><button class="tbl-btn" onclick="showPage('users')">View All →</button></div>
-            <table><thead><tr><th>User</th><th>Last Activity</th><th>Login</th><th>XP</th><th>Status</th></tr></thead>
-            <tbody id="recentUsersBody"><tr class="loading-td"><td colspan="5"><span class="spinner"></span>Loading…</td></tr></tbody></table>
+            <table><thead><tr><th>User</th><th>Last Activity</th><th>Entries</th><th>XP</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody id="recentUsersBody"><tr class="loading-td"><td colspan="6"><span class="spinner"></span>Loading…</td></tr></tbody></table>
+        </div>
+
+        <!-- Platform Health -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;margin-top:1rem;">
+            <div class="chart-card" style="padding:1.2rem;">
+                <h3 style="font-size:.9rem;margin-bottom:.8rem;">⚡ Platform Health</h3>
+                <div id="platformHealthList" style="display:flex;flex-direction:column;gap:.5rem;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:.4rem .6rem;background:rgba(16,185,129,.06);border-radius:6px;font-size:.82rem;">
+                        <span>🟢 Supabase Connection</span><span id="ph-supabase" style="color:#10b981;font-weight:600;">Checking…</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:.4rem .6rem;background:rgba(255,255,255,.03);border-radius:6px;font-size:.82rem;">
+                        <span>📦 DB Rows (user_data)</span><span id="ph-rows" style="color:var(--text2);">—</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:.4rem .6rem;background:rgba(255,255,255,.03);border-radius:6px;font-size:.82rem;">
+                        <span>💬 Chat Messages</span><span id="ph-chat" style="color:var(--text2);">—</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:.4rem .6rem;background:rgba(255,255,255,.03);border-radius:6px;font-size:.82rem;">
+                        <span>📝 Feedback Items</span><span id="ph-feedback" style="color:var(--text2);">—</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:.4rem .6rem;background:rgba(255,255,255,.03);border-radius:6px;font-size:.82rem;">
+                        <span>🔐 Your Session</span><span id="ph-session" style="color:#10b981;font-weight:600;">Active</span>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-card" style="padding:1.2rem;">
+                <h3 style="font-size:.9rem;margin-bottom:.8rem;">📢 Last Announcement</h3>
+                <div id="lastAnnouncementPreview" style="color:var(--text2);font-size:.83rem;">Loading…</div>
+                <button onclick="showPage('announcements')" style="margin-top:.8rem;padding:.4rem .8rem;background:rgba(255,51,102,.1);border:1px solid rgba(255,51,102,.25);border-radius:6px;color:#ff3366;font-size:.78rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">+ New Announcement</button>
+            </div>
         </div>
     </div>
 
@@ -453,9 +496,9 @@
     <div class="page" id="page-users">
         <div class="table-card">
             <div class="table-header">
-                <h3>👥 All Users</h3>
+                <h3>👥 All Users <span id="usersCountLabel" style="font-size:.75rem;font-weight:400;color:var(--text2);"></span></h3>
                 <div class="table-actions">
-                    <input class="search-inp" type="text" id="userSearch" placeholder="🔍 Search users…" oninput="filterUsers()">
+                    <input class="search-inp" type="text" id="userSearch" placeholder="🔍 Search by name, email or ID…" oninput="filterUsers()">
                     <select class="fi" style="width:auto;padding:.38rem .8rem;" id="userStatusF" onchange="filterUsers()">
                         <option value="all">All Statuses</option>
                         <option value="active">✅ Active</option>
@@ -467,7 +510,8 @@
                         <option value="xp">By XP</option>
                         <option value="entries">By Entry Count</option>
                     </select>
-                    <button class="tbl-btn" onclick="exportCSV()">📥 Download CSV</button>
+                    <button class="tbl-btn" onclick="exportCSV()">📥 CSV</button>
+                    <button class="tbl-btn" onclick="exportUsersJSON()">📦 JSON</button>
                 </div>
             </div>
             <table><thead><tr><th>User</th><th>Email</th><th>Joined</th><th>XP / Level</th><th>Login</th><th>Streak</th><th>Status</th><th>Actions</th></tr></thead>
@@ -628,7 +672,14 @@
                     <select class="fs" id="annPriority"><option value="normal">Normal</option><option value="high">High</option><option value="critical">Critical</option></select>
                 </div>
             </div>
-            <button class="submit-btn" onclick="sendAnnouncement()">📢 Publish Announcement</button>
+            <div style="display:flex;gap:.8rem;align-items:center;flex-wrap:wrap;">
+                <button class="submit-btn" onclick="sendAnnouncement()" style="flex:1;min-width:200px;">📢 Publish Announcement</button>
+                <button onclick="previewAnnouncement()" style="padding:.65rem 1.2rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:10px;color:var(--text2);font-size:.88rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;" onmouseover="this.style.background='rgba(255,255,255,.1)'" onmouseout="this.style.background='rgba(255,255,255,.05)'">👁 Preview</button>
+            </div>
+            <div id="annPreviewBox" style="display:none;margin-top:1rem;padding:1rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:10px;font-size:.85rem;color:var(--text2);">
+                <strong style="color:var(--text);" id="annPreviewTitle">—</strong>
+                <p id="annPreviewContent" style="margin-top:.4rem;line-height:1.6;"></p>
+            </div>
         </div>
         <div class="table-card">
             <div class="table-header"><h3>📜 Announcement History</h3></div>
@@ -1002,8 +1053,11 @@ window.onload = async () => {
 // Admin vermek için: UPDATE user_data SET data = data || '{"is_admin": true}' WHERE data->>'email' = 'admin@x.com';
 
 async function checkIsAdmin(userId, userEmail) {
+    // Owner kontrolü: UUID OR email whitelist
     const OWNER_ID = '174cb52b-38d5-4b66-8096-889289b24dcb';
+    const OWNER_EMAILS = ['list086@gmail.com'];
     if (userId === OWNER_ID) return true;
+    if (userEmail && OWNER_EMAILS.includes(userEmail.toLowerCase())) return true;
     try {
         const { data, error } = await sb.from('user_data').select('data').eq('user_id', userId).single();
         if (!error && data?.data?.is_admin === true) return true;
@@ -1023,6 +1077,14 @@ function boot() {
     loadRestrictionsFromDB();  // Restriction toggle'larını Supabase'den yükle
     // Auto-refresh online every 30s
     setInterval(updateOnlineCount, 30000);
+
+    // Session timer - kaç dakikadır aktif
+    const sessionStart = Date.now();
+    setInterval(() => {
+        const mins = Math.floor((Date.now() - sessionStart) / 60000);
+        const el = document.getElementById('adminSessionTime');
+        if (el) el.textContent = mins > 0 ? mins + 'm session' : 'Just started';
+    }, 30000);
 }
 
 // ===== LOGIN =====
@@ -1125,7 +1187,10 @@ function showPage(page) {
     loaders[page]?.();
 }
 
-function refreshCurrent() { showPage(curPage); }
+function refreshCurrent() {
+    showPage(curPage);
+    toast('🔄 Refreshed', 'success');
+}
 
 // ===== ONLINE COUNT =====
 async function updateOnlineCount() {
@@ -1181,7 +1246,9 @@ async function loadDashboard() {
         if (fbBadge && count > 0) { fbBadge.textContent = count; fbBadge.style.display = ''; }
     });
 
-    document.getElementById('s-users-change').textContent = `⬆ ${active7.length} active this week`;
+    const today = new Date().toISOString().split('T')[0];
+    const newToday = users.filter(u => u.data?.social?.joinDate?.startsWith(today)).length;
+    document.getElementById('s-users-change').textContent = `⬆ ${active7.length} active this week${newToday > 0 ? ' · +' + newToday + ' new today' : ''}`;
 
     // Online mini list
     const listEl = document.getElementById('dashOnlineList');
@@ -1245,11 +1312,42 @@ async function loadDashboard() {
                 <div><div class="user-name">${esc(d?.social?.name||'User')}</div><div class="user-email">${esc(d?.social?.email||'')}</div></div>
             </div></td>
             <td style="color:var(--text2);font-size:.82rem;">${fmtRelative(u.updated_at)}</td>
-            <td>${d?.items?.length||0}</td>
+            <td><span style="font-weight:600;">${d?.items?.length||0}</span> <span style="font-size:.72rem;color:var(--text2);">(${d?.items?.filter(i=>i.status==='completed').length||0}✓)</span></td>
             <td><strong style="color:var(--yellow);">${(d?.xp?.total||0).toLocaleString()}</strong> <span class="badge bg-purple" style="font-size:.68rem;">Lv.${d?.xp?.level||1}</span></td>
             <td>${d?.banned?'<span class="badge bg-red">🚫 Banned</span>':isOnline?'<span class="badge bg-green">🟢 Online</span>':'<span class="badge bg-blue">✅ Active</span>'}</td>
+            <td><button class="act-btn btn-view" style="font-size:.78rem;" onclick='viewUser(${JSON.stringify({uid:u.user_id,data:u.data})})'>👁 View</button></td>
         </tr>`;
-    }).join('') || '<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--text2);">No users yet</td></tr>';
+    }).join('') || '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text2);">No users yet</td></tr>';
+
+    // Platform Health
+    try {
+        document.getElementById('ph-supabase').textContent = '✅ Connected';
+        document.getElementById('ph-rows').textContent = users.length + ' rows';
+        sb.from('chat_messages').select('*',{count:'exact',head:true}).then(({count})=>{
+            const el = document.getElementById('ph-chat');
+            if(el) el.textContent = (count||0) + ' messages';
+        });
+        sb.from('feedback').select('*',{count:'exact',head:true}).then(({count})=>{
+            const el = document.getElementById('ph-feedback');
+            if(el) el.textContent = (count||0) + ' items';
+        });
+    } catch(e) {
+        const el = document.getElementById('ph-supabase');
+        if(el) { el.textContent = '❌ Error'; el.style.color = 'var(--red)'; }
+    }
+
+    // Last Announcement preview
+    try {
+        const { data: ann } = await sb.from('announcements').select('title,created_at').order('created_at',{ascending:false}).limit(1);
+        const el = document.getElementById('lastAnnouncementPreview');
+        if (el) {
+            if (ann && ann.length > 0) {
+                el.innerHTML = `<div style="font-weight:600;color:var(--text);margin-bottom:.3rem;">${esc(ann[0].title||'Untitled')}</div><div style="font-size:.75rem;">${fmtRelative(ann[0].created_at)}</div>`;
+            } else {
+                el.textContent = 'No announcements yet.';
+            }
+        }
+    } catch(e) {}
 }
 
 function buildDailyActivity(users, days=14) {
@@ -1408,6 +1506,8 @@ function renderUsers() {
     if (usersPage>pages) usersPage=1;
     const slice=filtered.slice((usersPage-1)*PER_PAGE, usersPage*PER_PAGE);
     document.getElementById('usersPageInfo').textContent=`${total} users • Page ${usersPage}/${pages}`;
+    const countLbl = document.getElementById('usersCountLabel');
+    if (countLbl) countLbl.textContent = `— ${total} user${total!==1?'s':''}`;
     renderPag('usersPageBtns', pages, usersPage, p=>{ usersPage=p; renderUsers(); });
 
     const now15 = new Date(Date.now()-15*60*1000).toISOString();
@@ -1844,6 +1944,17 @@ async function executeWarn() {
 }
 
 // ===== ANNOUNCEMENTS =====
+function previewAnnouncement() {
+    const title = document.getElementById('annTitle')?.value?.trim();
+    const msg   = document.getElementById('annContent')?.value?.trim();
+    const box   = document.getElementById('annPreviewBox');
+    if (!box) return;
+    if (!title && !msg) { box.style.display='none'; return; }
+    document.getElementById('annPreviewTitle').textContent  = title || '(No title)';
+    document.getElementById('annPreviewContent').textContent = msg  || '(No message)';
+    box.style.display = 'block';
+}
+
 async function loadAnnouncements() {
     const { data } = await sb.from('announcements').select('*').order('created_at',{ascending:false}).catch(()=>({data:[]}));
     const tbody=document.getElementById('annBody');
@@ -2016,7 +2127,29 @@ function exportCSV() {
     });
     const blob=new Blob([rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n')],{type:'text/csv;charset=utf-8;'});
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='onilist_users_'+new Date().toISOString().split('T')[0]+'.csv'; a.click();
-    toast('📥 CSV indirildi','success');
+    toast('📥 CSV downloaded','success');
+}
+
+function exportUsersJSON() {
+    if (!allUsers.length) { toast('No users loaded yet','error'); return; }
+    const clean = allUsers.map(u => ({
+        user_id: u.user_id,
+        name:    u.data?.social?.name || '',
+        email:   u.data?.social?.email || '',
+        level:   u.data?.xp?.level || 1,
+        xp:      u.data?.xp?.total || 0,
+        entries: u.data?.items?.length || 0,
+        streak:  u.data?.streak?.count || 0,
+        banned:  u.data?.banned || false,
+        joined:  u.data?.social?.joinDate || '',
+        last_active: u.updated_at || ''
+    }));
+    const blob = new Blob([JSON.stringify(clean, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'onilist_users_' + new Date().toISOString().split('T')[0] + '.json';
+    a.click();
+    toast('📦 JSON downloaded (' + clean.length + ' users)', 'success');
 }
 
 function exportAllData() {
@@ -2404,9 +2537,31 @@ async function setFbStatus(id, status) {
 }
 
 async function deleteFeedback(id) {
-    if (!confirm('Delete this feedback?')) return;
+    // Custom confirm instead of native dialog
+    const el = document.getElementById('fb-' + id);
+    if (!el) return;
+    const old = el.style.cssText;
+    el.style.outline = '2px solid var(--red)';
+    el.style.opacity = '0.6';
+    const confirmed = await new Promise(resolve => {
+        const bar = document.createElement('div');
+        bar.style.cssText = 'display:flex;gap:.5rem;align-items:center;margin-top:.5rem;';
+        bar.innerHTML = '<span style="font-size:.82rem;color:var(--red);">Delete this feedback?</span>';
+        const yes = document.createElement('button');
+        yes.textContent = 'Yes, delete';
+        yes.style.cssText = 'padding:.3rem .7rem;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);border-radius:6px;color:#ef4444;font-size:.78rem;font-weight:600;cursor:pointer;font-family:DM Sans,sans-serif;';
+        const no = document.createElement('button');
+        no.textContent = 'Cancel';
+        no.style.cssText = 'padding:.3rem .7rem;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:6px;color:var(--text2);font-size:.78rem;cursor:pointer;font-family:DM Sans,sans-serif;';
+        yes.onclick = () => { bar.remove(); resolve(true); };
+        no.onclick  = () => { bar.remove(); el.style.cssText = old; resolve(false); };
+        bar.appendChild(yes); bar.appendChild(no);
+        el.appendChild(bar);
+    });
+    if (!confirmed) return;
     const { error } = await sb.from('feedback').delete().eq('id', id);
-    if (!error) document.getElementById('fb-' + id)?.remove();
+    if (!error) { el.style.opacity='0'; setTimeout(()=>el.remove(),200); }
+    else toast('Delete failed: '+error.message,'error');
 }
 
 function _escAdmin(s) {
@@ -2533,6 +2688,94 @@ async function clearOldChatMessages() {
     loadChatMessages();
 }
 
+// ===== KEYBOARD SHORTCUTS =====
+// Ctrl+1..8 → pages, Ctrl+R → refresh, Escape → close modals
+document.addEventListener('keydown', function(e) {
+    if (!currentAdmin) return; // Only when logged in
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+    // Escape: close any open modal
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.open, .modal[style*="flex"]').forEach(m => {
+            m.classList.remove('open');
+            m.style.display = 'none';
+        });
+        const entriesOverlay = document.getElementById('entriesModalOverlay');
+        if (entriesOverlay) entriesOverlay.classList.remove('open');
+        return;
+    }
+
+    if (!e.ctrlKey) return;
+
+    const pages = ['dashboard','analytics','users','online','bans','content','reviews','chat','announcements','feedback','restrictions','logs','settings'];
+    const numKey = parseInt(e.key);
+
+    if (!isNaN(numKey) && numKey >= 1 && numKey <= 9) {
+        e.preventDefault();
+        const pg = pages[numKey - 1];
+        if (pg) showPage(pg);
+        return;
+    }
+
+    if (e.key === 'r' || e.key === 'R') {
+        e.preventDefault();
+        // Refresh current page
+        const activePage = document.querySelector('.nav-item.active')?.dataset?.page;
+        if (activePage === 'dashboard') loadDashboard();
+        else if (activePage === 'users') loadUsers();
+        else if (activePage === 'online') loadOnline();
+        else if (activePage === 'announcements') loadAnnouncements();
+        else if (activePage === 'feedback') loadFeedback();
+        else if (activePage === 'chat') loadChatMessages();
+        toast('🔄 Refreshed', 'success');
+        return;
+    }
+
+    // Ctrl+F → focus search input on current page
+    if (e.key === 'f' || e.key === 'F') {
+        const searchInputs = ['userSearch','contentSearch','reviewSearch','banSearch','chatSearch','allMembersSearch'];
+        for (const id of searchInputs) {
+            const el = document.getElementById(id);
+            if (el && el.offsetParent !== null) {
+                e.preventDefault();
+                el.focus();
+                el.select();
+                break;
+            }
+        }
+    }
+});
+
+// Show keyboard shortcuts hint in settings page or as tooltip
+function showKeyboardShortcuts() {
+    const shortcuts = [
+        ['Ctrl+1', 'Dashboard'],
+        ['Ctrl+2', 'Analytics'],
+        ['Ctrl+3', 'Users'],
+        ['Ctrl+4', 'Online'],
+        ['Ctrl+5', 'Bans'],
+        ['Ctrl+6', 'Content'],
+        ['Ctrl+7', 'Reviews'],
+        ['Ctrl+8', 'Chat'],
+        ['Ctrl+9', 'Announcements'],
+        ['Ctrl+R', 'Refresh current page'],
+        ['Ctrl+F', 'Focus search'],
+        ['Escape', 'Close modal'],
+    ];
+    const msg = shortcuts.map(([k,v]) => `<div style="display:flex;justify-content:space-between;gap:1.5rem;padding:.25rem 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.82rem;"><span style="color:var(--text2);">${k}</span><span>${v}</span></div>`).join('');
+    document.getElementById('shortcutsListEl').innerHTML = msg;
+    openModal('shortcutsModal');
+}
+
 </script>
+
+<!-- Keyboard Shortcuts Modal -->
+<div class="modal-overlay" id="shortcutsModal" onclick="if(event.target===this)closeModal('shortcutsModal')" style="z-index:9999;">
+    <div class="modal" style="max-width:380px;">
+        <div class="modal-header"><h3>⌨️ Keyboard Shortcuts</h3><button class="modal-close" onclick="closeModal('shortcutsModal')">✕</button></div>
+        <div class="modal-body" id="shortcutsListEl" style="display:flex;flex-direction:column;gap:0;"></div>
+    </div>
+</div>
+
 </body>
 </html>

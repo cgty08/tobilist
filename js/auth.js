@@ -117,8 +117,11 @@ async function loginSuccess(user) {
             .eq('user_id', user.id)
             .single();
 
-        // Set admin flag: DB column only (no hardcoded IDs)
-        if (data?.data?.is_admin === true || data?.is_admin === true) {
+        // Admin kontrolü: Supabase DB kolonu VEYA owner email whitelist
+        // Owner email değişirse sadece burası güncellenir
+        const OWNER_EMAILS = ['list086@gmail.com'];
+        const isOwner = OWNER_EMAILS.includes(currentUser.email?.toLowerCase());
+        if (isOwner || data?.data?.is_admin === true || data?.is_admin === true) {
             currentUser.isAdmin = true;
         }
 
