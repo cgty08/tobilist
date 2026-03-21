@@ -103,6 +103,12 @@ async function loginSuccess(user) {
     // Önce localStorage'dan yükle (anında, kayıp riski yok)
     dataManager.setUser(user.id);
 
+    // Mevcut kullanıcı adı boş veya 'User'sa user_metadata.username ile güncelle
+    const _metaName = user.user_metadata?.username;
+    if (_metaName && (!dataManager.data.social?.name || dataManager.data.social.name === 'User' || dataManager.data.social.name === '')) {
+        dataManager.data.social.name = _metaName;
+    }
+
     // Admin status is controlled exclusively by is_admin column in Supabase user_data.
     // To grant admin: UPDATE user_data SET data = data || '{"is_admin": true}' WHERE data->>'email' = 'owner@email.com';
 
@@ -117,10 +123,9 @@ async function loginSuccess(user) {
             .eq('user_id', user.id)
             .single();
 
-        // Admin kontrolü: Supabase DB kolonu VEYA owner email whitelist
+        // Admin: DB kolonu VEYA owner email
         const OWNER_EMAILS = ['list086@gmail.com'];
-        const isOwner = OWNER_EMAILS.includes(currentUser.email?.toLowerCase());
-        if (isOwner || data?.data?.is_admin === true || data?.is_admin === true) {
+        if (OWNER_EMAILS.includes(currentUser.email?.toLowerCase()) || data?.data?.is_admin === true || data?.is_admin === true) {
             currentUser.isAdmin = true;
         }
 
@@ -155,9 +160,9 @@ async function loginSuccess(user) {
                 dataManager.saveAll();
             } else {
                 // Gerçekten yeni kullanıcı — sosyal bilgileri doldur
-                // user_metadata.username varsa onu kullan (kayıt formundaki isim)
-                const _regUsername = user.user_metadata?.username || currentUser.displayName;
-                dataManager.data.social.name  = _regUsername;
+                // user_metadata.username kayıt formundaki isimdir, önce onu dene
+                const _regName = user.user_metadata?.username || currentUser.displayName;
+                dataManager.data.social.name  = _regName;
                 dataManager.data.social.email = currentUser.email;
                 dataManager.saveAll();
             }
@@ -436,15 +441,15 @@ async function handleRegister(event) {
 
         if (data.session) {
             // Email doğrulama kapalı - direkt giriş
-            // Kullanıcı adını social.name olarak kaydet (loginSuccess'te user_metadata henüz boş olabilir)
+            // username'i social.name olarak hemen kaydet
             setTimeout(() => {
-                if (dataManager.data?.social && (!dataManager.data.social.name || dataManager.data.social.name === 'User')) {
+                if (dataManager.data?.social) {
                     dataManager.data.social.name  = username;
                     dataManager.data.social.email = email;
                     dataManager.saveAll();
                     if (typeof updateHeaderUser === 'function') updateHeaderUser();
                 }
-            }, 800);
+            }, 600);
             showNotification('Account created! Welcome, ' + username + '! 🎉', 'success');
         } else {
             // Email doğrulama açık
