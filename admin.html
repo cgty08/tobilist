@@ -480,28 +480,126 @@
 
     <!-- ===== ANALYTICS ===== -->
     <div class="page" id="page-analytics">
-        <div class="stat-grid">
-            <div class="stat-card c-pink"><div class="stat-icon">🔥</div><div class="stat-label">Avg. Streak</div><div class="stat-value" id="a-streak">—</div><div class="stat-change">days/user</div></div>
-            <div class="stat-card c-blue"><div class="stat-icon">📊</div><div class="stat-label">Avg. List Size</div><div class="stat-value" id="a-list">—</div><div class="stat-change">entries/user</div></div>
-            <div class="stat-card c-green"><div class="stat-icon">⭐</div><div class="stat-label">Avg. Rating</div><div class="stat-value" id="a-rating">—</div><div class="stat-change">out of 10</div></div>
-            <div class="stat-card c-purple"><div class="stat-icon">🏆</div><div class="stat-label">Avg. Level</div><div class="stat-value" id="a-level">—</div><div class="stat-change">per user</div></div>
-            <div class="stat-card c-yellow"><div class="stat-icon">📋</div><div class="stat-label">Completion Rate</div><div class="stat-value" id="a-complete-rate">—</div><div class="stat-change">% completed</div></div>
-            <div class="stat-card c-orange"><div class="stat-icon">🌟</div><div class="stat-label">Longest Streak</div><div class="stat-value" id="a-longest-streak">—</div><div class="stat-change">days</div></div>
+
+        <!-- ── PLATFORM OVERVIEW STATS ─────────────────────────────── -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;">
+            <h2 style="font-size:1rem;font-weight:700;color:var(--text);">📊 Platform Overview</h2>
+            <span style="font-size:.75rem;color:var(--text2);">All registered users · Combined data</span>
         </div>
-        <div class="chart-grid-eq">
-            <div class="chart-card"><h3>🎭 Genre Distribution</h3><p>Most popular genres</p><canvas id="chartGenre" height="260"></canvas></div>
-            <div class="chart-card"><h3>👀 Watch Status</h3><p>Overall status breakdown</p><canvas id="chartStatus2" height="260"></canvas></div>
+        <div class="stat-grid" style="margin-bottom:1.5rem;">
+            <div class="stat-card c-blue">
+                <div class="stat-icon">👥</div>
+                <div class="stat-label">Total Users</div>
+                <div class="stat-value" id="a-total-users">—</div>
+                <div class="stat-change" id="a-active-week">— active this week</div>
+            </div>
+            <div class="stat-card c-green">
+                <div class="stat-icon">📺</div>
+                <div class="stat-label">Total Entries Tracked</div>
+                <div class="stat-value" id="a-total-entries">—</div>
+                <div class="stat-change" id="a-completed-entries">— completed</div>
+            </div>
+            <div class="stat-card c-purple">
+                <div class="stat-icon">⚡</div>
+                <div class="stat-label">Total XP Earned</div>
+                <div class="stat-value" id="a-total-xp">—</div>
+                <div class="stat-change" id="a-avg-xp">— avg/user</div>
+            </div>
+            <div class="stat-card c-yellow">
+                <div class="stat-icon">📋</div>
+                <div class="stat-label">Completion Rate</div>
+                <div class="stat-value" id="a-complete-rate">—</div>
+                <div class="stat-change">of all tracked entries</div>
+            </div>
+            <div class="stat-card c-pink">
+                <div class="stat-icon">🔥</div>
+                <div class="stat-label">Longest Streak</div>
+                <div class="stat-value" id="a-longest-streak">—</div>
+                <div class="stat-change" id="a-avg-streak">— days avg</div>
+            </div>
+            <div class="stat-card c-orange">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-label">Avg. Rating</div>
+                <div class="stat-value" id="a-rating">—</div>
+                <div class="stat-change" id="a-total-ratings">— ratings given</div>
+            </div>
         </div>
-        <div class="chart-grid-eq">
-            <div class="chart-card"><h3>📅 Monthly Registrations</h3><p>New signups last 6 months</p><canvas id="chartMonthly" height="200"></canvas></div>
-            <div class="chart-card"><h3>⚡ XP Distribution</h3><p>User XP levels</p><canvas id="chartXP" height="200"></canvas></div>
+
+        <!-- ── PER-USER AVERAGES ──────────────────────────────────── -->
+        <div style="background:var(--bg-card,#161d2b);border:1px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.5rem;">
+            <div style="font-size:.75rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text2);margin-bottom:.8rem;">Per-User Averages</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.6rem;">
+                <div style="text-align:center;padding:.6rem;background:rgba(255,255,255,.03);border-radius:8px;">
+                    <div style="font-size:1.3rem;font-weight:700;color:var(--text);" id="a-avg-list">—</div>
+                    <div style="font-size:.72rem;color:var(--text2);margin-top:.2rem;">entries/user</div>
+                </div>
+                <div style="text-align:center;padding:.6rem;background:rgba(255,255,255,.03);border-radius:8px;">
+                    <div style="font-size:1.3rem;font-weight:700;color:var(--text);" id="a-avg-level">—</div>
+                    <div style="font-size:.72rem;color:var(--text2);margin-top:.2rem;">avg level</div>
+                </div>
+                <div style="text-align:center;padding:.6rem;background:rgba(255,255,255,.03);border-radius:8px;">
+                    <div style="font-size:1.3rem;font-weight:700;color:var(--text);" id="a-avg-streak2">—</div>
+                    <div style="font-size:.72rem;color:var(--text2);margin-top:.2rem;">avg streak</div>
+                </div>
+                <div style="text-align:center;padding:.6rem;background:rgba(255,255,255,.03);border-radius:8px;">
+                    <div style="font-size:1.3rem;font-weight:700;color:var(--text);" id="a-avg-completed">—</div>
+                    <div style="font-size:.72rem;color:var(--text2);margin-top:.2rem;">completed/user</div>
+                </div>
+                <div style="text-align:center;padding:.6rem;background:rgba(255,255,255,.03);border-radius:8px;">
+                    <div style="font-size:1.3rem;font-weight:700;color:var(--text);" id="a-reviews-count">—</div>
+                    <div style="font-size:.72rem;color:var(--text2);margin-top:.2rem;">total reviews</div>
+                </div>
+            </div>
         </div>
+
+        <!-- ── CHARTS ROW 1 ──────────────────────────────────────── -->
+        <div class="chart-grid-eq" style="margin-bottom:1.2rem;">
+            <div class="chart-card">
+                <h3>📅 Monthly Registrations</h3>
+                <p style="font-size:.78rem;color:var(--text2);margin-bottom:.5rem;">New users signed up per month</p>
+                <canvas id="chartMonthly" height="220"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>⚡ XP Distribution</h3>
+                <p style="font-size:.78rem;color:var(--text2);margin-bottom:.5rem;">How users are spread across XP tiers</p>
+                <canvas id="chartXP" height="220"></canvas>
+            </div>
+        </div>
+
+        <!-- ── CHARTS ROW 2 ──────────────────────────────────────── -->
+        <div class="chart-grid-eq" style="margin-bottom:1.2rem;">
+            <div class="chart-card">
+                <h3>🎭 Top Genres</h3>
+                <p style="font-size:.78rem;color:var(--text2);margin-bottom:.5rem;">Most tracked genres across all users</p>
+                <canvas id="chartGenre" height="240"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>👀 Watch Status Breakdown</h3>
+                <p style="font-size:.78rem;color:var(--text2);margin-bottom:.5rem;">Combined status of all entries</p>
+                <canvas id="chartStatus2" height="240"></canvas>
+            </div>
+        </div>
+
+        <!-- ── CONTENT TYPE SPLIT ─────────────────────────────────── -->
+        <div class="chart-grid-eq" style="margin-bottom:1.2rem;">
+            <div class="chart-card">
+                <h3>📚 Content Type Split</h3>
+                <p style="font-size:.78rem;color:var(--text2);margin-bottom:.5rem;">Anime vs Manga vs Webtoon</p>
+                <canvas id="chartContentType" height="220"></canvas>
+            </div>
+            <div class="chart-card" style="padding:1.2rem;">
+                <h3 style="margin-bottom:.8rem;">🏅 Top Genres (Table)</h3>
+                <div id="topGenresTable" style="display:flex;flex-direction:column;gap:.35rem;max-height:200px;overflow-y:auto;"></div>
+            </div>
+        </div>
+
+        <!-- ── XP LEADERBOARD ─────────────────────────────────────── -->
         <div class="table-card">
             <div class="table-header">
                 <h3>🏆 XP Leaderboard <span style="font-size:.75rem;font-weight:400;color:var(--text2);">— All Registered Users</span></h3>
                 <span style="font-size:.78rem;color:var(--green);display:flex;align-items:center;gap:.4rem;"><span style="width:6px;height:6px;background:var(--green);border-radius:50%;display:inline-block;"></span>Real-time ranking</span>
             </div>
-            <table><thead><tr><th>#</th><th>User</th><th>XP</th><th>Level</th><th>Login</th><th>Streak</th><th>Completed</th></tr></thead>
+            <table><thead><tr><th>#</th><th>User</th><th>XP</th><th>Level</th><th>Entries</th><th>Streak</th><th>Completed</th></tr></thead>
             <tbody id="topUsersBody"><tr class="loading-td"><td colspan="7"><span class="spinner"></span>Loading…</td></tr></tbody></table>
         </div>
     </div>
@@ -1052,7 +1150,7 @@ window.onload = async () => {
         }
     } catch(e) { console.warn(e); }
 
-    // Aktif admin oturumu yok — login formunu goster
+    // Aktif admin oturumu yok — login formunu göster
     const _scmEl = document.getElementById('sessionCheckMsg');
     if (_scmEl) {
         _scmEl.innerHTML = '🔐 Please sign in with your admin account.';
@@ -1072,11 +1170,11 @@ window.onload = async () => {
     } catch(e) {}
 };
 
-// Server-side admin check — data JSONB icindeki is_admin alanini okur
-// Admin vermek icin: UPDATE user_data SET data = data || '{"is_admin": true}' WHERE data->>'email' = 'admin@x.com';
+// Server-side admin check — data JSONB içindeki is_admin alanını okur
+// Admin vermek için: UPDATE user_data SET data = data || '{"is_admin": true}' WHERE data->>'email' = 'admin@x.com';
 
 async function checkIsAdmin(userId, userEmail) {
-    // Owner kontrolu: UUID OR email whitelist
+    // Owner kontrolü: UUID OR email whitelist
     const OWNER_ID = '174cb52b-38d5-4b66-8096-889289b24dcb';
     const OWNER_EMAILS = ['list086@gmail.com'];
     if (userId === OWNER_ID) return true;
@@ -1099,11 +1197,11 @@ function boot() {
     startSessionVerify();      // Start periodic session validation
     checkSupabase();
     loadDashboard();
-    loadRestrictionsFromDB();  // Restriction toggle'larini Supabase'den yukle
+    loadRestrictionsFromDB();  // Restriction toggle'larını Supabase'den yükle
     // Auto-refresh online every 30s
     setInterval(updateOnlineCount, 30000);
 
-    // Session timer - kac dakikadir aktif
+    // Session timer - kaç dakikadır aktif
     const sessionStart = Date.now();
     setInterval(() => {
         const mins = Math.floor((Date.now() - sessionStart) / 60000);
@@ -1388,98 +1486,165 @@ function buildDailyActivity(users, days=14) {
 
 // ===== ANALYTICS =====
 async function loadAnalytics() {
-    const { data: rows } = await sb.from('user_data').select('data,updated_at');
+    // Fetch all user data + reviews count from Supabase
+    const [{ data: rows }, { count: reviewCount }] = await Promise.all([
+        sb.from('user_data').select('user_id,data,updated_at').order('updated_at', { ascending: false }),
+        sb.from('reviews').select('*', { count: 'exact', head: true })
+    ]);
     if (!rows) return;
 
-    let streakSum=0, listSum=0, ratingSum=0, ratingN=0, levelSum=0;
+    // ── Aggregate platform-wide stats ─────────────────────────────
+    let streakSum=0, listSum=0, ratingSum=0, ratingN=0, levelSum=0, xpSum=0;
     let totalEntries=0, totalCompleted=0, longestStreak=0;
-    const genres={}, statuses={};
-    const monthCounts={};
-    const xpBuckets={'0-99':0,'100-499':0,'500-999':0,'1k-4.9k':0,'5k+':0};
+    const genres={}, statuses={}, contentTypes={}, joinMonths={};
+    const xpBuckets={'0 XP':0,'1-99':0,'100-499':0,'500-999':0,'1k-4.9k':0,'5k+':0};
+    const ago7 = new Date(Date.now() - 7*864e5).toISOString();
+
+    let activeWeek = 0;
 
     rows.forEach(r => {
-        const d=r.data;
+        const d = r.data;
         if (!d) return;
-        if (d.streak?.count) { streakSum+=d.streak.count; if(d.streak.count>longestStreak) longestStreak=d.streak.count; }
+        if (r.updated_at > ago7 && !d.banned) activeWeek++;
+
+        // Streak
+        const streak = d.streak?.count || 0;
+        streakSum += streak;
+        if (streak > longestStreak) longestStreak = streak;
+
+        // XP
+        const xp = d.xp?.total || 0;
+        xpSum += xp;
+        if (xp === 0)     xpBuckets['0 XP']++;
+        else if (xp < 100)  xpBuckets['1-99']++;
+        else if (xp < 500)  xpBuckets['100-499']++;
+        else if (xp < 1000) xpBuckets['500-999']++;
+        else if (xp < 5000) xpBuckets['1k-4.9k']++;
+        else                xpBuckets['5k+']++;
+
+        if (d.xp?.level) levelSum += d.xp.level;
+
+        // Items
         if (d.items) {
-            listSum+=d.items.length; totalEntries+=d.items.length;
-            totalCompleted += d.items.filter(i=>i.status==='completed').length;
+            listSum += d.items.length;
+            totalEntries += d.items.length;
+            totalCompleted += d.items.filter(i => i.status === 'completed').length;
             d.items.forEach(i => {
-                if (i.rating){ ratingSum+=i.rating; ratingN++; }
-                if (i.genre) genres[i.genre]=(genres[i.genre]||0)+1;
-                if (i.status) statuses[i.status]=(statuses[i.status]||0)+1;
-                if (i.addedDate) {
-                    const m=i.addedDate.substring(0,7);
-                    monthCounts[m]=(monthCounts[m]||0)+1;
-                }
+                if (i.rating) { ratingSum += i.rating; ratingN++; }
+                if (i.genre)  genres[i.genre] = (genres[i.genre] || 0) + 1;
+                if (i.status) statuses[i.status] = (statuses[i.status] || 0) + 1;
+                if (i.type)   contentTypes[i.type] = (contentTypes[i.type] || 0) + 1;
             });
         }
-        if (d.xp?.level) levelSum+=d.xp.level;
-        const xp = d.xp?.total||0;
-        if (xp<100) xpBuckets['0-99']++;
-        else if (xp<500) xpBuckets['100-499']++;
-        else if (xp<1000) xpBuckets['500-999']++;
-        else if (xp<5000) xpBuckets['1k-4.9k']++;
-        else xpBuckets['5k+']++;
-        // Monthly registrations (by updated_at as proxy)
-        if (r.updated_at) {
-            const m=r.updated_at.substring(0,7);
+
+        // Monthly registrations — use joinDate from social, fall back to updated_at
+        const joinDate = d.social?.joinDate || r.updated_at;
+        if (joinDate) {
+            const m = joinDate.substring(0, 7);
+            joinMonths[m] = (joinMonths[m] || 0) + 1;
         }
     });
 
-    const n=rows.length||1;
-    document.getElementById('a-streak').textContent = (streakSum/n).toFixed(1);
-    document.getElementById('a-list').textContent   = (listSum/n).toFixed(1);
-    document.getElementById('a-rating').textContent = ratingN?(ratingSum/ratingN).toFixed(1):'0';
-    document.getElementById('a-level').textContent  = (levelSum/n).toFixed(1);
-    document.getElementById('a-complete-rate').textContent = totalEntries ? Math.round((totalCompleted/totalEntries)*100)+'%' : '0%';
-    document.getElementById('a-longest-streak').textContent = longestStreak;
+    const n = rows.length || 1;
+    const fmt = v => v >= 1000 ? (v/1000).toFixed(1)+'k' : String(v);
 
-    const gL=Object.keys(genres).sort((a,b)=>genres[b]-genres[a]).slice(0,10);
-    drawBar('chartGenre', gL, gL.map(g=>genres[g]));
-    const sMap={watching:'▶ Watching',completed:'✅ Completed',plantowatch:'📋 Planned',onhold:'⏸ On Hold',dropped:'❌ Dropped'};
-    const sL=Object.keys(statuses);
-    drawDonut('chartStatus2', sL.map(k=>sMap[k]||k), sL.map(k=>statuses[k]), ['#00d4ff','#10b981','#7c3aed','#f59e0b','#ef4444']);
+    // ── Update stat cards ─────────────────────────────────────────
+    const set = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
 
-    // Monthly
-    const months=Object.keys(monthCounts).sort().slice(-6);
-    drawBar('chartMonthly', months, months.map(m=>monthCounts[m]), ['#ff3366','#f97316','#f59e0b','#10b981','#00d4ff','#a855f7']);
+    set('a-total-users',    n);
+    set('a-active-week',    activeWeek + ' active this week');
+    set('a-total-entries',  fmt(totalEntries));
+    set('a-completed-entries', totalCompleted + ' completed');
+    set('a-total-xp',       fmt(xpSum));
+    set('a-avg-xp',         fmt(Math.round(xpSum/n)) + ' avg/user');
+    set('a-complete-rate',  totalEntries ? Math.round((totalCompleted/totalEntries)*100)+'%' : '0%');
+    set('a-longest-streak', longestStreak + ' days');
+    set('a-avg-streak',     (streakSum/n).toFixed(1) + ' days avg');
+    set('a-rating',         ratingN ? (ratingSum/ratingN).toFixed(1) : '—');
+    set('a-total-ratings',  ratingN + ' ratings given');
+
+    // Per-user averages
+    set('a-avg-list',      (listSum/n).toFixed(1));
+    set('a-avg-level',     (levelSum/n).toFixed(1));
+    set('a-avg-streak2',   (streakSum/n).toFixed(1));
+    set('a-avg-completed', (totalCompleted/n).toFixed(1));
+    set('a-reviews-count', reviewCount || 0);
+
+    // ── Charts ────────────────────────────────────────────────────
+
+    // Monthly registrations (real join dates, last 8 months)
+    const allMonths = Object.keys(joinMonths).sort().slice(-8);
+    drawBar('chartMonthly', allMonths, allMonths.map(m => joinMonths[m]),
+        ['#ff3366','#f97316','#f59e0b','#10b981','#00d4ff','#a855f7','#ec4899','#14b8a6']);
 
     // XP distribution
-    const xpK=Object.keys(xpBuckets);
-    drawBar('chartXP', xpK, xpK.map(k=>xpBuckets[k]), ['#8b5cf6']);
+    const xpK = Object.keys(xpBuckets);
+    drawBar('chartXP', xpK, xpK.map(k => xpBuckets[k]), ['#8b5cf6']);
 
-    // Top users — ALL registered users, sorted by XP (no online requirement)
+    // Genre distribution (top 10)
+    const gL = Object.keys(genres).sort((a,b) => genres[b]-genres[a]).slice(0, 10);
+    drawBar('chartGenre', gL, gL.map(g => genres[g]));
+
+    // Top genres table
+    const tgEl = document.getElementById('topGenresTable');
+    if (tgEl) {
+        const topG = Object.entries(genres).sort((a,b)=>b[1]-a[1]).slice(0,10);
+        const maxV = topG[0]?.[1] || 1;
+        tgEl.innerHTML = topG.map(([g,v], i) => `
+            <div style="display:flex;align-items:center;gap:.5rem;">
+                <span style="font-size:.72rem;color:var(--text2);width:18px;text-align:right;">${i+1}</span>
+                <div style="flex:1;background:rgba(255,255,255,.05);border-radius:4px;height:16px;overflow:hidden;">
+                    <div style="height:100%;background:linear-gradient(90deg,#7c3aed,#a855f7);width:${Math.round(v/maxV*100)}%;border-radius:4px;"></div>
+                </div>
+                <span style="font-size:.78rem;min-width:60px;">${esc(g)}</span>
+                <span style="font-size:.75rem;color:var(--text2);min-width:30px;text-align:right;">${v}</span>
+            </div>`).join('');
+    }
+
+    // Watch status donut
+    const sMap = { watching:'▶ Watching', completed:'✅ Completed', plantowatch:'📋 Planned', onhold:'⏸ On Hold', dropped:'❌ Dropped' };
+    const sL = Object.keys(statuses);
+    drawDonut('chartStatus2', sL.map(k => sMap[k]||k), sL.map(k => statuses[k]),
+        ['#00d4ff','#10b981','#7c3aed','#f59e0b','#ef4444']);
+
+    // Content type split (anime/manga/webtoon)
+    const ctLabels = ['Anime','Manga','Webtoon'];
+    const ctColors = ['#ff3366','#00d4ff','#10b981'];
+    const ctVals   = ctLabels.map(l => contentTypes[l.toLowerCase()] || contentTypes[l] || 0);
+    drawDonut('chartContentType', ctLabels, ctVals, ctColors);
+
+    // ── XP Leaderboard (all users) ────────────────────────────────
     const allSorted = rows
-        .map(r => r.data)
-        .filter(Boolean)
-        .filter(d => (d?.xp?.total || 0) > 0 || (d?.items?.length || 0) > 0) // at least 1 action performed
-        .sort((a, b) => (b?.xp?.total || 0) - (a?.xp?.total || 0));
+        .filter(r => r.data && ((r.data?.xp?.total || 0) > 0 || (r.data?.items?.length || 0) > 0))
+        .sort((a, b) => (b.data?.xp?.total || 0) - (a.data?.xp?.total || 0));
 
     document.getElementById('topUsersBody').innerHTML = allSorted.length === 0
         ? '<tr><td colspan="7"><div class="empty-state"><div class="ei">🏆</div><h3>No users yet</h3></div></td></tr>'
-        : allSorted.map((d, i) => {
+        : allSorted.map((r, i) => {
+            const d = r.data;
             const medals = ['🥇','🥈','🥉'];
             const rankDisplay = i < 3
                 ? `<strong style="font-size:1.1rem;">${medals[i]}</strong>`
-                : `<strong ${i < 10 ? 'style="color:var(--yellow)"' : ''}>#${i + 1}</strong>`;
-            const completedN = d?.items?.filter(i => i.status === 'completed').length || 0;
-            const avgRating  = d?.items?.filter(i => i.rating).length
-                ? (d.items.filter(i => i.rating).reduce((s, i) => s + i.rating, 0) / d.items.filter(i => i.rating).length).toFixed(1)
+                : `<strong ${i < 10 ? 'style="color:var(--yellow)"' : ''}>#${i+1}</strong>`;
+            const completedN = d?.items?.filter(it => it.status === 'completed').length || 0;
+            const avgRating  = d?.items?.filter(it => it.rating).length
+                ? (d.items.filter(it=>it.rating).reduce((s,it)=>s+it.rating,0) / d.items.filter(it=>it.rating).length).toFixed(1)
                 : '—';
+            const uname = (d?.social?.name && d.social.name !== 'User')
+                ? d.social.name : ((d?.social?.email||'').split('@')[0] || 'Anonymous');
             return `<tr>
                 <td style="text-align:center;">${rankDisplay}</td>
                 <td><div class="user-cell">
                     ${avatarHtml(d,'32px')}
                     <div>
-                        <div class="user-name">${esc(d?.social?.name && d.social.name !== 'User' ? d.social.name : (d?.social?.email ? d.social.email.split('@')[0] : 'Anonymous'))}</div>
-                        <div class="user-email" style="font-size:.7rem;color:var(--text3);">⭐ Ort: ${avgRating} · ${esc(d?.social?.email || '')}</div>
+                        <div class="user-name">${esc(uname)}</div>
+                        <div class="user-email" style="font-size:.7rem;color:var(--text3);">⭐ ${avgRating} · ${esc(d?.social?.email||'')}</div>
                     </div>
                 </div></td>
-                <td><strong style="color:var(--yellow);font-size:1rem;">${(d?.xp?.total || 0).toLocaleString('en-GB')}</strong> <span style="font-size:.7rem;color:var(--text2);">XP</span></td>
-                <td><span class="badge bg-purple">Lv.${d?.xp?.level || 1}</span></td>
-                <td><span style="font-weight:600;">${d?.items?.length || 0}</span></td>
-                <td>🔥 <strong>${d?.streak?.count || 0}</strong> <span style="font-size:.7rem;color:var(--text2);">days</span></td>
+                <td><strong style="color:var(--yellow);font-size:1rem;">${(d?.xp?.total||0).toLocaleString('en-GB')}</strong> <span style="font-size:.7rem;color:var(--text2);">XP</span></td>
+                <td><span class="badge bg-purple">Lv.${d?.xp?.level||1}</span></td>
+                <td><span style="font-weight:600;">${d?.items?.length||0}</span></td>
+                <td>🔥 <strong>${d?.streak?.count||0}</strong></td>
                 <td><span style="color:var(--green);font-weight:600;">${completedN}</span></td>
             </tr>`;
         }).join('');
@@ -2015,14 +2180,14 @@ async function toggleRestriction(el, key) {
     const isOn = el.classList.contains('on');
 
     if (key === 'maintenance') {
-        // Bakim modu: platform_settings tablosuna yaz
+        // Bakım modu: platform_settings tablosuna yaz
         const msg = document.getElementById('maintenanceMsg')?.value || 'System is under maintenance. Please try again later.';
         const { error } = await sb.from('platform_settings')
             .upsert({ key: 'maintenance', value: { enabled: isOn, message: msg }, updated_at: new Date().toISOString() });
         if (error) { toast('❌ Could not save: ' + error.message, 'error'); el.classList.toggle('on'); return; }
         toast(isOn ? '🔧 Maintenance mode ACTIVE — site is closed to users' : '✅ Maintenance mode OFF — site is open', isOn ? 'error' : 'success');
     } else {
-        // Diger kisitlamalar: platform_settings restrictions anahtarina yaz
+        // Diğer kısıtlamalar: platform_settings restrictions anahtarına yaz
         const { data: existing } = await sb.from('platform_settings').select('value').eq('key','restrictions').single().catch(()=>({data:null}));
         const restrictions = existing?.value || {};
         restrictions[key] = isOn;
@@ -2626,7 +2791,7 @@ async function loadChatMessages() {
 
 async function deleteChatMsg(id) {
     // Native confirm yerine inline onay kutusu
-    // Mesaj icerigini DOM'dan al
+    // Mesaj içeriğini DOM'dan al
     const rowEl = document.querySelector(`tr[data-msg-id="${id}"]`);
     const msgText = rowEl ? rowEl.querySelector('td:nth-child(2)')?.textContent?.trim() : '';
     if (rowEl && rowEl.dataset.confirming) return;
