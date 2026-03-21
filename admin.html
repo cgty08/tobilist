@@ -1052,7 +1052,7 @@ window.onload = async () => {
         }
     } catch(e) { console.warn(e); }
 
-    // Aktif admin oturumu yok — login formunu göster
+    // Aktif admin oturumu yok — login formunu goster
     const _scmEl = document.getElementById('sessionCheckMsg');
     if (_scmEl) {
         _scmEl.innerHTML = '🔐 Please sign in with your admin account.';
@@ -1072,11 +1072,11 @@ window.onload = async () => {
     } catch(e) {}
 };
 
-// Server-side admin check — data JSONB içindeki is_admin alanını okur
-// Admin vermek için: UPDATE user_data SET data = data || '{"is_admin": true}' WHERE data->>'email' = 'admin@x.com';
+// Server-side admin check — data JSONB icindeki is_admin alanini okur
+// Admin vermek icin: UPDATE user_data SET data = data || '{"is_admin": true}' WHERE data->>'email' = 'admin@x.com';
 
 async function checkIsAdmin(userId, userEmail) {
-    // Owner kontrolü: UUID OR email whitelist
+    // Owner kontrolu: UUID OR email whitelist
     const OWNER_ID = '174cb52b-38d5-4b66-8096-889289b24dcb';
     const OWNER_EMAILS = ['list086@gmail.com'];
     if (userId === OWNER_ID) return true;
@@ -1099,11 +1099,11 @@ function boot() {
     startSessionVerify();      // Start periodic session validation
     checkSupabase();
     loadDashboard();
-    loadRestrictionsFromDB();  // Restriction toggle'larını Supabase'den yükle
+    loadRestrictionsFromDB();  // Restriction toggle'larini Supabase'den yukle
     // Auto-refresh online every 30s
     setInterval(updateOnlineCount, 30000);
 
-    // Session timer - kaç dakikadır aktif
+    // Session timer - kac dakikadir aktif
     const sessionStart = Date.now();
     setInterval(() => {
         const mins = Math.floor((Date.now() - sessionStart) / 60000);
@@ -2015,14 +2015,14 @@ async function toggleRestriction(el, key) {
     const isOn = el.classList.contains('on');
 
     if (key === 'maintenance') {
-        // Bakım modu: platform_settings tablosuna yaz
+        // Bakim modu: platform_settings tablosuna yaz
         const msg = document.getElementById('maintenanceMsg')?.value || 'System is under maintenance. Please try again later.';
         const { error } = await sb.from('platform_settings')
             .upsert({ key: 'maintenance', value: { enabled: isOn, message: msg }, updated_at: new Date().toISOString() });
         if (error) { toast('❌ Could not save: ' + error.message, 'error'); el.classList.toggle('on'); return; }
         toast(isOn ? '🔧 Maintenance mode ACTIVE — site is closed to users' : '✅ Maintenance mode OFF — site is open', isOn ? 'error' : 'success');
     } else {
-        // Diğer kısıtlamalar: platform_settings restrictions anahtarına yaz
+        // Diger kisitlamalar: platform_settings restrictions anahtarina yaz
         const { data: existing } = await sb.from('platform_settings').select('value').eq('key','restrictions').single().catch(()=>({data:null}));
         const restrictions = existing?.value || {};
         restrictions[key] = isOn;
@@ -2626,7 +2626,7 @@ async function loadChatMessages() {
 
 async function deleteChatMsg(id) {
     // Native confirm yerine inline onay kutusu
-    // Mesaj içeriğini DOM'dan al
+    // Mesaj icerigini DOM'dan al
     const rowEl = document.querySelector(`tr[data-msg-id="${id}"]`);
     const msgText = rowEl ? rowEl.querySelector('td:nth-child(2)')?.textContent?.trim() : '';
     if (rowEl && rowEl.dataset.confirming) return;

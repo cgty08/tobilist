@@ -1,16 +1,16 @@
 // ============================================================
 //  OniList Service Worker v1.2
 //  Strateji:
-//   - Shell dosyaları (HTML/CSS/JS): Cache-first
-//   - API istekleri (jikan/anilist): Network-first, cache fallback
-//   - Resimler: Cache-first, 7 gün TTL
+//   - Shell dosyalari (HTML/CSS/JS): Cache-first
+//   - APi istekleri (jikan/anilist): Network-first, cache fallback
+//   - Resimler: Cache-first, 7 gun TTL
 // ============================================================
 
 const CACHE_NAME    = 'onilist-v1.2';
 const API_CACHE     = 'onilist-api-v1.2';
 const IMG_CACHE     = 'onilist-img-v1.2';
 
-// Kurulumda önceden cache'e alınacak app shell dosyaları
+// Kurulumda onceden cache'e alinacak app shell dosyalari
 const SHELL_URLS = [
     '/',
     '/index.html',
@@ -32,7 +32,7 @@ const SHELL_URLS = [
     '/icons/icon-96.png'
 ];
 
-// ===== INSTALL — shell dosyalarını önceden cache'e al =====
+// ===== iNSTALL — shell dosyalarini onceden cache'e al =====
 // Zorunlu dosyalar (bunlar yoksa SW install olmaz):
 const SHELL_REQUIRED = ['/', '/index.html', '/style.css', '/app.js', '/auth.js', '/api.js',
     '/ui.js', '/chat.js', '/xp-system.js', '/data-manager.js', '/manifest.json',
@@ -44,20 +44,20 @@ const SHELL_OPTIONAL = ['/privacy.html', '/404.html', '/icons/icon-192.png',
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME).then(async cache => {
-            // Zorunlu dosyaları cache'e al
+            // Zorunlu dosyalari cache'e al
             await cache.addAll(SHELL_REQUIRED);
-            // Opsiyonel dosyaları tek tek dene, hata olursa atla
+            // Opsiyonel dosyalari tek tek dene, hata olursa atla
             await Promise.allSettled(
                 SHELL_OPTIONAL.map(url =>
-                    cache.add(url).catch(() => console.log('[SW] Opsiyonel dosya bulunamadı (normal):', url))
+                    cache.add(url).catch(() => console.log('[SW] Opsiyonel dosya bulunamadi (normal):', url))
                 )
             );
             return self.skipWaiting();
-        }).catch(err => console.warn('[SW] Install cache hatası:', err))
+        }).catch(err => console.warn('[SW] install cache hatasi:', err))
     );
 });
 
-// ===== ACTIVATE — eski cache'leri temizle =====
+// ===== ACTiVATE — eski cache'leri temizle =====
 self.addEventListener('activate', event => {
     const currentCaches = [CACHE_NAME, API_CACHE, IMG_CACHE];
     event.waitUntil(
@@ -74,7 +74,7 @@ self.addEventListener('activate', event => {
     );
 });
 
-// ===== FETCH — istek tiplerine göre strateji =====
+// ===== FETCH — istek tiplerine gore strateji =====
 self.addEventListener('fetch', event => {
     const { request } = event;
     const url = new URL(request.url);
@@ -82,12 +82,12 @@ self.addEventListener('fetch', event => {
     // Chrome extension veya non-http istekleri atla
     if (!request.url.startsWith('http')) return;
 
-    // Supabase API — her zaman network (kullanıcı verisi kritik, asla stale gösterme)
+    // Supabase APi — her zaman network (kullanici verisi kritik, asla stale gosterme)
     if (url.hostname.includes('supabase.co')) {
         return; // SW devreye girme, direkt network
     }
 
-    // Jikan / AniList / Kitsu API — Network-first, hata varsa cache
+    // Jikan / AniList / Kitsu APi — Network-first, hata varsa cache
     if (
         url.hostname.includes('api.jikan.moe') ||
         url.hostname.includes('graphql.anilist.co') ||
@@ -102,7 +102,7 @@ self.addEventListener('fetch', event => {
         request.destination === 'image' ||
         url.pathname.match(/\.(png|jpg|jpeg|webp|gif|svg|ico)$/)
     ) {
-        event.respondWith(cacheFirstStrategy(request, IMG_CACHE, 60 * 60 * 24 * 7)); // 7 gün
+        event.respondWith(cacheFirstStrategy(request, iMG_CACHE, 60 * 60 * 24 * 7)); // 7 gun
         return;
     }
 
@@ -115,7 +115,7 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    // App Shell (HTML/CSS/JS) — Cache-first, güncel değilse arka planda güncelle (Stale-While-Revalidate)
+    // App Shell (HTML/CSS/JS) — Cache-first, guncel degilse arka planda guncelle (Stale-While-Revalidate)
     if (
         request.destination === 'document' ||
         request.destination === 'script' ||
@@ -126,17 +126,17 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    // Diğer tüm istekler — Network-first
+    // Diger tum istekler — Network-first
     event.respondWith(networkFirstStrategy(request, CACHE_NAME, 60 * 60));
 });
 
 // ============================================================
-//  STRATEJI FONKSİYONLARI
+//  STRATEJi FONKSIYONLARi
 // ============================================================
 
 /**
- * Cache-First: Önce cache'e bak, yoksa network'ten al ve cache'e yaz.
- * maxAge: saniye cinsinden cache süresi (eski cache varsa geçerli say)
+ * Cache-First: Once cache'e bak, yoksa network'ten al ve cache'e yaz.
+ * maxAge: saniye cinsinden cache suresi (eski cache varsa gecerli say)
  */
 async function cacheFirstStrategy(request, cacheName, maxAge) {
     const cache = await caches.open(cacheName);
@@ -148,7 +148,7 @@ async function cacheFirstStrategy(request, cacheName, maxAge) {
         if (dateHeader && maxAge) {
             const age = (Date.now() - new Date(dateHeader).getTime()) / 1000;
             if (age > maxAge) {
-                // Süresi dolmuş: arka planda yenile ama şimdi yine cache'i dön
+                // Suresi dolmus: arka planda yenile ama simdi yine cache'i don
                 fetchAndCache(request, cache).catch(() => {});
             }
         }
@@ -160,7 +160,7 @@ async function cacheFirstStrategy(request, cacheName, maxAge) {
         if (response.ok) await cache.put(request, response.clone());
         return response;
     } catch (err) {
-        // Network yok ve cache yok — boş 503
+        // Network yok ve cache yok — bos 503
         return new Response('You are offline and no cache is available.', {
             status: 503,
             headers: { 'Content-Type': 'text/plain; charset=utf-8' }
@@ -169,13 +169,13 @@ async function cacheFirstStrategy(request, cacheName, maxAge) {
 }
 
 /**
- * Network-First: Önce cache'e bak — süresi dolmamışsa direkt dön.
- * Süresi dolmuşsa veya cache yoksa network'e git, hata varsa cache'ten dön.
+ * Network-First: Once cache'e bak — suresi dolmamissa direkt don.
+ * Suresi dolmussa veya cache yoksa network'e git, hata varsa cache'ten don.
  */
 async function networkFirstStrategy(request, cacheName, maxAge) {
     const cache = await caches.open(cacheName);
 
-    // Cache'de var mı ve süresi geçerli mi?
+    // Cache'de var mi ve suresi gecerli mi?
     if (maxAge) {
         const cached = await cache.match(request);
         if (cached) {
@@ -183,7 +183,7 @@ async function networkFirstStrategy(request, cacheName, maxAge) {
             if (dateHeader) {
                 const age = (Date.now() - new Date(dateHeader).getTime()) / 1000;
                 if (age < maxAge) {
-                    return cached; // Cache geçerli, network'e gitme
+                    return cached; // Cache gecerli, network'e gitme
                 }
             }
         }
@@ -204,7 +204,7 @@ async function networkFirstStrategy(request, cacheName, maxAge) {
 }
 
 /**
- * Stale-While-Revalidate: Cache'i hemen dön, arka planda güncelle.
+ * Stale-While-Revalidate: Cache'i hemen don, arka planda guncelle.
  */
 async function staleWhileRevalidate(request, cacheName) {
     const cache = await caches.open(cacheName);
@@ -214,7 +214,7 @@ async function staleWhileRevalidate(request, cacheName) {
 
     if (cached) return cached;
 
-    // Cache yoksa network yanıtını bekle
+    // Cache yoksa network yanitini bekle
     const fresh = await fetchPromise;
     if (fresh) return fresh;
 
@@ -224,7 +224,7 @@ async function staleWhileRevalidate(request, cacheName) {
     });
 }
 
-/** Network'ten al, cache'e yaz, response döndür */
+/** Network'ten al, cache'e yaz, response dondur */
 async function fetchAndCache(request, cache) {
     const response = await fetch(request);
     if (response.ok || response.status === 0) {
@@ -233,7 +233,7 @@ async function fetchAndCache(request, cache) {
     return response;
 }
 
-// ===== PUSH BİLDİRİMLERİ (ileride kullanım için hazır) =====
+// ===== PUSH BILDIRIMLERI (ileride kullanim icin hazir) =====
 self.addEventListener('push', event => {
     if (!event.data) return;
     try {

@@ -2,7 +2,7 @@
    CHAT.CSS v3.0 - OniList Community Chat
    ============================================ */
 
-/* ===== INLINE CHAT SECTION ===== */
+/* ===== iNLiNE CHAT SECTiON ===== */
 .inline-chat-section { margin-top: 0.5rem; }
 
 .inline-chat-box {
@@ -180,7 +180,7 @@
     40%          { transform: scale(1.1); opacity: 1; }
 }
 
-/* ===== GUEST SECTION - Site uyumlu, temiz ===== */
+/* ===== GUEST SECTiON - Site uyumlu, temiz ===== */
 .inline-chat-guest {
     flex-shrink: 0;
     border-top: 1px solid var(--border, rgba(255,255,255,0.07));
@@ -246,7 +246,7 @@
     transform: translateY(-1px);
 }
 
-/* ===== INPUT AREA ===== */
+/* ===== iNPUT AREA ===== */
 .inline-chat-input-area {
     flex-shrink: 0;
     border-top: 1px solid var(--border, rgba(255,255,255,0.07));
@@ -336,7 +336,7 @@
     padding-left: 34px;
 }
 
-/* ===== FLOATING CHAT BUTTON ===== */
+/* ===== FLOATiNG CHAT BUTTON ===== */
 #chatToggleBtn {
     position: fixed;
     bottom: 1.5rem;
@@ -383,7 +383,7 @@
 
 #chatBadge.show { display: flex; }
 
-/* ===== FLOATING CHAT WINDOW ===== */
+/* ===== FLOATiNG CHAT WiNDOW ===== */
 #chatWindow {
     position: fixed;
     bottom: 4.8rem;
@@ -590,13 +590,13 @@
 }
 
 
-/* ===== SCROLL INDICATOR ===== */
+/* ===== SCROLL iNDiCATOR ===== */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateX(-50%) translateY(6px); }
     to   { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
-/* ===== RESPONSIVE ===== */
+/* ===== RESPONSiVE ===== */
 @media (max-width: 480px) {
     #chatWindow { width: calc(100vw - 1.5rem); right: 0.75rem; bottom: 4.2rem; }
     #chatToggleBtn { bottom: 0.9rem; right: 0.9rem; width: 46px; height: 46px; font-size: 1.1rem; }

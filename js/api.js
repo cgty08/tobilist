@@ -1,6 +1,6 @@
-// API.JS v7.0 - Jikan + AniList + Kitsu — ~5000+ içerik
-// Cache stratejisi: sadece final "all_v7" sonucu localStorage'a yazılır,
-// ara sorgular sadece memory cache'te tutulur → localStorage taşmaz.
+// APi.JS v7.0 - Jikan + AniList + Kitsu — ~5000+ icerik
+// Cache stratejisi: sadece final "all_v7" sonucu localStorage'a yazilir,
+// ara sorgular sadece memory cache'te tutulur → localStorage tasmaz.
 
 // ===== CACHE =====
 const APICache = {
@@ -25,7 +25,7 @@ const APICache = {
         } catch { return null; }
     },
 
-    // mem=true => sadece belleğe yaz (localStorage'a değil)
+    // mem=true => sadece bellege yaz (localStorage'a degil)
     set(key, data, memOnly = false) {
         const ts = Date.now();
         this._mem[key] = { data, ts };
@@ -78,7 +78,7 @@ function mapGenre(name) {
     return name.toLowerCase().replace(/\s+/g,'_');
 }
 
-// ===== DEDUPLICATE =====
+// ===== DEDUPLiCATE =====
 function normalizeTitle(name) {
     return (name || '')
         .toLowerCase()
@@ -121,7 +121,7 @@ function deduplicateContent(items) {
     return result;
 }
 
-// ===== JIKAN API (MAL) =====
+// ===== JiKAN APi (MAL) =====
 const _Jikan = {
     BASE: 'https://api.jikan.moe/v4',
     _last: 0, _queue: [], _busy: false,
@@ -237,7 +237,7 @@ const _Jikan = {
     }
 };
 
-// ===== ANİLİST GraphQL =====
+// ===== ANILIST GraphQL =====
 const _AniList = {
     BASE: 'https://graphql.anilist.co',
     _last: 0,
@@ -253,8 +253,7 @@ const _AniList = {
         this._last = Date.now();
         if (res.status === 429) {
             if (_retries >= 3) throw new Error('AniList rate limit: max retries exceeded');
-            // Üstel bekleme, ancak maksimum 15 saniye ile sınırlı (yoksa UI donmuş görünür)
-            const delay = Math.min(15000, 3000 * Math.pow(2, _retries));
+            const delay = 15000 * Math.pow(2, _retries);
             await new Promise(r => setTimeout(r, delay));
             return this.query(gql, vars, _retries + 1);
         }
@@ -291,7 +290,7 @@ const _AniList = {
 
     FRAG: `id title{romaji english native} format coverImage{extraLarge large} averageScore seasonYear startDate{year} episodes chapters description genres countryOfOrigin`,
 
-    // Helper: pages yükle, memOnly cache
+    // Helper: pages yukle, memOnly cache
     async _pages(ck, gql, mapper, pages) {
         const c = APICache.get(ck); if (c) return c;
         const out = [];
@@ -380,7 +379,7 @@ const _AniList = {
     }
 };
 
-// ===== KİTSU API =====
+// ===== KITSU APi =====
 const _Kitsu = {
     BASE: 'https://kitsu.io/api/edge',
 
@@ -492,13 +491,13 @@ const JikanAPI = {
         const c = APICache.get(ck);
         if (c) { if (onProgress) onProgress(c.length, c.length); return c; }
 
-        // ── AŞAMA 1: HIZLI ÖN YÜKLEMİ (3-5 saniye) ─────────────────────────
+        // ── ASAMA 1: HiZLi ON YUKLEMI (3-5 saniye) ─────────────────────────
         const ckFast = 'all_v7_fast';
         const cached_fast = APICache.get(ckFast);
 
         if (!cached_fast) {
             if (onProgress) onProgress(0, 500);
-            console.log('⚡ API: Hızlı ön yükleme başlıyor...');
+            console.log('⚡ APi: Hizli on yukleme basliyor...');
             const [fastA, fastM, fastW] = await Promise.allSettled([
                 _AniList.topAnime(2),
                 _AniList.topManga(2),
@@ -512,17 +511,17 @@ const JikanAPI = {
             const fastDeduped = deduplicateContent(fastAll);
             APICache.set(ckFast, fastDeduped, true); // memOnly
             if (onProgress) onProgress(fastDeduped.length, fastDeduped.length);
-            console.log(`⚡ Hızlı yükleme: ${fastDeduped.length} içerik`);
+            console.log(`⚡ Hizli yukleme: ${fastDeduped.length} icerik`);
             document.dispatchEvent(new CustomEvent('onilist:fastContentReady', { detail: fastDeduped }));
         } else {
             if (onProgress) onProgress(cached_fast.length, cached_fast.length);
             document.dispatchEvent(new CustomEvent('onilist:fastContentReady', { detail: cached_fast }));
         }
 
-        // ── AŞAMA 2: TAM YÜKLEMİ — 3 Batch paralel ─────────────────────────
-        console.log('🚀 API v7: Tam yükleme başlıyor...');
+        // ── ASAMA 2: TAM YUKLEMI — 3 Batch paralel ─────────────────────────
+        console.log('🚀 APi v7: Tam yukleme basliyor...');
 
-        // Batch 1: AniList popularity (ana kaynak, en güvenilir)
+        // Batch 1: AniList popularity (ana kaynak, en guvenilir)
         const [alA, alM, alW, alMH] = await Promise.allSettled([
             _AniList.topAnime(15),
             _AniList.topManga(14),
@@ -530,7 +529,7 @@ const JikanAPI = {
             _AniList.topManhua(10),
         ]);
 
-        // Batch 2: AniList score + trending (popularity'de olmayan içerikler)
+        // Batch 2: AniList score + trending (popularity'de olmayan icerikler)
         const [alAS, alMS, alWS, alMHS, alAT, alMT] = await Promise.allSettled([
             _AniList.topAnimeByScore(10),
             _AniList.topMangaByScore(8),
@@ -540,7 +539,7 @@ const JikanAPI = {
             _AniList.topMangaTrending(5),
         ]);
 
-        // Batch 3: Jikan + Kitsu (MAL tabanlı farklı içerikler)
+        // Batch 3: Jikan + Kitsu (MAL tabanli farkli icerikler)
         const [jkA, jkM, jkW, jkMH, ktA, ktM] = await Promise.allSettled([
             _Jikan.topAnime(16),
             _Jikan.topManga(12),
@@ -573,7 +572,7 @@ const JikanAPI = {
         const ac = deduped.filter(i => i.type === 'anime').length;
         const mc = deduped.filter(i => i.type === 'manga').length;
         const wc = deduped.filter(i => i.type === 'webtoon').length;
-        console.log(`✅ ${deduped.length} içerik — Anime:${ac} Manga:${mc} Webtoon:${wc}`);
+        console.log(`✅ ${deduped.length} icerik — Anime:${ac} Manga:${mc} Webtoon:${wc}`);
 
         // Sadece final sonucu localStorage'a yaz (~2-3MB max)
         APICache.set(ck, deduped); // localStorage'a yaz
@@ -582,4 +581,4 @@ const JikanAPI = {
     }
 };
 
-console.log('✅ API v7.0 — ~5000+ içerik, tek cache key');
+console.log('✅ APi v7.0 — ~5000+ icerik, tek cache key');

@@ -1,7 +1,7 @@
-// APP.JS v5.2 - OniList Ana Uygulama - Genişletilmiş İçerik
+// APP.JS v5.2 - OniList Ana Uygulama - Genisletilmis Icerik
 
 // =====================================================
-// PLATFORM SETTINGS — Maintenance mode + restrictions
+// PLATFORM SETTiNGS — Maintenance mode + restrictions
 // =====================================================
 window.platformSettings = {};
 
@@ -23,7 +23,7 @@ function isFeatureEnabled(key) {
     return restrictions[key] !== false;
 }
 
-// CSS class injection önlemi: type değeri her zaman bu listeden gelmeli
+// CSS class injection onlemi: type degeri her zaman bu listeden gelmeli
 const VALID_TYPES = ['anime', 'manga', 'webtoon'];
 function safeType(t) { return VALID_TYPES.includes(t) ? t : 'anime'; }
 
@@ -42,9 +42,9 @@ let seasonContent = [];
 let contentLoaded = false;
 let contentLoading = false;
 
-// ===== INIT =====
+// ===== iNiT =====
 function initializeApp() {
-    console.log('OniList v5.2 başlatılıyor...');
+    console.log('OniList v5.2 baslatiliyor...');
 
     if (dataManager.data) {
         updateStreak();
@@ -64,7 +64,7 @@ function initializeApp() {
         changeLanguage();
     }
 
-    // Duyuru popup'ı devre dışı
+    // Duyuru popup'i devre disi
     const hour = new Date().getHours();
     const greet = hour < 6 ? 'Good night 🌙' : hour < 12 ? 'Good morning ☀️' : hour < 18 ? 'Good afternoon 🌤️' : 'Good evening 🌙';
     const gEl = document.getElementById('bannerGreeting');
@@ -78,16 +78,16 @@ function initializeApp() {
     setupPWA();
     setupNetworkListeners();
 
-    // Platform settings yükle (restrictions)
+    // Platform settings yukle (restrictions)
     loadPlatformSettings();
 
-    // Duyuruları kontrol et
+    // Duyurulari kontrol et
     setTimeout(function() {
         if (typeof window._checkAnnouncements === 'function') window._checkAnnouncements();
     }, 1500);
 }
 
-// ===== API İÇERİK YÜKLEME =====
+// ===== APi ICERIK YUKLEME =====
 async function loadContentFromAPI() {
     if (contentLoaded || contentLoading) {
         renderHomePage();
@@ -98,14 +98,14 @@ async function loadContentFromAPI() {
     showLoadingPlaceholders();
 
     try {
-        // Hızlı ön yükleme: AniList'ten ilk içerikler gelince hemen göster
-        // window global kirliliği önlemek için custom event kullanılıyor
+        // Hizli on yukleme: AniList'ten ilk icerikler gelince hemen goster
+        // window global kirliligi onlemek icin custom event kullaniliyor
         function _fastContentHandler(e) {
             const fastContent = e.detail || [];
             if (!contentLoaded && fastContent.length > 0) {
                 allContent = fastContent;
                 trendingContent = fastContent.filter(i => i.type === 'anime').slice(0, 20);
-                console.log('⚡ Hızlı içerik gösteriliyor:', fastContent.length);
+                console.log('⚡ Hizli icerik gosteriliyor:', fastContent.length);
                 renderHomePage();
                 renderDiscoverGrid();
             }
@@ -124,38 +124,16 @@ async function loadContentFromAPI() {
         contentLoaded = true;
         contentLoading = false;
 
-        console.log('✅ Tam yükleme:', allContent.length, 'içerik');
+        console.log('✅ Tam yukleme:', allContent.length, 'icerik');
         renderHomePage();
         renderDiscoverGrid();
     } catch(e) {
-        console.error('API yüklenemedi:', e);
+        console.error('APi yuklenemedi:', e);
         contentLoading = false;
-        contentLoaded = false; // Tekrar denemeye izin ver (geçici ağ hatası olabilir)
+        contentLoaded = true; // Tekrar denemeyi onle
         renderHomePage();
         renderDiscoverGrid();
-        showNotification('İçerik yüklenemedi. Bağlantınızı kontrol edip tekrar deneyin.', 'error');
-
-        // Discover grid'e yeniden deneme butonu göster
-        const dg = document.getElementById('discoverGrid');
-        if (dg) {
-            dg.innerHTML = '';
-            const retryWrap = document.createElement('div');
-            retryWrap.style.cssText = 'text-align:center;padding:3rem 1rem;color:var(--text-muted);';
-            const retryIcon = document.createElement('div');
-            retryIcon.style.cssText = 'font-size:2.5rem;margin-bottom:0.7rem;';
-            retryIcon.textContent = '📡';
-            const retryMsg = document.createElement('p');
-            retryMsg.style.cssText = 'margin-bottom:1rem;font-size:0.9rem;';
-            retryMsg.textContent = 'İçerik yüklenemedi. İnternet bağlantınızı kontrol edin.';
-            const retryBtn = document.createElement('button');
-            retryBtn.className = 'btn btn-primary';
-            retryBtn.textContent = '🔄 Tekrar Dene';
-            retryBtn.onclick = () => loadContentFromAPI();
-            retryWrap.appendChild(retryIcon);
-            retryWrap.appendChild(retryMsg);
-            retryWrap.appendChild(retryBtn);
-            dg.appendChild(retryWrap);
-        }
+        showNotification(_lang === 'en' ? 'Error loading content.' : 'Error loading content.', 'error');
     }
 }
 
@@ -169,20 +147,20 @@ function showLoadingPlaceholders() {
     if (dg) dg.innerHTML = '<div class="discover-loading"><div class="loader"></div><p style="margin-top:1rem;color:var(--text-muted);">'+(_lang==='en'?'Loading content...':'Loading content...')+'</p></div>';
 }
 
-// ===== SLUG YARDIMCISI =====
+// ===== SLUG YARDiMCiSi =====
 function toSlug(str) {
     if (!str) return 'icerik';
     return str
         .toLowerCase()
-        .replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s')
-        .replace(/ı/g,'i').replace(/ö/g,'o').replace(/ç/g,'c')
+        .replace(/g/g,'g').replace(/u/g,'u').replace(/s/g,'s')
+        .replace(/i/g,'i').replace(/o/g,'o').replace(/c/g,'c')
         .replace(/[^a-z0-9\s-]/g,'')
         .trim().replace(/\s+/g,'-').replace(/-+/g,'-')
         .substring(0,60);
 }
 
-// ===== BÖLÜM GEÇİŞİ =====
-// Section render işini tek yerde tutan yardımcı fonksiyon
+// ===== BOLUM GECISI =====
+// Section render isini tek yerde tutan yardimci fonksiyon
 function _renderSection(section, scrollY = 0) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
@@ -341,7 +319,7 @@ function renderMediaRow(containerId, items) {
     }).join('');
 }
 
-// ===== KEŞFET =====
+// ===== KESFET =====
 function filterDiscoverType(type, btn) {
     currentDiscoverType = type;
     discoverPage = 1;
@@ -443,7 +421,7 @@ function onDiscoverSearch() {
     discoverSearchTimeout = setTimeout(renderDiscoverGrid, 300);
 }
 
-// ===== HIZLI EKLE =====
+// ===== HiZLi EKLE =====
 function quickAddFromJson(jsonStr) {
     try {
         const decoded = jsonStr.replace(/&quot;/g, '"');
@@ -544,7 +522,7 @@ function addItem(event) {
     showNotification('✅ ' + _esc(newItem.name) + (_lang==='en'?' added!':' eklendi!'), 'success');
 }
 
-// ===== JIKAN ARAMA (modal içi) =====
+// ===== JiKAN ARAMA (modal ici) =====
 let searchTimeout;
 async function searchAPI() {
     const queryEl = document.getElementById('apiSearch');
@@ -556,7 +534,7 @@ async function searchAPI() {
     if (query.length < 2) { resultsDiv.innerHTML = ''; return; }
 
     searchTimeout = setTimeout(async () => {
-        resultsDiv.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:0.8rem;font-size:0.85rem;">🔍 Aranıyor...</div>';
+        resultsDiv.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:0.8rem;font-size:0.85rem;">🔍 Araniyor...</div>';
         try {
             const results = await JikanAPI.searchAll(query, 5);
             if (results.length > 0) {
@@ -610,8 +588,8 @@ function fillFromAPI(jsonStr) {
     }
 }
 
-// ===== BİLDİRİMLER =====
-function openNotifications() { showNotification('Bildirim merkezi yakında! 🔔', 'info'); }
+// ===== BILDIRIMLER =====
+function openNotifications() { showNotification('Bildirim merkezi yakinda! 🔔', 'info'); }
 
 function toggleNotifications() {
     const el = document.getElementById('pushNotifications');
@@ -629,13 +607,13 @@ function setupPWA() {
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js', { scope: '/' })
             .then(reg => {
-                console.log('✅ Service Worker kayıtlı:', reg.scope);
+                console.log('✅ Service Worker kayitli:', reg.scope);
                 reg.addEventListener('updatefound', () => {
                     const newWorker = reg.installing;
                     if (!newWorker) return;
                     newWorker.addEventListener('statechange', () => {
                         if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                            console.log('[SW] Yeni sürüm mevcut, sayfa yenilendiğinde aktif olacak.');
+                            console.log('[SW] Yeni surum mevcut, sayfa yenilendiginde aktif olacak.');
                         }
                     });
                 });
@@ -680,7 +658,7 @@ function setupNetworkListeners() {
 }
 
 // =====================================================
-// LIBRARY'DEN DETAY SAYFASI
+// LiBRARY'DEN DETAY SAYFASi
 // =====================================================
 function openDetailPageFromLibrary(itemId) {
     if (!dataManager.data) return;
@@ -698,7 +676,7 @@ function openDetailPageFromLibrary(itemId) {
 
 
 // =====================================================
-// DUYURU SİSTEMİ v2 - Güçlü & Güzel
+// DUYURU SISTEMI v2 - Guclu & Guzel
 // =====================================================
 async function checkAnnouncements() {
     if (!window.supabaseClient) return;
@@ -830,7 +808,7 @@ document.addEventListener('keydown', (e) => {
 
 console.log('✅ App.js v5.2 loaded');
 // =====================================================
-// DETAY SAYFASI SİSTEMİ
+// DETAY SAYFASi SISTEMI
 // =====================================================
 
 let currentDetailItem = null;
@@ -892,7 +870,7 @@ function _fillDetailBasic(item) {
     const badge = document.getElementById('dpTypeBadge');
     if (badge) { badge.textContent = (item.type || 'anime').toUpperCase(); badge.className = 'dp-type-badge ' + (item.type || 'anime'); }
 
-    // Genres — API'den gelen veriler, _esc ile korunuyor
+    // Genres — APi'den gelen veriler, _esc ile korunuyor
     const genresEl = document.getElementById('dpGenres');
     if (genresEl) {
         genresEl.innerHTML = (item.genres || []).map(g => `<span class="dp-genre-tag">${_esc(g)}</span>`).join('') || '<span style="color:var(--text-muted)">Loading...</span>';
@@ -1028,7 +1006,7 @@ function _applyDetailSynopsis() {
     if (text) el.textContent = text;
 }
 
-// ===== REVIEWS =====
+// ===== REViEWS =====
 async function loadReviews(contentId) {
     const container = document.getElementById('reviewsList');
     if (!container) return;
@@ -1121,7 +1099,7 @@ async function submitReview() {
             updated_at:   new Date().toISOString()
         }, { onConflict: 'content_id,user_id' });
 
-    if (error) { showNotification('Yorum gönderilemedi: ' + error.message, 'error'); return; }
+    if (error) { showNotification('Yorum gonderilemedi: ' + error.message, 'error'); return; }
     showNotification('✅ Yorumun kaydedildi!', 'success');
 
     if (dataManager.data) {
@@ -1133,9 +1111,9 @@ async function submitReview() {
             const reviewXP = comment.length >= 200
                 ? XP_REWARDS.writeLongReview
                 : XP_REWARDS.writeReview;
-            xpSystem.addXP(reviewXP, (typeof _lang !== 'undefined' && _lang === 'en')
+            xpSystem.addXP(reviewXP, _lang === 'en'
                 ? (comment.length >= 200 ? 'Detailed review! ✍️' : 'Review written!')
-                : (comment.length >= 200 ? 'Detaylı yorum! ✍️' : 'Yorum yazıldı!'));
+                : (comment.length >= 200 ? 'Detayli yorum! ✍️' : 'Yorum yazildi!'));
             reviewedItems.push(contentKey);
             dataManager.data.reviewedItems = reviewedItems;
         }
@@ -1152,7 +1130,7 @@ async function deleteReview(reviewId, contentId) {
     if (!error) { showNotification('Yorum silindi.', 'info'); loadReviews(contentId); }
 }
 
-// ===== SIMILAR CONTENT =====
+// ===== SiMiLAR CONTENT =====
 function loadSimilarContent(item) {
     const container = document.getElementById('similarGrid');
     if (!container) return;
@@ -1211,7 +1189,7 @@ function goBackFromDetail() {
     }
 }
 
-// ===== XSS KORUMA YARDIMCILARI =====
+// ===== XSS KORUMA YARDiMCiLARi =====
 function _esc(str) {
     return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
 }

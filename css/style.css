@@ -1,5 +1,5 @@
 /* ============================================
-   STYLE.CSS v5.1 - AniTrack - Tamamen düzeltildi
+   STYLE.CSS v5.1 - AniTrack - Tamamen duzeltildi
    ============================================ */
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -324,7 +324,7 @@ header {
 .locked-tab { opacity: 0.65; }
 .locked-tab:hover { opacity: 0.85; }
 
-/* ====== SECTIONS ====== */
+/* ====== SECTiONS ====== */
 .section { display: none; animation: sectionIn 0.3s ease; }
 .section.active { display: block; }
 
@@ -418,7 +418,7 @@ header {
 
 .bsc-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
 
-/* ====== HOME SECTIONS ====== */
+/* ====== HOME SECTiONS ====== */
 .home-section-block { margin-bottom: 2.5rem; }
 
 .section-header-row {
@@ -597,7 +597,7 @@ header {
 
 .qs-label { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.15rem; text-transform: uppercase; letter-spacing: 0.5px; }
 
-/* ====== DISCOVER ====== */
+/* ====== DiSCOVER ====== */
 .discover-tabs { display: flex; gap: 0.7rem; margin-bottom: 1.3rem; flex-wrap: wrap; }
 
 .discover-tab {
@@ -664,7 +664,7 @@ header {
 }
 
 
-/* ====== DISCOVER HERO ====== */
+/* ====== DiSCOVER HERO ====== */
 .discover-hero {
     position: relative;
     border-radius: 20px;
@@ -778,8 +778,8 @@ header {
 .page-title { font-family: 'Poppins', sans-serif; font-size: 1.9rem; font-weight: 700; margin-bottom: 0.25rem; }
 .page-sub { color: var(--text-secondary); }
 
-/* ====== PROFILE ====== */
-/* ===== PROFİL ===== */
+/* ====== PROFiLE ====== */
+/* ===== PROFIL ===== */
 .profile-header-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
@@ -803,7 +803,7 @@ header {
     position: relative;
 }
 
-/* Avatar wrap — fotoğraf yükleme butonu */
+/* Avatar wrap — fotograf yukleme butonu */
 .profile-avatar-wrap {
     position: relative;
     flex-shrink: 0;
@@ -825,7 +825,7 @@ header {
 .profile-avatar-large.has-photo { font-size: 0; }
 .profile-avatar-large:hover { border-color: var(--accent-primary); }
 
-/* Küçük + butonu */
+/* Kucuk + butonu */
 .avatar-cam-btn {
     position: absolute;
     bottom: 2px; right: 2px;
@@ -870,7 +870,7 @@ header {
     color: #f87171;
 }
 
-/* STAT GRID — sayaçlar */
+/* STAT GRiD — sayaclar */
 .profile-stats-grid {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
@@ -893,7 +893,7 @@ header {
 }
 
 .profile-stat-card:hover { border-color: var(--border-hover); transform: translateY(-2px); }
-.psc-icon { display: none; } /* artık göstermiyoruz */
+.psc-icon { display: none; } /* artik gostermiyoruz */
 
 .psc-val {
     font-size: 1.6rem;
@@ -911,7 +911,7 @@ header {
     font-weight: 500;
 }
 
-/* DURUM ÇUBUKLARI */
+/* DURUM CUBUKLARi */
 .status-bar-row {
     display: flex;
     align-items: center;
@@ -969,7 +969,7 @@ header {
     margin-bottom: 0.8rem;
 }
 
-/* AKTİVİTE */
+/* AKTIVITE */
 .activity-list { display: flex; flex-direction: column; gap: 0.4rem; }
 
 .activity-item {
@@ -994,7 +994,7 @@ header {
     flex-shrink: 0;
 }
 
-/* BAŞARIMLAR */
+/* BASARiMLAR */
 .recent-achievements { display: flex; flex-direction: column; gap: 0.4rem; }
 
 .ach-mini {
@@ -1013,7 +1013,7 @@ header {
 .ach-mini-name { font-weight: 600; flex: 1; font-size: 0.81rem; }
 .ach-mini-xp { color: var(--accent-gold); font-size: 0.7rem; font-weight: 700; }
 
-/* PAYLAŞ */
+/* PAYLAS */
 .share-btns { display: flex; gap: 0.5rem; flex-wrap: wrap; }
 
 .share-btn {
@@ -1030,7 +1030,7 @@ header {
 }
 .share-btn:hover { border-color: var(--border-hover); color: var(--text-primary); transform: translateY(-1px); }
 
-/* FOTOĞRAF YÜKLEME MODALI */
+/* FOTOGRAF YUKLEME MODALi */
 .avatar-upload-zone {
     display: flex;
     align-items: center;
@@ -1091,7 +1091,7 @@ header {
 }
 .btn-remove-photo:hover { border-color: var(--danger); color: var(--danger); }
 
-/* ====== LIBRARY ====== */
+/* ====== LiBRARY ====== */
 .filter-bar { display: flex; gap: 0.7rem; margin-bottom: 1.8rem; flex-wrap: wrap; }
 .search-box { flex: 1; min-width: 180px; }
 
@@ -1304,7 +1304,7 @@ select {
     letter-spacing: 0.4px;
 }
 
-/* ====== ANALYTICS ====== */
+/* ====== ANALYTiCS ====== */
 .analytics-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
@@ -1338,7 +1338,7 @@ select {
 
 .bar-fill { height: 100%; border-radius: 10px; transition: width 0.5s ease; }
 
-/* ====== AI SECTION ====== */
+/* ====== Ai SECTiON ====== */
 .ai-header-card {
     background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(255,51,102,0.05));
     border: 1px solid rgba(124,58,237,0.2);
@@ -1410,7 +1410,7 @@ select {
 .ai-btn-row { display: flex; gap: 0.8rem; position: relative; z-index: 1; flex-wrap: wrap; }
 .ai-recs-section { margin-bottom: 2.5rem; }
 
-/* ====== ACHIEVEMENTS ====== */
+/* ====== ACHiEVEMENTS ====== */
 .achievements-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -1469,7 +1469,7 @@ select {
 .ach-status.locked { background: rgba(255,255,255,0.05); color: var(--text-muted); }
 .ach-status.done { background: rgba(16,185,129,0.12); color: var(--success); font-weight: 600; }
 
-/* ====== SETTINGS ====== */
+/* ====== SETTiNGS ====== */
 .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.3rem; }
 
 .theme-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.8rem; }
@@ -1751,7 +1751,7 @@ select {
 
 .cc-opt.selected, .cc-opt:hover { border-color: white; transform: scale(1.08); }
 
-/* ====== NOTIFICATION ====== */
+/* ====== NOTiFiCATiON ====== */
 .notification {
     position: fixed;
     bottom: 1.8rem;
@@ -1774,7 +1774,7 @@ select {
 .notification.error { border-left: 3px solid var(--danger); }
 .notification.info { border-left: 3px solid var(--accent-secondary); }
 
-/* ====== LOADING ====== */
+/* ====== LOADiNG ====== */
 .loading-screen {
     position: fixed;
     inset: 0;
@@ -1810,7 +1810,7 @@ select {
 
 .loading-text { color: var(--text-muted); font-size: 0.88rem; margin-top: 1rem; }
 
-/* ====== MISC ====== */
+/* ====== MiSC ====== */
 .offline-banner {
     background: var(--warning);
     color: white;
@@ -1898,7 +1898,7 @@ select {
 
 .discover-loading .loader { margin: 0 auto; }
 
-/* ====== RESPONSIVE ====== */
+/* ====== RESPONSiVE ====== */
 @media (max-width: 1200px) {
     .anilist-banner { grid-template-columns: 1fr; }
     .banner-right { display: none; }
@@ -1942,7 +1942,7 @@ select {
 }
 
 /* =====================================================
-   DETAY SAYFASI CSS
+   DETAY SAYFASi CSS
    ===================================================== */
 
 /* Breadcrumb */
@@ -2110,12 +2110,12 @@ select {
     margin: 0;
 }
 
-/* Info list */
+/* info list */
 .dp-info-list { display: flex; flex-direction: column; gap: 0.7rem; }
 .dp-info-row { display: flex; justify-content: space-between; font-size: 0.85rem; }
 .dp-info-label { color: #6b7280; }
 
-/* ===== REVIEW FORM ===== */
+/* ===== REViEW FORM ===== */
 .review-form { display: flex; flex-direction: column; gap: 0.8rem; }
 .star-row { display: flex; align-items: center; gap: 1rem; }
 .stars-container { display: flex; gap: 0.15rem; }
@@ -2161,7 +2161,7 @@ select {
 }
 .review-submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,51,102,0.4); }
 
-/* ===== REVIEW CARDS ===== */
+/* ===== REViEW CARDS ===== */
 .review-card {
     background: rgba(255,255,255,0.03);
     border: 1px solid rgba(255,255,255,0.06);
@@ -2232,17 +2232,17 @@ select {
     display: inline-block;
 }
 /* =====================================================
-   MOBILE IMPROVEMENTS v5.2 — ADDITIVE ONLY
+   MOBiLE iMPROVEMENTS v5.2 — ADDiTiVE ONLY
    ===================================================== */
 
-/* Header: streak/total badge'leri küçük ekranda gizle */
+/* Header: streak/total badge'leri kucuk ekranda gizle */
 @media (max-width: 480px) {
     #streakBadge,
     #totalBadge {
         display: none !important;
     }
 
-    /* Level badge: XP bar'ı gizle, sadece level numarası kalsın */
+    /* Level badge: XP bar'i gizle, sadece level numarasi kalsin */
     .xp-container .xp-bar,
     .xp-container .xp-text {
         display: none;
@@ -2252,13 +2252,13 @@ select {
         gap: 0.3rem;
     }
 
-    /* Language selector küçülsün */
+    /* Language selector kuculsun */
     .language-selector {
         font-size: 0.75rem;
         padding: 0.28rem 0.4rem;
     }
 
-    /* Admin butonu küçülsün */
+    /* Admin butonu kuculsun */
     #adminShortcutBtn {
         font-size: 0.72rem !important;
         padding: .28rem .5rem !important;
@@ -2275,17 +2275,17 @@ select {
     }
     .header-actions::-webkit-scrollbar { display: none; }
 
-    /* Banner başlık font küçük ekranda oku */
+    /* Banner baslik font kucuk ekranda oku */
     .banner-title { font-size: 1.5rem !important; }
     .banner-sub { font-size: 0.82rem; }
 
-    /* Detail page poster küçülsün */
+    /* Detail page poster kuculsun */
     .dp-poster {
         width: 90px !important;
         min-width: 90px !important;
     }
 
-    /* Chat section tam genişlik */
+    /* Chat section tam genislik */
     .inline-chat-box {
         border-radius: 12px;
     }
@@ -2298,7 +2298,7 @@ select {
         overflow-y: auto;
     }
 
-    /* Nav tab text küçük ekranda daha küçük */
+    /* Nav tab text kucuk ekranda daha kucuk */
     .nav-tab {
         font-size: 0.72rem !important;
         padding: 0.4rem 0.6rem !important;
@@ -2310,7 +2310,7 @@ select {
     }
 }
 
-/* Orta ekran (tablet) iyileştirmeleri */
+/* Orta ekran (tablet) iyilestirmeleri */
 @media (max-width: 768px) {
     /* Detail page banner dikey hizala */
     .dp-banner-content {

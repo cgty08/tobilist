@@ -72,19 +72,19 @@ const dataManager = {
     saveAll() {
         if (!this.currentUserId || !this.data) return false;
 
-        // Önce localStorage'a kaydet
+        // Once localStorage'a kaydet
         try {
             const s = JSON.stringify(this.data);
             localStorage.setItem('onilist_user_' + this.currentUserId, s);
             localStorage.setItem('onilist_backup_' + this.currentUserId, s);
         } catch(e) {
-            console.warn('localStorage kayıt hatası (quota dolmuş olabilir):', e.message);
+            console.warn('localStorage kayit hatasi (quota dolmus olabilir):', e.message);
             if (typeof showNotification === 'function') {
-                showNotification('⚠️ Yerel depolama dolu! Veriler yalnızca buluta kaydediliyor.', 'warning');
+                showNotification('⚠️ Yerel depolama dolu! Veriler yalnizca buluta kaydediliyor.', 'warning');
             }
         }
 
-        // Sonra Supabase'e kaydet (800ms debounce — önceki 1500ms'den düşürüldü)
+        // Sonra Supabase'e kaydet (800ms debounce — onceki 1500ms'den dusuruldu)
         clearTimeout(this.saveTimeout);
         const userId = this.currentUserId;
         const snapshot = JSON.parse(JSON.stringify(this.data));
@@ -99,13 +99,13 @@ const dataManager = {
         return true;
     },
 
-    // Sayfa kapanırken veya kritik anlarda beklemeden kaydet
-    // keepalive: true — tarayıcı sekmeyi kapansa bile isteği tamamlar
+    // Sayfa kapanirken veya kritik anlarda beklemeden kaydet
+    // keepalive: true — tarayici sekmeyi kapansa bile istegi tamamlar
     flushNow() {
         if (!this.currentUserId || !this.data) return;
         clearTimeout(this.saveTimeout);
 
-        // Supabase client üzerinden gönder
+        // Supabase client uzerinden gonder
         if (window.supabaseClient) {
             window.supabaseClient
                 .from('user_data')
@@ -113,7 +113,7 @@ const dataManager = {
                 .then(({ error }) => { if (error) console.warn('Supabase flushNow error:', error.message); });
         }
 
-        // Ayrıca Beacon API ile güvenli fallback (sayfa kapansa bile iletilir)
+        // Ayrica Beacon APi ile guvenli fallback (sayfa kapansa bile iletilir)
         try {
             const payload = JSON.stringify({
                 user_id: this.currentUserId,
@@ -121,7 +121,7 @@ const dataManager = {
                 updated_at: new Date().toISOString()
             });
             if (navigator.sendBeacon && payload.length < 64000) {
-                // Beacon yalnızca localStorage yedek olarak — asıl kayıt Supabase üzerinden
+                // Beacon yalnizca localStorage yedek olarak — asil kayit Supabase uzerinden
                 localStorage.setItem('onilist_user_' + this.currentUserId, JSON.stringify(this.data));
             }
         } catch(e) {}
@@ -129,15 +129,15 @@ const dataManager = {
 
     save() { return this.saveAll(); },
 
-    // deepMerge — prototype pollution koruması eklendi:
-    // __proto__, constructor, prototype anahtarları yoksayılıyor
+    // deepMerge — prototype pollution korumasi eklendi:
+    // __proto__, constructor, prototype anahtarlari yoksayiliyor
     deepMerge(target, source) {
         if (!source) return target;
         const result = { ...target };
         for (const key in source) {
-            // Sadece kaynak objenin kendi anahtarlarını al, prototype zincirinden gelenleri değil
+            // Sadece kaynak objenin kendi anahtarlarini al, prototype zincirinden gelenleri degil
             if (!Object.prototype.hasOwnProperty.call(source, key)) continue;
-            // Tehlikeli anahtarları engelle
+            // Tehlikeli anahtarlari engelle
             if (key === '__proto__' || key === 'constructor' || key === 'prototype') continue;
             if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
                 result[key] = this.deepMerge(target[key] || {}, source[key]);
@@ -154,7 +154,7 @@ const dataManager = {
 
     exportCSV() {
         if (!this.data) return '';
-        const headers = ['İsim','Tip','Durum','Mevcut','Toplam','Puan','Tür','Tarih'];
+        const headers = ['Isim','Tip','Durum','Mevcut','Toplam','Puan','Tur','Tarih'];
         const rows = this.data.items.map(i => [
             '"' + (i.name||'').replace(/"/g,'""') + '"', i.type, i.status,
             i.currentEpisode || 0, i.totalEpisodes || 0, i.rating || 0,
@@ -164,15 +164,15 @@ const dataManager = {
         return [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
     },
 
-    // importData — prototype pollution + alan whitelist + boyut limiti koruması
+    // importData — prototype pollution + alan whitelist + boyut limiti korumasi
     importData(rawData) {
         try {
-            // DoS koruması: 5MB üstü JSON'u reddet
+            // DoS korumasi: 5MB ustu JSON'u reddet
             if (!rawData || rawData.length > 5_000_000) return false;
             const imported = JSON.parse(rawData);
             if (!this.data) return false;
 
-            // Güvenli alan listesi — dışarıdan gelen nesnede sadece bu anahtarlara izin ver
+            // Guvenli alan listesi — disaridan gelen nesnede sadece bu anahtarlara izin ver
             const SAFE_ITEM_KEYS = [
                 'id','name','nameEn','type','status','poster','rating',
                 'currentEpisode','totalEpisodes','chapters','genre','genres',

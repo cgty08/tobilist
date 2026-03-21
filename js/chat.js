@@ -1,11 +1,11 @@
 // ============================================
 //   CHAT.JS v2.0 - OniList Topluluk Sohbeti
 //   Supabase Realtime + localStorage fallback
-//   v2.0: ChatCore ortak modül ile refactor edildi
+//   v2.0: ChatCore ortak modul ile refactor edildi
 // ============================================
 
 // ════════════════════════════════════════════
-//  CHATCORE — OniChat + InlineChat paylaşımlı temel
+//  CHATCORE — OniChat + inlineChat paylasimli temel
 // ════════════════════════════════════════════
 const ChatCore = (function () {
 
@@ -30,7 +30,7 @@ const ChatCore = (function () {
                     name: u.name || ''
                 };
             });
-            // Global cache'i de güncelle (InlineChat de kullanır)
+            // Global cache'i de guncelle (inlineChat de kullanir)
             window._avatarCache = _avatarCache;
         } catch(e) {}
     }
@@ -58,7 +58,7 @@ const ChatCore = (function () {
         return `<span style="font-size:1rem;line-height:1;">${escapeHTML(emoji)}</span>`;
     }
 
-    // ── Yardımcılar ──────────────────────────────────────────
+    // ── Yardimcilar ──────────────────────────────────────────
     function escapeHTML(str) {
         return String(str)
             .replace(/&/g, '&amp;').replace(/</g, '&lt;')
@@ -83,7 +83,7 @@ const ChatCore = (function () {
         return new Date(isoStr).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
     }
 
-    // ── Mesaj render (container ID dışarıdan verilir) ────────
+    // ── Mesaj render (container iD disaridan verilir) ────────
     function renderMessage(row, containerId, onIncrementUnread) {
         const container = document.getElementById(containerId);
         if (!container) return;
@@ -104,8 +104,7 @@ const ChatCore = (function () {
         const text      = escapeHTML(row.content || '');
         const time      = formatTime(row.created_at);
         const canClick  = !isOwn && row.user_id;
-        // safeName: escapeHTML ile tüm özel karakterler kaçırılır (onclick injection önlenir)
-        const safeName  = escapeHTML(getDisplayName(row));
+        const safeName  = getDisplayName(row).replace(/'/g, "\\'");
         const clickAttr = canClick
             ? `onclick="openPublicProfile('${row.user_id}','${safeName}')" style="cursor:pointer;" title="${name} profile"`
             : '';
@@ -133,7 +132,7 @@ const ChatCore = (function () {
         if (force || atBottom) setTimeout(() => { el.scrollTop = el.scrollHeight; }, 50);
     }
 
-    // ── Mesaj yükleme ────────────────────────────────────────
+    // ── Mesaj yukleme ────────────────────────────────────────
     async function loadMessages(containerId, onDone) {
         if (!window.supabaseClient) {
             _systemMsg(containerId, '💡 Chat is temporarily unavailable.');
@@ -162,7 +161,7 @@ const ChatCore = (function () {
         if (typeof onDone === 'function') onDone();
     }
 
-    // ── Realtime aboneliği ───────────────────────────────────
+    // ── Realtime aboneligi ───────────────────────────────────
     function subscribeRealtime(channelName, containerId, onNewMsg, onStatusChange) {
         if (!window.supabaseClient) return null;
 
@@ -171,10 +170,10 @@ const ChatCore = (function () {
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: TABLE }, (payload) => {
                 const container = document.getElementById(containerId);
                 if (!container) { renderMessage(payload.new, containerId, onNewMsg); return; }
-                // Gerçek ID ile zaten var mı?
+                // Gercek iD ile zaten var mi?
                 const existing = container.querySelector(`[data-msg-id="${payload.new.id}"]`);
                 if (existing) return;
-                // Aynı kullanıcının optimistic mesajını bul ve replace et
+                // Ayni kullanicinin optimistic mesajini bul ve replace et
                 const myId = getMyUserId();
                 if (myId && payload.new.user_id === myId) {
                     const optEl = container.querySelector('[data-msg-id^="opt_"]');
@@ -188,7 +187,7 @@ const ChatCore = (function () {
         return ch;
     }
 
-    // ── Mesaj gönderme ───────────────────────────────────────
+    // ── Mesaj gonderme ───────────────────────────────────────
     async function sendMessage({ inputId, sendBtnId, containerId, onIncrementUnread }) {
         const input = document.getElementById(inputId);
         if (!input) return;
@@ -244,10 +243,10 @@ const ChatCore = (function () {
         setTimeout(() => { if (sendBtn) sendBtn.disabled = false; }, 800);
     }
 
-    // ── Özel zamanlayıcı tablosu (rate limit için) ──────────
+    // ── Ozel zamanlayici tablosu (rate limit icin) ──────────
     const _sendTimestamps = {};
 
-    // ── İç yardımcılar ──────────────────────────────────────
+    // ── Ic yardimcilar ──────────────────────────────────────
     function _systemMsg(containerId, text) {
         renderMessage({ type: 'system', content: text }, containerId, null);
     }
@@ -270,7 +269,7 @@ const ChatCore = (function () {
 
 
 // ════════════════════════════════════════════
-//  ONICHAT — Floating popup sohbet
+//  ONiCHAT — Floating popup sohbet
 // ════════════════════════════════════════════
 const OniChat = (function () {
 
@@ -283,7 +282,7 @@ const OniChat = (function () {
 
     function q(id) { return document.getElementById(id); }
 
-    // ── HTML Şablonu ─────────────────────────────────────────
+    // ── HTML Sablonu ─────────────────────────────────────────
     function buildHTML() {
         const el = document.createElement('div');
         el.innerHTML = `
@@ -358,7 +357,7 @@ const OniChat = (function () {
         if (badge) { badge.classList.remove('show'); badge.textContent = ''; }
     }
 
-    // ── Karakter sayacı ──────────────────────────────────────
+    // ── Karakter sayaci ──────────────────────────────────────
     function updateCharCount(val) {
         const counter = q('chatCharCount');
         if (!counter) return;
@@ -373,7 +372,7 @@ const OniChat = (function () {
         }
     }
 
-    // ── Auth UI ──────────────────────────────────────────────
+    // ── Auth Ui ──────────────────────────────────────────────
     function updateAuthUI() {
         const isLoggedIn = !!(window.currentUser && (window.currentUser.uid || window.currentUser.id));
         const inputArea   = q('chatInputArea');
@@ -423,7 +422,7 @@ const OniChat = (function () {
         });
     }
 
-    // ── Init ─────────────────────────────────────────────────
+    // ── init ─────────────────────────────────────────────────
     function init() {
         if (initialized) return;
         initialized = true;
@@ -468,7 +467,7 @@ if (document.readyState === 'loading') {
 
 
 // ════════════════════════════════════════════
-//  INLINECHAT — Ana sayfa yerleşik sohbet
+//  iNLiNECHAT — Ana sayfa yerlesik sohbet
 // ════════════════════════════════════════════
 const InlineChat = (function () {
 
@@ -477,7 +476,7 @@ const InlineChat = (function () {
 
     function q(id) { return document.getElementById(id); }
 
-    // ── Auth UI ──────────────────────────────────────────────
+    // ── Auth Ui ──────────────────────────────────────────────
     function updateAuthUI() {
         const u = window.currentUser;
         const isLoggedIn = !!(u && (u.uid || u.id));
@@ -499,7 +498,7 @@ const InlineChat = (function () {
         }
     }
 
-    // window.currentUser atandığı an yakalamak için setter trap
+    // window.currentUser atandigi an yakalamak icin setter trap
     function patchCurrentUserSetter() {
         if (window.__currentUserPatched) return;
         window.__currentUserPatched = true;
@@ -549,7 +548,7 @@ const InlineChat = (function () {
         });
     }
 
-    // ── Init ─────────────────────────────────────────────────
+    // ── init ─────────────────────────────────────────────────
     function init() {
         if (initialized) return;
         if (!q('inlineChatMessages')) return;

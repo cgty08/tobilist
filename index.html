@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Content Security Policy — XSS saldırılarına karşı koruma -->
+    <!-- Content Security Policy — XSS saldirilarina karsi koruma -->
     <meta http-equiv="Content-Security-Policy" content="
         default-src 'self';
         script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net;
@@ -61,7 +61,7 @@
     <meta name="application-name" content="OniList">
     <meta name="mobile-web-app-capable" content="yes">
 
-    <!-- ===== SCHEMA.ORG YAPISAL VERİ ===== -->
+    <!-- ===== SCHEMA.ORG YAPISAL VERI ===== -->
     <script type="application/ld+json">
     {
     "@context": "https://schema.org",
@@ -156,7 +156,7 @@
     }
     </script>
 
-    <!-- ===== PRECONNECT (hız için) ===== -->
+    <!-- ===== PRECONNECT (hiz icin) ===== -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://unpkg.com">
@@ -309,7 +309,7 @@
             <!-- Login -->
             <div id="modalLoginBox">
                 <div class="auth-modal-header">
-                    <span class="auth-modal-logo" style="display:flex;align-items:center;gap:.4rem;justify-content:center;"><img src="data:image/png;base64,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" width="24" height="24" alt="OniList" style="object-fit:contain;border-radius:4px;">ONİLİST</span>
+                    <span class="auth-modal-logo" style="display:flex;align-items:center;gap:.4rem;justify-content:center;"><img src="data:image/png;base64,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" width="24" height="24" alt="OniList" style="object-fit:contain;border-radius:4px;">ONILIST</span>
                     <h3>Welcome back!</h3>
                     <p>Sign in to your account and continue</p>
                 </div>
@@ -344,7 +344,7 @@
             <!-- Register -->
             <div id="modalRegisterBox" style="display:none;">
                 <div class="auth-modal-header">
-                    <span class="auth-modal-logo" style="display:flex;align-items:center;gap:.4rem;justify-content:center;"><img src="data:image/png;base64,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" width="24" height="24" alt="OniList" style="object-fit:contain;border-radius:4px;">ONİLİST</span>
+                    <span class="auth-modal-logo" style="display:flex;align-items:center;gap:.4rem;justify-content:center;"><img src="data:image/png;base64,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" width="24" height="24" alt="OniList" style="object-fit:contain;border-radius:4px;">ONILIST</span>
                     <h3>Create account</h3>
                     <p>Sign up free, start your collection</p>
                 </div>
@@ -384,7 +384,7 @@
             <!-- Forgot Password -->
             <div id="modalForgotBox" style="display:none;">
                 <div class="auth-modal-header">
-                    <span class="auth-modal-logo" style="display:flex;align-items:center;gap:.4rem;justify-content:center;"><img src="data:image/png;base64,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" width="24" height="24" alt="OniList" style="object-fit:contain;border-radius:4px;">ONİLİST</span>
+                    <span class="auth-modal-logo" style="display:flex;align-items:center;gap:.4rem;justify-content:center;"><img src="data:image/png;base64,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" width="24" height="24" alt="OniList" style="object-fit:contain;border-radius:4px;">ONILIST</span>
                     <h3>Reset Password</h3>
                     <p>A reset link will be sent to your email</p>
                 </div>
@@ -409,7 +409,7 @@
 
         <!-- Loading Screen -->
         <div class="loading-screen" id="loadingScreen">
-            <div class="loading-logo" style="display:flex;align-items:center;gap:.5rem;justify-content:center;"><img src="data:image/png;base64,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" width="40" height="40" alt="OniList" style="object-fit:contain;border-radius:8px;">ONİLİST</div>
+            <div class="loading-logo" style="display:flex;align-items:center;gap:.5rem;justify-content:center;"><img src="data:image/png;base64,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" width="40" height="40" alt="OniList" style="object-fit:contain;border-radius:8px;">ONILIST</div>
             <div class="loader"></div>
             <div class="loading-text" data-i18n="loadingText">Loading...</div>
         </div>
@@ -520,9 +520,9 @@
                             <div class="banner-particle p3"></div>
                         </div>
                         <div class="banner-left">
-                            <div class="banner-greeting" id="bannerGreeting">Hoş geldiniz 👋</div>
+                            <div class="banner-greeting" id="bannerGreeting">Hos geldiniz 👋</div>
                             <h2 class="banner-title">Your Anime World<br><span class="gradient-text">Track & Discover</span></h2>
-                            <p class="banner-sub">500+ anime, manga ve webtoon arasından seç. Listeni oluştur, puan ver, level atla.</p>
+                            <p class="banner-sub">500+ anime, manga ve webtoon arasindan sec. Listeni olustur, puan ver, level atla.</p>
                             <div class="banner-actions" id="bannerActions"></div>
                             <!-- Feature chips -->
                             <div class="hero-chips">
@@ -573,7 +573,7 @@
                         </div>
                     </div>
 
-                    <!-- PLATFORM LIVE STATS (canlı istatistik) -->
+                    <!-- PLATFORM LIVE STATS (canli istatistik) -->
                     <div class="platform-stats-bar" id="platformStatsBar">
                         <div class="psb-item">
                             <span class="psb-dot"></span>
@@ -605,13 +605,13 @@
                     <!-- TRENDING -->
                     <div class="home-section-block">
                         <div class="section-header-row">
-                            <h3 class="sh-title">🔥 Şu An Trend</h3>
-                            <button class="sh-more" onclick="switchSection('discover')">Tümünü Gör →</button>
+                            <h3 class="sh-title">🔥 Su An Trend</h3>
+                            <button class="sh-more" onclick="switchSection('discover')">Tumunu Gor →</button>
                         </div>
                         <div class="media-row" id="trendingGrid"></div>
                     </div>
 
-                    <!-- SUBTLE AD — Trending altı -->
+                    <!-- SUBTLE AD — Trending alti -->
                     <div class="ad-slot ad-slot-subtle" id="adSlot1">
                         <div class="ad-inner">
                             <span class="ad-tag">Reklam</span>
@@ -619,7 +619,7 @@
                                 <!-- Google AdSense kodu buraya gelecek -->
                                 <!-- <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="XXXXXXXXXX" data-ad-format="auto" data-full-width-responsive="true"></ins> -->
                                 <div class="ad-placeholder-inner">
-                                    <span style="color:var(--text-muted);font-size:0.78rem;opacity:0.5;">Reklam Alanı — 728×90</span>
+                                    <span style="color:var(--text-muted);font-size:0.78rem;opacity:0.5;">Reklam Alani — 728×90</span>
                                 </div>
                             </div>
                         </div>
@@ -647,7 +647,7 @@
                     <!-- SEASONAL -->
                     <div class="home-section-block">
                         <div class="section-header-row">
-                            <h3 class="sh-title">🌸 Bu Sezon Popüler</h3>
+                            <h3 class="sh-title">🌸 Bu Sezon Populer</h3>
                             <button class="sh-more" onclick="switchSection('discover')">Hepsi →</button>
                         </div>
                         <div class="media-row" id="seasonPopularGrid"></div>
@@ -657,29 +657,29 @@
                     <div class="features-section">
                         <div class="features-header">
                             <h3 class="features-title">Neden <span class="gradient-text">OniList?</span></h3>
-                            <p class="features-sub">Anime takibini bir üst seviyeye taşıyan özellikler</p>
+                            <p class="features-sub">Anime takibini bir ust seviyeye tasiyan ozellikler</p>
                         </div>
                         <div class="features-grid">
                             <div class="feature-card" onclick="requireAuth('ai')">
                                 <div class="feature-icon">🤖</div>
                                 <div class="feature-content">
-                                    <div class="feature-title">AI Öneri Motoru</div>
-                                    <div class="feature-desc">İzleme alışkanlıklarını analiz ederek sana özel anime ve manga önerileri üretir.</div>
+                                    <div class="feature-title">AI Oneri Motoru</div>
+                                    <div class="feature-desc">Izleme aliskanliklarini analiz ederek sana ozel anime ve manga onerileri uretir.</div>
                                 </div>
                                 <div class="feature-arrow">→</div>
                             </div>
                             <div class="feature-card" onclick="requireAuth('achievements')">
                                 <div class="feature-icon">🏆</div>
                                 <div class="feature-content">
-                                    <div class="feature-title">XP & Başarım Sistemi</div>
-                                    <div class="feature-desc">Her eklediğinde, tamamladığında ve puan verdiğinde XP kazan. Seviyeleri geç, rozetler topla.</div>
+                                    <div class="feature-title">XP & Basarim Sistemi</div>
+                                    <div class="feature-desc">Her eklediginde, tamamladiginda ve puan verdiginde XP kazan. Seviyeleri gec, rozetler topla.</div>
                                 </div>
                                 <div class="feature-arrow">→</div>
                             </div>
                             <div class="feature-card" onclick="requireAuth('calendar')">
                                 <div class="feature-icon">📅</div>
                                 <div class="feature-content">
-                                    <div class="feature-title">Haftalık Yayın Takvimi</div>
+                                    <div class="feature-title">Haftalik Yayin Takvimi</div>
                                     <div class="feature-desc">Which anime airs on which day? Stay on top with the live calendar, auto-marks your library.</div>
                                 </div>
                                 <div class="feature-arrow">→</div>
@@ -687,15 +687,15 @@
                             <div class="feature-card" onclick="requireAuth('analytics')">
                                 <div class="feature-icon">📊</div>
                                 <div class="feature-content">
-                                    <div class="feature-title">Kişisel Analitik</div>
-                                    <div class="feature-desc">Kaç anime izledin, ortalama puanın ne? Detaylı grafiklerle izleme alışkanlıklarını keşfet.</div>
+                                    <div class="feature-title">Kisisel Analitik</div>
+                                    <div class="feature-desc">Kac anime izledin, ortalama puanin ne? Detayli grafiklerle izleme aliskanliklarini kesfet.</div>
                                 </div>
                                 <div class="feature-arrow">→</div>
                             </div>
                             <div class="feature-card">
                                 <div class="feature-icon">🔥</div>
                                 <div class="feature-content">
-                                    <div class="feature-title">Günlük Streak</div>
+                                    <div class="feature-title">Gunluk Streak</div>
                                     <div class="feature-desc">Log in every day, keep your streak! Bonus XP for 7 consecutive days.</div>
                                 </div>
                                 <div class="feature-arrow">→</div>
@@ -704,7 +704,7 @@
                                 <div class="feature-icon">📥</div>
                                 <div class="feature-content">
                                     <div class="feature-title">Import & Export</div>
-                                    <div class="feature-desc">Verilerini JSON veya CSV olarak indir. Başka platformlardan listenizi kolayca aktar.</div>
+                                    <div class="feature-desc">Verilerini JSON veya CSV olarak indir. Baska platformlardan listenizi kolayca aktar.</div>
                                 </div>
                                 <div class="feature-arrow">→</div>
                             </div>
@@ -727,19 +727,19 @@
                     <!-- HIGH RATED -->
                     <div class="home-section-block">
                         <div class="section-header-row">
-                            <h3 class="sh-title">💡 Yüksek Puanlı</h3>
-                            <button class="sh-more" onclick="requireAuth('ai')">AI Önerileri →</button>
+                            <h3 class="sh-title">💡 Yuksek Puanli</h3>
+                            <button class="sh-more" onclick="requireAuth('ai')">AI Onerileri →</button>
                         </div>
                         <div class="media-row" id="homeRecommendationsGrid"></div>
                     </div>
 
-                    <!-- SUBTLE AD — High Rated altı -->
+                    <!-- SUBTLE AD — High Rated alti -->
                     <div class="ad-slot ad-slot-subtle" id="adSlot2">
                         <div class="ad-inner">
                             <span class="ad-tag">Reklam</span>
                             <div class="ad-placeholder">
                                 <div class="ad-placeholder-inner">
-                                    <span style="color:var(--text-muted);font-size:0.78rem;opacity:0.5;">Reklam Alanı — 728×90</span>
+                                    <span style="color:var(--text-muted);font-size:0.78rem;opacity:0.5;">Reklam Alani — 728×90</span>
                                 </div>
                             </div>
                         </div>
@@ -749,7 +749,7 @@
                     <div class="community-section">
                         <div class="community-header">
                             <h3 class="features-title">🌍 <span class="gradient-text">Community</span></h3>
-                            <p class="features-sub">OniList büyüyor — seninle büyüyor</p>
+                            <p class="features-sub">OniList buyuyor — seninle buyuyor</p>
                         </div>
                         <div class="community-grid">
                             <!-- Top users leaderboard -->
@@ -797,11 +797,11 @@
                                 </p>
                                 <div style="display:flex;flex-direction:column;gap:0.6rem;">
                                     <button class="btn btn-primary" onclick="openAuthModal('register')" style="width:100%;" data-i18n="joinBtn">✨ Join Free</button>
-                                    <button class="btn btn-ghost" onclick="switchSection('discover')" style="width:100%;" data-i18n="joinDiscoverBtn">🔍 İçerikleri Keşfet</button>
+                                    <button class="btn btn-ghost" onclick="switchSection('discover')" style="width:100%;" data-i18n="joinDiscoverBtn">🔍 Icerikleri Kesfet</button>
                                 </div>
                                 <div class="join-badges">
-                                    <span class="jb" data-i18n="joinBadgeFree">🆓 Ücretsiz</span>
-                                    <span class="jb" data-i18n="joinBadgeSafe">🔒 Güvenli</span>
+                                    <span class="jb" data-i18n="joinBadgeFree">🆓 Ucretsiz</span>
+                                    <span class="jb" data-i18n="joinBadgeSafe">🔒 Guvenli</span>
                                     <span class="jb" data-i18n="joinBadgeMobile">📱 Mobil Uyumlu</span>
                                 </div>
                             </div>
@@ -827,43 +827,43 @@
 
                 <!-- DISCOVER -->
                 <div id="discoverSection" class="section">
-                    <!-- Keşfet Hero -->
+                    <!-- Kesfet Hero -->
                     <div class="discover-hero">
                         <div class="discover-hero-bg"></div>
                         <div class="discover-hero-content">
                             <div class="discover-hero-left">
-                                <div class="discover-hero-badge" data-i18n="discoverBadge">🔥 500+ İçerik</div>
+                                <div class="discover-hero-badge" data-i18n="discoverBadge">🔥 500+ Icerik</div>
                                 <h1 class="discover-hero-title" data-i18n="discoverHeroTitle">Discover</h1>
-                                <p class="discover-hero-sub" data-i18n="discoverHeroSub">Anime, manga ve webtoon dünyasını keşfet. Favori serini bul.</p>
+                                <p class="discover-hero-sub" data-i18n="discoverHeroSub">Anime, manga ve webtoon dunyasini kesfet. Favori serini bul.</p>
                             </div>
                             <div class="discover-hero-search">
                                 <div class="discover-search-box-new">
                                     <span class="dsn-icon">🔍</span>
                                     <input type="text" id="discoverSearch" placeholder="Anime, manga veya webtoon ara..." data-i18n-placeholder="discoverSearchPlaceholder" oninput="onDiscoverSearch()">
                                 </div>
-                                <span id="discoverStats" class="discover-stat-text">İçerik yükleniyor...</span>
+                                <span id="discoverStats" class="discover-stat-text">Icerik yukleniyor...</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Filtre Çubuğu -->
+                    <!-- Filtre Cubugu -->
                     <div class="discover-filter-bar">
                         <div class="discover-type-tabs">
-                            <button class="discover-tab active" onclick="filterDiscoverType('all', this)" data-i18n="discoverAllTab">✨ Tümü</button>
+                            <button class="discover-tab active" onclick="filterDiscoverType('all', this)" data-i18n="discoverAllTab">✨ Tumu</button>
                             <button class="discover-tab" onclick="filterDiscoverType('anime', this)" data-i18n="discoverAnimeTab">🎬 Anime</button>
                             <button class="discover-tab" onclick="filterDiscoverType('manga', this)" data-i18n="discoverMangaTab">📖 Manga</button>
                             <button class="discover-tab" onclick="filterDiscoverType('webtoon', this)" data-i18n="discoverWebtoonTab">📱 Webtoon</button>
                         </div>
                         <div class="discover-sort-wrap">
                             <select id="discoverSort" onchange="discoverPage=1; renderDiscoverGrid()">
-                                <option value="rating" data-i18n-suffix=" " data-i18n="byRatingSort">⭐ Puana Göre</option>
-                                <option value="name" data-i18n-suffix=" " data-i18n="byNameSort">🔤 İsme Göre</option>
-                                <option value="year" data-i18n-suffix=" " data-i18n="byYearSort">📅 Yıla Göre</option>
+                                <option value="rating" data-i18n-suffix=" " data-i18n="byRatingSort">⭐ Puana Gore</option>
+                                <option value="name" data-i18n-suffix=" " data-i18n="byNameSort">🔤 Isme Gore</option>
+                                <option value="year" data-i18n-suffix=" " data-i18n="byYearSort">📅 Yila Gore</option>
                             </select>
                         </div>
                     </div>
 
-                    <!-- Tür Filtreleri -->
+                    <!-- Tur Filtreleri -->
                     <div class="genre-filters">
                         <button class="genre-tag active" onclick="filterByGenre('all', this)" data-i18n="genreAll">All</button>
                         <button class="genre-tag" onclick="filterByGenre('action', this)" data-i18n="genreAction">Action</button>
@@ -884,30 +884,30 @@
 
                 <!-- LIBRARY -->
                 <div id="librarySection" class="section">
-                    <div class="page-header"><h2 class="page-title" data-i18n="libraryTitle">📚 Kütüphanem</h2></div>
+                    <div class="page-header"><h2 class="page-title" data-i18n="libraryTitle">📚 Kutuphanem</h2></div>
                     <div class="filter-bar">
                         <div class="search-box">
-                            <input type="text" id="searchInput" placeholder="İçerik ara..." oninput="filterItems()">
+                            <input type="text" id="searchInput" placeholder="Icerik ara..." oninput="filterItems()">
                         </div>
                         <select id="typeFilter" onchange="filterItems()">
-                            <option value="all" data-i18n="allTypesOpt">Tüm Tipler</option>
+                            <option value="all" data-i18n="allTypesOpt">Tum Tipler</option>
                             <option value="anime">🎬 Anime</option>
                             <option value="manga">📖 Manga</option>
                             <option value="webtoon">📱 Webtoon</option>
                         </select>
                         <select id="statusFilter" onchange="filterItems()">
-                            <option value="all" data-i18n="allStatusesOpt">Tüm Durumlar</option>
-                            <option value="watching" data-i18n="statusWatching">▶️ İzliyorum</option>
-                            <option value="completed" data-i18n="statusCompleted">✅ Tamamlandı</option>
+                            <option value="all" data-i18n="allStatusesOpt">Tum Durumlar</option>
+                            <option value="watching" data-i18n="statusWatching">▶️ Izliyorum</option>
+                            <option value="completed" data-i18n="statusCompleted">✅ Tamamlandi</option>
                             <option value="onhold" data-i18n="statusOnHold">⏸️ Beklemede</option>
                             <option value="plantowatch">📋 Plan to Watch</option>
-                            <option value="dropped" data-i18n="statusDropped">❌ Bırakıldı</option>
+                            <option value="dropped" data-i18n="statusDropped">❌ Birakildi</option>
                         </select>
                         <select id="sortBy" onchange="filterItems()">
                             <option value="recent" data-i18n="sortRecent">En Yeni</option>
-                            <option value="name" data-i18n="sortName">İsim (A-Z)</option>
+                            <option value="name" data-i18n="sortName">Isim (A-Z)</option>
                             <option value="rating" data-i18n="sortRating">Puan</option>
-                            <option value="progress" data-i18n="sortProgress">İlerleme</option>
+                            <option value="progress" data-i18n="sortProgress">Ilerleme</option>
                         </select>
                     </div>
                     <div id="itemsGrid" class="items-grid"></div>
@@ -919,20 +919,20 @@
                         <div class="profile-cover" id="profileCoverBg"></div>
                         <div class="profile-main">
                             <div class="profile-avatar-wrap">
-                                <div class="profile-avatar-large" id="profileAvatarLarge" onclick="editProfile()" title="Fotoğraf değiştir">👤</div>
-                                <button class="avatar-cam-btn" onclick="editProfile()" title="Fotoğraf yükle">＋</button>
+                                <div class="profile-avatar-large" id="profileAvatarLarge" onclick="editProfile()" title="Fotograf degistir">👤</div>
+                                <button class="avatar-cam-btn" onclick="editProfile()" title="Fotograf yukle">＋</button>
                             </div>
                             <div class="profile-info">
                                 <h2 class="profile-username" id="profileUsername">User</h2>
                                 <p class="profile-email-display" id="profileEmailDisplay"></p>
-                                <p class="profile-bio-text" id="profileBioText">Anime, manga ve webtoon takipçisi</p>
+                                <p class="profile-bio-text" id="profileBioText">Anime, manga ve webtoon takipcisi</p>
                                 <div class="profile-badges">
                                     <span class="profile-badge level-badge-sm">Lv.<span id="profileLvBadge">1</span></span>
                                     <span class="profile-badge streak-badge"><span id="profileStreakBadge">0</span> day streak</span>
                                 </div>
                                 <div style="display:flex;gap:0.6rem;margin-top:0.9rem;flex-wrap:wrap;">
-                                    <button class="btn btn-secondary" onclick="editProfile()" data-i18n="profileEditBtn">Profili Düzenle</button>
-                                    <button class="btn btn-ghost" onclick="shareProfile()" data-i18n="profileShareBtn">Paylaş</button>
+                                    <button class="btn btn-secondary" onclick="editProfile()" data-i18n="profileEditBtn">Profili Duzenle</button>
+                                    <button class="btn btn-ghost" onclick="shareProfile()" data-i18n="profileShareBtn">Paylas</button>
                                 </div>
                             </div>
                         </div>
@@ -959,22 +959,22 @@
                         </div>
                         <div>
                             <div class="profile-section-block" style="margin-bottom:1rem;">
-                                <div class="psb-title" data-i18n="profileFavGenresTitle">Favori Türler</div>
+                                <div class="psb-title" data-i18n="profileFavGenresTitle">Favori Turler</div>
                                 <div id="favoriteGenres"></div>
                             </div>
                             <div class="profile-section-block">
-                                <div class="psb-title" data-i18n="profileAchievementsTitle">Son Başarımlar</div>
+                                <div class="psb-title" data-i18n="profileAchievementsTitle">Son Basarimlar</div>
                                 <div class="recent-achievements" id="recentAchievements"></div>
                             </div>
                         </div>
                     </div>
 
                     <div class="profile-section-block">
-                        <div class="psb-title" data-i18n="profileExportTitle">Dışa Aktar</div>
+                        <div class="psb-title" data-i18n="profileExportTitle">Disa Aktar</div>
                         <div class="share-btns">
-                            <button class="share-btn twitter" onclick="shareToTwitter()" data-i18n="profileTwitterBtn">Twitter'da Paylaş</button>
+                            <button class="share-btn twitter" onclick="shareToTwitter()" data-i18n="profileTwitterBtn">Twitter'da Paylas</button>
                             <button class="share-btn copy" onclick="copyProfileLink()" data-i18n="profileCopyBtn">Linki Kopyala</button>
-                            <button class="share-btn export" onclick="exportData('json')" data-i18n="profileJSONBtn">JSON İndir</button>
+                            <button class="share-btn export" onclick="exportData('json')" data-i18n="profileJSONBtn">JSON Indir</button>
                         </div>
                     </div>
                 </div>
@@ -984,7 +984,7 @@
                     <div class="page-header"><h2 class="page-title" data-i18n="calendarTitle">📅 Airing Calendar</h2></div>
                     <div class="calendar-container">
                         <div class="calendar-header-row">
-                            <span data-i18n="weeklySchedule">Haftalık Yayın Takvimi</span>
+                            <span data-i18n="weeklySchedule">Haftalik Yayin Takvimi</span>
                             <button class="btn btn-secondary" onclick="syncCalendar()" data-i18n="calendarSyncBtn">🔄 Senkronize Et</button>
                         </div>
                         <div class="weekdays" id="weekdaysContainer"></div>
@@ -1004,30 +1004,30 @@
                         <div class="ai-header-content">
                             <div class="ai-robot-icon">🤖</div>
                             <div>
-                                <h2 class="ai-title" data-i18n="aiTitle">AI Öneri Motoru</h2>
-                                <p class="ai-sub" data-i18n="aiSub">İzleme alışkanlıklarını analiz ederek sana özel içerikler buluyor</p>
+                                <h2 class="ai-title" data-i18n="aiTitle">AI Oneri Motoru</h2>
+                                <p class="ai-sub" data-i18n="aiSub">Izleme aliskanliklarini analiz ederek sana ozel icerikler buluyor</p>
                             </div>
                         </div>
                         <div class="ai-analysis-cards">
-                            <div class="aac"><div class="aac-icon">📊</div><div class="aac-label" data-i18n="aiWatchingLabel">İzleme Paterni</div><div class="aac-val" id="aiWatchingPattern">-</div></div>
-                            <div class="aac"><div class="aac-icon">🎯</div><div class="aac-label" data-i18n="aiFavGenreLabel">Favori Tür</div><div class="aac-val" id="aiFavoriteGenres">-</div></div>
+                            <div class="aac"><div class="aac-icon">📊</div><div class="aac-label" data-i18n="aiWatchingLabel">Izleme Paterni</div><div class="aac-val" id="aiWatchingPattern">-</div></div>
+                            <div class="aac"><div class="aac-icon">🎯</div><div class="aac-label" data-i18n="aiFavGenreLabel">Favori Tur</div><div class="aac-val" id="aiFavoriteGenres">-</div></div>
                             <div class="aac"><div class="aac-icon">⭐</div><div class="aac-label" data-i18n="aiAvgLabel">Avg Rating</div><div class="aac-val" id="aiAvgRating">-</div></div>
-                            <div class="aac"><div class="aac-icon"></div><div class="aac-label" data-i18n="aiAccuracyLabel">AI Doğruluğu</div><div class="aac-val">98%</div></div>
+                            <div class="aac"><div class="aac-icon"></div><div class="aac-label" data-i18n="aiAccuracyLabel">AI Dogrulugu</div><div class="aac-val">98%</div></div>
                         </div>
                         <div class="ai-btn-row">
-                            <button class="btn btn-primary btn-large" onclick="generateAIRecommendations()" data-i18n="aiNewRecsBtn">✨ Yeni Öneriler Al</button>
+                            <button class="btn btn-primary btn-large" onclick="generateAIRecommendations()" data-i18n="aiNewRecsBtn">✨ Yeni Oneriler Al</button>
                             <button class="btn btn-secondary" onclick="refreshAIAnalysis()" data-i18n="aiRefreshBtn">🔄 Yenile</button>
                         </div>
                     </div>
                     <div class="ai-recs-section">
                         <div class="section-header-row">
-                            <h3 class="sh-title" data-i18n="aiForYouTitle">💎 Size Özel</h3>
+                            <h3 class="sh-title" data-i18n="aiForYouTitle">💎 Size Ozel</h3>
                         </div>
                         <div class="media-row" id="aiRecommendations"></div>
                     </div>
                     <div class="ai-recs-section">
                         <div class="section-header-row">
-                            <h3 class="sh-title" data-i18n="aiSimilarTitle">🎭 Beğendiklerinize Benzer</h3>
+                            <h3 class="sh-title" data-i18n="aiSimilarTitle">🎭 Begendiklerinize Benzer</h3>
                         </div>
                         <div class="media-row" id="aiSimilarRecommendations"></div>
                     </div>
@@ -1037,7 +1037,7 @@
                 <div id="achievementsSection" class="section">
                     <div class="page-header">
                         <h2 class="page-title" data-i18n="achievementsTitle">🏆 Achievements</h2>
-                        <p class="page-sub" data-i18n="achievementsSub">İçerik ekle, tamamla ve seviyeleri geç</p>
+                        <p class="page-sub" data-i18n="achievementsSub">Icerik ekle, tamamla ve seviyeleri gec</p>
                     </div>
                     <div id="achievementsGrid" class="achievements-grid"></div>
                 </div>
@@ -1059,7 +1059,7 @@
                         <div class="dp-banner-content">
                             <img id="dpPoster" src="" alt="" class="dp-poster">
                             <div class="dp-header-info">
-                                <span id="dpTypeBadge" class="dp-type-badge anime">ANİME</span>
+                                <span id="dpTypeBadge" class="dp-type-badge anime">ANIME</span>
                                 <h1 id="dpTitle" class="dp-title">—</h1>
                                 <div class="dp-stats-row">
                                     <div class="dp-stat">⭐ <span id="dpScore">—</span></div>
@@ -1078,11 +1078,11 @@
 
                     <!-- Main grid -->
                     <div class="dp-body">
-                        <!-- Sol: Özet + Yorumlar -->
+                        <!-- Sol: Ozet + Yorumlar -->
                         <div class="dp-main-col">
-                            <!-- Özet -->
+                            <!-- Ozet -->
                             <div class="dp-card">
-                                <h3 class="dp-card-title" data-i18n="dpSynopsisTitle">📖 Özet</h3>
+                                <h3 class="dp-card-title" data-i18n="dpSynopsisTitle">📖 Ozet</h3>
                                 <p id="dpSynopsis" class="dp-synopsis" data-i18n="dpSynopsisLoading">Loading...</p>
                             </div>
 
@@ -1103,10 +1103,10 @@
                                             <button class="star-btn" onclick="setStarRating(9)">★</button>
                                             <button class="star-btn" onclick="setStarRating(10)">★</button>
                                         </div>
-                                        <span id="ratingText" class="rating-text" data-i18n="dpRatingText">Puan seç</span>
+                                        <span id="ratingText" class="rating-text" data-i18n="dpRatingText">Puan sec</span>
                                     </div>
-                                    <textarea id="reviewComment" class="review-textarea" placeholder="Düşüncelerini yaz (isteğe bağlı)..." data-i18n-placeholder="dpCommentPlaceholder" rows="3"></textarea>
-                                    <button id="reviewSubmitBtn" class="review-submit-btn" onclick="submitReview()" data-i18n="dpSubmitReview">💬 Yorumu Gönder</button>
+                                    <textarea id="reviewComment" class="review-textarea" placeholder="Dusuncelerini yaz (istege bagli)..." data-i18n-placeholder="dpCommentPlaceholder" rows="3"></textarea>
+                                    <button id="reviewSubmitBtn" class="review-submit-btn" onclick="submitReview()" data-i18n="dpSubmitReview">💬 Yorumu Gonder</button>
                                 </div>
                             </div>
 
@@ -1123,25 +1123,25 @@
                             </div>
                         </div>
 
-                        <!-- Sağ: Detaylar -->
+                        <!-- Sag: Detaylar -->
                         <div class="dp-side-col">
                             <div class="dp-card dp-info-card">
                                 <h3 class="dp-card-title" data-i18n="dpInfoTitle">ℹ️ Bilgiler</h3>
                                 <div class="dp-info-list">
-                                    <div class="dp-info-row"><span class="dp-info-label" data-i18n="dpTypeLabel">Tür</span><span id="dpTypeSide">—</span></div>
-                                    <div class="dp-info-row"><span class="dp-info-label" data-i18n="dpRankLabel">Sıralama</span><span id="dpRank">—</span></div>
-                                    <div class="dp-info-row"><span class="dp-info-label" data-i18n="dpMembersLabel">Üye</span><span id="dpMembers">—</span></div>
-                                    <div class="dp-info-row"><span class="dp-info-label" data-i18n="dpStudioLabel">Stüdyo</span><span id="dpStudio">—</span></div>
+                                    <div class="dp-info-row"><span class="dp-info-label" data-i18n="dpTypeLabel">Tur</span><span id="dpTypeSide">—</span></div>
+                                    <div class="dp-info-row"><span class="dp-info-label" data-i18n="dpRankLabel">Siralama</span><span id="dpRank">—</span></div>
+                                    <div class="dp-info-row"><span class="dp-info-label" data-i18n="dpMembersLabel">Uye</span><span id="dpMembers">—</span></div>
+                                    <div class="dp-info-row"><span class="dp-info-label" data-i18n="dpStudioLabel">Studyo</span><span id="dpStudio">—</span></div>
                                     <div class="dp-info-row"><span class="dp-info-label" data-i18n="dpStatusLabel">Durum</span><span id="dpStatusSide">—</span></div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Benzer İçerikler -->
+                    <!-- Benzer Icerikler -->
                     <div class="home-section-block" style="margin-top:2rem;">
                         <div class="section-header-row">
-                            <h3 class="sh-title" data-i18n="dpSimilarTitle">🎯 Benzer İçerikler</h3>
+                            <h3 class="sh-title" data-i18n="dpSimilarTitle">🎯 Benzer Icerikler</h3>
                         </div>
                         <div class="media-row" id="similarGrid"></div>
                     </div>
@@ -1153,41 +1153,41 @@
                         <div class="chart-container">
                             <h3 class="chart-title" data-i18n="settingsThemeTitle">🎨 Tema</h3>
                             <div class="theme-grid">
-                                <div class="theme-option theme-dark active" onclick="setTheme('dark')"><div class="theme-name" data-i18n="themeDark">Karanlık</div></div>
-                                <div class="theme-option theme-light" onclick="setTheme('light')"><div class="theme-name" data-i18n="themeLight">Aydınlık</div></div>
+                                <div class="theme-option theme-dark active" onclick="setTheme('dark')"><div class="theme-name" data-i18n="themeDark">Karanlik</div></div>
+                                <div class="theme-option theme-light" onclick="setTheme('light')"><div class="theme-name" data-i18n="themeLight">Aydinlik</div></div>
                                 <div class="theme-option theme-neon" onclick="setTheme('neon')"><div class="theme-name" data-i18n="themeNeon">Neon</div></div>
                                 <div class="theme-option theme-pastel" onclick="setTheme('pastel')"><div class="theme-name" data-i18n="themePastel">Pastel</div></div>
                             </div>
                         </div>
                         <div class="chart-container">
-                            <h3 class="chart-title" data-i18n="settingsDataTitle">📤 Veri Yönetimi</h3>
-                            <p style="color:var(--text-secondary);font-size:0.88rem;margin-bottom:1rem;">Verilerinizi dışa aktarın veya içe aktarın</p>
+                            <h3 class="chart-title" data-i18n="settingsDataTitle">📤 Veri Yonetimi</h3>
+                            <p style="color:var(--text-secondary);font-size:0.88rem;margin-bottom:1rem;">Verilerinizi disa aktarin veya ice aktarin</p>
                             <div style="display:flex;gap:0.8rem;flex-wrap:wrap;">
-                                <button class="btn btn-primary" onclick="exportData('json')" data-i18n="jsonDown">📥 JSON İndir</button>
-                                <button class="btn btn-primary" onclick="exportData('csv')" data-i18n="csvDown">📥 CSV İndir</button>
-                                <button class="btn btn-secondary" onclick="importData()" data-i18n="importBtn">📤 Veri Yükle</button>
+                                <button class="btn btn-primary" onclick="exportData('json')" data-i18n="jsonDown">📥 JSON Indir</button>
+                                <button class="btn btn-primary" onclick="exportData('csv')" data-i18n="csvDown">📥 CSV Indir</button>
+                                <button class="btn btn-secondary" onclick="importData()" data-i18n="importBtn">📤 Veri Yukle</button>
                             </div>
                         </div>
                         <div class="chart-container">
                             <h3 class="chart-title" data-i18n="settingsNotifTitle">🔔 Bildirimler</h3>
                             <label class="toggle-label">
                                 <input type="checkbox" id="pushNotifications" onchange="toggleNotifications()">
-                                <span data-i18n="settingsNotifLabel">Push bildirimleri etkinleştir</span>
+                                <span data-i18n="settingsNotifLabel">Push bildirimleri etkinlestir</span>
                             </label>
                         </div>
                         
                         <div class="chart-container" id="passwordChangeCard">
-                            <h3 class="chart-title">🔐 Şifre Değiştir</h3>
-                            <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:1.2rem;">Hesap güvenliğiniz için güçlü bir şifre kullanın.</p>
+                            <h3 class="chart-title">🔐 Sifre Degistir</h3>
+                            <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:1.2rem;">Hesap guvenliginiz icin guclu bir sifre kullanin.</p>
                             <div style="margin-bottom:0.9rem;">
-                                <label style="display:block;font-size:0.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.4rem;">Mevcut Şifre</label>
+                                <label style="display:block;font-size:0.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.4rem;">Mevcut Sifre</label>
                                 <div class="password-wrapper">
                                     <input type="password" id="currentPassword" placeholder="••••••••" style="width:100%;padding:0.8rem 2.8rem 0.8rem 1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;font-size:0.9rem;font-family:DM Sans,sans-serif;outline:none;box-sizing:border-box;transition:border-color 0.2s;" onfocus="this.style.borderColor='rgba(255,51,102,0.7)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
                                     <button type="button" class="toggle-pw" onclick="togglePwVisibility('currentPassword',this)">👁</button>
                                 </div>
                             </div>
                             <div style="margin-bottom:0.9rem;">
-                                <label style="display:block;font-size:0.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.4rem;">Yeni Şifre</label>
+                                <label style="display:block;font-size:0.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.4rem;">Yeni Sifre</label>
                                 <div class="password-wrapper">
                                     <input type="password" id="newPassword" placeholder="At least 8 characters" style="width:100%;padding:0.8rem 2.8rem 0.8rem 1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;font-size:0.9rem;font-family:DM Sans,sans-serif;outline:none;box-sizing:border-box;transition:border-color 0.2s;" oninput="checkPasswordStrengthSettings(this.value)" onfocus="this.style.borderColor='rgba(255,51,102,0.7)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
                                     <button type="button" class="toggle-pw" onclick="togglePwVisibility('newPassword',this)">👁</button>
@@ -1196,7 +1196,7 @@
                                 <div id="settingsPwStrengthText" style="font-size:0.73rem;margin-top:0.25rem;min-height:1rem;font-weight:600;"></div>
                             </div>
                             <div style="margin-bottom:1.2rem;">
-                                <label style="display:block;font-size:0.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.4rem;">Yeni Şifre (Tekrar)</label>
+                                <label style="display:block;font-size:0.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.4rem;">Yeni Sifre (Tekrar)</label>
                                 <div class="password-wrapper">
                                     <input type="password" id="confirmNewPassword" placeholder="Confirm your password" style="width:100%;padding:0.8rem 2.8rem 0.8rem 1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;font-size:0.9rem;font-family:DM Sans,sans-serif;outline:none;box-sizing:border-box;transition:border-color 0.2s;" onfocus="this.style.borderColor='rgba(255,51,102,0.7)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
                                     <button type="button" class="toggle-pw" onclick="togglePwVisibility('confirmNewPassword',this)">👁</button>
@@ -1209,10 +1209,10 @@
                             </button>
                         </div>
                         <div class="chart-container danger-zone">
-                            <h3 class="chart-title" data-i18n="settingsDangerTitle">⚠️ Hesap İşlemleri</h3>
-                            <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:1rem;">Bu işlemler geri alınamaz.</p>
+                            <h3 class="chart-title" data-i18n="settingsDangerTitle">⚠️ Hesap Islemleri</h3>
+                            <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:1rem;">Bu islemler geri alinamaz.</p>
                             <button class="btn-danger" onclick="handleLogout()" data-i18n="settingsLogoutBtn">🚪 Sign Out</button>
-                            <button class="btn-danger-outline" onclick="deleteAccount()" data-i18n="settingsDeleteBtn">🗑️ Hesabı Sil</button>
+                            <button class="btn-danger-outline" onclick="deleteAccount()" data-i18n="settingsDeleteBtn">🗑️ Hesabi Sil</button>
                         </div>
                     </div>
                 </div>
@@ -1224,19 +1224,19 @@
         <div id="addModal" class="modal" style="display:none;">
             <div class="modal-content">
                 <div class="modal-top">
-                    <h2 class="modal-title" data-i18n="addModalTitle">✨ Yeni İçerik Ekle</h2>
+                    <h2 class="modal-title" data-i18n="addModalTitle">✨ Yeni Icerik Ekle</h2>
                     <button class="modal-close" onclick="closeModal()">✕</button>
                 </div>
                 <form id="addForm" onsubmit="addItem(event)">
                     <div class="form-group">
                         <label>🔍 Jikan API'den Ara (opsiyonel)</label>
-                        <input type="text" id="apiSearch" placeholder="Anime veya manga adı yazın..." oninput="searchAPI()">
+                        <input type="text" id="apiSearch" placeholder="Anime veya manga adi yazin..." oninput="searchAPI()">
                         <div id="apiResults"></div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Name *</label>
-                            <input type="text" id="itemName" required placeholder="Anime / Manga adı">
+                            <input type="text" id="itemName" required placeholder="Anime / Manga adi">
                         </div>
                         <div class="form-group">
                             <label>Tip *</label>
@@ -1256,10 +1256,10 @@
                             <label>Durum</label>
                             <select id="itemStatus">
                                 <option value="plantowatch">📋 Plan to Watch</option>
-                                <option value="watching" data-i18n="statusWatching">▶️ İzliyorum</option>
-                                <option value="completed" data-i18n="statusCompleted">✅ Tamamlandı</option>
+                                <option value="watching" data-i18n="statusWatching">▶️ Izliyorum</option>
+                                <option value="completed" data-i18n="statusCompleted">✅ Tamamlandi</option>
                                 <option value="onhold" data-i18n="statusOnHold">⏸️ Beklemede</option>
-                                <option value="dropped" data-i18n="statusDropped">❌ Bırakıldı</option>
+                                <option value="dropped" data-i18n="statusDropped">❌ Birakildi</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -1285,7 +1285,7 @@
                         <textarea id="itemNotes" rows="2" placeholder="Write your thoughts..."></textarea>
                     </div>
                     <div class="modal-actions">
-                        <button type="button" class="btn btn-secondary" onclick="closeModal()">İptal</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">Iptal</button>
                         <button type="submit" class="btn btn-primary">✨ Ekle</button>
                     </div>
                 </form>
@@ -1296,12 +1296,12 @@
         <div id="editProfileModal" class="modal" style="display:none;">
             <div class="modal-content" style="max-width:500px;">
                 <div class="modal-top">
-                    <h2 class="modal-title">Profili Düzenle</h2>
+                    <h2 class="modal-title">Profili Duzenle</h2>
                     <button class="modal-close" onclick="closeEditProfile()">✕</button>
                 </div>
                 <form id="editProfileForm" onsubmit="saveProfile(event)">
 
-                    <!-- FOTOĞRAF YÜKLEME -->
+                    <!-- FOTOGRAF YUKLEME -->
                     <div class="avatar-upload-zone">
                         <div class="avatar-preview-wrap">
                             <div id="avatarPreview" class="avatar-preview-el">👤</div>
@@ -1316,9 +1316,9 @@
                         <input type="file" id="avatarFileInput" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">
                     </div>
 
-                    <!-- VEYA EMOJİ -->
+                    <!-- VEYA EMOJI -->
                     <div class="form-group">
-                        <label style="font-size:0.75rem;color:var(--text-muted);letter-spacing:0.3px;">Veya emoji seç</label>
+                        <label style="font-size:0.75rem;color:var(--text-muted);letter-spacing:0.3px;">Veya emoji sec</label>
                         <div class="avatar-selector">
                             <button type="button" class="avatar-option" onclick="selectAvatar('👤')">👤</button>
                             <button type="button" class="avatar-option" onclick="selectAvatar('😎')">😎</button>
@@ -1342,11 +1342,11 @@
 
                     <div class="form-group">
                         <label>Username</label>
-                        <input type="text" id="editUsername" required maxlength="30" placeholder="Adın...">
+                        <input type="text" id="editUsername" required maxlength="30" placeholder="Adin...">
                     </div>
                     <div class="form-group">
                         <label>Bio</label>
-                        <textarea id="editBio" rows="2" placeholder="Kendinizi tanıtın..." maxlength="200"></textarea>
+                        <textarea id="editBio" rows="2" placeholder="Kendinizi tanitin..." maxlength="200"></textarea>
                     </div>
                     <div class="form-group">
                         <label style="font-size:0.75rem;color:var(--text-muted);letter-spacing:0.3px;">Kapak rengi</label>
@@ -1362,7 +1362,7 @@
                         <input type="hidden" id="selectedCoverColor" value="gradient1">
                     </div>
                     <div class="modal-actions">
-                        <button type="button" class="btn btn-secondary" onclick="closeEditProfile()">İptal</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeEditProfile()">Iptal</button>
                         <button type="submit" class="btn btn-primary">Kaydet</button>
                     </div>
                 </form>
@@ -1377,7 +1377,7 @@
 
     </div><!-- /mainApp -->
 
-    <!-- Scripts - DOĞRU SIRADA -->
+    <!-- Scripts - DOGRU SIRADA -->
     <script src="js/data-manager.js"></script>
     <script src="js/xp-system.js"></script>
     <script src="js/api.js"></script>
@@ -1388,14 +1388,14 @@
 
     <!-- Home page live stats & leaderboard -->
     <script>
-    // Supabase'den canlı platform istatistiklerini çeker (RPC ile — RLS bypass)
+    // Supabase'den canli platform istatistiklerini ceker (RPC ile — RLS bypass)
     async function loadHomeLiveStats() {
         try {
             if (!window.supabaseClient) return;
             const fmt = n => n >= 1000 ? (n/1000).toFixed(1)+'K' : n;
             const setEl = (id, v) => { const e = document.getElementById(id); if(e) e.textContent = v; };
 
-            // 1) Platform istatistikleri — get_platform_stats() RPC (herkese açık)
+            // 1) Platform istatistikleri — get_platform_stats() RPC (herkese acik)
             const { data: stats, error: statsErr } = await window.supabaseClient
                 .rpc('get_platform_stats');
 
@@ -1413,7 +1413,7 @@
             }
 
             // 2) Leaderboard — public_leaderboard view
-            // Önce tam kolonlarla dene (user_id, avatar_url varsa), hata olursa temel kolonlarla dene
+            // Once tam kolonlarla dene (user_id, avatar_url varsa), hata olursa temel kolonlarla dene
             let leaders = null, lbErr = null, hasUserId = false;
 
             const r1 = await window.supabaseClient
@@ -1462,14 +1462,14 @@
         } catch(e) { console.warn('Live stats error:', e); }
     }
 
-    // Sayfa yüklenince çalıştır, 60 saniyede bir yenile
+    // Sayfa yuklenince calistir, 60 saniyede bir yenile
     document.addEventListener('DOMContentLoaded',()=>{
         setTimeout(loadHomeLiveStats, 2000);
         setInterval(loadHomeLiveStats, 60000);
-        // Duyuru popup'ı devre dışı
+        // Duyuru popup'i devre disi
     });
 
-    // ===== DUYURU SİSTEMİ - MODAL =====
+    // ===== DUYURU SISTEMI - MODAL =====
     window.checkAnnouncements = async function() {
         if (!window.supabaseClient) return;
         try {
@@ -1481,7 +1481,7 @@
             if (r.error || !r.data || !r.data.length) return;
             var dismissed = [];
             try { dismissed = JSON.parse(localStorage.getItem('dismissed_announcements')||'[]'); } catch(e){}
-            // String karşılaştırması - number/string uyumsuzluğunu önler
+            // String karsilastirmasi - number/string uyumsuzlugunu onler
             var dismissedStr = dismissed.map(function(d){ return String(d); });
             var visible = r.data.filter(function(a){ return !dismissedStr.includes(String(a.id)); });
             if (!visible.length) return;
@@ -1489,7 +1489,7 @@
         } catch(e) { console.warn('Ann check failed:', e); }
     };
 
-    // loadAnnouncements = checkAnnouncements (eski çağrılar için alias)
+    // loadAnnouncements = checkAnnouncements (eski cagrilar icin alias)
     window.loadAnnouncements = window.checkAnnouncements;
 
     function _showAnnModal(ann) {
@@ -1532,7 +1532,7 @@
             +(dateStr ? '<div style="color:#6b7280;font-size:0.75rem;font-family:DM Sans,sans-serif;">'+dateStr+'</div>' : '')
             +'</div></div>'
             +(ann.content||ann.body ? '<div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-left:3px solid '+t.accent+';border-radius:10px;padding:0.9rem 1rem;color:#c0c8d8;font-size:0.88rem;line-height:1.6;font-family:DM Sans,sans-serif;margin-bottom:1.3rem;">'+(ann.content||ann.body)+'</div>' : '<div style="margin-bottom:1rem;"></div>')
-            +'<button id="annOkBtn" style="width:100%;padding:0.8rem;background:linear-gradient(135deg,'+t.accent+','+t.accent+'aa);border:none;border-radius:12px;color:'+t.badgeText+';font-size:0.9rem;font-weight:700;font-family:DM Sans,sans-serif;cursor:pointer;box-shadow:0 4px 20px '+t.glow+';">Anladım ✓</button>'
+            +'<button id="annOkBtn" style="width:100%;padding:0.8rem;background:linear-gradient(135deg,'+t.accent+','+t.accent+'aa);border:none;border-radius:12px;color:'+t.badgeText+';font-size:0.9rem;font-weight:700;font-family:DM Sans,sans-serif;cursor:pointer;box-shadow:0 4px 20px '+t.glow+';">Anladim ✓</button>'
             +'</div></div>';
 
         document.body.appendChild(overlay);
@@ -1590,7 +1590,7 @@
 <script>
 // ============================================================
 //  PUBLIC PROFILE SYSTEM v1.0
-//  Başka kullanıcıların profilini modal olarak göster
+//  Baska kullanicilarin profilini modal olarak goster
 // ============================================================
 
 const COVERS_MAP = {
@@ -1610,19 +1610,19 @@ window.openPublicProfile = async function(userId, fallbackName) {
     const body = document.getElementById('publicProfileBody');
     if (!modal) return;
 
-    // Kendi profilimse kendi profil sayfasına yönlendir
+    // Kendi profilimse kendi profil sayfasina yonlendir
     const myId = window.currentUser ? (window.currentUser.uid || window.currentUser.id) : null;
     if (myId && userId === myId) {
         if (typeof switchSection === 'function') switchSection('profile');
         return;
     }
 
-    // Modal aç
+    // Modal ac
     modal.style.display = 'flex';
     requestAnimationFrame(() => { content.style.transform = 'scale(1) translateY(0)'; content.style.opacity = '1'; });
     document.body.style.overflow = 'hidden';
 
-    // Loading göster
+    // Loading goster
     body.innerHTML = `
         <div style="display:flex;align-items:center;justify-content:center;padding:3rem;flex-direction:column;gap:0.8rem;">
             <div class="chat-loading-dots"><span></span><span></span><span></span></div>
@@ -1632,7 +1632,7 @@ window.openPublicProfile = async function(userId, fallbackName) {
     try {
         if (!window.supabaseClient) throw new Error('Supabase connection unavailable');
 
-        // Önce get_public_profile RPC dene (Supabase'de varsa)
+        // Once get_public_profile RPC dene (Supabase'de varsa)
         let uData = null;
 
         try {
@@ -1656,7 +1656,7 @@ window.openPublicProfile = async function(userId, fallbackName) {
             }
         }
 
-        // Hiçbiri çalışmadıysa public_leaderboard'dan temel bilgi göster
+        // Hicbiri calismadiysa public_leaderboard'dan temel bilgi goster
         if (!uData) {
             const { data: lbRows } = await window.supabaseClient
                 .from('public_leaderboard')
@@ -1721,21 +1721,21 @@ function renderPublicProfile(d, updatedAt, fallbackName) {
     ];
     const lvlInfo = LEVEL_TITLES_LOCAL.find(t => level >= t.min && level <= t.max) || LEVEL_TITLES_LOCAL[LEVEL_TITLES_LOCAL.length-1];
 
-    // İstatistikler
+    // Istatistikler
     const anime   = items.filter(i => i.type === 'anime').length;
     const manga   = items.filter(i => i.type === 'manga').length;
     const webtoon = items.filter(i => i.type === 'webtoon').length;
     const completed = items.filter(i => i.status === 'completed').length;
     const totalXP = xp.total || 0;
 
-    // Durum dağılımı
+    // Durum dagilimi
     const watching   = items.filter(i => i.status === 'watching').length;
     const plantowatch= items.filter(i => i.status === 'plantowatch').length;
     const dropped    = items.filter(i => i.status === 'dropped').length;
     const total = items.length || 1;
     const pct = (n) => Math.round(n/total*100);
 
-    // Son başarımlar
+    // Son basarimlar
     let achHtml = '<span style="color:#6b7280;font-size:0.82rem;">No achievements yet</span>';
     if (typeof ACHIEVEMENTS !== 'undefined') {
         const unlocked = ACHIEVEMENTS.filter(a => achs.includes(a.id)).slice(-6).reverse();
@@ -1750,7 +1750,7 @@ function renderPublicProfile(d, updatedAt, fallbackName) {
         }
     }
 
-    // İzleme listesi (son 8 item)
+    // Izleme listesi (son 8 item)
     const recentItems = [...items].reverse().slice(0, 8);
     const typeIcons = { anime:'🎬', manga:'📖', webtoon:'📱' };
     const statusColors = { watching:'#00d4ff', completed:'#10b981', plantowatch:'#a78bfa', onhold:'#fbbf24', dropped:'#f87171' };
@@ -1789,7 +1789,7 @@ function renderPublicProfile(d, updatedAt, fallbackName) {
             </div>
             <p style="color:#8892a4;font-size:0.85rem;line-height:1.5;margin-bottom:1rem;">${bio}</p>
 
-            <!-- İstatistik kartları -->
+            <!-- Istatistik kartlari -->
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-bottom:1rem;">
                 ${[
                     ['🎬','Anime',anime],['📖','Manga',manga],['📱','Webtoon',webtoon],
@@ -1802,7 +1802,7 @@ function renderPublicProfile(d, updatedAt, fallbackName) {
                     </div>`).join('')}
             </div>
 
-            <!-- Durum dağılımı -->
+            <!-- Durum dagilimi -->
             <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:0.9rem;margin-bottom:1rem;">
                 <div style="font-size:0.8rem;font-weight:700;color:#a0a8b9;margin-bottom:0.6rem;text-transform:uppercase;letter-spacing:0.5px;">Watch Status</div>
                 ${[
@@ -1818,13 +1818,13 @@ function renderPublicProfile(d, updatedAt, fallbackName) {
                     </div>`).join('')}
             </div>
 
-            <!-- Son Başarımlar -->
+            <!-- Son Basarimlar -->
             <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:0.9rem;margin-bottom:1rem;">
                 <div style="font-size:0.8rem;font-weight:700;color:#a0a8b9;margin-bottom:0.6rem;text-transform:uppercase;letter-spacing:0.5px;">🏅 Achievements</div>
                 <div style="display:flex;flex-wrap:wrap;gap:0.4rem;">${achHtml}</div>
             </div>
 
-            <!-- İçerik Listesi -->
+            <!-- Icerik Listesi -->
             <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:0.9rem;">
                 <div style="font-size:0.8rem;font-weight:700;color:#a0a8b9;margin-bottom:0.6rem;text-transform:uppercase;letter-spacing:0.5px;">📋 Recent Content</div>
                 ${listHtml}
@@ -1841,7 +1841,7 @@ window.closePublicProfile = function() {
     setTimeout(() => { modal.style.display = 'none'; document.body.style.overflow = ''; }, 300);
 };
 
-// Backdrop tıklamasıyla kapat
+// Backdrop tiklamasiyla kapat
 document.addEventListener('DOMContentLoaded', function() {
     const backdrop = document.getElementById('publicProfileBackdrop');
     if (backdrop) backdrop.addEventListener('click', window.closePublicProfile);

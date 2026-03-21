@@ -1,5 +1,5 @@
 /* ============================================
-   AUTH.CSS v2.0 - Tamamen düzeltildi
+   AUTH.CSS v2.0 - Tamamen duzeltildi
    ============================================ */
 
 /* ===== AUTH MODAL (popup) ===== */
@@ -484,7 +484,7 @@
     flex-wrap: wrap;
 }
 
-/* ===== RESPONSIVE ===== */
+/* ===== RESPONSiVE ===== */
 @media (max-width: 480px) {
     .auth-modal-content {
         padding: 1.8rem 1.4rem;
@@ -497,7 +497,7 @@
     .guest-app-banner { font-size: 0.8rem; padding: 0.6rem 1rem; }
 }
 
-/* In-library button state */
+/* in-library button state */
 .add-to-list-btn.in-library {
     background: rgba(16, 185, 129, 0.1);
     border-color: rgba(16, 185, 129, 0.4);

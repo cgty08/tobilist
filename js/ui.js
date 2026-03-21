@@ -1,7 +1,7 @@
 // UI.JS v6.0 - Full TR/EN language support + bug fixes
 
 // ===== XSS KORUMA YARDIMCISI =====
-// Kullanıcıdan gelen tüm metinler innerHTML'e girmeden önce bu fonksiyondan geçmeli
+// Kullanicidan gelen tum metinler innerHTML'e girmeden once bu fonksiyondan gecmeli
 function escapeHTML(str) {
     if (!str) return '';
     return String(str)
@@ -878,7 +878,7 @@ function applyLanguage() {
 
     // Rating text (only if no rating selected)
     const ratingTextEl = document.getElementById('ratingText');
-    if (ratingTextEl && (ratingTextEl.textContent === 'Puan seç' || ratingTextEl.textContent === 'Select rating')) {
+    if (ratingTextEl && (ratingTextEl.textContent === 'Puan sec' || ratingTextEl.textContent === 'Select rating')) {
         ratingTextEl.textContent = t('dpRatingText');
     }
 
@@ -888,7 +888,7 @@ function applyLanguage() {
 
     // Review submit button
     const reviewSubmitBtn = document.getElementById('reviewSubmitBtn');
-    if (reviewSubmitBtn && (reviewSubmitBtn.textContent === '💬 Yorumu Gönder' || reviewSubmitBtn.textContent === '💬 Submit Review')) {
+    if (reviewSubmitBtn && (reviewSubmitBtn.textContent === '💬 Yorumu Gonder' || reviewSubmitBtn.textContent === '💬 Submit Review')) {
         reviewSubmitBtn.textContent = t('dpSubmitReview');
     }
 
@@ -897,7 +897,7 @@ function applyLanguage() {
     if (dpSynopsisEl) {
         if (window._detailSynopsis && (window._detailSynopsis.en || window._detailSynopsis.tr)) {
             if (typeof _applyDetailSynopsis === 'function') _applyDetailSynopsis();
-        } else if (dpSynopsisEl.textContent === 'Yükleniyor...' || dpSynopsisEl.textContent === 'Açıklama yükleniyor...' || dpSynopsisEl.textContent === 'Loading description...') {
+        } else if (dpSynopsisEl.textContent === 'Yukleniyor...' || dpSynopsisEl.textContent === 'Aciklama yukleniyor...' || dpSynopsisEl.textContent === 'Loading description...') {
             dpSynopsisEl.textContent = t('dpSynopsisLoading');
         }
     }
@@ -913,13 +913,13 @@ function applyLanguage() {
     if (discoverStatsEl) {
         const txt = discoverStatsEl.textContent || '';
         // Loading state
-        if (txt === 'İçerik yükleniyor...' || txt === 'Loading content...') {
-            discoverStatsEl.textContent = _lang === 'en' ? 'Loading content...' : 'İçerik yükleniyor...';
+        if (txt === 'Icerik yukleniyor...' || txt === 'Loading content...') {
+            discoverStatsEl.textContent = _lang === 'en' ? 'Loading content...' : 'Icerik yukleniyor...';
         }
-        // Loaded state: "786 results found" / "786 içerik bulundu"
+        // Loaded state: "786 results found" / "786 icerik bulundu"
         const numMatch = txt.match(/^(\d+)\s/);
         if (numMatch) {
-            discoverStatsEl.textContent = numMatch[1] + (_lang === 'en' ? ' results found' : ' içerik bulundu');
+            discoverStatsEl.textContent = numMatch[1] + (_lang === 'en' ? ' results found' : ' icerik bulundu');
         }
     }
 
@@ -1101,14 +1101,14 @@ function updateItem(id, field, value) {
     const oldValue = item[field];
     item[field] = value;
 
-    // Kütüphane işlemleri XP vermiyor — döngü önleme
+    // Kutuphane islemleri XP vermiyor — dongu onleme
     if (field === 'status' && value === 'completed' && oldValue !== 'completed') {
         if (item.totalEpisodes > 0) item.currentEpisode = item.totalEpisodes;
-        checkAchievements(); // XP yok, sadece başarım kontrolü
+        checkAchievements(); // XP yok, sadece basarim kontrolu
     } else if (field === 'status') {
         checkAchievements();
     }
-    // rating, notes, watching değişiklikleri XP vermiyor
+    // rating, notes, watching degisiklikleri XP vermiyor
 
     dataManager.saveAll();
     filterItems();
@@ -1127,7 +1127,7 @@ function deleteItem(id) {
 
 // ===== PROFILE =====
 
-// Avatar'ı bir element'e uygula (fotoğraf varsa fotoğraf, yoksa emoji)
+// Avatar'i bir element'e uygula (fotograf varsa fotograf, yoksa emoji)
 function _applyAvatar(elId, social) {
     const el = document.getElementById(elId);
     if (!el) return;
@@ -1151,11 +1151,11 @@ function renderProfilePage() {
     const d = dataManager.data;
     const set = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
 
-    set('profileUsername', d.social.name || 'Kullanıcı');
+    set('profileUsername', d.social.name || 'Kullanici');
     set('profileEmailDisplay', currentUser.email || '');
-    set('profileBioText', d.social.bio || 'Anime, manga ve webtoon takipçisi');
+    set('profileBioText', d.social.bio || 'Anime, manga ve webtoon takipcisi');
 
-    // Avatar — fotoğraf veya emoji
+    // Avatar — fotograf veya emoji
     _applyAvatar('profileAvatarLarge', d.social);
 
     // Kapak
@@ -1178,7 +1178,7 @@ function renderProfilePage() {
 
     const items = d.items || [];
 
-    // İzleme durumu özeti
+    // Izleme durumu ozeti
     const watching   = items.filter(i => i.status === 'watching').length;
     const completed  = items.filter(i => i.status === 'completed').length;
     const planned    = items.filter(i => i.status === 'plantowatch').length;
@@ -1193,7 +1193,7 @@ function renderProfilePage() {
     set('profileStreakVal',     d.streak?.longest || d.streak?.count || 0);
     set('profileXPTotal',      d.xp?.total || 0);
 
-    // Durum çubukları
+    // Durum cubuklari
     const statusBar = document.getElementById('profileStatusBars');
     if (statusBar) {
         const total = items.length || 1;
@@ -1201,7 +1201,7 @@ function renderProfilePage() {
             { label: t('watching_stat'),    count: watching,  color: '#00d4ff' },
             { label: t('completed_stat'),   count: completed, color: '#10b981' },
             { label: t('plantowatch_stat'), count: planned,   color: '#a78bfa' },
-            { label: _lang === 'en' ? 'Dropped' : 'Bırakıldı', count: dropped, color: '#f87171' },
+            { label: _lang === 'en' ? 'Dropped' : 'Birakildi', count: dropped, color: '#f87171' },
         ];
         statusBar.innerHTML = bars.map(b => `
             <div class="status-bar-row">
@@ -1230,7 +1230,7 @@ function renderProfilePage() {
             completed:   t('completed_stat'),
             plantowatch: t('plantowatch_stat'),
             onhold:      t('onhold_stat'),
-            dropped:     _lang === 'en' ? 'Dropped' : 'Bırakıldı'
+            dropped:     _lang === 'en' ? 'Dropped' : 'Birakildi'
         };
         if (recent.length === 0) {
             actList.innerHTML = '<div style="color:var(--text-muted);font-size:0.88rem;padding:0.8rem 0;">' + t('noActivity') + '</div>';
@@ -1249,7 +1249,7 @@ function renderProfilePage() {
         }
     }
 
-    // Favori türler — bar chart
+    // Favori turler — bar chart
     const genres = {};
     items.forEach(i => { if (i.genre) genres[i.genre] = (genres[i.genre] || 0) + 1; });
     const favGenres = document.getElementById('favoriteGenres');
@@ -1269,7 +1269,7 @@ function renderProfilePage() {
             : '<span style="color:var(--text-muted);font-size:0.88rem;">' + t('noGenres') + '</span>';
     }
 
-    // Son başarımlar
+    // Son basarimlar
     const recentAch = document.getElementById('recentAchievements');
     if (recentAch) {
         const achList = typeof ACHIEVEMENTS !== 'undefined' ? ACHIEVEMENTS : [];
@@ -1300,7 +1300,7 @@ function editProfile() {
     document.getElementById('selectedAvatar').value = d.avatar || '👤';
     document.getElementById('selectedCoverColor').value = d.cover || 'gradient1';
 
-    // Önizlemeyi güncelle
+    // Onizlemeyi guncelle
     _applyAvatar('avatarPreview', d);
 
     document.querySelectorAll('.avatar-option').forEach(btn =>
@@ -1327,7 +1327,7 @@ function saveProfile(event) {
     dataManager.data.social.bio    = document.getElementById('editBio').value.trim();
     dataManager.data.social.avatar = document.getElementById('selectedAvatar').value;
     dataManager.data.social.cover  = document.getElementById('selectedCoverColor').value;
-    // avatarUrl modal içinde doğrudan set edildi, dokunmuyoruz
+    // avatarUrl modal icinde dogrudan set edildi, dokunmuyoruz
 
     dataManager.saveAll();
     closeEditProfile();
@@ -1341,7 +1341,7 @@ function selectAvatar(emoji) {
     document.querySelectorAll('.avatar-option').forEach(btn =>
         btn.classList.toggle('selected', btn.textContent.trim() === emoji)
     );
-    // Emoji seçilince fotoğrafı kaldır
+    // Emoji secilince fotografi kaldir
     if (dataManager.data) dataManager.data.social.avatarUrl = null;
     _applyAvatar('avatarPreview', { avatar: emoji, avatarUrl: null });
 }
@@ -1353,7 +1353,7 @@ function selectCoverColor(color) {
     );
 }
 
-// ===== FOTOĞRAF YÜKLEME =====
+// ===== FOTOGRAF YUKLEME =====
 function triggerAvatarUpload() {
     document.getElementById('avatarFileInput')?.click();
 }
@@ -1362,11 +1362,11 @@ function handleAvatarUpload(event) {
     const file = event.target.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
-        showNotification(_lang === 'en' ? 'Please select an image file' : 'Lütfen bir görsel dosyası seçin', 'error');
+        showNotification(_lang === 'en' ? 'Please select an image file' : 'Lutfen bir gorsel dosyasi secin', 'error');
         return;
     }
     if (file.size > 3 * 1024 * 1024) {
-        showNotification(_lang === 'en' ? "Image must be under 3MB" : "Görsel 3MB'den küçük olmalı", 'error');
+        showNotification(_lang === 'en' ? "Image must be under 3MB" : "Gorsel 3MB'den kucuk olmali", 'error');
         return;
     }
     const reader = new FileReader();
@@ -1382,15 +1382,15 @@ function handleAvatarUpload(event) {
             canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
             const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
 
-            // Önizle
+            // Onizle
             _applyAvatar('avatarPreview', { avatarUrl: dataUrl });
 
             // Kaydet (saveProfile'da da korunacak)
             if (dataManager.data) dataManager.data.social.avatarUrl = dataUrl;
 
-            // Emoji seçimini temizle
+            // Emoji secimini temizle
             document.querySelectorAll('.avatar-option').forEach(b => b.classList.remove('selected'));
-            showNotification(_lang === 'en' ? 'Photo uploaded ✓' : 'Fotoğraf yüklendi ✓', 'success');
+            showNotification(_lang === 'en' ? 'Photo uploaded ✓' : 'Fotograf yuklendi ✓', 'success');
         };
         img.src = e.target.result;
     };
@@ -1402,7 +1402,7 @@ function removeAvatarPhoto() {
     if (dataManager.data) dataManager.data.social.avatarUrl = null;
     const emoji = document.getElementById('selectedAvatar')?.value || '👤';
     _applyAvatar('avatarPreview', { avatar: emoji, avatarUrl: null });
-    showNotification(_lang === 'en' ? 'Photo removed' : 'Fotoğraf kaldırıldı', 'info');
+    showNotification(_lang === 'en' ? 'Photo removed' : 'Fotograf kaldirildi', 'info');
 }
 
 // ===== ACHIEVEMENTS =====
@@ -1414,13 +1414,13 @@ function renderAchievements() {
         ? (obj[_lang] || obj.tr || Object.values(obj)[0])
         : obj;
 
-    // Özet banner
+    // Ozet banner
     const total    = ACHIEVEMENTS.length;
     const doneCount = unlocked.length;
     const pct      = Math.round((doneCount / total) * 100);
     const totalXP  = ACHIEVEMENTS.filter(a => unlocked.includes(a.id)).reduce((s, a) => s + (a.xp || 0), 0);
 
-    // Başarımları sırala: önce kazanılanlar, sonra kilitliler
+    // Basarimlari sirala: once kazanilanlar, sonra kilitliler
     const sorted = [...ACHIEVEMENTS].sort((a, b) => {
         const aD = unlocked.includes(a.id);
         const bD = unlocked.includes(b.id);
@@ -1432,12 +1432,12 @@ function renderAchievements() {
     const rarityColor = { common: '#6b7280', uncommon: '#3b82f6', rare: '#8b5cf6', epic: '#ec4899', legendary: '#f59e0b' };
 
     container.innerHTML = `
-        <!-- Özet Bar -->
+        <!-- Ozet Bar -->
         <div style="grid-column:1/-1; background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:1.4rem 1.8rem; margin-bottom:.5rem;">
             <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; margin-bottom:1rem;">
                 <div>
-                    <div style="font-size:1.1rem; font-weight:700; margin-bottom:.2rem;">🏆 ${_lang === 'en' ? 'Achievement Progress' : 'Başarım İlerlemesi'}</div>
-                    <div style="color:var(--text-secondary); font-size:.85rem;">${doneCount} / ${total} ${_lang === 'en' ? 'unlocked' : 'kazanıldı'} · +${totalXP} XP</div>
+                    <div style="font-size:1.1rem; font-weight:700; margin-bottom:.2rem;">🏆 ${_lang === 'en' ? 'Achievement Progress' : 'Basarim Ilerlemesi'}</div>
+                    <div style="color:var(--text-secondary); font-size:.85rem;">${doneCount} / ${total} ${_lang === 'en' ? 'unlocked' : 'kazanildi'} · +${totalXP} XP</div>
                 </div>
                 <div style="font-size:2rem; font-weight:800; background:linear-gradient(135deg,#f59e0b,#ff3366); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">%${pct}</div>
             </div>
@@ -1506,8 +1506,8 @@ function renderAnalytics() {
             <div style="display:grid;gap:.8rem;">
                 ${[
                     [t('totalContent'), items.length],
-                    [t('streakLabel'), (dataManager.data.streak.count||0) + (_lang==='en'?' days':' gün')],
-                    [t('longestStreak'), (dataManager.data.streak.longest||0) + (_lang==='en'?' days':' gün')]
+                    [t('streakLabel'), (dataManager.data.streak.count||0) + (_lang==='en'?' days':' gun')],
+                    [t('longestStreak'), (dataManager.data.streak.longest||0) + (_lang==='en'?' days':' gun')]
                 ].map(([l,v]) =>
                     `<div style="display:flex;justify-content:space-between;padding:.6rem 0;border-bottom:1px solid var(--border);">
                         <span style="color:var(--text-secondary);">${l}</span><strong>${v}</strong>
@@ -1518,11 +1518,11 @@ function renderAnalytics() {
 }
 
 // ===== CALENDAR =====
-// Bu haftanın Pazartesi başlangıcı ve Pazar bitişini hesapla
+// Bu haftanin Pazartesi baslangici ve Pazar bitisini hesapla
 function _getWeekBounds() {
     const now   = new Date();
     const day   = now.getDay(); // 0=Paz,1=Pzt...
-    // Pazartesi = gün 1; eğer Pazar ise geri 6 gün
+    // Pazartesi = gun 1; eger Pazar ise geri 6 gun
     const diffToMon = (day === 0) ? -6 : 1 - day;
     const mon = new Date(now);
     mon.setDate(now.getDate() + diffToMon);
@@ -1573,7 +1573,7 @@ async function _fetchAniListCalendar() {
     if (cached) return cached;
 
     try {
-        // 3 sayfa paralel çek - haftalık schedule çok büyük olabilir
+        // 3 sayfa paralel cek - haftalik schedule cok buyuk olabilir
         const pages = await Promise.all([1, 2, 3].map(page =>
             fetch('https://graphql.anilist.co', {
                 method: 'POST',
@@ -1587,10 +1587,10 @@ async function _fetchAniListCalendar() {
 
         const allSchedules = pages.flatMap(j => j?.data?.Page?.airingSchedules || []);
 
-        // Gün bazında grupla — her anime için EN GÜNCEL bölümü tut
+        // Gun bazinda grupla — her anime icin EN GUNCEL bolumu tut
         // JS getDay(): 0=Paz, 1=Pzt, ... 6=Cmt
         const byDay = { 0:[], 1:[], 2:[], 3:[], 4:[], 5:[], 6:[] };
-        const seenId = new Map(); // mediaId → {day, idx} ile mükerrer önleme
+        const seenId = new Map(); // mediaId → {day, idx} ile mukerrer onleme
 
         allSchedules.forEach(s => {
             const media = s.media;
@@ -1613,7 +1613,7 @@ async function _fetchAniListCalendar() {
             };
 
             if (seenId.has(id)) {
-                // Aynı anime bu hafta birden fazla bölüm yayınlıyorsa hepsini ekle
+                // Ayni anime bu hafta birden fazla bolum yayinliyorsa hepsini ekle
                 byDay[day].push(entry);
             } else {
                 seenId.set(id, true);
@@ -1621,7 +1621,7 @@ async function _fetchAniListCalendar() {
             }
         });
 
-        // Her gün: önce yayın saatine göre sırala, sonra popülariteye göre
+        // Her gun: once yayin saatine gore sirala, sonra populariteye gore
         Object.keys(byDay).forEach(d => {
             byDay[d].sort((a, b) => {
                 if (a.airingAt !== b.airingAt) return a.airingAt - b.airingAt;
@@ -1655,11 +1655,11 @@ async function renderCalendar() {
         legendEl.innerHTML = `
             <div class="cal-legend-item">
                 <span class="cal-legend-pip" style="background:#10b981;"></span>
-                <span>${_lang === 'en' ? 'In your library' : 'Kütüphanende var'}</span>
+                <span>${_lang === 'en' ? 'In your library' : 'Kutuphanende var'}</span>
             </div>
             <div class="cal-legend-item">
                 <span class="cal-legend-pip" style="background:rgba(255,255,255,.18);"></span>
-                <span>${_lang === 'en' ? 'Not added yet' : 'Henüz eklenmemiş'}</span>
+                <span>${_lang === 'en' ? 'Not added yet' : 'Henuz eklenmemis'}</span>
             </div>`;
         container.parentElement.insertBefore(legendEl, container);
     }
@@ -1704,7 +1704,7 @@ async function renderCalendar() {
             <div class="cal-col-header">
                 <div class="cal-col-header-top">
                     <span class="cal-day-name">${dayName}</span>
-                    ${isToday ? `<span class="cal-today-badge">${_lang === 'en' ? 'Today' : 'Bugün'}</span>` : ''}
+                    ${isToday ? `<span class="cal-today-badge">${_lang === 'en' ? 'Today' : 'Bugun'}</span>` : ''}
                 </div>
                 <div class="cal-col-header-bottom">
                     <span class="cal-date-str">${dateStr}</span>
@@ -1744,7 +1744,7 @@ async function renderCalendar() {
                 const card = document.createElement('div');
                 card.className = 'cal-card' + (inLib ? ' cal-card--inlib' : '');
                 card.style.setProperty('--cal-accent', accentColor);
-                card.setAttribute('title', `${a.name} — Bölüm ${a.episode}${a.totalEps ? '/'+a.totalEps : ''} • ${airTime}`);
+                card.setAttribute('title', `${a.name} — Bolum ${a.episode}${a.totalEps ? '/'+a.totalEps : ''} • ${airTime}`);
                 card.onclick = () => openDetailPage(safeItem);
 
                 card.innerHTML = `
@@ -1988,12 +1988,12 @@ function _injectCalendarStyles() {
 
 
 async function syncCalendar() {
-    // Bu haftanın cache key'ini temizle
+    // Bu haftanin cache key'ini temizle
     const week = _getWeekBounds();
     APICache.clear(`cal_week_${week.start}`);
     APICache.clear('cal_anilist_v2'); // eski cache'leri de temizle
     APICache.clear('cal_schedule');
-    showNotification(_lang === 'en' ? 'Syncing calendar... 📡' : 'Takvim güncelleniyor... 📡', 'info');
+    showNotification(_lang === 'en' ? 'Syncing calendar... 📡' : 'Takvim guncelleniyor... 📡', 'info');
     await renderCalendar();
     showNotification(t('calSynced'), 'success');
 }
@@ -2022,11 +2022,11 @@ function generateAIRecommendations() {
     if (!allContent || allContent.length === 0) {
         if (_aiRetryCount >= 5) {
             _aiRetryCount = 0;
-            showNotification(_lang==='en'?'Could not load content. Please refresh.':'İçerik yüklenemedi. Sayfayı yenileyin.', 'error');
+            showNotification(_lang==='en'?'Could not load content. Please refresh.':'Icerik yuklenemedi. Sayfayi yenileyin.', 'error');
             return;
         }
         _aiRetryCount++;
-        showNotification(_lang==='en'?'Loading content, please wait...':'İçerikler yükleniyor, lütfen bekleyin...', 'info');
+        showNotification(_lang==='en'?'Loading content, please wait...':'Icerikler yukleniyor, lutfen bekleyin...', 'info');
         setTimeout(generateAIRecommendations, 3000);
         return;
     }
@@ -2087,7 +2087,7 @@ function _renderAIAnalysisCard(myItems, topGenres) {
     if (myItems.length === 0) {
         el.textContent = _lang==='en'
             ? 'Add items to your library to see your personalized analysis! 🌟'
-            : 'Kütüphanene içerik ekledikçe sana özel analiz burada görünecek! 🌟';
+            : 'Kutuphanene icerik ekledikce sana ozel analiz burada gorunecek! 🌟';
         return;
     }
 
@@ -2115,20 +2115,20 @@ function _renderAIAnalysisCard(myItems, topGenres) {
         if (topGenres.length>0) text+=`Recs below are sorted by your ${topGenres.slice(0,2).join(' & ')} taste.`;
         else text+='Rate more titles to personalize your recs.';
     } else {
-        if (topGenres.length>0) { text+=topGenres[0]+' türünü çok sevdiğin anlaşılıyor'; if(topGenres[1]) text+=', '+topGenres[1]+' de favorilerin arasında'; text+='. '; }
-        if (topFav.length>0) text+=topFav.join(' ve ')+' için 5 yıldız verdin. ';
+        if (topGenres.length>0) { text+=topGenres[0]+' turunu cok sevdigin anlasiliyor'; if(topGenres[1]) text+=', '+topGenres[1]+' de favorilerin arasinda'; text+='. '; }
+        if (topFav.length>0) text+=topFav.join(' ve ')+' icin 5 yildiz verdin. ';
         if (avg) {
             const n=parseFloat(avg);
-            if(n>=4) text+='Yüksek standartların var. ';
-            else if(n>=3) text+='Dengeli değerlendirme yapıyorsun. ';
-            else text+='Henüz keşif aşamandasın. ';
+            if(n>=4) text+='Yuksek standartlarin var. ';
+            else if(n>=3) text+='Dengeli degerlendirme yapiyorsun. ';
+            else text+='Henuz kesif asamandasin. ';
         }
         if (completed>0&&total>0) {
             const rate=Math.round(completed/total*100);
-            if(rate>=70) text+=`Başladıklarının %${rate}'ini bitiriyorsun. `;
+            if(rate>=70) text+=`Basladiklarinin %${rate}'ini bitiriyorsun. `;
         }
-        if (topGenres.length>0) text+=`Öneriler ${topGenres.slice(0,2).join(' ve ')} zevkine göre sıralandı.`;
-        else text+='İçeriklere puan verdikçe öneriler daha kişisel olacak.';
+        if (topGenres.length>0) text+=`Oneriler ${topGenres.slice(0,2).join(' ve ')} zevkine gore siralandi.`;
+        else text+='Iceriklere puan verdikce oneriler daha kisisel olacak.';
     }
     el.textContent = text;
 }
@@ -2143,7 +2143,7 @@ function shareToTwitter() {
     const count = dataManager.data.items.length;
     const text = _lang==='en'
         ? `Tracking ${count} titles on OniList! 🎌\n#OniList #Anime`
-        : `OniList'te ${count} içerik takip ediyorum! 🎌\n#OniList #Anime`;
+        : `OniList'te ${count} icerik takip ediyorum! 🎌\n#OniList #Anime`;
     window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text), '_blank');
 }
 
@@ -2155,7 +2155,7 @@ function copyProfileLink() {
 
 // ===== EXPORT / IMPORT =====
 function exportData(format) {
-    if (!dataManager.data) { showNotification(_lang==='en'?'No data to export!':'Dışa aktarılacak veri yok!', 'error'); return; }
+    if (!dataManager.data) { showNotification(_lang==='en'?'No data to export!':'Disa aktarilacak veri yok!', 'error'); return; }
     const content = format === 'json' ? dataManager.exportJSON() : dataManager.exportCSV();
     const type    = format === 'json' ? 'application/json' : 'text/csv;charset=utf-8;';
     const blob    = new Blob([content], { type });
