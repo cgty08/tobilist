@@ -183,6 +183,7 @@ function _renderSection(section, scrollY = 0) {
         case 'achievements': if (!isGuest) renderAchievements(); break;
         case 'ai':           if (!isGuest) renderAISection(); break;
         case 'library':      if (!isGuest) filterItems(); break;
+        case 'translate':    break;
         case 'detail':       break;
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });

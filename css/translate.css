@@ -1,0 +1,729 @@
+/* ============================================================
+   OniList Translate Widget v2.0 — translate.css
+   Tüm class'lar "ont-" prefix'li — mevcut CSS ile çakışmaz.
+   ============================================================ */
+
+/* ── Root ─────────────────────────────────────────────────── */
+#onilist-translate-root {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+}
+
+/* ── Widget Shell ─────────────────────────────────────────── */
+.ont-widget {
+    background: var(--bg-secondary, #141824);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 12px 50px rgba(0, 0, 0, 0.4), 0 0 0 0.5px rgba(255,255,255,0.04) inset;
+    position: relative;
+}
+
+/* ── Header ───────────────────────────────────────────────── */
+.ont-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1.2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.ont-title {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+}
+
+.ont-logo-ring {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(255,51,102,0.15), rgba(0,212,255,0.1));
+    border: 1px solid rgba(255,51,102,0.25);
+    flex-shrink: 0;
+}
+
+.ont-title-text {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary, #e8eaf2);
+    letter-spacing: -0.2px;
+}
+
+.ont-ai-badge {
+    background: linear-gradient(135deg, rgba(255,51,102,0.18), rgba(0,212,255,0.12));
+    border: 1px solid rgba(255,51,102,0.3);
+    border-radius: 20px;
+    padding: 0.12rem 0.55rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #ff3366;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+}
+
+.ont-header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.ont-kbd-hint {
+    font-size: 0.68rem;
+    color: var(--text-muted, #4b5563);
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px;
+    padding: 0.15rem 0.45rem;
+    font-family: monospace;
+    letter-spacing: 0.3px;
+}
+
+/* ── Icon Buttons ─────────────────────────────────────────── */
+.ont-icon-btn {
+    width: 30px;
+    height: 30px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    color: var(--text-secondary, #8892a4);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.18s ease;
+    flex-shrink: 0;
+}
+
+.ont-icon-btn:hover:not(:disabled) {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.2);
+    color: var(--text-primary, #e8eaf2);
+}
+
+.ont-icon-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.ont-icon-btn.ont-xs { width: 26px; height: 26px; border-radius: 7px; }
+
+/* ── Formality Bar ────────────────────────────────────────── */
+.ont-formality-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 1.1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.01);
+}
+
+.ont-form-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-muted, #4b5563);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+}
+
+.ont-form-group {
+    display: flex;
+    gap: 0.3rem;
+}
+
+.ont-form-btn {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 20px;
+    padding: 0.22rem 0.7rem;
+    font-size: 0.74rem;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text-secondary, #8892a4);
+    cursor: pointer;
+    transition: all 0.18s;
+    white-space: nowrap;
+}
+
+.ont-form-btn:hover {
+    background: rgba(255,51,102,0.08);
+    border-color: rgba(255,51,102,0.2);
+    color: #ff3366;
+}
+
+.ont-form-btn.active {
+    background: rgba(255,51,102,0.16);
+    border-color: rgba(255,51,102,0.45);
+    color: #ff3366;
+}
+
+/* ── Lang Bar ─────────────────────────────────────────────── */
+.ont-lang-bar {
+    display: flex;
+    align-items: center;
+    padding: 0.55rem 1rem;
+    gap: 0.6rem;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.015);
+}
+
+.ont-lang-side {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-width: 0;
+}
+
+.ont-lang-right { justify-content: flex-end; }
+
+.ont-lang-sel {
+    flex: 1;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    color: var(--text-primary, #e8eaf2);
+    padding: 0.5rem 2rem 0.5rem 0.85rem;
+    font-size: 0.85rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238892a4' stroke-width='1.5' stroke-linecap='round' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.65rem center;
+    min-width: 0;
+}
+
+.ont-lang-sel:focus {
+    border-color: rgba(255,51,102,0.5);
+    background-color: rgba(255,51,102,0.05);
+}
+
+.ont-lang-sel option { background: #1a2035; color: #e8eaf2; }
+
+/* Detected chip */
+.ont-detect-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: rgba(16,185,129,0.1);
+    border: 1px solid rgba(16,185,129,0.3);
+    border-radius: 6px;
+    padding: 0.18rem 0.5rem;
+    font-size: 0.7rem;
+    color: #10b981;
+    font-weight: 600;
+    white-space: nowrap;
+    animation: ont-slide-in 0.25s ease;
+}
+
+.ont-detect-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #10b981;
+    animation: ont-dot-pulse 1.5s ease infinite;
+    flex-shrink: 0;
+}
+
+@keyframes ont-dot-pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.4; transform: scale(0.7); }
+}
+
+@keyframes ont-slide-in {
+    from { opacity: 0; transform: translateX(-6px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Swap button */
+.ont-swap-btn {
+    width: 36px;
+    height: 36px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    color: var(--text-secondary, #8892a4);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.ont-swap-btn:hover {
+    background: rgba(255,51,102,0.1);
+    border-color: rgba(255,51,102,0.3);
+    color: #ff3366;
+}
+
+.ont-swap-spin svg { animation: ont-spin 0.42s ease; }
+
+@keyframes ont-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(180deg); }
+}
+
+/* ── Panels ───────────────────────────────────────────────── */
+.ont-panels {
+    display: flex;
+    min-height: 250px;
+}
+
+.ont-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.ont-panel-src { border-right: 1px solid rgba(255,255,255,0.06); }
+
+.ont-gutter { width: 1px; background: rgba(255,255,255,0.05); flex-shrink: 0; }
+
+/* Panel bar */
+.ont-panel-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem 0.25rem;
+}
+
+.ont-panel-flag {
+    font-size: 1.1rem;
+    line-height: 1;
+    user-select: none;
+}
+
+.ont-bar-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+/* TTS button */
+.ont-tts-btn {
+    width: 26px;
+    height: 26px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 7px;
+    color: var(--text-secondary, #8892a4);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.18s;
+    flex-shrink: 0;
+}
+
+.ont-tts-btn:hover:not(:disabled) {
+    background: rgba(0,212,255,0.12);
+    border-color: rgba(0,212,255,0.3);
+    color: #00d4ff;
+}
+
+.ont-tts-btn.ont-tts-active {
+    background: rgba(0,212,255,0.18);
+    border-color: rgba(0,212,255,0.4);
+    color: #00d4ff;
+    animation: ont-tts-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes ont-tts-pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(0,212,255,0.4); }
+    50%      { box-shadow: 0 0 0 4px rgba(0,212,255,0); }
+}
+
+.ont-tts-btn:disabled { opacity: 0.28; cursor: not-allowed; }
+
+/* Textarea */
+.ont-textarea {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    resize: none;
+    color: var(--text-primary, #e8eaf2);
+    font-size: 1rem;
+    font-family: 'DM Sans', sans-serif;
+    line-height: 1.65;
+    padding: 0.4rem 1rem 0.8rem;
+    caret-color: #ff3366;
+}
+
+.ont-textarea::placeholder { color: var(--text-muted, #4b5563); font-size: 0.88rem; }
+
+/* Output */
+.ont-output {
+    flex: 1;
+    padding: 0.4rem 1rem 0.8rem;
+    font-size: 1rem;
+    line-height: 1.65;
+    color: var(--text-primary, #e8eaf2);
+    overflow-y: auto;
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+
+.ont-placeholder {
+    color: var(--text-muted, #4b5563);
+    font-size: 0.88rem;
+    font-style: italic;
+}
+
+.ont-output-text { color: #e8eaf2; }
+.ont-error-text  { color: #ef4444; font-size: 0.85rem; }
+
+/* ── Skeleton Loader ──────────────────────────────────────── */
+.ont-skeleton {
+    flex: 1;
+    padding: 0.8rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.ont-sk-line {
+    height: 14px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.06) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.06) 75%);
+    background-size: 200% 100%;
+    border-radius: 6px;
+    animation: ont-shimmer 1.6s infinite;
+}
+
+.ont-sk-w80 { width: 80%; }
+.ont-sk-w60 { width: 60%; }
+.ont-sk-w75 { width: 75%; }
+.ont-sk-w45 { width: 45%; }
+
+@keyframes ont-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* ── Panel Footer ─────────────────────────────────────────── */
+.ont-panel-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.45rem 0.85rem 0.65rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    gap: 0.5rem;
+}
+
+.ont-footer-right { justify-content: flex-end; min-height: 34px; }
+
+.ont-counters {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.ont-cnt {
+    font-size: 0.7rem;
+    color: var(--text-muted, #4b5563);
+    font-weight: 600;
+}
+
+.ont-cnt-warn { color: #f59e0b !important; }
+.ont-cnt-sep  { color: rgba(255,255,255,0.15); font-size: 0.7rem; }
+
+/* Translate button */
+.ont-translate-btn {
+    background: linear-gradient(135deg, #ff3366, #ff5580);
+    color: #fff;
+    border: none;
+    border-radius: 9px;
+    padding: 0.44rem 1.1rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    box-shadow: 0 2px 12px rgba(255,51,102,0.32);
+    min-width: 76px;
+    justify-content: center;
+}
+
+.ont-translate-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(255,51,102,0.48);
+}
+
+.ont-translate-btn:active:not(:disabled) { transform: translateY(0); }
+
+.ont-translate-btn:disabled {
+    background: rgba(255,255,255,0.07);
+    color: rgba(255,255,255,0.28);
+    box-shadow: none;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Loading dots */
+.ont-dots {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.ont-dots span {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.85);
+    animation: ont-bounce 1.2s ease-in-out infinite;
+}
+
+.ont-dots span:nth-child(2) { animation-delay: 0.18s; }
+.ont-dots span:nth-child(3) { animation-delay: 0.36s; }
+
+@keyframes ont-bounce {
+    0%,80%,100% { transform: scale(0.7); opacity: 0.4; }
+    40%          { transform: scale(1.1); opacity: 1; }
+}
+
+/* Toasts */
+.ont-toast {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.3rem 0.65rem;
+    border-radius: 8px;
+    background: rgba(16,185,129,0.15);
+    border: 1px solid rgba(16,185,129,0.3);
+    color: #10b981;
+    display: none;
+}
+
+.ont-fav-toast {
+    background: rgba(251,191,36,0.12);
+    border-color: rgba(251,191,36,0.3);
+    color: #fbbf24;
+}
+
+.ont-toast-in { animation: ont-fade-up 0.25s ease; }
+
+@keyframes ont-fade-up {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Quick Bar ────────────────────────────────────────────── */
+.ont-quick-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.5rem 1rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.01);
+    flex-wrap: wrap;
+}
+
+.ont-quick-lbl {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-muted, #4b5563);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.ont-quick-pills { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+
+.ont-quick-pill {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 20px;
+    padding: 0.2rem 0.65rem;
+    font-size: 0.73rem;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text-secondary, #8892a4);
+    cursor: pointer;
+    transition: all 0.17s;
+    white-space: nowrap;
+}
+
+.ont-quick-pill:hover {
+    background: rgba(255,51,102,0.1);
+    border-color: rgba(255,51,102,0.28);
+    color: #ff3366;
+}
+
+.ont-quick-pill.active {
+    background: rgba(255,51,102,0.15);
+    border-color: rgba(255,51,102,0.45);
+    color: #ff3366;
+}
+
+/* ── Side Panel ───────────────────────────────────────────── */
+.ont-side-panel {
+    border-top: 1px solid rgba(255,255,255,0.07);
+    background: rgba(255,255,255,0.01);
+    animation: ont-slide-down 0.22s ease;
+}
+
+@keyframes ont-slide-down {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.ont-side-tabs {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.55rem 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    position: sticky;
+    top: 0;
+    background: var(--bg-secondary, #141824);
+    z-index: 2;
+}
+
+.ont-side-tab {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: none;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.76rem;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text-secondary, #8892a4);
+    cursor: pointer;
+    transition: all 0.18s;
+}
+
+.ont-side-tab:hover { background: rgba(255,255,255,0.05); color: var(--text-primary, #e8eaf2); }
+
+.ont-side-tab.active {
+    background: rgba(255,51,102,0.12);
+    border-color: rgba(255,51,102,0.35);
+    color: #ff3366;
+}
+
+.ont-side-clear {
+    margin-left: auto;
+    background: none;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 7px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.82rem;
+    cursor: pointer;
+    color: var(--text-secondary, #8892a4);
+    transition: all 0.18s;
+}
+
+.ont-side-clear:hover { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.3); color: #ef4444; }
+
+.ont-side-body {
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.ont-side-body::-webkit-scrollbar { width: 4px; }
+.ont-side-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+.ont-side-empty {
+    padding: 1.2rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-muted, #4b5563);
+}
+
+.ont-side-item {
+    padding: 0.65rem 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.ont-side-item:hover { background: rgba(255,255,255,0.03); }
+.ont-side-item:last-child { border-bottom: none; }
+
+.ont-side-item-top {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.25rem;
+}
+
+.ont-side-langs {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #ff3366;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.ont-side-age {
+    font-size: 0.66rem;
+    color: var(--text-muted, #4b5563);
+    margin-left: auto;
+}
+
+.ont-del-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.7rem;
+    color: var(--text-muted, #4b5563);
+    padding: 0.15rem 0.25rem;
+    border-radius: 4px;
+    transition: all 0.15s;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.ont-del-btn:hover { background: rgba(239,68,68,0.15); color: #ef4444; }
+
+.ont-side-src {
+    font-size: 0.78rem;
+    color: var(--text-secondary, #8892a4);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-bottom: 0.15rem;
+}
+
+.ont-side-tgt {
+    font-size: 0.8rem;
+    color: var(--text-primary, #c8d0e0);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ── Scrollbars inside widget ─────────────────────────────── */
+.ont-widget ::-webkit-scrollbar { width: 4px; }
+.ont-widget ::-webkit-scrollbar-track { background: transparent; }
+.ont-widget ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 620px) {
+    .ont-panels { flex-direction: column; }
+    .ont-panel-src { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .ont-gutter { display: none; }
+    .ont-panels { min-height: unset; }
+    .ont-panel  { min-height: 160px; }
+    .ont-lang-bar { gap: 0.35rem; padding: 0.5rem 0.75rem; }
+    .ont-swap-btn { width: 32px; height: 32px; }
+    .ont-quick-bar { padding: 0.45rem 0.75rem; }
+    .ont-formality-bar { flex-wrap: wrap; gap: 0.4rem; }
+    .ont-kbd-hint { display: none; }
+}
