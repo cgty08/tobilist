@@ -566,7 +566,7 @@
                             <div class="inline-chat-input-area" id="inlineChatInputArea" style="display:none;">
                                 <div class="inline-chat-input-row">
                                     <span class="inline-chat-my-avatar" id="inlineChatMyAvatar">&#x1F464;</span>
-                                    <textarea id="inlineChatInput" placeholder="Bir &#x15f;eyler yaz... (Enter = g&#xf6;nder)" rows="1" maxlength="300"></textarea>
+                                    <textarea id="inlineChatInput" placeholder="Write something... (Enter = send)" rows="1" maxlength="300"></textarea>
                                     <button id="inlineChatSendBtn" disabled>&#x27A4;</button>
                                 </div>
                                 <div class="inline-chat-hint">Enter to send &middot; Shift+Enter new line &middot; Max 300 chars</div>
@@ -1179,16 +1179,16 @@
                         
                         <div class="chart-container" id="passwordChangeCard">
                             <h3 class="chart-title">🔐 Sifre Degistir</h3>
-                            <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:1.2rem;">Hesap guvenliginiz icin guclu bir sifre kullanin.</p>
+                            <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:1.2rem;">Use a strong password to keep your account secure.</p>
                             <div style="margin-bottom:0.9rem;">
-                                <label style="display:block;font-size:0.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.4rem;">Mevcut Sifre</label>
+                                <label style="display:block;font-size:0.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.4rem;">Current Password</label>
                                 <div class="password-wrapper">
                                     <input type="password" id="currentPassword" placeholder="••••••••" style="width:100%;padding:0.8rem 2.8rem 0.8rem 1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;font-size:0.9rem;font-family:DM Sans,sans-serif;outline:none;box-sizing:border-box;transition:border-color 0.2s;" onfocus="this.style.borderColor='rgba(255,51,102,0.7)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
                                     <button type="button" class="toggle-pw" onclick="togglePwVisibility('currentPassword',this)">👁</button>
                                 </div>
                             </div>
                             <div style="margin-bottom:0.9rem;">
-                                <label style="display:block;font-size:0.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.4rem;">Yeni Sifre</label>
+                                <label style="display:block;font-size:0.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.4rem;">New Password</label>
                                 <div class="password-wrapper">
                                     <input type="password" id="newPassword" placeholder="At least 8 characters" style="width:100%;padding:0.8rem 2.8rem 0.8rem 1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;font-size:0.9rem;font-family:DM Sans,sans-serif;outline:none;box-sizing:border-box;transition:border-color 0.2s;" oninput="checkPasswordStrengthSettings(this.value)" onfocus="this.style.borderColor='rgba(255,51,102,0.7)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
                                     <button type="button" class="toggle-pw" onclick="togglePwVisibility('newPassword',this)">👁</button>
@@ -1197,7 +1197,7 @@
                                 <div id="settingsPwStrengthText" style="font-size:0.73rem;margin-top:0.25rem;min-height:1rem;font-weight:600;"></div>
                             </div>
                             <div style="margin-bottom:1.2rem;">
-                                <label style="display:block;font-size:0.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.4rem;">Yeni Sifre (Tekrar)</label>
+                                <label style="display:block;font-size:0.82rem;font-weight:600;color:var(--text-secondary);margin-bottom:0.4rem;">Confirm New Password</label>
                                 <div class="password-wrapper">
                                     <input type="password" id="confirmNewPassword" placeholder="Confirm your password" style="width:100%;padding:0.8rem 2.8rem 0.8rem 1rem;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;font-size:0.9rem;font-family:DM Sans,sans-serif;outline:none;box-sizing:border-box;transition:border-color 0.2s;" onfocus="this.style.borderColor='rgba(255,51,102,0.7)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
                                     <button type="button" class="toggle-pw" onclick="togglePwVisibility('confirmNewPassword',this)">👁</button>
