@@ -1029,7 +1029,7 @@ async function changePasswordSettings() {
         const { error: signInErr } = await window.supabaseClient.auth.signInWithPassword({
             email: currentUser.email, password: currentPw
         });
-        if (signinErr) throw new Error('Mevcut sifre yanlis!');
+        if (signInErr) throw new Error('Mevcut sifre yanlis!');
 
         const { error: updateErr } = await window.supabaseClient.auth.updateUser({ password: newPw });
         if (updateErr) throw updateErr;
