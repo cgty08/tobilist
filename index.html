@@ -1208,6 +1208,12 @@
                             <button onclick="changePasswordSettings()" id="pwChangeBtn" style="background:linear-gradient(135deg,#ff3366,#ff5580);color:#fff;border:none;border-radius:10px;padding:0.85rem 1.5rem;font-size:0.9rem;font-weight:700;cursor:pointer;font-family:DM Sans,sans-serif;width:100%;transition:all 0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
                                 🔐 Update Password
                             </button>
+                            <div style="text-align:center;margin-top:0.9rem;">
+                                <button onclick="sendSettingsPasswordReset()" style="background:none;border:none;color:#8892a4;font-size:0.82rem;font-family:'DM Sans',sans-serif;cursor:pointer;text-decoration:underline;padding:0;transition:color 0.2s;" onmouseover="this.style.color='#ff3366'" onmouseout="this.style.color='#8892a4'">
+                                    Şifreni mi unuttun? E-postanıza sıfırlama linki gönder →
+                                </button>
+                            </div>
+                            <div id="settingsResetSuccess" style="display:none;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-left:3px solid #10b981;color:#10b981;padding:0.7rem 1rem;border-radius:8px;font-size:0.85rem;margin-top:0.8rem;text-align:center;"></div>
                         </div>
                         <div class="chart-container danger-zone">
                             <h3 class="chart-title" data-i18n="settingsDangerTitle">⚠️ Hesap Islemleri</h3>
