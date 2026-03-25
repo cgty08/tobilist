@@ -1006,41 +1006,17 @@ function checkPasswordStrengthSettings(pw) {
 }
 
 
-// ===== AYARLAR — ŞİFRE SIFIRLAMA (mevcut şifre bilinmiyorsa) =====
 async function sendSettingsPasswordReset() {
-    if (!currentUser || !currentUser.email) {
-        showNotification('Oturum bilgisi bulunamadı.', 'error');
-        return;
-    }
-
-    const successEl = document.getElementById('settingsResetSuccess');
-    if (successEl) {
-        successEl.style.display = 'none';
-        successEl.textContent = '';
-    }
-
+    if (!currentUser || !currentUser.email) { showNotification("Oturum bilgisi bulunamadı.", "error"); return; }
+    const successEl = document.getElementById("settingsResetSuccess");
+    if (successEl) { successEl.style.display = "none"; successEl.textContent = ""; }
     try {
-        const redirectUrl = window.location.origin + window.location.pathname + '?reset=1';
-        const { error } = await window.supabaseClient.auth.resetPasswordForEmail(
-            currentUser.email,
-            { redirectTo: redirectUrl }
-        );
-
-        if (error && (error.message.includes('rate limit') || error.message.includes('Rate limit'))) {
-            showNotification('Çok fazla deneme. Lütfen birkaç dakika bekleyin.', 'error');
-            return;
-        }
-
-        if (successEl) {
-            successEl.textContent = '✅ ' + currentUser.email + ' adresine şifre sıfırlama linki gönderildi! Gelen kutunuzu (ve spam klasörünü) kontrol edin.';
-            successEl.style.display = 'block';
-            setTimeout(() => { successEl.style.display = 'none'; }, 8000);
-        }
-    } catch(e) {
-        showNotification('Hata oluştu: ' + (e.message || 'Bilinmeyen hata'), 'error');
-    }
+        const redirectUrl = window.location.origin + window.location.pathname + "?reset=1";
+        const { error } = await window.supabaseClient.auth.resetPasswordForEmail(currentUser.email, { redirectTo: redirectUrl });
+        if (error && (error.message.includes("rate limit") || error.message.includes("Rate limit"))) { showNotification("Çok fazla deneme. Lütfen birkaç dakika bekleyin.", "error"); return; }
+        if (successEl) { successEl.textContent = "✅ " + currentUser.email + " adresine şifre sıfırlama linki gönderildi!"; successEl.style.display = "block"; setTimeout(() => { successEl.style.display = "none"; }, 8000); }
+    } catch(e) { showNotification("Hata: " + (e.message || "Bilinmeyen hata"), "error"); }
 }
-
 async function changePasswordSettings() {
     const currentPw = (document.getElementById('currentPassword')?.value || '').trim();
     const newPw = (document.getElementById('newPassword')?.value || '').trim();

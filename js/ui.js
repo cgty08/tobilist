@@ -2001,20 +2001,40 @@ async function syncCalendar() {
 // ===== AI =====
 function renderAISection() {
     if (!dataManager.data) return;
-    const items = dataManager.data.items;
+    const items = dataManager.data.items || [];
     const rated = items.filter(i => i.rating > 0);
-    const avg   = rated.length > 0 ? (rated.reduce((a, i) => a + i.rating, 0) / rated.length).toFixed(1) : '-';
+    const avg   = rated.length > 0 ? (rated.reduce((a,i) => a + i.rating, 0) / rated.length).toFixed(1) : '-';
 
     const genres = {};
     items.forEach(i => { if (i.genre) genres[i.genre] = (genres[i.genre] || 0) + 1; });
-    const topGenre = Object.entries(genres).sort((a, b) => b[1] - a[1])[0]?.[0] || '-';
+    const topGenre = Object.entries(genres).sort((a,b) => b[1]-a[1])[0]?.[0] || '-';
+
+    const completed = items.filter(i => i.status === 'completed').length;
+    const watching  = items.filter(i => i.status === 'watching').length;
 
     const set = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
-    set('aiWatchingPattern', items.filter(i => i.status === 'watching').length + (_lang==='en'?' active':' aktif'));
+    set('aiWatchingPattern', watching + (_lang==='en' ? ' active' : ' aktif'));
     set('aiFavoriteGenres', topGenre);
     set('aiAvgRating', avg);
+    set('aiLibrarySize', items.length);
+    set('aiCompletedCount', completed);
 
-    generateAIRecommendations();
+    const barFill = document.querySelector('.ai-dash-bar-fill');
+    if (barFill) {
+        const pct = items.length > 0 ? Math.min(100, Math.round(watching / items.length * 100)) : 0;
+        barFill.style.width = Math.max(5, pct) + '%';
+    }
+
+    const emptyState = document.getElementById('aiEmptyState');
+    const recsSection = document.querySelectorAll('.ai-recs-section');
+    if (items.length < 3) {
+        if (emptyState) emptyState.style.display = 'block';
+        recsSection.forEach(s => s.style.display = 'none');
+    } else {
+        if (emptyState) emptyState.style.display = 'none';
+        recsSection.forEach(s => s.style.display = 'block');
+        generateAIRecommendations();
+    }
 }
 
 let _aiRetryCount = 0;
@@ -2026,7 +2046,6 @@ function generateAIRecommendations() {
             return;
         }
         _aiRetryCount++;
-        showNotification(_lang==='en'?'Loading content, please wait...':'Icerikler yukleniyor, lutfen bekleyin...', 'info');
         setTimeout(generateAIRecommendations, 3000);
         return;
     }
@@ -2043,9 +2062,10 @@ function generateAIRecommendations() {
             genreScores[i.genre].total += (i.rating || 3);
         }
     });
+
     const topGenres = Object.entries(genreScores)
         .sort((a,b) => (b[1].total/b[1].count) - (a[1].total/a[1].count))
-        .slice(0,4).map(e=>e[0]);
+        .slice(0,4).map(e => e[0]);
 
     let recs = allContent
         .filter(i => !myNames.includes((i.name||'').toLowerCase()))
@@ -2060,80 +2080,83 @@ function generateAIRecommendations() {
         })
         .sort((a,b) => b._score - a._score);
 
-    renderMediaRow('aiRecommendations', recs.slice(0,10));
-    renderMediaRow('aiSimilarRecommendations', recs.slice(10,20));
-    _renderAIAnalysisCard(myItems, topGenres);
+    renderMediaRow('aiRecommendations', recs.slice(0, 12));
+    renderMediaRow('aiSimilarRecommendations', recs.slice(12, 24));
+    _renderAITasteCard(myItems, topGenres);
     showNotification(t('aiUpdated'), 'success');
 }
 
-function _renderAIAnalysisCard(myItems, topGenres) {
-    if (!document.getElementById('aiAnalysisCard')) {
-        const section = document.querySelector('#aiSection .ai-recs-section');
-        if (section) {
-            section.insertAdjacentHTML('beforebegin',
-                `<div id="aiAnalysisCard" style="background:rgba(255,51,102,.06);border:1px solid rgba(255,51,102,.2);border-radius:16px;padding:1.2rem 1.4rem;margin-bottom:1.5rem;">
-                <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.7rem;">
-                    <span style="font-size:1.1rem;">🤖</span>
-                    <strong style="font-size:.95rem;">${_lang==='en'?'Your Taste Analysis':'Zevk Analizin'}</strong>
-                </div>
-                <div id="aiAnalysisText" style="color:var(--text-secondary);font-size:.88rem;line-height:1.7;"></div>
-                </div>`
-            );
-        }
-    }
-    const el = document.getElementById('aiAnalysisText');
-    if (!el) return;
+function _renderAITasteCard(myItems, topGenres) {
+    const card = document.getElementById('aiAnalysisCard');
+    const textEl = document.getElementById('aiAnalysisText');
+    const tagsEl = document.getElementById('aiGenreTags');
+    if (!card || !textEl) return;
+
+    card.style.display = 'block';
 
     if (myItems.length === 0) {
-        el.textContent = _lang==='en'
-            ? 'Add items to your library to see your personalized analysis! 🌟'
-            : 'Kutuphanene icerik ekledikce sana ozel analiz burada gorunecek! 🌟';
+        textEl.textContent = _lang==='en'
+            ? 'Add items to your library to see your personalized analysis!'
+            : 'Kutuphanene icerik ekledikce sana ozel analiz burada gorunecek!';
         return;
     }
 
-    const completed = myItems.filter(i=>i.status==='completed').length;
-    const rated     = myItems.filter(i=>i.rating>0);
-    const avg       = rated.length>0 ? (rated.reduce((a,i)=>a+i.rating,0)/rated.length).toFixed(1) : null;
-    const topFav    = myItems.filter(i=>i.rating>=5).map(i=>i.name).slice(0,2);
+    const completed = myItems.filter(i => i.status==='completed').length;
+    const rated     = myItems.filter(i => i.rating > 0);
+    const avg       = rated.length > 0 ? (rated.reduce((a,i) => a+i.rating, 0)/rated.length).toFixed(1) : null;
+    const topFav    = myItems.filter(i => i.rating >= 5).map(i => i.name).slice(0, 3);
     const total     = myItems.length;
 
     let text = '';
     if (_lang === 'en') {
-        if (topGenres.length>0) { text+=`You seem to love ${topGenres[0]}`; if(topGenres[1]) text+=` and ${topGenres[1]}`; text+='. '; }
-        if (topFav.length>0) text+=`You gave 5 stars to ${topFav.join(' and ')}. `;
+        if (topGenres.length > 0) { text += `You gravitate toward ${topGenres[0]}`; if (topGenres[1]) text += ` and ${topGenres[1]}`; text += '. '; }
+        if (topFav.length > 0) text += `You rated ${topFav.slice(0,2).join(' and ')} highly. `;
         if (avg) {
-            const n=parseFloat(avg);
-            if(n>=4) text+='You have high standards! ';
-            else if(n>=3) text+='You give balanced ratings. ';
-            else text+="You're still exploring — try more titles! ";
+            const n = parseFloat(avg);
+            if (n >= 4.2) text += 'You have refined taste and high standards. ';
+            else if (n >= 3) text += 'Your ratings are balanced and thoughtful. ';
+            else text += "You're still exploring — try more titles! ";
         }
-        if (completed>0&&total>0) {
-            const rate=Math.round(completed/total*100);
-            if(rate>=70) text+=`You finish ${rate}% of what you start — very dedicated! `;
-            else if(rate>=40) text+=`Your completion rate is ${rate}%. `;
+        if (completed > 0 && total > 0) {
+            const rate = Math.round(completed/total*100);
+            if (rate >= 70) text += `You complete ${rate}% of what you start — very committed! `;
+            else if (rate >= 40) text += `Your completion rate is ${rate}%. `;
         }
-        if (topGenres.length>0) text+=`Recs below are sorted by your ${topGenres.slice(0,2).join(' & ')} taste.`;
-        else text+='Rate more titles to personalize your recs.';
+        if (topGenres.length > 0) text += `Recs are ranked by your ${topGenres.slice(0,2).join(' & ')} preference.`;
+        else text += 'Rate more titles to personalize your recommendations.';
     } else {
-        if (topGenres.length>0) { text+=topGenres[0]+' turunu cok sevdigin anlasiliyor'; if(topGenres[1]) text+=', '+topGenres[1]+' de favorilerin arasinda'; text+='. '; }
-        if (topFav.length>0) text+=topFav.join(' ve ')+' icin 5 yildiz verdin. ';
+        if (topGenres.length > 0) { text += `${topGenres[0]} turunu cok seviyorsun`; if (topGenres[1]) text += `, ${topGenres[1]} de favorilerin arasinda`; text += '. '; }
+        if (topFav.length > 0) text += `${topFav.slice(0,2).join(' ve ')} icin yuksek puan verdin. `;
         if (avg) {
-            const n=parseFloat(avg);
-            if(n>=4) text+='Yuksek standartlarin var. ';
-            else if(n>=3) text+='Dengeli degerlendirme yapiyorsun. ';
-            else text+='Henuz kesif asamandasin. ';
+            const n = parseFloat(avg);
+            if (n >= 4.2) text += 'Rafine bir zevkin var. ';
+            else if (n >= 3) text += 'Dengeli degerlendirmeler yapiyorsun. ';
+            else text += 'Hala kesif asamandasin! ';
         }
-        if (completed>0&&total>0) {
-            const rate=Math.round(completed/total*100);
-            if(rate>=70) text+=`Basladiklarinin %${rate}'ini bitiriyorsun. `;
+        if (completed > 0 && total > 0) {
+            const rate = Math.round(completed/total*100);
+            if (rate >= 70) text += `Basladiklarinin %${rate}'ini bitiriyorsun. `;
         }
-        if (topGenres.length>0) text+=`Oneriler ${topGenres.slice(0,2).join(' ve ')} zevkine gore siralandi.`;
-        else text+='Iceriklere puan verdikce oneriler daha kisisel olacak.';
+        if (topGenres.length > 0) text += `Oneriler ${topGenres.slice(0,2).join(' ve ')} zevkine gore siralanmistir.`;
+        else text += 'Daha fazla puan verdikce oneriler kisisellesecek.';
     }
-    el.textContent = text;
+
+    textEl.textContent = text;
+
+    if (tagsEl && topGenres.length > 0) {
+        tagsEl.innerHTML = '';
+        topGenres.forEach(g => {
+            const tag = document.createElement('span');
+            tag.className = 'ai-genre-tag';
+            tag.textContent = g;
+            tagsEl.appendChild(tag);
+        });
+    }
 }
 
 function refreshAIAnalysis() { renderAISection(); }
+
+
 
 // ===== SOCIAL =====
 function shareProfile() { copyProfileLink(); }

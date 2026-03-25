@@ -1000,38 +1000,119 @@
 
                 <!-- AI -->
                 <div id="aiSection" class="section">
-                    <div class="ai-header-card">
-                        <div class="ai-header-glow"></div>
-                        <div class="ai-header-content">
-                            <div class="ai-robot-icon">🤖</div>
-                            <div>
-                                <h2 class="ai-title" data-i18n="aiTitle">AI Oneri Motoru</h2>
-                                <p class="ai-sub" data-i18n="aiSub">Izleme aliskanliklarini analiz ederek sana ozel icerikler buluyor</p>
+
+                    <!-- AI HERO -->
+                    <div class="ai-hero">
+                        <div class="ai-hero-bg"></div>
+                        <div class="ai-hero-grid-lines"></div>
+                        <div class="ai-hero-inner">
+                            <div class="ai-hero-left">
+                                <div class="ai-badge">🤖 AI-Powered</div>
+                                <h2 class="ai-hero-title">Recommendation<br><span class="ai-hero-accent">Engine</span></h2>
+                                <p class="ai-hero-sub">Watching habits analyzed. Personalized picks crafted just for you.</p>
+                                <div class="ai-hero-actions">
+                                    <button class="ai-btn-primary" onclick="generateAIRecommendations()">
+                                        <span class="ai-btn-shine"></span>
+                                        ✨ Generate Recommendations
+                                    </button>
+                                    <button class="ai-btn-ghost" onclick="refreshAIAnalysis()">🔄 Refresh Analysis</button>
+                                </div>
+                            </div>
+                            <div class="ai-hero-right">
+                                <div class="ai-orb ai-orb-1"></div>
+                                <div class="ai-orb ai-orb-2"></div>
+                                <div class="ai-stat-ring">
+                                    <div class="ai-stat-ring-inner">
+                                        <span class="ai-stat-ring-val">98%</span>
+                                        <span class="ai-stat-ring-label">Accuracy</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="ai-analysis-cards">
-                            <div class="aac"><div class="aac-icon">📊</div><div class="aac-label" data-i18n="aiWatchingLabel">Izleme Paterni</div><div class="aac-val" id="aiWatchingPattern">-</div></div>
-                            <div class="aac"><div class="aac-icon">🎯</div><div class="aac-label" data-i18n="aiFavGenreLabel">Favori Tur</div><div class="aac-val" id="aiFavoriteGenres">-</div></div>
-                            <div class="aac"><div class="aac-icon">⭐</div><div class="aac-label" data-i18n="aiAvgLabel">Avg Rating</div><div class="aac-val" id="aiAvgRating">-</div></div>
-                            <div class="aac"><div class="aac-icon"></div><div class="aac-label" data-i18n="aiAccuracyLabel">AI Dogrulugu</div><div class="aac-val">98%</div></div>
+                    </div>
+
+                    <!-- STATS DASHBOARD -->
+                    <div class="ai-dashboard">
+                        <div class="ai-dash-card ai-dash-main">
+                            <div class="ai-dash-icon">📊</div>
+                            <div class="ai-dash-label">Watching Pattern</div>
+                            <div class="ai-dash-val" id="aiWatchingPattern">—</div>
+                            <div class="ai-dash-bar"><div class="ai-dash-bar-fill" style="width:70%"></div></div>
                         </div>
-                        <div class="ai-btn-row">
-                            <button class="btn btn-primary btn-large" onclick="generateAIRecommendations()" data-i18n="aiNewRecsBtn">✨ Yeni Oneriler Al</button>
-                            <button class="btn btn-secondary" onclick="refreshAIAnalysis()" data-i18n="aiRefreshBtn">🔄 Yenile</button>
+                        <div class="ai-dash-card">
+                            <div class="ai-dash-icon">🎯</div>
+                            <div class="ai-dash-label">Favourite Genre</div>
+                            <div class="ai-dash-val ai-dash-accent" id="aiFavoriteGenres">—</div>
+                        </div>
+                        <div class="ai-dash-card">
+                            <div class="ai-dash-icon">⭐</div>
+                            <div class="ai-dash-label">Avg. Rating</div>
+                            <div class="ai-dash-val" id="aiAvgRating">—</div>
+                        </div>
+                        <div class="ai-dash-card ai-dash-highlight">
+                            <div class="ai-dash-icon">🧠</div>
+                            <div class="ai-dash-label">AI Accuracy</div>
+                            <div class="ai-dash-val ai-dash-green">98%</div>
+                            <div class="ai-dash-pulse"></div>
+                        </div>
+                        <div class="ai-dash-card">
+                            <div class="ai-dash-icon">📚</div>
+                            <div class="ai-dash-label">Library Size</div>
+                            <div class="ai-dash-val" id="aiLibrarySize">—</div>
+                        </div>
+                        <div class="ai-dash-card">
+                            <div class="ai-dash-icon">✅</div>
+                            <div class="ai-dash-label">Completed</div>
+                            <div class="ai-dash-val" id="aiCompletedCount">—</div>
                         </div>
                     </div>
+
+                    <!-- TASTE ANALYSIS -->
+                    <div class="ai-taste-card" id="aiAnalysisCard" style="display:none;">
+                        <div class="ai-taste-header">
+                            <span class="ai-taste-icon">🎭</span>
+                            <div>
+                                <div class="ai-taste-title">Your Taste Analysis</div>
+                                <div class="ai-taste-sub">Based on your library activity</div>
+                            </div>
+                            <div class="ai-taste-badge">Live</div>
+                        </div>
+                        <div class="ai-taste-body" id="aiAnalysisText"></div>
+                        <div class="ai-genre-tags" id="aiGenreTags"></div>
+                    </div>
+
+                    <!-- FOR YOU -->
                     <div class="ai-recs-section">
-                        <div class="section-header-row">
-                            <h3 class="sh-title" data-i18n="aiForYouTitle">💎 Size Ozel</h3>
+                        <div class="ai-section-header">
+                            <div class="ai-section-title">
+                                <span class="ai-section-dot"></span>
+                                💎 For You
+                            </div>
+                            <span class="ai-section-sub">Personalized picks</span>
                         </div>
                         <div class="media-row" id="aiRecommendations"></div>
                     </div>
+
+                    <!-- SIMILAR -->
                     <div class="ai-recs-section">
-                        <div class="section-header-row">
-                            <h3 class="sh-title" data-i18n="aiSimilarTitle">🎭 Begendiklerinize Benzer</h3>
+                        <div class="ai-section-header">
+                            <div class="ai-section-title">
+                                <span class="ai-section-dot ai-section-dot-purple"></span>
+                                🎭 More Like Your Favourites
+                            </div>
+                            <span class="ai-section-sub">Genre-matched discoveries</span>
                         </div>
                         <div class="media-row" id="aiSimilarRecommendations"></div>
                     </div>
+
+                    <!-- EMPTY STATE -->
+                    <div class="ai-empty" id="aiEmptyState" style="display:none;">
+                        <div class="ai-empty-icon">🌟</div>
+                        <h3 class="ai-empty-title">Build Your Library First</h3>
+                        <p class="ai-empty-sub">Add a few anime or manga to your library so the AI can learn your taste and generate tailored recommendations.</p>
+                        <button class="ai-btn-primary" onclick="switchSection('discover')">🔍 Explore Content</button>
+                    </div>
+
                 </div>
 
                 <!-- ACHIEVEMENTS -->

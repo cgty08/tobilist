@@ -3291,3 +3291,491 @@ header {
     z-index: 10000 !important;
     position: relative !important;
 }
+
+/* ================================================================
+   AI SECTION — Kapsamlı yenileme
+   ================================================================ */
+
+/* AI HERO */
+.ai-hero {
+    position: relative;
+    background: #050810;
+    border-radius: 0;
+    margin: 0 -1.5rem 2rem;
+    overflow: hidden;
+    min-height: 280px;
+    display: flex;
+    align-items: stretch;
+}
+
+.ai-hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 60% 80% at 0% 50%, rgba(124,58,237,0.28) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 60% at 100% 20%, rgba(0,212,255,0.15) 0%, transparent 55%),
+        radial-gradient(ellipse 35% 50% at 50% 100%, rgba(255,51,102,0.12) 0%, transparent 55%);
+    animation: aiHeroBg 12s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+
+@keyframes aiHeroBg {
+    0%   { opacity: 0.8; transform: scale(1); }
+    100% { opacity: 1;   transform: scale(1.06); }
+}
+
+.ai-hero-grid-lines {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(124,58,237,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(124,58,237,0.06) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    mask-image: radial-gradient(ellipse at 30% 50%, black 20%, transparent 70%);
+}
+
+.ai-hero-inner {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 3rem;
+    gap: 2rem;
+}
+
+.ai-hero-left { flex: 1; }
+
+.ai-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(124,58,237,0.15);
+    border: 1px solid rgba(124,58,237,0.3);
+    color: #a78bfa;
+    border-radius: 100px;
+    padding: 0.32rem 0.9rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 1.2rem;
+}
+
+.ai-hero-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 3.8rem;
+    line-height: 0.95;
+    letter-spacing: 2px;
+    color: #fff;
+    margin-bottom: 1rem;
+}
+
+.ai-hero-accent {
+    background: linear-gradient(135deg, #7c3aed, #00d4ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.ai-hero-sub {
+    font-size: 0.9rem;
+    color: #6b7280;
+    line-height: 1.65;
+    max-width: 380px;
+    margin-bottom: 1.8rem;
+}
+
+.ai-hero-actions { display: flex; gap: 0.7rem; flex-wrap: wrap; }
+
+.ai-btn-primary {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    border: none;
+    border-radius: 12px;
+    padding: 0.85rem 1.6rem;
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #fff;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    box-shadow: 0 8px 28px rgba(124,58,237,0.4);
+    transition: all 0.25s;
+    letter-spacing: 0.2px;
+}
+
+.ai-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 40px rgba(124,58,237,0.55);
+}
+
+.ai-btn-shine {
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+    transition: left 0.5s ease;
+}
+
+.ai-btn-primary:hover .ai-btn-shine { left: 150%; }
+
+.ai-btn-ghost {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    padding: 0.85rem 1.4rem;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #8892a4;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.22s;
+}
+
+.ai-btn-ghost:hover {
+    background: rgba(255,255,255,0.09);
+    color: #e8eaf2;
+    transform: translateY(-2px);
+}
+
+/* Sağ taraf — accuracy ring */
+.ai-hero-right {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    flex-shrink: 0;
+}
+
+.ai-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(30px);
+    animation: orbFloat 5s ease-in-out infinite;
+}
+
+.ai-orb-1 {
+    width: 120px; height: 120px;
+    background: rgba(124,58,237,0.35);
+    top: 10%; left: 10%;
+}
+
+.ai-orb-2 {
+    width: 80px; height: 80px;
+    background: rgba(0,212,255,0.25);
+    bottom: 10%; right: 5%;
+    animation-delay: -2.5s;
+}
+
+@keyframes orbFloat {
+    0%,100% { transform: scale(1) translate(0,0); }
+    50%      { transform: scale(1.12) translate(6px,-6px); }
+}
+
+.ai-stat-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid rgba(124,58,237,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(124,58,237,0.06);
+    backdrop-filter: blur(10px);
+    animation: ringPulse 3s ease-in-out infinite;
+}
+
+@keyframes ringPulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(124,58,237,0.3); }
+    50%      { box-shadow: 0 0 0 12px rgba(124,58,237,0); }
+}
+
+.ai-stat-ring-inner { text-align: center; }
+
+.ai-stat-ring-val {
+    display: block;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 2.8rem;
+    letter-spacing: 2px;
+    color: #a78bfa;
+    line-height: 1;
+}
+
+.ai-stat-ring-label {
+    display: block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #4b5563;
+    margin-top: 0.2rem;
+}
+
+/* ----------------------------------------------------------------
+   AI DASHBOARD — 6 kart
+   ---------------------------------------------------------------- */
+
+.ai-dashboard {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+}
+
+.ai-dash-card {
+    background: #0d1117;
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 16px;
+    padding: 1.3rem 1rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.28s ease;
+}
+
+.ai-dash-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(124,58,237,0.25);
+    box-shadow: 0 14px 32px rgba(0,0,0,0.4);
+}
+
+.ai-dash-highlight {
+    background: rgba(124,58,237,0.07);
+    border-color: rgba(124,58,237,0.2);
+}
+
+.ai-dash-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.ai-dash-label {
+    font-size: 0.58rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: #374151;
+    margin-bottom: 0.4rem;
+}
+
+.ai-dash-val {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 1.6rem;
+    letter-spacing: 0.8px;
+    color: #e8eaf2;
+    line-height: 1;
+    display: block;
+}
+
+.ai-dash-accent { color: #a78bfa !important; }
+.ai-dash-green  { color: #10b981 !important; }
+
+.ai-dash-bar {
+    height: 3px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 2px;
+    margin-top: 0.6rem;
+    overflow: hidden;
+}
+
+.ai-dash-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #7c3aed, #00d4ff);
+    border-radius: 2px;
+    transition: width 1s ease;
+}
+
+.ai-dash-pulse {
+    position: absolute;
+    top: 0.6rem; right: 0.6rem;
+    width: 6px; height: 6px;
+    background: #10b981;
+    border-radius: 50%;
+    box-shadow: 0 0 6px #10b981;
+    animation: psbPulse 2s ease-in-out infinite;
+}
+
+/* ----------------------------------------------------------------
+   TASTE ANALYSIS CARD
+   ---------------------------------------------------------------- */
+
+.ai-taste-card {
+    background: #0d1117;
+    border: 1px solid rgba(124,58,237,0.2);
+    border-radius: 18px;
+    padding: 1.6rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.ai-taste-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(124,58,237,0.5), transparent);
+}
+
+.ai-taste-header {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.ai-taste-icon {
+    font-size: 1.6rem;
+    width: 44px; height: 44px;
+    background: rgba(124,58,237,0.1);
+    border: 1px solid rgba(124,58,237,0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.ai-taste-title {
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #e8eaf2;
+    margin-bottom: 0.15rem;
+}
+
+.ai-taste-sub { font-size: 0.75rem; color: #374151; }
+
+.ai-taste-badge {
+    margin-left: auto;
+    background: rgba(16,185,129,0.1);
+    border: 1px solid rgba(16,185,129,0.25);
+    color: #10b981;
+    border-radius: 100px;
+    padding: 0.2rem 0.7rem;
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.ai-taste-badge::before {
+    content: '';
+    width: 5px; height: 5px;
+    background: #10b981;
+    border-radius: 50%;
+    box-shadow: 0 0 5px #10b981;
+    animation: psbPulse 2s ease-in-out infinite;
+}
+
+.ai-taste-body {
+    font-size: 0.88rem;
+    color: #8892a4;
+    line-height: 1.7;
+    margin-bottom: 1rem;
+}
+
+.ai-genre-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+
+.ai-genre-tag {
+    background: rgba(124,58,237,0.1);
+    border: 1px solid rgba(124,58,237,0.25);
+    color: #a78bfa;
+    border-radius: 100px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+/* ----------------------------------------------------------------
+   AI RECS SECTION HEADER
+   ---------------------------------------------------------------- */
+
+.ai-recs-section { margin-bottom: 2rem; }
+
+.ai-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 0.65rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.ai-section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #c8d0e0;
+}
+
+.ai-section-dot {
+    width: 7px; height: 7px;
+    background: #7c3aed;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #7c3aed;
+    flex-shrink: 0;
+    animation: psbPulse 2.5s ease-in-out infinite;
+}
+
+.ai-section-dot-purple { background: #a78bfa; box-shadow: 0 0 8px #a78bfa; }
+.ai-section-sub { font-size: 0.75rem; color: #374151; font-weight: 600; }
+
+/* ----------------------------------------------------------------
+   EMPTY STATE
+   ---------------------------------------------------------------- */
+
+.ai-empty {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: #0d1117;
+    border: 1px dashed rgba(124,58,237,0.2);
+    border-radius: 20px;
+    margin-bottom: 2rem;
+}
+
+.ai-empty-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    display: block;
+    animation: ctaFloat 3s ease-in-out infinite;
+}
+
+.ai-empty-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 2rem;
+    letter-spacing: 1.5px;
+    color: #fff;
+    margin-bottom: 0.7rem;
+}
+
+.ai-empty-sub {
+    color: #4b5563;
+    font-size: 0.88rem;
+    max-width: 380px;
+    margin: 0 auto 1.8rem;
+    line-height: 1.65;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .ai-dashboard { grid-template-columns: repeat(3, 1fr); }
+    .ai-hero-right { display: none; }
+}
+
+@media (max-width: 768px) {
+    .ai-hero-inner { padding: 2rem 1.5rem; }
+    .ai-hero-title { font-size: 2.8rem; }
+    .ai-dashboard { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 480px) {
+    .ai-hero-title { font-size: 2.2rem; }
+    .ai-dashboard { grid-template-columns: repeat(2, 1fr); }
+}
