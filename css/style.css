@@ -3263,3 +3263,31 @@ nav {
     .guest-cta-card { padding: 3rem 1.2rem !important; }
     .quick-stats-row { grid-template-columns: repeat(2, 1fr) !important; }
 }
+
+/* ----------------------------------------------------------------
+   DROPDOWN Z-INDEX DÜZELTME
+   ---------------------------------------------------------------- */
+
+.user-menu-wrapper {
+    position: relative !important;
+    z-index: 9999 !important;
+}
+
+.user-dropdown {
+    z-index: 99999 !important;
+    position: absolute !important;
+}
+
+/* Banner ve discover hero dropdown'ı kesmemeli */
+.anilist-banner,
+.discover-hero,
+.features-section,
+.guest-cta-card {
+    z-index: 1 !important;
+    isolation: auto !important;
+}
+
+header {
+    z-index: 10000 !important;
+    position: relative !important;
+}
