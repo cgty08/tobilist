@@ -18,8 +18,8 @@ const dataManager = {
                 bio: '',
                 avatar: '👤',
                 cover: 'gradient1',
-                joinDate: new Date().toISOString(),
-                email: ''
+                joinDate: new Date().toISOString()
+                // email buraya yazilmaz — auth.users'dan okunur
             },
             favorites: [],
             watchHistory: []
@@ -71,6 +71,32 @@ const dataManager = {
 
     saveAll() {
         if (!this.currentUserId || !this.data) return false;
+
+        // ── GÜVENLİK: Veri bütünlüğü kontrolü ──────────────────────────
+        // XP manipülasyonu tespiti
+        const xp = this.data.xp;
+        if (
+            typeof xp?.total !== 'number' || xp.total < 0 || xp.total > 9_999_999 ||
+            typeof xp?.level !== 'number' || xp.level < 1 || xp.level > 999 ||
+            typeof xp?.current !== 'number' || xp.current < 0
+        ) {
+            console.warn('[Security] Geçersiz XP değeri tespit edildi, kayıt engellendi.');
+            return false;
+        }
+
+        // email alanı user_data'da asla tutulmamalı
+        if (this.data.social?.email) {
+            delete this.data.social.email;
+        }
+
+        // is_admin client tarafından yazılamaz
+        if (this.data.is_admin !== undefined) {
+            delete this.data.is_admin;
+        }
+        if (this.data.social?.is_admin !== undefined) {
+            delete this.data.social.is_admin;
+        }
+        // ── GÜVENLİK SONU ───────────────────────────────────────────────
 
         // Once localStorage'a kaydet
         try {

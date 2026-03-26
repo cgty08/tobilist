@@ -123,9 +123,10 @@ async function loginSuccess(user) {
             .eq('user_id', user.id)
             .single();
 
-        // Admin: DB kolonu VEYA owner email
-        const OWNER_EMAILS = ['list086@gmail.com'];
-        if (OWNER_EMAILS.includes(currentUser.email?.toLowerCase()) || data?.data?.is_admin === true || data?.is_admin === true) {
+        // Admin: YALNIZCA Supabase DB kolonu kontrol edilir.
+        // Hicbir email adresi client-side kodda bulunmamali.
+        // Admin vermek icin: Supabase Dashboard > user_data tablosu > is_admin = true
+        if (data?.is_admin === true || data?.data?.is_admin === true) {
             currentUser.isAdmin = true;
         }
 
@@ -163,7 +164,7 @@ async function loginSuccess(user) {
                 // user_metadata.username kayit formundaki isimdir, once onu dene
                 const _regName = user.user_metadata?.username || currentUser.displayName;
                 dataManager.data.social.name  = _regName;
-                dataManager.data.social.email = currentUser.email;
+                // email asla user_data objesine yazilmaz - auth.users'da zaten var
                 dataManager.saveAll();
             }
         } else if (error) {
@@ -339,6 +340,26 @@ document.addEventListener('keydown', (e) => {
 
 // Backdrop tiklamasi mousedown/mouseup ile ustte handle ediliyor
 
+// ===== iZiN VERiLEN EMAIL DOMAiNLERi =====
+const ALLOWED_EMAIL_DOMAINS = [
+    'gmail.com',
+    'hotmail.com',
+    'outlook.com',
+    'live.com',
+    'msn.com',
+    'hotmail.co.uk',
+    'hotmail.com.tr',
+    'live.com.tr',
+    'outlook.com.tr'
+];
+
+function isEmailDomainAllowed(email) {
+    if (!email || typeof email !== 'string') return false;
+    const parts = email.trim().toLowerCase().split('@');
+    if (parts.length !== 2) return false;
+    return ALLOWED_EMAIL_DOMAINS.includes(parts[1]);
+}
+
 // ===== LOGiN =====
 async function handleLogin(event) {
     event.preventDefault();
@@ -356,6 +377,10 @@ async function handleLogin(event) {
     const password = passwordEl.value;
 
     if (!email) { showError('loginError', 'Please enter your email address!'); return; }
+    if (!isEmailDomainAllowed(email)) {
+        showError('loginError', 'Sadece Gmail veya Hotmail/Outlook adresleriyle giriş yapabilirsiniz.');
+        return;
+    }
     if (!password) { showError('loginError', 'Please enter your password!'); return; }
 
     const btn = document.getElementById('loginBtn');
@@ -405,6 +430,10 @@ async function handleRegister(event) {
         showError('registerError', 'Please enter your email address!');
         return;
     }
+    if (!isEmailDomainAllowed(email)) {
+        showError('registerError', 'Sadece Gmail veya Hotmail/Outlook adresleriyle kayıt olabilirsiniz.');
+        return;
+    }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         showError('registerError', 'Gecerli bir e-posta adresi giriniz!');
         return;
@@ -444,8 +473,8 @@ async function handleRegister(event) {
             // username'i social.name olarak hemen kaydet
             setTimeout(() => {
                 if (dataManager.data?.social) {
-                    dataManager.data.social.name  = username;
-                    dataManager.data.social.email = email;
+                    dataManager.data.social.name = username;
+                    // email asla user_data'ya yazilmaz
                     dataManager.saveAll();
                     if (typeof updateHeaderUser === 'function') updateHeaderUser();
                 }
