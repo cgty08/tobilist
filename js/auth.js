@@ -703,34 +703,29 @@ function deleteAccount() {
                 const { error: rpcErr } = await window.supabaseClient.rpc('delete_user');
 
                 if (rpcErr) {
-                    // RPC başarısız: kullanıcı veri tabanından silindi ama auth kaydı kaldı
-                    // Hesabı tamamen devre dışı bırakmak için şifreyi rastgele karmaşık bir değerle değiştir
-                    console.warn('[DeleteAccount] RPC başarısız, şifre sıfırlama yöntemi deneniyor:', rpcErr.message);
+                    // RPC başarısız: şifreyi rastgele değer ile değiştir
+                    // → kullanıcı artık eski şifresiyle giremez
+                    console.warn('[DeleteAccount] RPC başarısız, şifre sıfırlama fallback:', rpcErr.message);
+                    const tempPw = (typeof crypto !== 'undefined' && crypto.randomUUID)
+                        ? crypto.randomUUID() + crypto.randomUUID()
+                        : Math.random().toString(36).repeat(4) + Date.now();
 
-                    // Rastgele geçici şifre — kullanıcı bir daha giremez
-                    const tempPw = crypto.randomUUID() + crypto.randomUUID();
                     const { error: pwErr } = await window.supabaseClient.auth.updateUser({ password: tempPw });
-
                     if (pwErr) {
-                        // Her iki yöntem de başarısız: kullanıcıyı bilgilendir
+                        // Her iki yöntem de başarısız — kullanıcıyı bilgilendir
                         _closeBox();
+                        await window.supabaseClient.auth.signOut();
                         showNotification(
-                            '⚠️ Verileriniz silindi ancak kimlik doğrulama kaydı tamamen kaldırılamadı. ' +
-                            'Lütfen destek ekibiyle iletişime geçin: support@onilist.com',
+                            '⚠️ Verileriniz silindi fakat kimlik kaydı tam kaldırılamadı. ' +
+                            'Lütfen destek ile iletişime geçin.',
                             'warning'
                         );
-                        // Yine de çıkış yap
-                        await window.supabaseClient.auth.signOut();
-                        currentUser = null;
-                        isGuest = true;
+                        currentUser = null; isGuest = true;
                         dataManager.data = dataManager.defaultData();
                         dataManager.currentUserId = null;
-                        updateUIForGuest();
-                        switchSection('home');
+                        updateUIForGuest(); switchSection('home');
                         return;
                     }
-                    // Şifre değiştirildi — kullanıcı artık eski şifresiyle giremez
-                    console.log('[DeleteAccount] Şifre rastgele değerle değiştirildi — hesap erişilemez hale getirildi.');
                 }
 
                 // 3. localStorage temizle

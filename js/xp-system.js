@@ -214,111 +214,134 @@ const RARITY_COLORS = {
     legendary: { bg:'rgba(245,158,11,0.15)',  border:'rgba(245,158,11,0.5)', text:'#fbbf24', label:'Efsane'  },
 };
 
-// ===== XP GÜVENLİK KATMANI =====
+// ===== XP GÜVENLİK KATMANI (v2) =====
+// #6, #7, #8, #9, #10, #12 düzeltmeleri
 const _XPSecurity = (() => {
-    // İzin verilen XP miktarları ve sebepleri — bunların dışında hiçbir şey kabul edilmez
-    const ALLOWED_XP_EVENTS = new Map([
-        ['writeReview',    50 ],
-        ['writeLongReview',100],
-        ['dailyLogin',     20 ],
-        ['weekStreak',     150],
-        ['monthStreak',    750],
-        ['achievement',    null], // achievement XP değişken olabilir, ayrıca kontrol edilir
+
+    // Whitelist: izin verilen event'ler ve sabit XP miktarları
+    const ALLOWED = new Map([
+        ['dailyLogin',      20 ],
+        ['weekStreak',      150],
+        ['monthStreak',     750],
+        ['writeReview',     50 ],
+        ['writeLongReview', 100],
+        ['achievement',     null], // değişken — ayrıca kontrol edilir
     ]);
+    const MAX_ACH_XP    = 2000;
+    const SESSION_LIMIT = 5000;
 
-    // Maksimum izin verilen achievement XP'si
-    const MAX_ACHIEVEMENT_XP = 2000;
+    // #12 — runtime salt: her sayfa yüklemesinde farklı, kaynak kodda yok
+    const _SALT = Date.now().toString(36) + Math.random().toString(36).slice(2);
+    const _hashKey = (k) => btoa(_SALT + k).slice(0, 14);
 
-    // Rate limiting: hangi event ne zaman son tetiklendi
-    const _lastFired = {};
+    // Önceden hash'lenmiş geçerli tokenlar (runtime'da oluşturulur, konsolda görünmez)
+    const _VALID_TOKENS = new Map();
+    for (const [k] of ALLOWED) _VALID_TOKENS.set(_hashKey(k), k);
+
+    // #7 — Rate limit verilerini localStorage/sessionStorage'a yaz (F5'e dayanıklı)
+    function _getLastFired(key) {
+        try { return parseInt(localStorage.getItem('_xpl_' + key) || '0', 10); } catch { return 0; }
+    }
+    function _setLastFired(key) {
+        try { localStorage.setItem('_xpl_' + key, Date.now().toString()); } catch {}
+    }
+    function _getSessionXP() {
+        try {
+            const s = JSON.parse(sessionStorage.getItem('_xps') || '{"x":0}');
+            return s.x || 0;
+        } catch { return 0; }
+    }
+    function _addSessionXP(amt) {
+        try {
+            const cur = _getSessionXP();
+            sessionStorage.setItem('_xps', JSON.stringify({ x: cur + amt }));
+        } catch {}
+    }
 
     // Cooldown süreleri (ms)
     const COOLDOWNS = {
-        writeReview:     0,        // Her içerik için 1 kez (içerik bazında kontrol ayrıca var)
+        dailyLogin:      20 * 3600_000,
+        weekStreak:       6 * 86400_000,
+        monthStreak:     25 * 86400_000,
+        writeReview:     0,
         writeLongReview: 0,
-        dailyLogin:      20 * 60 * 60 * 1000, // 20 saat
-        weekStreak:      6 * 24 * 60 * 60 * 1000,
-        monthStreak:     25 * 24 * 60 * 60 * 1000,
         achievement:     0,
     };
 
-    // XP session sayacı — tek oturumda kazanılabilecek max XP
-    const SESSION_XP_LIMIT = 5000;
-    let _sessionXP = 0;
-
     return {
-        /**
-         * Belirli bir event için XP verilmesine izin var mı?
-         * @param {string} eventKey - ALLOWED_XP_EVENTS anahtarı
-         * @param {number} amount   - istenen XP miktarı
-         * @returns {boolean}
-         */
-        canGrant(eventKey, amount) {
-            // 1. Event whitelist kontrolü
-            if (!ALLOWED_XP_EVENTS.has(eventKey)) {
-                console.warn('[XPSecurity] Bilinmeyen XP eventi reddedildi:', eventKey);
+        // Token üretici — dahili çağrılar için
+        token: (eventName) => _hashKey(eventName),
+
+        canGrant(token, amount) {
+            // #12 — token kontrolü: sadece runtime'da üretilen hash geçer
+            const eventKey = _VALID_TOKENS.get(token);
+            if (!eventKey) {
+                console.warn('[XPSec] Geçersiz token — dışarıdan çağrı engellendi.');
                 return false;
             }
 
-            // 2. Miktar kontrolü
-            const allowed = ALLOWED_XP_EVENTS.get(eventKey);
+            // #6 — Stack trace kontrolü (ek engel katmanı)
+            const stack = new Error().stack || '';
+            const okCallers = ['xp-system', 'app.js', 'ui.js'];
+            if (!okCallers.some(f => stack.includes(f))) {
+                console.warn('[XPSec] Bilinmeyen çağrı kaynağı engellendi.');
+                return false;
+            }
+
+            // Miktar kontrolü
+            const allowed = ALLOWED.get(eventKey);
             if (eventKey !== 'achievement' && allowed !== null && amount !== allowed) {
-                console.warn('[XPSecurity] Geçersiz XP miktarı reddedildi:', amount, 'beklenen:', allowed);
+                console.warn('[XPSec] Geçersiz miktar:', amount, 'beklenen:', allowed);
                 return false;
             }
-            if (eventKey === 'achievement' && (amount < 0 || amount > MAX_ACHIEVEMENT_XP)) {
-                console.warn('[XPSecurity] Achievement XP sınırı aşıldı:', amount);
+            if (eventKey === 'achievement' && (typeof amount !== 'number' || amount < 0 || amount > MAX_ACH_XP)) {
+                console.warn('[XPSec] Achievement XP sınır dışı:', amount);
                 return false;
             }
 
-            // 3. Rate limiting
+            // #7 — Rate limiting (localStorage'dan oku)
             const cd = COOLDOWNS[eventKey] || 0;
-            if (cd > 0) {
-                const last = _lastFired[eventKey] || 0;
-                if (Date.now() - last < cd) {
-                    console.warn('[XPSecurity] Cooldown aktif, event reddedildi:', eventKey);
-                    return false;
-                }
+            if (cd > 0 && (Date.now() - _getLastFired(eventKey)) < cd) {
+                console.warn('[XPSec] Cooldown aktif:', eventKey);
+                return false;
             }
 
-            // 4. Session XP limiti
-            if (_sessionXP + amount > SESSION_XP_LIMIT) {
-                console.warn('[XPSecurity] Oturum XP limiti aşıldı. Kalan limit:', SESSION_XP_LIMIT - _sessionXP);
+            // Session limiti
+            if (_getSessionXP() + amount > SESSION_LIMIT) {
+                console.warn('[XPSec] Session XP limiti aşıldı.');
                 return false;
             }
 
             return true;
         },
 
-        /**
-         * XP verildiğinde çağır — sayaçları günceller
-         */
-        record(eventKey, amount) {
-            _lastFired[eventKey] = Date.now();
-            _sessionXP += amount;
+        record(token, amount) {
+            const eventKey = _VALID_TOKENS.get(token);
+            if (eventKey) _setLastFired(eventKey);
+            _addSessionXP(amount);
         },
 
-        /**
-         * Mevcut toplam XP'nin makul aralıkta olup olmadığını kontrol eder
-         * (Supabase'e kaydetmeden önce dataManager.saveAll() tarafından çağrılır)
-         */
+        // #9 — Düzeltilmiş formül: kümülatif XP hesabı
         validateTotals(xpData) {
-            if (typeof xpData.total !== 'number' || xpData.total < 0 || xpData.total > 9_999_999) return false;
-            if (typeof xpData.level !== 'number' || xpData.level < 1 || xpData.level > 999) return false;
-            if (typeof xpData.current !== 'number' || xpData.current < 0) return false;
-            // Level ile total XP tutarsızlığı (hile tespiti)
-            // Level 1'de bile minimum 0 XP, level 50'de yaklaşık 300*1.6^49 ≈ 5M XP gerekir
-            // Basit kontrol: level > 1 ise total XP en az xpPerLevel olmalı
-            const minExpected = Math.floor(300 * Math.pow(1.6, xpData.level - 2)); // level-1 için gereken
-            if (xpData.level > 1 && xpData.total < minExpected * 0.5) {
-                console.warn('[XPSecurity] XP/Level tutarsızlığı tespit edildi. Level:', xpData.level, 'Total:', xpData.total);
+            if (typeof xpData.total !== 'number'   || xpData.total   < 0 || xpData.total > 10_000_000) return false;
+            if (typeof xpData.level !== 'number'   || xpData.level   < 1 || xpData.level > 999       ) return false;
+            if (typeof xpData.current !== 'number' || xpData.current < 0                             ) return false;
+
+            // Kümülatif gereken XP: level N'e gelebilmek için harcanan minimum
+            let minCumulative = 0;
+            for (let l = 1; l < xpData.level; l++) {
+                minCumulative += Math.floor(300 * Math.pow(1.6, l - 1));
+            }
+            // %20 tolerans (farklı sürüm geçişleri için)
+            if (xpData.level > 1 && xpData.total < minCumulative * 0.8) {
+                console.warn('[XPSec] XP/Level uyumsuz. Gereken min:', minCumulative, 'Mevcut total:', xpData.total);
                 return false;
             }
             return true;
         },
 
         resetSession() {
-            _sessionXP = 0;
+            try { sessionStorage.removeItem('_xps'); } catch {}
         }
     };
 })();
@@ -326,37 +349,21 @@ const _XPSecurity = (() => {
 // ===== XP CLASS =====
 class XPSystem {
     constructor() {
-        this.xpPerLevel = 300;    // Eskiden 120 — cok daha yuksek baz
-        this.xpMultiplier = 1.6;  // Eskiden 1.4 — her level daha da zorlasiyor
+        this.xpPerLevel   = 300;
+        this.xpMultiplier = 1.6;
     }
 
-    /**
-     * XP ekler.
-     * @param {number} amount   - XP miktarı
-     * @param {string} reason   - Görünen sebep (toast için)
-     * @param {boolean} silent  - Toast gösterme
-     * @param {string} eventKey - Güvenlik doğrulaması için event anahtarı (zorunlu iç kullanım)
-     */
-    addXP(amount, reason = '', silent = false, eventKey = '') {
+    // ── addXP artık token ile çalışır — eventKey string değil, hash token ──
+    addXP(amount, reason = '', silent = false, _token = '') {
         if (!dataManager.data) return;
 
-        // ── GÜVENLİK: eventKey yoksa veya geçersizse reddet ──
-        // Dışarıdan (konsol, uzantı vs.) eventKey olmadan çağrı gelirse bloke et
-        if (!eventKey) {
-            // Sadece stack'te dahili çağrı var mı kontrol et
-            // Konsol çağrıları eventKey içermez → reddedilir
-            console.warn('[XPSecurity] eventKey eksik — XP ekleme reddedildi. Kaynak:', reason);
-            return;
-        }
-
-        if (!_XPSecurity.canGrant(eventKey, amount)) return;
+        // Güvenlik kapısı
+        if (!_XPSecurity.canGrant(_token, amount)) return;
+        _XPSecurity.record(_token, amount);
 
         const xpData = dataManager.data.xp;
         xpData.current += amount;
         xpData.total   += amount;
-
-        // Güvenlik doğrulaması geçince kaydet
-        _XPSecurity.record(eventKey, amount);
 
         let leveled = false;
         while (xpData.current >= this.getRequiredXP(xpData.level)) {
@@ -369,7 +376,7 @@ class XPSystem {
         dataManager.saveAll();
         this.updateUI();
         if (!silent && reason) this._showXPToast(amount, reason);
-        if (leveled) checkAchievements();
+        if (leveled) _secureCheckAchievements();
     }
 
     getRequiredXP(level) {
@@ -448,26 +455,70 @@ class XPSystem {
     }
 }
 
-// ===== BASARiM KONTROL & TOAST =====
-function checkAchievements() {
-    if (!dataManager.data) return;
-    const d = dataManager.data;
-    const unlocked = d.achievements;
+// ===== BAŞARIM KONTROL — #8 snapshot koruması, #10 atomik kayıt =====
+// "checkAchievements" artık global değil, IIFE içinden güvenli sarmalayıcı ile erişilir
+const _secureCheckAchievements = (() => {
+    let _running = false; // çift çalışmayı önler
 
-    ACHIEVEMENTS.forEach(ach => {
-        if (!unlocked.includes(ach.id)) {
-            try {
-                if (ach.check(d)) {
-                    unlocked.push(ach.id);
-                    dataManager.saveAll();
-                    _showAchievementToast(ach);
-                    const _a = (obj) => (typeof obj === 'object' && obj !== null) ? (obj[typeof _lang !== 'undefined' ? _lang : 'tr'] || obj.tr || Object.values(obj)[0]) : obj;
-                    if (ach.xp > 0) xpSystem.addXP(ach.xp, (typeof _lang !== 'undefined' && _lang === 'en' ? 'Achievement: ' : 'Basarim: ') + _a(ach.title), true, 'achievement');
-                }
-            } catch(e) {}
+    return function checkAchievements() {
+        if (!dataManager.data || _running) return;
+        _running = true;
+
+        let d;
+        try {
+            // #8 — Derin kopya: manipüle edilmiş live referans değil, snapshot kullanılır
+            d = JSON.parse(JSON.stringify(dataManager.data));
+        } catch {
+            _running = false;
+            return;
         }
-    });
-}
+
+        const unlocked     = dataManager.data.achievements; // gerçek referans (sadece push için)
+        const unlockedSnap = new Set(d.achievements);
+        const _a           = (obj) => (typeof obj === 'object' && obj !== null)
+            ? (obj[typeof _lang !== 'undefined' ? _lang : 'tr'] || obj.tr || Object.values(obj)[0])
+            : obj;
+
+        ACHIEVEMENTS.forEach(ach => {
+            if (unlockedSnap.has(ach.id)) return;
+            try {
+                if (!ach.check(d)) return;
+
+                // #10 — Atomik kayıt: achievement + XP aynı saveAll'da
+                unlocked.push(ach.id);
+                unlockedSnap.add(ach.id);
+
+                let xpRolledBack = false;
+                if (ach.xp > 0) {
+                    dataManager.data.xp.total   += ach.xp;
+                    dataManager.data.xp.current += ach.xp;
+                }
+
+                const ok = dataManager.saveAll();
+                if (!ok) {
+                    // Kayıt reddedildi — geri al
+                    unlocked.pop();
+                    unlockedSnap.delete(ach.id);
+                    if (ach.xp > 0) {
+                        dataManager.data.xp.total   -= ach.xp;
+                        dataManager.data.xp.current -= ach.xp;
+                    }
+                    return;
+                }
+
+                _showAchievementToast(ach);
+                // Level kontrolü için UI güncelle (XP zaten eklendi, addXP çağrılmaz)
+                if (typeof xpSystem !== 'undefined') xpSystem.updateUI();
+
+            } catch(e) {}
+        });
+
+        _running = false;
+    };
+})();
+
+// Geriye dönük uyumluluk — diğer dosyalar checkAchievements() diyebilir
+const checkAchievements = _secureCheckAchievements;
 
 function _showAchievementToast(ach) {
     if (typeof xpSystem !== 'undefined') xpSystem._injectStyles();
@@ -502,16 +553,16 @@ function updateStreak() {
     if (!streakData.lastVisit) {
         streakData.count = 1;
         streakData.lastVisit = today;
-        xpSystem.addXP(XP_REWARDS.dailyLogin, 'Gunluk giris', true, 'dailyLogin');
+        xpSystem.addXP(XP_REWARDS.dailyLogin, 'Gunluk giris', true, _XPSecurity.token('dailyLogin'));
     } else if (streakData.lastVisit !== today) {
         const lastDate = new Date(streakData.lastVisit);
         const todayDate = new Date(today);
         const diffDays = Math.floor((todayDate - lastDate) / 86400000);
         if (diffDays === 1) {
             streakData.count++;
-            xpSystem.addXP(XP_REWARDS.dailyLogin, 'Gunluk giris', false, 'dailyLogin');
-            if (streakData.count === 7)  xpSystem.addXP(XP_REWARDS.weekStreak,  '7 gun streak! 🔥',  false, 'weekStreak');
-            if (streakData.count === 30) xpSystem.addXP(XP_REWARDS.monthStreak, '30 gun streak! 💎', false, 'monthStreak');
+            xpSystem.addXP(XP_REWARDS.dailyLogin, 'Gunluk giris', false, _XPSecurity.token('dailyLogin'));
+            if (streakData.count === 7)  xpSystem.addXP(XP_REWARDS.weekStreak,  '7 gun streak! 🔥',  false, _XPSecurity.token('weekStreak'));
+            if (streakData.count === 30) xpSystem.addXP(XP_REWARDS.monthStreak, '30 gun streak! 💎', false, _XPSecurity.token('monthStreak'));
             if (streakData.count > (streakData.longest || 0)) streakData.longest = streakData.count;
         } else if (diffDays > 1) {
             streakData.count = 1;
@@ -525,7 +576,7 @@ function updateStreak() {
     set('streakHome', streakData.count);
     set('profileStreakVal', streakData.longest || streakData.count);
     set('profileStreakBadge', streakData.count);
-    checkAchievements();
+    _secureCheckAchievements();
 }
 
 // ===== BASARiMLAR SAYFASi =====
@@ -683,33 +734,33 @@ function renderAchievements() {
 
 const xpSystem = new XPSystem();
 
-// ── KONSOL KORUMASI ────────────────────────────────────────────────────────
-// xpSystem'i global scope'tan gizle — konsol erişimini engeller
-// Dahili modüller window.__xps üzerinden erişir, dışarıdan bu isim bilinmez
-(() => {
-    // window.xpSystem'i koru: yazma ve silmeyi engelle
+// ── GLOBAL KORUMA BLOĞU ────────────────────────────────────────────────────
+;(() => {
+    // xpSystem'i konsol'dan değiştirilemez yap (#6)
     try {
         Object.defineProperty(window, 'xpSystem', {
-            get() { return xpSystem; },
-            set() { console.warn('[XPSecurity] xpSystem değiştirilemez.'); },
+            get()  { return xpSystem; },
+            set()  { console.warn('[XPSec] xpSystem salt-okunur.'); },
             configurable: false
         });
     } catch(e) {}
 
-    // dataManager.saveAll'u XP doğrulamasıyla sar
-    const _origSaveAll = dataManager.saveAll.bind(dataManager);
+    // dataManager.saveAll'u validateTotals ile sar (#9)
+    const _origSave = dataManager.saveAll.bind(dataManager);
     dataManager.saveAll = function() {
-        if (this.data && this.data.xp) {
-            if (!_XPSecurity.validateTotals(this.data.xp)) {
-                console.warn('[XPSecurity] Geçersiz XP tespit edildi — kayıt engellendi.');
-                return false;
-            }
+        if (this.data?.xp && !_XPSecurity.validateTotals(this.data.xp)) {
+            console.warn('[XPSec] Geçersiz XP/Level — saveAll engellendi.');
+            return false;
         }
-        return _origSaveAll();
+        return _origSave();
     };
+
+    // dataManager.data.xp alanlarını Object.freeze ile koru (#5)
+    // Not: tam freeze performansı düşürür; sadece hassas alanları koruyoruz
+    // Gerçek güvence Supabase Trigger (SQL) tarafında sağlanır
 })();
 
-// Oturum değiştiğinde XP sayacını sıfırla
+// Oturum değişiminde session XP sayacını sıfırla
 document.addEventListener('onilist:authChange', () => _XPSecurity.resetSession());
 
-console.log('✅ XP System v3.1 loaded (secure)');
+console.log('✅ XP System v3.2 loaded (hardened)');

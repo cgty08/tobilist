@@ -330,7 +330,22 @@
 </head>
 <body>
 
-<!-- LOGIN -->
+<!-- ===== ADMIN ERİŞİM KORUMASI — #2 ===================================
+     Sayfa yüklenir yüklenmez tüm içerik gizlenir.
+     Supabase oturumu doğrulanana kadar hiçbir şey görünmez.
+     ===================================================================== -->
+<script>
+(function() {
+    // Tüm body içeriğini hemen gizle — admin kontrolü tamamlanınca açılır
+    var overlay = document.createElement('div');
+    overlay.id = '_adminGate';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:2147483647;background:#070a12;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem;font-family:sans-serif;';
+    overlay.innerHTML = '<div style="width:36px;height:36px;border:3px solid rgba(255,51,102,0.3);border-top-color:#ff3366;border-radius:50%;animation:_spin 0.8s linear infinite;"></div><div style="color:#6b7280;font-size:0.85rem;letter-spacing:1px;">Doğrulanıyor…</div><style>@keyframes _spin{to{transform:rotate(360deg)}}</style>';
+    document.body.appendChild(overlay);
+})();
+</script>
+
+
 <div id="loginScreen">
     <div class="login-box">
         <div class="login-logo">
@@ -1146,9 +1161,15 @@ window.onload = async () => {
         const { data: { session } } = await sb.auth.getSession();
         if (session?.user) {
             const isAdm = await checkIsAdmin(session.user.id, session.user.email);
-            if (isAdm) { currentAdmin = session.user; boot(); }
+            if (isAdm) { currentAdmin = session.user; boot(); return; }
         }
     } catch(e) { console.warn(e); }
+
+    // Yetkisiz erişim — overlay'i 403 ekranına çevir
+    var gate = document.getElementById('_adminGate');
+    if (gate) {
+        gate.innerHTML = '<div style="text-align:center;"><div style="font-size:4rem;margin-bottom:1rem;">🔒</div><div style="font-size:1.5rem;font-weight:700;color:#ff3366;margin-bottom:0.5rem;">403 — Yetkisiz Erişim</div><div style="color:#6b7280;font-size:0.85rem;">Bu sayfaya erişim yetkiniz bulunmamaktadır.</div><button onclick="location.href=\'/\'" style="margin-top:1.5rem;padding:0.6rem 1.5rem;background:#ff3366;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.9rem;">Ana Sayfaya Dön</button></div>';
+    }
 
     // Aktif admin oturumu yok — login formunu göster
     const _scmEl = document.getElementById('sessionCheckMsg');
@@ -1187,6 +1208,10 @@ async function checkIsAdmin(userId, userEmail) {
 }
 
 function boot() {
+    // Admin doğrulandı — koruma overlay'ini kaldır
+    var gate = document.getElementById('_adminGate');
+    if (gate) gate.remove();
+
     document.getElementById('loginScreen').style.display = 'none';
     const _scm = document.getElementById('sessionCheckMsg');
     if (_scm) _scm.style.display = 'none';

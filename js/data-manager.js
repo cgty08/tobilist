@@ -73,14 +73,28 @@ const dataManager = {
         if (!this.currentUserId || !this.data) return false;
 
         // ── GÜVENLİK: Veri bütünlüğü kontrolü ──────────────────────────
-        // XP manipülasyonu tespiti
         const xp = this.data.xp;
+
+        // XP tip ve aralık kontrolü
         if (
-            typeof xp?.total !== 'number' || xp.total < 0 || xp.total > 9_999_999 ||
-            typeof xp?.level !== 'number' || xp.level < 1 || xp.level > 999 ||
+            typeof xp?.total   !== 'number' || xp.total   < 0 || xp.total   > 10_000_000 ||
+            typeof xp?.level   !== 'number' || xp.level   < 1 || xp.level   > 999        ||
             typeof xp?.current !== 'number' || xp.current < 0
         ) {
-            console.warn('[Security] Geçersiz XP değeri tespit edildi, kayıt engellendi.');
+            console.warn('[Security] Geçersiz XP değeri tespit edildi, kayıt engellendi.', xp);
+            return false;
+        }
+
+        // Achievements tip kontrolü
+        if (!Array.isArray(this.data.achievements)) {
+            console.warn('[Security] achievements array değil — kayıt engellendi.');
+            return false;
+        }
+
+        // Achievements sayısı makul aralıkta mı? (toplam başarım sayısından fazla olamaz)
+        const MAX_ACHIEVEMENTS = 100; // ACHIEVEMENTS dizisinin uzunluğundan büyük olamaz
+        if (this.data.achievements.length > MAX_ACHIEVEMENTS) {
+            console.warn('[Security] Anormal achievements sayısı — kayıt engellendi:', this.data.achievements.length);
             return false;
         }
 
