@@ -119,14 +119,13 @@ async function loginSuccess(user) {
     try {
         const { data, error } = await window.supabaseClient
             .from('user_data')
-            .select('data,is_admin')
+            .select('data')
             .eq('user_id', user.id)
             .single();
 
-        // Admin: YALNIZCA Supabase DB kolonu kontrol edilir.
-        // Hicbir email adresi client-side kodda bulunmamali.
-        // Admin vermek icin: Supabase Dashboard > user_data tablosu > is_admin = true
-        if (data?.is_admin === true || data?.data?.is_admin === true) {
+        // Admin: yalnızca data JSONB içindeki is_admin alanı kontrol edilir.
+        // Vermek için: Supabase Dashboard > user_data > data kolonunu düzenle > is_admin: true
+        if (data?.data?.is_admin === true) {
             currentUser.isAdmin = true;
         }
 
@@ -712,7 +711,6 @@ function deleteAccount() {
 
                     const { error: pwErr } = await window.supabaseClient.auth.updateUser({ password: tempPw });
                     if (pwErr) {
-                        // Her iki yöntem de başarısız — kullanıcıyı bilgilendir
                         _closeBox();
                         await window.supabaseClient.auth.signOut();
                         showNotification(

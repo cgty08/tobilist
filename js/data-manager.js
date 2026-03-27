@@ -85,14 +85,12 @@ const dataManager = {
             return false;
         }
 
-        // Achievements tip kontrolü
+        // Achievements tip ve boyut kontrolü
         if (!Array.isArray(this.data.achievements)) {
             console.warn('[Security] achievements array değil — kayıt engellendi.');
             return false;
         }
-
-        // Achievements sayısı makul aralıkta mı? (toplam başarım sayısından fazla olamaz)
-        const MAX_ACHIEVEMENTS = 100; // ACHIEVEMENTS dizisinin uzunluğundan büyük olamaz
+        const MAX_ACHIEVEMENTS = 100;
         if (this.data.achievements.length > MAX_ACHIEVEMENTS) {
             console.warn('[Security] Anormal achievements sayısı — kayıt engellendi:', this.data.achievements.length);
             return false;
