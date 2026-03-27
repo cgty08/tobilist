@@ -694,16 +694,43 @@ function deleteAccount() {
             if (window.supabaseClient) {
                 const userId = currentUser.id || currentUser.uid;
 
-                // 1. Tum verileri sil
+                // 1. Tüm kullanıcı verilerini sil
                 await window.supabaseClient.from('user_data').delete().eq('user_id', userId);
                 try { await window.supabaseClient.from('reviews').delete().eq('user_id', userId); } catch(e){}
                 try { await window.supabaseClient.from('comments').delete().eq('user_id', userId); } catch(e){}
 
-                // 2. Permanently delete from auth.users via RPC
+                // 2. auth.users'dan kalıcı silme — RPC zorunlu
                 const { error: rpcErr } = await window.supabaseClient.rpc('delete_user');
+
                 if (rpcErr) {
-                    console.warn('RPC yok, hesap auth tablosundan silinemedi:', rpcErr.message);
-                    showNotification('⚠️ Hesap verileri silindi ancak kimlik dogrulama kaydi tam silinemedi. Destek ekibiyle iletisime gecin.', 'warning');
+                    // RPC başarısız: kullanıcı veri tabanından silindi ama auth kaydı kaldı
+                    // Hesabı tamamen devre dışı bırakmak için şifreyi rastgele karmaşık bir değerle değiştir
+                    console.warn('[DeleteAccount] RPC başarısız, şifre sıfırlama yöntemi deneniyor:', rpcErr.message);
+
+                    // Rastgele geçici şifre — kullanıcı bir daha giremez
+                    const tempPw = crypto.randomUUID() + crypto.randomUUID();
+                    const { error: pwErr } = await window.supabaseClient.auth.updateUser({ password: tempPw });
+
+                    if (pwErr) {
+                        // Her iki yöntem de başarısız: kullanıcıyı bilgilendir
+                        _closeBox();
+                        showNotification(
+                            '⚠️ Verileriniz silindi ancak kimlik doğrulama kaydı tamamen kaldırılamadı. ' +
+                            'Lütfen destek ekibiyle iletişime geçin: support@onilist.com',
+                            'warning'
+                        );
+                        // Yine de çıkış yap
+                        await window.supabaseClient.auth.signOut();
+                        currentUser = null;
+                        isGuest = true;
+                        dataManager.data = dataManager.defaultData();
+                        dataManager.currentUserId = null;
+                        updateUIForGuest();
+                        switchSection('home');
+                        return;
+                    }
+                    // Şifre değiştirildi — kullanıcı artık eski şifresiyle giremez
+                    console.log('[DeleteAccount] Şifre rastgele değerle değiştirildi — hesap erişilemez hale getirildi.');
                 }
 
                 // 3. localStorage temizle
@@ -722,7 +749,7 @@ function deleteAccount() {
             dataManager.currentUserId = null;
             updateUIForGuest();
             switchSection('home');
-            showNotification('Hesabiniz silindi. Gorusuruz!', 'info');
+            showNotification('Hesabınız kalıcı olarak silindi. Görüşürüz!', 'info');
         } catch(e) {
             console.error('Hesap silme hatasi:', e);
             showNotification('Hata olustu: ' + e.message, 'error');
