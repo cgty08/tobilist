@@ -77,7 +77,7 @@ const dataManager = {
 
         // XP tip ve aralık kontrolü
         if (
-            typeof xp?.total   !== 'number' || xp.total   < 0 || xp.total   > 10_000_000 ||
+            typeof xp?.total   !== 'number' || xp.total   < 0 || xp.total   > 500_000 ||
             typeof xp?.level   !== 'number' || xp.level   < 1 || xp.level   > 999        ||
             typeof xp?.current !== 'number' || xp.current < 0
         ) {

@@ -1114,7 +1114,9 @@ async function submitReview() {
                 : XP_REWARDS.writeReview;
             xpSystem.addXP(reviewXP, _lang === 'en'
                 ? (comment.length >= 200 ? 'Detailed review! ✍️' : 'Review written!')
-                : (comment.length >= 200 ? 'Detayli yorum! ✍️' : 'Yorum yazildi!'));
+                : (comment.length >= 200 ? 'Detayli yorum! ✍️' : 'Yorum yazildi!'),
+                false,
+                _XPSecurity.token(comment.length >= 200 ? 'writeLongReview' : 'writeReview'));
             reviewedItems.push(contentKey);
             dataManager.data.reviewedItems = reviewedItems;
         }
