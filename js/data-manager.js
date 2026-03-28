@@ -122,16 +122,28 @@ const dataManager = {
             }
         }
 
-        // Sonra Supabase'e kaydet (800ms debounce — onceki 1500ms'den dusuruldu)
+        // Sonra Supabase'e kaydet (800ms debounce)
         clearTimeout(this.saveTimeout);
         const userId = this.currentUserId;
         const snapshot = JSON.parse(JSON.stringify(this.data));
+
+        // Supabase'e gönderilmeden önce güvenli alanları temizle
+        // is_admin data JSONB içinde olmamalı — auth.js bunu data?.data?.is_admin'dan okur
+        if (snapshot.is_admin !== undefined)         delete snapshot.is_admin;
+        if (snapshot.social?.is_admin !== undefined) delete snapshot.social.is_admin;
+        if (snapshot.banned === undefined)           {} // ban bilgisi kalabilir (admin seter)
+
         this.saveTimeout = setTimeout(() => {
             if (window.supabaseClient && userId) {
                 window.supabaseClient
                     .from('user_data')
-                    .upsert({ user_id: userId, data: snapshot, updated_at: new Date().toISOString() }, { onConflict: 'user_id' })
-                    .then(({ error }) => { if (error) console.warn('Supabase save error:', error.message); });
+                    .upsert(
+                        { user_id: userId, data: snapshot, updated_at: new Date().toISOString() },
+                        { onConflict: 'user_id' }
+                    )
+                    .then(({ error }) => {
+                        if (error) console.warn('Supabase save error:', error.message);
+                    });
             }
         }, 800);
         return true;
@@ -145,9 +157,16 @@ const dataManager = {
 
         // Supabase client uzerinden gonder
         if (window.supabaseClient) {
+            const flushSnap = JSON.parse(JSON.stringify(this.data));
+            if (flushSnap.is_admin !== undefined)         delete flushSnap.is_admin;
+            if (flushSnap.social?.is_admin !== undefined) delete flushSnap.social.is_admin;
+
             window.supabaseClient
                 .from('user_data')
-                .upsert({ user_id: this.currentUserId, data: this.data, updated_at: new Date().toISOString() }, { onConflict: 'user_id' })
+                .upsert(
+                    { user_id: this.currentUserId, data: flushSnap, updated_at: new Date().toISOString() },
+                    { onConflict: 'user_id' }
+                )
                 .then(({ error }) => { if (error) console.warn('Supabase flushNow error:', error.message); });
         }
 
