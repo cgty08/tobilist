@@ -1689,11 +1689,12 @@ function getUserEmail(row) {
     );
 }
 
-function normalizeUserRow(row) {
+function normalizeUserRow(row, emailMap = null) {
     const user = { ...row };
     const data = { ...(user?.data || {}) };
     const social = { ...(data?.social || {}) };
-    const email = getUserEmail(user);
+    const mappedEmail = emailMap?.[user?.user_id] || '';
+    const email = getUserEmail(user) || mappedEmail;
 
     if (!social.email && email) {
         social.email = email;
@@ -1702,6 +1703,38 @@ function normalizeUserRow(row) {
     data.social = social;
     user.data = data;
     return user;
+}
+
+async function loadUserEmailMap() {
+    const emailMap = {};
+
+    // Preferred source: server-side RPC that can read auth.users safely.
+    try {
+        const rpc = await sb.rpc('get_user_emails');
+        const rows = Array.isArray(rpc?.data) ? rpc.data : [];
+        rows.forEach(r => {
+            const uid = r?.user_id;
+            const em = (r?.email || '').trim();
+            if (uid && em && !emailMap[uid]) emailMap[uid] = em;
+        });
+    } catch (e) {}
+
+    // Fallback source: chat messages keep sender email for some users.
+    try {
+        const { data } = await sb
+            .from('chat_messages')
+            .select('user_id,email')
+            .neq('email', '')
+            .order('created_at', { ascending: false })
+            .limit(5000);
+        (data || []).forEach(r => {
+            const uid = r?.user_id;
+            const em = (r?.email || '').trim();
+            if (uid && em && !emailMap[uid]) emailMap[uid] = em;
+        });
+    } catch (e) {}
+
+    return emailMap;
 }
 
 async function loadUsers() {
@@ -1722,7 +1755,8 @@ async function loadUsers() {
         data = fb.data || []; error = fb.error;
     }
     if (error) { toast('Error: '+error.message,'error'); return; }
-    allUsers = (data || []).map(normalizeUserRow);
+    const emailMap = await loadUserEmailMap();
+    allUsers = (data || []).map(u => normalizeUserRow(u, emailMap));
     usersPage=1;
     renderUsers();
 }
