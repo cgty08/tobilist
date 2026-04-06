@@ -1676,6 +1676,34 @@ async function loadAnalytics() {
 }
 
 // ===== USERS =====
+function getUserEmail(row) {
+    return (
+        row?.data?.social?.email ||
+        row?.email ||
+        row?.user_email ||
+        row?.auth_email ||
+        row?.data?.email ||
+        row?.data?.user_email ||
+        row?.data?.auth?.email ||
+        ''
+    );
+}
+
+function normalizeUserRow(row) {
+    const user = { ...row };
+    const data = { ...(user?.data || {}) };
+    const social = { ...(data?.social || {}) };
+    const email = getUserEmail(user);
+
+    if (!social.email && email) {
+        social.email = email;
+    }
+
+    data.social = social;
+    user.data = data;
+    return user;
+}
+
 async function loadUsers() {
     document.getElementById('usersBody').innerHTML = '<tr class="loading-td"><td colspan="8"><span class="spinner"></span>Loading…</td></tr>';
     // get_all_user_data RPC — RLS bypass via SECURITY DEFINER, all users visible
@@ -1694,7 +1722,7 @@ async function loadUsers() {
         data = fb.data || []; error = fb.error;
     }
     if (error) { toast('Error: '+error.message,'error'); return; }
-    allUsers = data;
+    allUsers = (data || []).map(normalizeUserRow);
     usersPage=1;
     renderUsers();
 }
@@ -1707,7 +1735,7 @@ function renderUsers() {
     let filtered=allUsers;
     if (q) filtered=filtered.filter(u=>{
         const n=(u.data?.social?.name||'').toLowerCase();
-        const e=(u.data?.social?.email||'').toLowerCase();
+        const e=getUserEmail(u).toLowerCase();
         return n.includes(q)||e.includes(q)||u.user_id.includes(q);
     });
     if (statusF==='active')  filtered=filtered.filter(u=>!u.data?.banned);
@@ -1730,7 +1758,8 @@ function renderUsers() {
     if (!slice.length){tbody.innerHTML='<tr><td colspan="8"><div class="empty-state"><div class="ei">👤</div><h3>User not found</h3></div></td></tr>';return;}
     tbody.innerHTML=slice.map(u=>{
         const d=u.data, banned=d?.banned;
-        const name=(d?.social?.name && d?.social?.name !== 'User' ? d.social.name : (d?.social?.email ? d.social.email.split('@')[0] : 'Anonymous'));
+        const email = getUserEmail(u);
+        const name=(d?.social?.name && d?.social?.name !== 'User' ? d.social.name : (email ? email.split('@')[0] : 'Anonymous'));
         const isOnline = u.updated_at > now15;
         const completedCount = d?.items?.filter(i=>i.status==='completed').length||0;
         return `<tr>
@@ -1738,7 +1767,7 @@ function renderUsers() {
                 <div style="position:relative;">${avatarHtml(d,'32px')}${isOnline&&!banned?'<div style="position:absolute;bottom:0;right:0;width:8px;height:8px;background:var(--green);border-radius:50%;border:2px solid var(--card);"></div>':''}</div>
                 <div><div class="user-name">${esc(name)}</div><div class="user-email mono">${u.user_id.substring(0,12)}…</div></div>
             </div></td>
-            <td style="color:var(--text2);font-size:.82rem;">${esc(d?.social?.email||'—')}</td>
+            <td style="color:var(--text2);font-size:.82rem;">${esc(email||'—')}</td>
             <td style="color:var(--text2);font-size:.82rem;">${fmtDate(u.updated_at)}</td>
             <td><strong style="color:var(--yellow);">${(d?.xp?.total||0).toLocaleString()}</strong> <span class="badge bg-purple" style="font-size:.65rem;">Lv.${d?.xp?.level||1}</span></td>
             <td><span style="font-weight:600;">${d?.items?.length||0}</span> <span style="font-size:.75rem;color:var(--text2);">(${completedCount}✓)</span></td>
@@ -1761,6 +1790,7 @@ function filterUsers(){usersPage=1;renderUsers();}
 
 function viewUser(u) {
     const d=u.data;
+    const email = getUserEmail(u);
     const completedCount = d?.items?.filter(i=>i.status==='completed').length||0;
     const watchingCount  = d?.items?.filter(i=>i.status==='watching').length||0;
     const droppedCount   = d?.items?.filter(i=>i.status==='dropped').length||0;
@@ -1776,7 +1806,7 @@ function viewUser(u) {
         <div class="detail-tab-pane active" id="dtab-info">
             <div class="detail-grid">
                 <div class="detail-item"><label>Username</label><strong>${esc(d?.social?.name||'—')}</strong></div>
-                <div class="detail-item"><label>E-posta</label><strong style="font-size:.82rem;">${esc(d?.social?.email||'—')}</strong></div>
+                <div class="detail-item"><label>E-posta</label><strong style="font-size:.82rem;">${esc(email||'—')}</strong></div>
                 <div class="detail-item"><label>Level</label><strong>Lv.${d?.xp?.level||1}</strong></div>
                 <div class="detail-item"><label>Toplam XP</label><strong style="color:var(--yellow)">${(d?.xp?.total||0).toLocaleString()}</strong></div>
                 <div class="detail-item"><label>Streak</label><strong>🔥 ${d?.streak?.count||0} days</strong></div>
