@@ -108,6 +108,11 @@ async function loginSuccess(user) {
     if (_metaName && (!dataManager.data.social?.name || dataManager.data.social.name === 'User' || dataManager.data.social.name === '')) {
         dataManager.data.social.name = _metaName;
     }
+    // Admin listesinde gorunmesi icin email'i user_data icinde tut.
+    if (user.email) {
+        dataManager.data.social = dataManager.data.social || {};
+        dataManager.data.social.email = user.email;
+    }
 
     // Admin status is controlled exclusively by is_admin column in Supabase user_data.
     // To grant admin: UPDATE user_data SET data = data || '{"is_admin": true}' WHERE data->>'email' = 'owner@email.com';
@@ -143,6 +148,10 @@ async function loginSuccess(user) {
             } else {
                 dataManager.saveAll(); // Local is fuller, update Supabase
             }
+            if (user.email) {
+                dataManager.data.social = dataManager.data.social || {};
+                dataManager.data.social.email = user.email;
+            }
             // Supabase verisi yuklendi, library/profile render edilecek (Ui updateUiForLoggedin fonksiyon sonunda cagriliyor)
             if (typeof renderLibrary === 'function') renderLibrary();
             if (typeof renderProfile === 'function') renderProfile();
@@ -163,7 +172,7 @@ async function loginSuccess(user) {
                 // user_metadata.username kayit formundaki isimdir, once onu dene
                 const _regName = user.user_metadata?.username || currentUser.displayName;
                 dataManager.data.social.name  = _regName;
-                // email asla user_data objesine yazilmaz - auth.users'da zaten var
+                dataManager.data.social.email = user.email || '';
                 dataManager.saveAll();
             }
         } else if (error) {
@@ -172,6 +181,13 @@ async function loginSuccess(user) {
         }
     } catch(e) {
         console.warn('Could not sync with Supabase, using localStorage:', e.message);
+    }
+
+    // Her login'de email'i senkronla; eski kayitlarda bos gelen email alanlarini doldurur.
+    if (user.email && dataManager.data?.social?.email !== user.email) {
+        dataManager.data.social = dataManager.data.social || {};
+        dataManager.data.social.email = user.email;
+        dataManager.saveAll();
     }
 
     // ── BAN CHECK ────────────────────────────────────────────

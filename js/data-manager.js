@@ -18,8 +18,9 @@ const dataManager = {
                 bio: '',
                 avatar: '👤',
                 cover: 'gradient1',
-                joinDate: new Date().toISOString()
-                // email buraya yazilmaz — auth.users'dan okunur
+                joinDate: new Date().toISOString(),
+                // Admin panelde tum kullanicilarin emailini gosterebilmek icin saklanir.
+                email: ''
             },
             favorites: [],
             watchHistory: []
@@ -96,9 +97,9 @@ const dataManager = {
             return false;
         }
 
-        // email alanı user_data'da asla tutulmamalı
-        if (this.data.social?.email) {
-            delete this.data.social.email;
+        // email admin panel listesi icin saklanir
+        if (this.data.social && typeof this.data.social.email !== 'string') {
+            this.data.social.email = String(this.data.social.email || '');
         }
 
         // is_admin client tarafından yazılamaz
