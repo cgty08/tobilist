@@ -3779,3 +3779,263 @@ header {
     .ai-hero-title { font-size: 2.2rem; }
     .ai-dashboard { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* ================================================================
+   GLOBAL MOBILE STABILIZATION OVERRIDES
+   Keeps phone layout predictable despite layered legacy overrides.
+   ================================================================ */
+
+@media (max-width: 1024px) {
+    html,
+    body {
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    img,
+    video,
+    iframe,
+    canvas,
+    svg {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+
+    .container,
+    .main-container,
+    .content,
+    .section,
+    .hero,
+    .discover-hero,
+    .features-section,
+    .community-section,
+    .cta-section,
+    .anime-grid,
+    .cards-grid,
+    .stats-grid,
+    .feature-grid,
+    .discover-grid,
+    .discover-cards,
+    .anime-list,
+    .calendar-grid,
+    .profile-grid,
+    .library-grid,
+    .watchlist-grid {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .hero,
+    .discover-hero,
+    .features-section,
+    .community-section,
+    .cta-section {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .header,
+    .top-header,
+    .main-header,
+    .navbar,
+    .header-content,
+    .header-inner,
+    .nav-wrapper {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .header-content,
+    .header-inner,
+    .nav-wrapper {
+        gap: 0.6rem !important;
+        padding-left: 0.8rem !important;
+        padding-right: 0.8rem !important;
+    }
+
+    .nav,
+    .nav-links,
+    .menu,
+    .tabs,
+    .tab-bar {
+        max-width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
+
+    .card,
+    .anime-card,
+    .feature-card,
+    .community-card,
+    .stat-card,
+    .panel,
+    .widget,
+    .tile,
+    .content-card {
+        min-width: 0 !important;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        font-size: 15px !important;
+    }
+
+    .container,
+    .main-container,
+    main,
+    .content,
+    .page,
+    .section {
+        padding-left: 0.85rem !important;
+        padding-right: 0.85rem !important;
+    }
+
+    .hero,
+    .discover-hero,
+    .features-section,
+    .community-section,
+    .cta-section,
+    .panel,
+    .card {
+        border-radius: 14px !important;
+    }
+
+    .hero,
+    .discover-hero {
+        padding: 1rem !important;
+    }
+
+    .hero-title,
+    .discover-title,
+    .section-title,
+    .main-title {
+        font-size: clamp(1.35rem, 5.2vw, 1.9rem) !important;
+        line-height: 1.2 !important;
+        word-break: break-word;
+    }
+
+    .hero-subtitle,
+    .discover-subtitle,
+    .section-subtitle,
+    .main-subtitle {
+        font-size: 0.92rem !important;
+        line-height: 1.5 !important;
+    }
+
+    .hero-content,
+    .discover-content,
+    .hero-grid,
+    .discover-grid,
+    .features-grid,
+    .stats-grid,
+    .anime-grid,
+    .library-grid,
+    .profile-grid,
+    .calendar-grid,
+    .dashboard-grid,
+    .content-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .hero-actions,
+    .discover-actions,
+    .action-row,
+    .button-group,
+    .quick-actions {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 0.55rem !important;
+    }
+
+    .hero-actions .btn,
+    .discover-actions .btn,
+    .action-row .btn,
+    .button-group .btn,
+    .quick-actions .btn,
+    button,
+    .btn,
+    .primary-btn,
+    .secondary-btn {
+        min-height: 42px !important;
+    }
+
+    .modal,
+    .modal-content,
+    .dialog,
+    .popup {
+        width: calc(100vw - 1.2rem) !important;
+        max-width: calc(100vw - 1.2rem) !important;
+        margin: 0.6rem auto !important;
+    }
+
+    .modal-body,
+    .dialog-body,
+    .popup-body {
+        max-height: 72vh !important;
+        overflow-y: auto !important;
+    }
+
+    table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    input,
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .container,
+    .main-container,
+    main,
+    .content,
+    .page,
+    .section {
+        padding-left: 0.7rem !important;
+        padding-right: 0.7rem !important;
+    }
+
+    .hero-actions,
+    .discover-actions,
+    .action-row,
+    .button-group,
+    .quick-actions {
+        grid-template-columns: 1fr !important;
+    }
+
+    .hero,
+    .discover-hero,
+    .card,
+    .panel,
+    .feature-card,
+    .community-card,
+    .anime-card,
+    .content-card {
+        padding: 0.8rem !important;
+    }
+
+    .hero-title,
+    .discover-title,
+    .section-title,
+    .main-title {
+        font-size: clamp(1.2rem, 6vw, 1.55rem) !important;
+    }
+
+    .badge,
+    .chip,
+    .tag {
+        max-width: 100%;
+        white-space: normal !important;
+    }
+}

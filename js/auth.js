@@ -140,6 +140,13 @@ async function loginSuccess(user) {
         }
 
         if (!error && data && data.data) {
+            if (data.data.deleted === true || data.data.blocked_recreate === true || data.data.deleted_at) {
+                await window.supabaseClient.auth.signOut();
+                showNotification('Bu hesap kalici olarak kapatildi.', 'error');
+                guestMode();
+                return;
+            }
+
             // Data exists in Supabase — always prefer remote on mobile (localStorage may be empty)
             const remoteItems = data.data.items || [];
             const localItems = dataManager.data.items || [];
@@ -375,6 +382,60 @@ function isEmailDomainAllowed(email) {
     return ALLOWED_EMAIL_DOMAINS.includes(parts[1]);
 }
 
+function normalizeEmail(email) {
+    return String(email || '').trim().toLowerCase();
+}
+
+async function getUserDataByEmail(email) {
+    if (!window.supabaseClient || !email) return null;
+    const normalized = normalizeEmail(email);
+
+    try {
+        const { data, error } = await window.supabaseClient
+            .from('user_data')
+            .select('user_id,data,updated_at')
+            .eq('data->social->>email', normalized)
+            .limit(1)
+            .maybeSingle();
+        if (!error && data) return data;
+    } catch (e) {}
+
+    try {
+        const { data, error } = await window.supabaseClient
+            .from('user_data')
+            .select('user_id,data,updated_at')
+            .contains('data', { social: { email: normalized } })
+            .limit(1)
+            .maybeSingle();
+        if (!error && data) return data;
+    } catch (e) {}
+
+    return null;
+}
+
+async function checkRegistrationEligibility(email) {
+    const row = await getUserDataByEmail(email);
+    if (!row?.data) return { ok: true };
+
+    const d = row.data || {};
+    const isDeleted = d.deleted === true || d.blocked_recreate === true || !!d.deleted_at;
+    const isActiveBan = d.banned === true && (!d.ban_expiry || new Date(d.ban_expiry) > new Date());
+
+    if (isDeleted) {
+        return {
+            ok: false,
+            reason: 'Bu e-posta ile açılmış hesap kalıcı silindiği için yeniden kayıt açılamaz.'
+        };
+    }
+    if (isActiveBan) {
+        return {
+            ok: false,
+            reason: 'Bu e-posta banlı olduğu için yeni hesap açılamaz.'
+        };
+    }
+    return { ok: true };
+}
+
 // ===== LOGiN =====
 async function handleLogin(event) {
     event.preventDefault();
@@ -453,6 +514,13 @@ async function handleRegister(event) {
         showError('registerError', 'Gecerli bir e-posta adresi giriniz!');
         return;
     }
+
+    const eligibility = await checkRegistrationEligibility(email);
+    if (!eligibility.ok) {
+        showError('registerError', eligibility.reason || 'Bu e-posta ile kayıt açılamaz.');
+        return;
+    }
+
     if (!password || password.length < 6) {
         showError('registerError', 'Password must be at least 6 characters!');
         return;
@@ -489,7 +557,7 @@ async function handleRegister(event) {
             setTimeout(() => {
                 if (dataManager.data?.social) {
                     dataManager.data.social.name = username;
-                    // email asla user_data'ya yazilmaz
+                    dataManager.data.social.email = normalizeEmail(email);
                     dataManager.saveAll();
                     if (typeof updateHeaderUser === 'function') updateHeaderUser();
                 }
@@ -708,38 +776,39 @@ function deleteAccount() {
         try {
             if (window.supabaseClient) {
                 const userId = currentUser.id || currentUser.uid;
+                const emailNormalized = normalizeEmail(currentUser.email || '');
 
-                // 1. Tüm kullanıcı verilerini sil
-                await window.supabaseClient.from('user_data').delete().eq('user_id', userId);
+                // 0. Tombstone kaydi birak: ayni email ile yeniden kayit engeli
+                const tombstoneData = {
+                    social: { email: emailNormalized, name: 'Deleted User' },
+                    deleted: true,
+                    blocked_recreate: true,
+                    deleted_at: new Date().toISOString(),
+                    banned: true,
+                    ban_reason: 'Account deleted by user',
+                    ban_expiry: null,
+                    items: [],
+                    achievements: [],
+                    favorites: [],
+                    watchHistory: [],
+                    warnings: []
+                };
+                await window.supabaseClient
+                    .from('user_data')
+                    .upsert({ user_id: userId, data: tombstoneData, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
+
+                // 1. Kullaniciya ait icerik tablolarini temizle
                 try { await window.supabaseClient.from('reviews').delete().eq('user_id', userId); } catch(e){}
                 try { await window.supabaseClient.from('comments').delete().eq('user_id', userId); } catch(e){}
 
-                // 2. auth.users'dan kalıcı silme — RPC zorunlu
-                const { error: rpcErr } = await window.supabaseClient.rpc('delete_user');
+                // 2. Kimligi silmek yerine devre disi birak: ayni email ile yeniden kayit engeli
+                const tempPw = (typeof crypto !== 'undefined' && crypto.randomUUID)
+                    ? crypto.randomUUID() + crypto.randomUUID()
+                    : Math.random().toString(36).repeat(4) + Date.now();
 
-                if (rpcErr) {
-                    // RPC başarısız: şifreyi rastgele değer ile değiştir
-                    // → kullanıcı artık eski şifresiyle giremez
-                    console.warn('[DeleteAccount] RPC başarısız, şifre sıfırlama fallback:', rpcErr.message);
-                    const tempPw = (typeof crypto !== 'undefined' && crypto.randomUUID)
-                        ? crypto.randomUUID() + crypto.randomUUID()
-                        : Math.random().toString(36).repeat(4) + Date.now();
-
-                    const { error: pwErr } = await window.supabaseClient.auth.updateUser({ password: tempPw });
-                    if (pwErr) {
-                        _closeBox();
-                        await window.supabaseClient.auth.signOut();
-                        showNotification(
-                            '⚠️ Verileriniz silindi fakat kimlik kaydı tam kaldırılamadı. ' +
-                            'Lütfen destek ile iletişime geçin.',
-                            'warning'
-                        );
-                        currentUser = null; isGuest = true;
-                        dataManager.data = dataManager.defaultData();
-                        dataManager.currentUserId = null;
-                        updateUIForGuest(); switchSection('home');
-                        return;
-                    }
+                const { error: pwErr } = await window.supabaseClient.auth.updateUser({ password: tempPw });
+                if (pwErr) {
+                    console.warn('[DeleteAccount] password rotation failed:', pwErr.message);
                 }
 
                 // 3. localStorage temizle
@@ -758,7 +827,7 @@ function deleteAccount() {
             dataManager.currentUserId = null;
             updateUIForGuest();
             switchSection('home');
-            showNotification('Hesabınız kalıcı olarak silindi. Görüşürüz!', 'info');
+            showNotification('Hesabınız kalıcı olarak kapatıldı. Görüşürüz!', 'info');
         } catch(e) {
             console.error('Hesap silme hatasi:', e);
             showNotification('Hata olustu: ' + e.message, 'error');

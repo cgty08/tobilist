@@ -1367,7 +1367,7 @@ async function updateOnlineCount() {
 async function loadDashboard() {
     const { data: rows, error } = await sb.from('user_data').select('user_id,data,updated_at').order('updated_at',{ascending:false});
     if (error) { toast('Load error: ' + error.message, 'error'); return; }
-    const users = rows || [];
+    const users = (rows || []).filter(u => !(u?.data?.deleted === true || u?.data?.blocked_recreate === true || !!u?.data?.deleted_at));
 
     // Stats
     const ago7  = new Date(Date.now() - 7*864e5).toISOString();
@@ -1689,6 +1689,11 @@ function getUserEmail(row) {
     );
 }
 
+function isSoftDeletedUser(row) {
+    const d = row?.data || {};
+    return d.deleted === true || d.blocked_recreate === true || !!d.deleted_at;
+}
+
 function normalizeUserRow(row, emailMap = null) {
     const user = { ...row };
     const data = { ...(user?.data || {}) };
@@ -1756,7 +1761,7 @@ async function loadUsers() {
     }
     if (error) { toast('Error: '+error.message,'error'); return; }
     const emailMap = await loadUserEmailMap();
-    allUsers = (data || []).map(u => normalizeUserRow(u, emailMap));
+    allUsers = (data || []).map(u => normalizeUserRow(u, emailMap)).filter(u => !isSoftDeletedUser(u));
     usersPage=1;
     renderUsers();
 }
@@ -1936,7 +1941,7 @@ async function loadOnline() {
     const now15  = new Date(Date.now()-15*60*1000).toISOString();
     const now1h  = new Date(Date.now()-60*60*1000).toISOString();
     const today  = new Date(); today.setHours(0,0,0,0);
-    const users  = _raw;
+    const users  = (_raw || []).filter(u => !isSoftDeletedUser(u));
 
     const online  = users.filter(u => u.updated_at > now15 && !u.data?.banned);
     const hour1   = users.filter(u => u.updated_at > now1h && !u.data?.banned);
@@ -2038,7 +2043,7 @@ function renderAllMembers() {
 let allBanData = [];
 async function loadBans() {
     const { data } = await sb.from('user_data').select('user_id,data,updated_at');
-    allBanData = (data||[]).filter(u=>u.data?.banned);
+    allBanData = (data||[]).filter(u => u.data?.banned && !isSoftDeletedUser(u));
     document.getElementById('banCountBadge').textContent = allBanData.length;
     document.getElementById('banCountBadge').style.display = allBanData.length>0?'':'none';
     filterBans();
@@ -2073,7 +2078,7 @@ async function loadContent() {
     const { data } = await sb.from('user_data').select('user_id,data');
     const typeF=document.getElementById('contentTypeF')?.value||'all';
     allContent=[];
-    (data||[]).forEach(u=>{
+    (data||[]).filter(u => !isSoftDeletedUser(u)).forEach(u=>{
         (u.data?.items||[]).forEach(item=>{
             if(typeF==='all'||item.type===typeF)
                 allContent.push({...item, _uid:u.user_id, _uname:(u.data?.social?.name && u.data?.social?.name !== 'User' ? u.data.social.name : (u.data?.social?.email ? u.data.social.email.split('@')[0] : 'Anonymous')), _email:u.data?.social?.email||''});
@@ -2677,21 +2682,35 @@ async function permanentDeleteUser(uid, name) {
     if (!sb) { alert('No Supabase connection! Please reload the page.'); return; }
 
     try {
-        // 1. Delete user_data table
-        const { error: e1 } = await sb.from('user_data').delete().eq('user_id', uid);
-        if (e1) console.warn('user_data delete error:', e1.message);
+        // 1. Email'i koruyup tombstone birak: ayni email ile yeniden kayit engeli
+        let existingData = {};
+        try {
+            const { data: row } = await sb.from('user_data').select('data').eq('user_id', uid).single();
+            existingData = row?.data || {};
+        } catch (e) {}
+        const preservedEmail = (existingData?.social?.email || '').toString().trim().toLowerCase();
+        const tombstone = {
+            social: { email: preservedEmail, name: 'Deleted User' },
+            deleted: true,
+            blocked_recreate: true,
+            deleted_at: new Date().toISOString(),
+            banned: true,
+            ban_reason: 'Permanently deleted by admin',
+            ban_expiry: null,
+            items: [],
+            achievements: [],
+            favorites: [],
+            watchHistory: [],
+            warnings: []
+        };
+        const { error: e1 } = await sb.from('user_data').upsert({ user_id: uid, data: tombstone, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
+        if (e1) console.warn('user_data tombstone error:', e1.message);
 
         // 2. Delete reviews and comments (ignore if table doesn't exist)
         try { await sb.from('reviews').delete().eq('user_id', uid); } catch(e){}
         try { await sb.from('comments').delete().eq('user_id', uid); } catch(e){}
 
-        // 3. Delete from auth.users - try RPC first
-        const { error: rpcErr } = await sb.rpc('admin_delete_user', { target_user_id: uid });
-        if (rpcErr) {
-            console.warn('RPC error (normal - if SQL not added):', rpcErr.message);
-            // If no RPC: user_data deleted, auth not removed but user can't login
-            // because user_data otherwise app treats them as a new user
-        }
+        // 3. auth kaydini silmiyoruz: ayni email ile yeniden kayit acilmasin diye hesap bloke kalir.
 
         // 4. Remove from UI
         if (typeof _allUsers !== 'undefined') {
