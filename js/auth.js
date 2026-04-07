@@ -288,6 +288,7 @@ function openAuthModal(mode = 'login') {
     if (!modal) return;
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
+    resetAuthButtons();
     clearAllErrors();
     if (mode === 'register') showModalRegister();
     else if (mode === 'forgot') showModalForgot();
@@ -316,6 +317,7 @@ function closeAuthModal() {
     if (!modal) return;
     const content = modal.querySelector('.auth-modal-content');
     if (content) content.classList.remove('show');
+    resetAuthButtons();
     setTimeout(() => {
         modal.style.display = 'none';
         document.body.style.overflow = '';
@@ -329,6 +331,7 @@ function showModalLogin() {
     if (lb) lb.style.display = 'block';
     if (rb) rb.style.display = 'none';
     if (fb) fb.style.display = 'none';
+    resetAuthButtons();
     clearAllErrors();
 }
 
@@ -339,6 +342,7 @@ function showModalRegister() {
     if (lb) lb.style.display = 'none';
     if (rb) rb.style.display = 'block';
     if (fb) fb.style.display = 'none';
+    resetAuthButtons();
     clearAllErrors();
 }
 
@@ -349,7 +353,16 @@ function showModalForgot() {
     if (lb) lb.style.display = 'none';
     if (rb) rb.style.display = 'none';
     if (fb) fb.style.display = 'block';
+    resetAuthButtons();
     clearAllErrors();
+}
+
+function resetAuthButtons() {
+    const loginBtn = document.getElementById('loginBtn');
+    if (loginBtn) setButtonLoading(loginBtn, false, '<span>Sign In</span><span class="btn-arrow">→</span>');
+
+    const registerBtn = document.getElementById('registerBtn');
+    if (registerBtn) setButtonLoading(registerBtn, false, '<span>Create Account</span><span class="btn-arrow">→</span>');
 }
 
 document.addEventListener('keydown', (e) => {

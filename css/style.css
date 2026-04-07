@@ -5,39 +5,41 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-    --bg-primary: #0b0f1a;
-    --bg-secondary: #141824;
-    --bg-card: #1a1f2e;
-    --bg-hover: #1f2537;
-    --accent-primary: #ff3366;
-    --accent-secondary: #00d4ff;
-    --accent-tertiary: #7c3aed;
+    --bg-primary: #12110f;
+    --bg-secondary: #191714;
+    --bg-card: #221f1a;
+    --bg-hover: #2a2620;
+    --accent-primary: #d3647f;
+    --accent-secondary: #b89a72;
+    --accent-tertiary: #7f6a57;
     --accent-gold: #fbbf24;
-    --text-primary: #e8eaf2;
-    --text-secondary: #8892a4;
-    --text-muted: #4b5563;
-    --border: rgba(255,255,255,0.07);
-    --border-hover: rgba(255,255,255,0.14);
+    --text-primary: #ece6de;
+    --text-secondary: #b4a99a;
+    --text-muted: #6f665b;
+    --border: rgba(236,230,222,0.08);
+    --border-hover: rgba(236,230,222,0.16);
     --success: #10b981;
     --warning: #f59e0b;
     --danger: #ef4444;
     --shadow: 0 8px 32px rgba(0,0,0,0.4);
     --shadow-card: 0 4px 16px rgba(0,0,0,0.3);
     --radius: 12px;
+    --header-bg: rgba(18,17,15,0.96);
 }
 
 [data-theme="light"] {
-    --bg-primary: #f0f2f8;
-    --bg-secondary: #ffffff;
+    --bg-primary: #f4f0eb;
+    --bg-secondary: #fffdf8;
     --bg-card: #ffffff;
-    --bg-hover: #f5f7ff;
-    --text-primary: #1a1f2e;
-    --text-secondary: #475569;
-    --text-muted: #94a3b8;
+    --bg-hover: #f7f1ea;
+    --text-primary: #2e261f;
+    --text-secondary: #625548;
+    --text-muted: #998a7c;
     --border: rgba(0,0,0,0.08);
     --border-hover: rgba(0,0,0,0.15);
     --shadow: 0 8px 32px rgba(0,0,0,0.1);
     --shadow-card: 0 4px 16px rgba(0,0,0,0.08);
+    --header-bg: rgba(244,240,235,0.97);
 }
 
 [data-theme="neon"] {
@@ -52,16 +54,17 @@
 }
 
 [data-theme="pastel"] {
-    --bg-primary: #f0f4ff;
-    --bg-secondary: #fafbff;
+    --bg-primary: #f3efe9;
+    --bg-secondary: #fbf8f2;
     --bg-card: #ffffff;
-    --accent-primary: #e879a0;
-    --accent-secondary: #60a5fa;
-    --accent-tertiary: #a78bfa;
-    --text-primary: #1e1b4b;
-    --text-secondary: #4c1d95;
-    --border: rgba(139,92,246,0.1);
-    --bg-hover: #f0eeff;
+    --accent-primary: #c8758b;
+    --accent-secondary: #b39a79;
+    --accent-tertiary: #8f7a64;
+    --text-primary: #34271f;
+    --text-secondary: #6f5b4a;
+    --border: rgba(143,122,100,0.14);
+    --bg-hover: #f4eee6;
+    --header-bg: rgba(243,239,233,0.97);
 }
 
 html {
@@ -1142,6 +1145,11 @@ header {
     text-overflow: ellipsis;
 }
 
+.profile-dm-block {
+    border-color: rgba(211,100,127,0.28);
+    box-shadow: 0 12px 36px rgba(0,0,0,0.26), inset 0 0 0 1px rgba(211,100,127,0.08);
+}
+
 .dm-chat-col {
     display: flex;
     flex-direction: column;
@@ -1163,7 +1171,7 @@ header {
     flex: 1;
     padding: 0.65rem;
     overflow-y: auto;
-    min-height: 230px;
+    min-height: 300px;
 }
 
 .dm-msg {

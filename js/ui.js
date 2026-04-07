@@ -721,26 +721,32 @@ function applyLanguage() {
     }
 
     // ===== PROFILE =====
-    const profileEditBtn = document.querySelector('#profileSection .btn-secondary');
+    const profileEditBtn = document.querySelector('#profileSection button[onclick*="editProfile"]');
     if (profileEditBtn && profileEditBtn.textContent.trim() !== t('profileEditBtn')) profileEditBtn.textContent = t('profileEditBtn');
-    const profileShareBtn = document.querySelector('#profileSection .btn-ghost');
+    const profileShareBtn = document.querySelector('#profileSection button[onclick*="shareProfile"]');
     if (profileShareBtn) profileShareBtn.textContent = t('profileShareBtn');
 
     const profileStatCards = document.querySelectorAll('.profile-stat-card .psc-label');
     const profileStatKeys = [null, null, null, 'profileCompletedLabel', 'profileXPLabel', 'profileStreakLabel'];
     profileStatCards.forEach((el, i) => { if (profileStatKeys[i]) el.textContent = t(profileStatKeys[i]); });
 
-    const profileSectionBlocks = document.querySelectorAll('#profileSection .psb-title');
-    if (profileSectionBlocks[0]) profileSectionBlocks[0].textContent = t('profileStatusTitle');
-    if (profileSectionBlocks[1]) profileSectionBlocks[1].textContent = t('profileActivityTitle');
-    if (profileSectionBlocks[2]) profileSectionBlocks[2].textContent = t('profileFavGenresTitle');
-    if (profileSectionBlocks[3]) profileSectionBlocks[3].textContent = t('profileAchievementsTitle');
-    if (profileSectionBlocks[4]) profileSectionBlocks[4].textContent = t('profileExportTitle');
+    const profileStatusTitleEl = document.querySelector('#profileSection .psb-title[data-i18n="profileStatusTitle"]');
+    if (profileStatusTitleEl) profileStatusTitleEl.textContent = t('profileStatusTitle');
+    const profileActivityTitleEl = document.querySelector('#profileSection .psb-title[data-i18n="profileActivityTitle"]');
+    if (profileActivityTitleEl) profileActivityTitleEl.textContent = t('profileActivityTitle');
+    const profileFavTitleEl = document.querySelector('#profileSection .psb-title[data-i18n="profileFavGenresTitle"]');
+    if (profileFavTitleEl) profileFavTitleEl.textContent = t('profileFavGenresTitle');
+    const profileAchTitleEl = document.querySelector('#profileSection .psb-title[data-i18n="profileAchievementsTitle"]');
+    if (profileAchTitleEl) profileAchTitleEl.textContent = t('profileAchievementsTitle');
+    const profileExportTitleEl = document.querySelector('#profileSection .psb-title[data-i18n="profileExportTitle"]');
+    if (profileExportTitleEl) profileExportTitleEl.textContent = t('profileExportTitle');
 
-    const profileExportBtns = document.querySelectorAll('.share-btn');
-    if (profileExportBtns[0]) profileExportBtns[0].textContent = t('profileTwitterBtn');
-    if (profileExportBtns[1]) profileExportBtns[1].textContent = t('profileCopyBtn');
-    if (profileExportBtns[2]) profileExportBtns[2].textContent = t('profileJSONBtn');
+    const profileTwitterBtnEl = document.querySelector('#profileSection [data-i18n="profileTwitterBtn"]');
+    if (profileTwitterBtnEl) profileTwitterBtnEl.textContent = t('profileTwitterBtn');
+    const profileCopyBtnEl = document.querySelector('#profileSection [data-i18n="profileCopyBtn"]');
+    if (profileCopyBtnEl) profileCopyBtnEl.textContent = t('profileCopyBtn');
+    const profileJsonBtnEl = document.querySelector('#profileSection [data-i18n="profileJSONBtn"]');
+    if (profileJsonBtnEl) profileJsonBtnEl.textContent = t('profileJSONBtn');
 
     // Profile streak badge suffix
     const profileStreakBadge = document.querySelector('.streak-badge');
