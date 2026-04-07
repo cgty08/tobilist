@@ -5,41 +5,41 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-    --bg-primary: #12110f;
-    --bg-secondary: #191714;
-    --bg-card: #221f1a;
-    --bg-hover: #2a2620;
-    --accent-primary: #d3647f;
-    --accent-secondary: #b89a72;
-    --accent-tertiary: #7f6a57;
+    --bg-primary: #111317;
+    --bg-secondary: #171a20;
+    --bg-card: #1d2129;
+    --bg-hover: #252b35;
+    --accent-primary: #c86a82;
+    --accent-secondary: #8fa2b8;
+    --accent-tertiary: #6d7785;
     --accent-gold: #fbbf24;
-    --text-primary: #ece6de;
-    --text-secondary: #b4a99a;
-    --text-muted: #6f665b;
-    --border: rgba(236,230,222,0.08);
-    --border-hover: rgba(236,230,222,0.16);
+    --text-primary: #e8ecf2;
+    --text-secondary: #a5afbd;
+    --text-muted: #687384;
+    --border: rgba(232,236,242,0.08);
+    --border-hover: rgba(232,236,242,0.16);
     --success: #10b981;
     --warning: #f59e0b;
     --danger: #ef4444;
     --shadow: 0 8px 32px rgba(0,0,0,0.4);
     --shadow-card: 0 4px 16px rgba(0,0,0,0.3);
     --radius: 12px;
-    --header-bg: rgba(18,17,15,0.96);
+    --header-bg: rgba(17,19,23,0.96);
 }
 
 [data-theme="light"] {
-    --bg-primary: #f4f0eb;
-    --bg-secondary: #fffdf8;
+    --bg-primary: #f2f4f7;
+    --bg-secondary: #fbfcfe;
     --bg-card: #ffffff;
-    --bg-hover: #f7f1ea;
-    --text-primary: #2e261f;
-    --text-secondary: #625548;
-    --text-muted: #998a7c;
+    --bg-hover: #f4f6fa;
+    --text-primary: #222834;
+    --text-secondary: #5c6678;
+    --text-muted: #8a93a3;
     --border: rgba(0,0,0,0.08);
     --border-hover: rgba(0,0,0,0.15);
     --shadow: 0 8px 32px rgba(0,0,0,0.1);
     --shadow-card: 0 4px 16px rgba(0,0,0,0.08);
-    --header-bg: rgba(244,240,235,0.97);
+    --header-bg: rgba(242,244,247,0.97);
 }
 
 [data-theme="neon"] {
@@ -54,17 +54,17 @@
 }
 
 [data-theme="pastel"] {
-    --bg-primary: #f3efe9;
-    --bg-secondary: #fbf8f2;
+    --bg-primary: #eef1f6;
+    --bg-secondary: #f8fafe;
     --bg-card: #ffffff;
-    --accent-primary: #c8758b;
-    --accent-secondary: #b39a79;
-    --accent-tertiary: #8f7a64;
-    --text-primary: #34271f;
-    --text-secondary: #6f5b4a;
-    --border: rgba(143,122,100,0.14);
-    --bg-hover: #f4eee6;
-    --header-bg: rgba(243,239,233,0.97);
+    --accent-primary: #ba7d91;
+    --accent-secondary: #97a8bb;
+    --accent-tertiary: #7f8ea0;
+    --text-primary: #293142;
+    --text-secondary: #637089;
+    --border: rgba(127,142,160,0.14);
+    --bg-hover: #f1f4fa;
+    --header-bg: rgba(238,241,246,0.97);
 }
 
 html {
@@ -4348,4 +4348,57 @@ header {
         max-width: 100%;
         white-space: normal !important;
     }
+}
+
+/* ================================================================
+   MATTE GRAPHITE OVERRIDE — Home banner + Track/Discover
+   ================================================================ */
+
+.anilist-banner {
+    background: linear-gradient(145deg, #161920 0%, #11151b 50%, #171b22 100%) !important;
+    border: 1px solid rgba(232,236,242,0.08) !important;
+    box-shadow: 0 16px 34px rgba(0,0,0,0.34) !important;
+}
+
+.anilist-banner::before {
+    background:
+        radial-gradient(ellipse 60% 80% at 0% 50%, rgba(143,163,184,0.14) 0%, transparent 55%),
+        radial-gradient(ellipse 45% 65% at 100% 15%, rgba(200,106,130,0.12) 0%, transparent 55%),
+        radial-gradient(ellipse 35% 50% at 65% 100%, rgba(109,119,133,0.12) 0%, transparent 55%) !important;
+}
+
+.banner-title .gradient-text {
+    background: linear-gradient(135deg, #d4dbe5 0%, #c58ea0 55%, #9caec2 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+}
+
+.banner-actions .btn-primary,
+.banner-actions button.btn-primary {
+    background: linear-gradient(135deg, #c26d86, #b07b90) !important;
+}
+
+.discover-hero {
+    background: linear-gradient(145deg, #161920 0%, #11151b 50%, #171b22 100%) !important;
+    border: 1px solid rgba(232,236,242,0.08) !important;
+    box-shadow: 0 16px 34px rgba(0,0,0,0.34) !important;
+}
+
+.discover-hero-bg {
+    background:
+        radial-gradient(ellipse 50% 85% at 0% 50%, rgba(143,163,184,0.16) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 55% at 100% 20%, rgba(200,106,130,0.12) 0%, transparent 55%) !important;
+}
+
+.discover-hero-title {
+    background: linear-gradient(135deg, #edf1f7 30%, #cb8ea1 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+}
+
+.discover-tab.active {
+    background: linear-gradient(135deg, rgba(200,106,130,0.2), rgba(143,163,184,0.16)) !important;
+    border-color: rgba(200,106,130,0.32) !important;
 }
