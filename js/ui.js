@@ -2011,6 +2011,11 @@ function renderAISection() {
 
     const completed = items.filter(i => i.status === 'completed').length;
     const watching  = items.filter(i => i.status === 'watching').length;
+    const ratedPct = items.length > 0 ? (rated.length / items.length) : 0;
+    const completedPct = items.length > 0 ? (completed / items.length) : 0;
+    const confidence = Math.round(Math.max(52, Math.min(98,
+        52 + (items.length * 1.15) + (ratedPct * 20) + (completedPct * 10)
+    )));
 
     const set = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
     set('aiWatchingPattern', watching + (_lang==='en' ? ' active' : ' aktif'));
@@ -2018,6 +2023,8 @@ function renderAISection() {
     set('aiAvgRating', avg);
     set('aiLibrarySize', items.length);
     set('aiCompletedCount', completed);
+    set('aiAccuracyVal', confidence + '%');
+    set('aiAccuracyRingVal', confidence + '%');
 
     const barFill = document.querySelector('.ai-dash-bar-fill');
     if (barFill) {
