@@ -9,9 +9,9 @@
     --bg-secondary: #171a20;
     --bg-card: #1d2129;
     --bg-hover: #252b35;
-    --accent-primary: #c86a82;
-    --accent-secondary: #8fa2b8;
-    --accent-tertiary: #6d7785;
+    --accent-primary: #3ecf8e;
+    --accent-secondary: #7dd3b0;
+    --accent-tertiary: #56bfa1;
     --accent-gold: #fbbf24;
     --text-primary: #e8ecf2;
     --text-secondary: #a5afbd;
@@ -4362,13 +4362,13 @@ header {
 
 .anilist-banner::before {
     background:
-        radial-gradient(ellipse 60% 80% at 0% 50%, rgba(143,163,184,0.14) 0%, transparent 55%),
-        radial-gradient(ellipse 45% 65% at 100% 15%, rgba(200,106,130,0.12) 0%, transparent 55%),
-        radial-gradient(ellipse 35% 50% at 65% 100%, rgba(109,119,133,0.12) 0%, transparent 55%) !important;
+        radial-gradient(ellipse 60% 80% at 0% 50%, rgba(62,207,142,0.16) 0%, transparent 55%),
+        radial-gradient(ellipse 45% 65% at 100% 15%, rgba(125,211,176,0.12) 0%, transparent 55%),
+        radial-gradient(ellipse 35% 50% at 65% 100%, rgba(86,191,161,0.10) 0%, transparent 55%) !important;
 }
 
 .banner-title .gradient-text {
-    background: linear-gradient(135deg, #d4dbe5 0%, #c58ea0 55%, #9caec2 100%) !important;
+    background: linear-gradient(135deg, #e9f8f0 0%, #7dd3b0 55%, #3ecf8e 100%) !important;
     -webkit-background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
     background-clip: text !important;
@@ -4376,7 +4376,7 @@ header {
 
 .banner-actions .btn-primary,
 .banner-actions button.btn-primary {
-    background: linear-gradient(135deg, #c26d86, #b07b90) !important;
+    background: linear-gradient(135deg, #2fb879, #3ecf8e) !important;
 }
 
 .discover-hero {
@@ -4387,18 +4387,18 @@ header {
 
 .discover-hero-bg {
     background:
-        radial-gradient(ellipse 50% 85% at 0% 50%, rgba(143,163,184,0.16) 0%, transparent 55%),
-        radial-gradient(ellipse 40% 55% at 100% 20%, rgba(200,106,130,0.12) 0%, transparent 55%) !important;
+        radial-gradient(ellipse 50% 85% at 0% 50%, rgba(62,207,142,0.16) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 55% at 100% 20%, rgba(125,211,176,0.12) 0%, transparent 55%) !important;
 }
 
 .discover-hero-title {
-    background: linear-gradient(135deg, #edf1f7 30%, #cb8ea1 100%) !important;
+    background: linear-gradient(135deg, #f0fbf5 30%, #63cda0 100%) !important;
     -webkit-background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
     background-clip: text !important;
 }
 
 .discover-tab.active {
-    background: linear-gradient(135deg, rgba(200,106,130,0.2), rgba(143,163,184,0.16)) !important;
-    border-color: rgba(200,106,130,0.32) !important;
+    background: linear-gradient(135deg, rgba(62,207,142,0.2), rgba(125,211,176,0.16)) !important;
+    border-color: rgba(62,207,142,0.34) !important;
 }
