@@ -2624,8 +2624,8 @@ select {
    ---------------------------------------------------------------- */
 
 nav {
-    background: rgba(7,9,20,0.97) !important;
-    border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+    background: rgba(18,22,28,0.97) !important;
+    border-bottom: 1px solid rgba(232,236,242,0.08) !important;
     backdrop-filter: blur(20px) !important;
     position: sticky !important;
     top: 0 !important;
@@ -2639,17 +2639,17 @@ nav {
     padding: 0.48rem 1rem !important;
     font-size: 0.83rem !important;
     font-weight: 600 !important;
-    color: #4b5563 !important;
+    color: #8d97a8 !important;
     transition: all 0.18s ease !important;
     border: 1px solid transparent !important;
 }
 
-.nav-tab:hover { color: #a0a8b9 !important; background: rgba(255,255,255,0.04) !important; }
+.nav-tab:hover { color: #d2dbe8 !important; background: rgba(125,211,176,0.08) !important; }
 
 .nav-tab.active {
-    color: #fff !important;
-    background: rgba(255,51,102,0.1) !important;
-    border-color: rgba(255,51,102,0.25) !important;
+    color: #f2fff8 !important;
+    background: rgba(62,207,142,0.16) !important;
+    border-color: rgba(62,207,142,0.34) !important;
 }
 
 /* ----------------------------------------------------------------
@@ -2658,7 +2658,7 @@ nav {
 
 .anilist-banner {
     position: relative !important;
-    background: #050810 !important;
+    background: #121822 !important;
     border: none !important;
     border-radius: 0 !important;
     margin: 0 -1.5rem 2.5rem !important;
