@@ -921,13 +921,13 @@
                         <div class="profile-cover" id="profileCoverBg"></div>
                         <div class="profile-main">
                             <div class="profile-avatar-wrap">
-                                <div class="profile-avatar-large" id="profileAvatarLarge" onclick="editProfile()" title="Fotograf degistir">👤</div>
-                                <button class="avatar-cam-btn" onclick="editProfile()" title="Fotograf yukle">＋</button>
+                                <div class="profile-avatar-large" id="profileAvatarLarge" onclick="editProfile()" data-i18n-title="profilePhotoChangeTitle" title="Change photo">👤</div>
+                                <button class="avatar-cam-btn" onclick="editProfile()" data-i18n-title="profilePhotoUploadTitle" title="Upload photo">＋</button>
                             </div>
                             <div class="profile-info">
                                 <h2 class="profile-username" id="profileUsername">User</h2>
                                 <p class="profile-email-display" id="profileEmailDisplay"></p>
-                                <p class="profile-bio-text" id="profileBioText">Anime, manga ve webtoon takipcisi</p>
+                                <p class="profile-bio-text" id="profileBioText">Anime, manga &amp; webtoon fan</p>
                                 <div class="profile-badges">
                                     <span class="profile-badge level-badge-sm">Lv.<span id="profileLvBadge">1</span></span>
                                     <span class="profile-badge streak-badge"><span id="profileStreakBadge">0</span> day streak</span>
@@ -936,7 +936,7 @@
                                 <div style="display:flex;gap:0.6rem;margin-top:0.9rem;flex-wrap:wrap;">
                                     <button class="btn btn-secondary" onclick="editProfile()" data-i18n="profileEditBtn">Profili Duzenle</button>
                                     <button class="btn btn-ghost" onclick="shareProfile()" data-i18n="profileShareBtn">Paylas</button>
-                                    <button class="btn btn-ghost" onclick="document.getElementById('dmMessageInput')?.focus()">Mesaj Kutusu</button>
+                                    <button class="btn btn-ghost" onclick="document.getElementById('dmMessageInput')?.focus()" data-i18n="profileMsgBoxBtn">Message Box</button>
                                 </div>
                             </div>
                         </div>
@@ -944,15 +944,15 @@
 
                     <div class="profile-insight-row">
                         <div class="profile-insight-card">
-                            <div class="pi-label">Ortalama Puan</div>
+                            <div class="pi-label" data-i18n="profileAvgRatingLabel">Average Rating</div>
                             <div class="pi-value" id="profileAvgRating">-</div>
                         </div>
                         <div class="profile-insight-card">
-                            <div class="pi-label">Tamamlama Orani</div>
+                            <div class="pi-label" data-i18n="profileCompletionRateLabel">Completion Rate</div>
                             <div class="pi-value" id="profileCompletionRate">0%</div>
                         </div>
                         <div class="profile-insight-card">
-                            <div class="pi-label">Aktivite Seviyesi</div>
+                            <div class="pi-label" data-i18n="profileActivityLevelLabel">Activity Level</div>
                             <div class="pi-value" id="profileActivityLevel">Yeni</div>
                         </div>
                     </div>
@@ -969,23 +969,23 @@
                     <div class="profile-network-grid">
                         <div class="profile-section-block profile-members-block">
                             <div class="profile-panel-head">
-                                <div class="psb-title" style="margin-bottom:0;">Kullanici Kesfet</div>
-                                <button class="share-btn copy" onclick="refreshProfileMemberDirectory()">Yenile</button>
+                                <div class="psb-title" style="margin-bottom:0;" data-i18n="profileDiscoverUsersTitle">Discover Members</div>
+                                <button class="share-btn copy" onclick="refreshProfileMemberDirectory()" data-i18n="profileRefreshBtn">Refresh</button>
                             </div>
-                            <input id="profileMemberSearch" class="profile-member-search" placeholder="Kullanici ara..." />
+                            <input id="profileMemberSearch" class="profile-member-search" data-i18n-placeholder="profileSearchUsersPlaceholder" placeholder="Search users..." />
                             <div id="profileMemberGrid" class="profile-member-grid"></div>
                         </div>
 
                         <div class="profile-section-block profile-dm-block">
-                            <div class="psb-title" style="margin-bottom:0.65rem;">Ozel Mesajlar</div>
+                            <div class="psb-title" style="margin-bottom:0.65rem;" data-i18n="profilePrivateMessagesTitle">Private Messages</div>
                             <div class="profile-dm-layout">
                                 <div id="dmThreadList" class="dm-thread-list"></div>
                                 <div class="dm-chat-col">
-                                    <div id="dmChatHeader" class="dm-chat-header">Bir konusma secin</div>
+                                    <div id="dmChatHeader" class="dm-chat-header" data-i18n="dmSelectConversation">Select a conversation</div>
                                     <div id="dmChatMessages" class="dm-chat-messages"></div>
                                     <div class="dm-chat-compose">
-                                        <textarea id="dmMessageInput" placeholder="Mesaj yaz..." rows="2"></textarea>
-                                        <button class="btn btn-primary" onclick="sendCurrentDMMessage()">Gonder</button>
+                                        <textarea id="dmMessageInput" data-i18n-placeholder="dmComposePlaceholder" placeholder="Type a message..." rows="2"></textarea>
+                                        <button class="btn btn-primary" onclick="sendCurrentDMMessage()" data-i18n="dmSendBtn">Send</button>
                                     </div>
                                 </div>
                             </div>
@@ -1823,6 +1823,8 @@ window.openPublicProfile = async function(userId, fallbackName) {
 function renderPublicProfile(d, updatedAt, fallbackName, userId) {
     const body = document.getElementById('publicProfileBody');
     if (!body) return;
+    const currentLang = (typeof getCurrentLang === 'function') ? getCurrentLang() : 'en';
+    const dmBtnText = currentLang === 'en' ? '✉ Direct Message' : '✉ Ozel Mesaj';
 
     const social = d.social || {};
     const xp     = d.xp     || {};
@@ -1922,7 +1924,7 @@ function renderPublicProfile(d, updatedAt, fallbackName, userId) {
             </div>
             <p style="color:#8892a4;font-size:0.85rem;line-height:1.5;margin-bottom:1rem;">${bio}</p>
             <div style="display:flex;gap:0.5rem;margin-bottom:0.95rem;flex-wrap:wrap;">
-                <button id="ppMessageBtn" style="padding:0.45rem 0.8rem;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);border-radius:8px;color:#e5e7eb;cursor:pointer;font-size:0.78rem;">✉ Ozel Mesaj</button>
+                <button id="ppMessageBtn" style="padding:0.45rem 0.8rem;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);border-radius:8px;color:#e5e7eb;cursor:pointer;font-size:0.78rem;">${dmBtnText}</button>
             </div>
 
             <!-- Istatistik kartlari -->

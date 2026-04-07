@@ -94,12 +94,32 @@ const translations = {
         footerDiscover: 'Keşfet', footerRegister: 'Kayıt Ol', footerHome: 'Ana Sayfa',
         // PROFILE
         profileEditBtn: 'Profili Düzenle', profileShareBtn: 'Paylaş',
+        profileMsgBoxBtn: 'Mesaj Kutusu',
+        profileAvgRatingLabel: 'Ortalama Puan', profileCompletionRateLabel: 'Tamamlama Oranı', profileActivityLevelLabel: 'Aktivite Seviyesi',
+        profileDiscoverUsersTitle: 'Kullanıcı Keşfet', profileRefreshBtn: 'Yenile',
+        profileSearchUsersPlaceholder: 'Kullanıcı ara...', profilePrivateMessagesTitle: 'Özel Mesajlar',
+        profilePhotoChangeTitle: 'Fotoğraf değiştir', profilePhotoUploadTitle: 'Fotoğraf yükle',
         profileCompletedLabel: 'Tamamlanan', profileXPLabel: 'Toplam XP', profileStreakLabel: 'En Uzun Seri',
         profileStatusTitle: 'İzleme Durumu', profileActivityTitle: 'Son Aktiviteler',
         profileFavGenresTitle: 'Favori Türler', profileAchievementsTitle: 'Son Başarımlar',
         profileExportTitle: 'Dışa Aktar',
         profileTwitterBtn: "Twitter'da Paylaş", profileCopyBtn: 'Linki Kopyala', profileJSONBtn: 'JSON İndir',
         profileStreakSuffix: 'gün serisi',
+        profileJoinedRecently: 'Yeni katıldı', profileUnknownUser: 'Kullanıcı',
+        profileActivityNew: 'Yeni', profileActivityActive: 'Aktif', profileActivityHardcore: 'Hardcore',
+        droppedLabel: 'Bırakıldı',
+        memberViewProfileBtn: 'Profil', memberMessageBtn: 'Mesaj',
+        dmSelectConversation: 'Bir konuşma seçin',
+        dmComposePlaceholder: 'Mesaj yaz...', dmSendBtn: 'Gönder',
+        dmLoading: 'Yükleniyor...', dmUserNotFound: 'Kullanıcı bulunamadı.',
+        dmNoMessagesYet: 'Henüz mesaj yok.', dmStartConversationHint: 'Soldan bir kullanıcı seçip mesajlaşmaya başlayabilirsiniz.',
+        dmSendFirstMessage: 'Henüz mesaj yok. İlk mesajı gönderin.',
+        dmSignInRequired: 'Mesajlaşma için giriş yapın.',
+        dmUnavailable: 'Özel mesajlaşma şu an kullanılamıyor.',
+        dmServerConfigRequired: 'Sunucu tarafı ayarı gerekiyor: private_messages tablosu.',
+        dmLoadFailed: 'Mesajlar yüklenemedi.', dmErrorPrefix: 'Hata: ',
+        dmSelectUserAndType: 'Kullanıcı seçip mesaj yazın.',
+        dmSendFailedPrefix: 'Mesaj gönderilemedi: ',
         profileDropdownItem: '👤 Profilim', settingsDropdownItem: '⚙️ Ayarlar',
         achievementsDropdownItem: '🏆 Başarımlar',
         // CALENDAR
@@ -302,12 +322,32 @@ const translations = {
         footerDiscover: 'Discover', footerRegister: 'Sign Up', footerHome: 'Home',
         // PROFILE
         profileEditBtn: 'Edit Profile', profileShareBtn: 'Share',
+        profileMsgBoxBtn: 'Message Box',
+        profileAvgRatingLabel: 'Average Rating', profileCompletionRateLabel: 'Completion Rate', profileActivityLevelLabel: 'Activity Level',
+        profileDiscoverUsersTitle: 'Discover Members', profileRefreshBtn: 'Refresh',
+        profileSearchUsersPlaceholder: 'Search users...', profilePrivateMessagesTitle: 'Private Messages',
+        profilePhotoChangeTitle: 'Change photo', profilePhotoUploadTitle: 'Upload photo',
         profileCompletedLabel: 'Completed', profileXPLabel: 'Total XP', profileStreakLabel: 'Longest Streak',
         profileStatusTitle: 'Watch Status', profileActivityTitle: 'Recent Activity',
         profileFavGenresTitle: 'Favorite Genres', profileAchievementsTitle: 'Recent Achievements',
         profileExportTitle: 'Export',
         profileTwitterBtn: 'Share on Twitter', profileCopyBtn: 'Copy Link', profileJSONBtn: 'Download JSON',
         profileStreakSuffix: 'day streak',
+        profileJoinedRecently: 'Recently joined', profileUnknownUser: 'User',
+        profileActivityNew: 'New', profileActivityActive: 'Active', profileActivityHardcore: 'Hardcore',
+        droppedLabel: 'Dropped',
+        memberViewProfileBtn: 'Profile', memberMessageBtn: 'Message',
+        dmSelectConversation: 'Select a conversation',
+        dmComposePlaceholder: 'Type a message...', dmSendBtn: 'Send',
+        dmLoading: 'Loading...', dmUserNotFound: 'No users found.',
+        dmNoMessagesYet: 'No messages yet.', dmStartConversationHint: 'Select a user on the left to start chatting.',
+        dmSendFirstMessage: 'No messages yet. Send the first one.',
+        dmSignInRequired: 'Sign in to use messaging.',
+        dmUnavailable: 'Private messaging is currently unavailable.',
+        dmServerConfigRequired: 'Server-side setup is required: private_messages table.',
+        dmLoadFailed: 'Messages could not be loaded.', dmErrorPrefix: 'Error: ',
+        dmSelectUserAndType: 'Select a user and type a message.',
+        dmSendFailedPrefix: 'Message could not be sent: ',
         profileDropdownItem: '👤 My Profile', settingsDropdownItem: '⚙️ Settings',
         achievementsDropdownItem: '🏆 Achievements',
         // CALENDAR
@@ -467,6 +507,11 @@ function applyLanguage() {
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
         const key = el.getAttribute('data-i18n-placeholder');
         if (translations[_lang]?.[key]) el.placeholder = translations[_lang][key];
+    });
+
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+        const key = el.getAttribute('data-i18n-title');
+        if (translations[_lang]?.[key]) el.title = translations[_lang][key];
     });
 
     const set = (id, key) => { const e=document.getElementById(id); if(e) e.textContent=t(key); };
@@ -725,6 +770,20 @@ function applyLanguage() {
     if (profileEditBtn && profileEditBtn.textContent.trim() !== t('profileEditBtn')) profileEditBtn.textContent = t('profileEditBtn');
     const profileShareBtn = document.querySelector('#profileSection button[onclick*="shareProfile"]');
     if (profileShareBtn) profileShareBtn.textContent = t('profileShareBtn');
+    const profileMsgBoxBtn = document.querySelector('#profileSection button[onclick*="dmMessageInput"]');
+    if (profileMsgBoxBtn) profileMsgBoxBtn.textContent = t('profileMsgBoxBtn');
+
+    const piLabels = document.querySelectorAll('.profile-insight-card .pi-label');
+    const piKeys = ['profileAvgRatingLabel', 'profileCompletionRateLabel', 'profileActivityLevelLabel'];
+    piLabels.forEach((el, i) => { if (piKeys[i]) el.textContent = t(piKeys[i]); });
+
+    const profileDiscoverTitle = document.querySelector('#profileSection .profile-members-block .psb-title');
+    if (profileDiscoverTitle) profileDiscoverTitle.textContent = t('profileDiscoverUsersTitle');
+    const profileRefreshBtn = document.querySelector('#profileSection .profile-members-block button');
+    if (profileRefreshBtn) profileRefreshBtn.textContent = t('profileRefreshBtn');
+
+    const profileDmTitle = document.querySelector('#profileSection .profile-dm-block .psb-title');
+    if (profileDmTitle) profileDmTitle.textContent = t('profilePrivateMessagesTitle');
 
     const profileStatCards = document.querySelectorAll('.profile-stat-card .psc-label');
     const profileStatKeys = [null, null, null, 'profileCompletedLabel', 'profileXPLabel', 'profileStreakLabel'];
@@ -1157,9 +1216,9 @@ function renderProfilePage() {
     const d = dataManager.data;
     const set = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
 
-    set('profileUsername', d.social.name || 'Kullanici');
+    set('profileUsername', d.social.name || t('profileUnknownUser'));
     set('profileEmailDisplay', currentUser.email || '');
-    set('profileBioText', d.social.bio || 'Anime, manga ve webtoon takipcisi');
+    set('profileBioText', d.social.bio || t('bioDefault'));
 
     // Avatar — fotograf veya emoji
     _applyAvatar('profileAvatarLarge', d.social);
@@ -1193,7 +1252,7 @@ function renderProfilePage() {
     const avgRating  = rated.length ? (rated.reduce((s, i) => s + i.rating, 0) / rated.length).toFixed(1) : '—';
     const joinDateText = d.social?.joinDate
         ? new Date(d.social.joinDate).toLocaleDateString(_lang === 'en' ? 'en-GB' : 'tr-TR', { month: 'short', year: 'numeric' })
-        : (_lang === 'en' ? 'Recently joined' : 'Yeni katildi');
+        : t('profileJoinedRecently');
 
     set('profileTotalAnime',    items.filter(i => i.type === 'anime').length);
     set('profileTotalManga',    items.filter(i => i.type === 'manga').length);
@@ -1206,10 +1265,10 @@ function renderProfilePage() {
     set('profileCompletionRate', items.length ? Math.round((completed / items.length) * 100) + '%' : '0%');
 
     const actLevel = (items.length >= 120 || (d.streak?.count || 0) >= 30)
-        ? (_lang === 'en' ? 'Hardcore' : 'Hardcore')
+        ? t('profileActivityHardcore')
         : (items.length >= 45 || (d.streak?.count || 0) >= 10)
-            ? (_lang === 'en' ? 'Active' : 'Aktif')
-            : (_lang === 'en' ? 'New' : 'Yeni');
+            ? t('profileActivityActive')
+            : t('profileActivityNew');
     set('profileActivityLevel', actLevel);
 
     // Durum cubuklari
@@ -1220,7 +1279,7 @@ function renderProfilePage() {
             { label: t('watching_stat'),    count: watching,  color: '#00d4ff' },
             { label: t('completed_stat'),   count: completed, color: '#10b981' },
             { label: t('plantowatch_stat'), count: planned,   color: '#a78bfa' },
-            { label: _lang === 'en' ? 'Dropped' : 'Birakildi', count: dropped, color: '#f87171' },
+            { label: t('droppedLabel'), count: dropped, color: '#f87171' },
         ];
         statusBar.innerHTML = bars.map(b => `
             <div class="status-bar-row">
@@ -1249,7 +1308,7 @@ function renderProfilePage() {
             completed:   t('completed_stat'),
             plantowatch: t('plantowatch_stat'),
             onhold:      t('onhold_stat'),
-            dropped:     _lang === 'en' ? 'Dropped' : 'Birakildi'
+            dropped:     t('droppedLabel')
         };
         if (recent.length === 0) {
             actList.innerHTML = '<div style="color:var(--text-muted);font-size:0.88rem;padding:0.8rem 0;">' + t('noActivity') + '</div>';
@@ -1365,7 +1424,7 @@ function _memberCardHtml(u) {
         ? '<div class="pm-avatar"><img src="' + _escHtml(u.avatar_url) + '" alt="avatar"></div>'
         : '<div class="pm-avatar">' + _escHtml(u.avatar || '👤') + '</div>';
 
-    const safeName = u.name || 'User';
+    const safeName = u.name || t('profileUnknownUser');
     const name = _escHtml(safeName);
     const lvl = u.level || 1;
     const xp = Number(u.xp_total || 0).toLocaleString(_lang === 'en' ? 'en-US' : 'tr-TR');
@@ -1374,8 +1433,8 @@ function _memberCardHtml(u) {
         + avatar
         + '<div class="pm-meta"><div class="pm-name">' + name + '</div><div class="pm-sub">Lv.' + lvl + ' · ' + xp + ' XP</div></div>'
         + '<div class="pm-actions">'
-        + '<button class="pm-action-btn" onclick="openPublicProfile(decodeURIComponent(\'' + _encArg(u.user_id) + '\'),decodeURIComponent(\'' + _encArg(safeName) + '\'))">Profil</button>'
-        + '<button class="pm-action-btn" onclick="openPrivateChatWithUser(decodeURIComponent(\'' + _encArg(u.user_id) + '\'),decodeURIComponent(\'' + _encArg(safeName) + '\'))">Mesaj</button>'
+        + '<button class="pm-action-btn" onclick="openPublicProfile(decodeURIComponent(\'' + _encArg(u.user_id) + '\'),decodeURIComponent(\'' + _encArg(safeName) + '\'))">' + t('memberViewProfileBtn') + '</button>'
+        + '<button class="pm-action-btn" onclick="openPrivateChatWithUser(decodeURIComponent(\'' + _encArg(u.user_id) + '\'),decodeURIComponent(\'' + _encArg(safeName) + '\'))">' + t('memberMessageBtn') + '</button>'
         + '</div></div>';
 }
 
@@ -1389,13 +1448,13 @@ async function renderProfileMemberDirectory(force = false) {
         inp.addEventListener('input', () => renderProfileMemberDirectory(false));
     }
 
-    grid.innerHTML = '<div class="dm-empty">Yukleniyor...</div>';
+    grid.innerHTML = '<div class="dm-empty">' + t('dmLoading') + '</div>';
     const users = await _fetchProfileDirectory(force);
     const q = inp.value.trim().toLowerCase();
     const filtered = q ? users.filter(u => String(u.name || '').toLowerCase().includes(q)) : users;
 
     if (!filtered.length) {
-        grid.innerHTML = '<div class="dm-empty">Kullanici bulunamadi.</div>';
+        grid.innerHTML = '<div class="dm-empty">' + t('dmUserNotFound') + '</div>';
         return;
     }
     grid.innerHTML = filtered.slice(0, 40).map(_memberCardHtml).join('');
@@ -1407,7 +1466,7 @@ async function _checkPrivateDMBackend() {
 
     if (!window.supabaseClient || !currentUser) {
         privateDMState.backendAvailable = false;
-        privateDMState.backendReason = 'Supabase yok.';
+        privateDMState.backendReason = 'Supabase unavailable.';
         return false;
     }
 
@@ -1418,7 +1477,7 @@ async function _checkPrivateDMBackend() {
 
         if (error) {
             privateDMState.backendAvailable = false;
-            privateDMState.backendReason = error.message || 'private_messages table erisilemedi.';
+            privateDMState.backendReason = error.message || 'private_messages table unavailable.';
             return false;
         }
         privateDMState.backendAvailable = true;
@@ -1426,7 +1485,7 @@ async function _checkPrivateDMBackend() {
         return true;
     } catch (e) {
         privateDMState.backendAvailable = false;
-        privateDMState.backendReason = e.message || 'private_messages table erisilemedi.';
+        privateDMState.backendReason = e.message || 'private_messages table unavailable.';
         return false;
     }
 }
@@ -1511,19 +1570,19 @@ function _renderDMThreads() {
     });
 
     if (!threadIds.length) {
-        listEl.innerHTML = '<div class="dm-empty">Henuz mesaj yok.</div>';
+        listEl.innerHTML = '<div class="dm-empty">' + t('dmNoMessagesYet') + '</div>';
         return;
     }
 
     listEl.innerHTML = threadIds.map(id => {
         const rows = byUser[id];
         const last = rows[rows.length - 1];
-        const meta = privateDMState.userIndex[id] || { name: 'User' };
+        const meta = privateDMState.userIndex[id] || { name: t('profileUnknownUser') };
         const isActive = privateDMState.activeUserId === id;
 
         const unread = rows.filter(r => r.receiver_id === uid && r.sender_id === id && !r.read_at).length;
-        return '<div class="dm-thread-item ' + (isActive ? 'active' : '') + '" onclick="openPrivateChatWithUser(decodeURIComponent(\'' + _encArg(id) + '\'),decodeURIComponent(\'' + _encArg(meta.name || 'User') + '\'))">'
-            + '<div class="dm-thread-name">' + _escHtml(meta.name || 'User') + (unread ? ' (' + unread + ')' : '') + '</div>'
+        return '<div class="dm-thread-item ' + (isActive ? 'active' : '') + '" onclick="openPrivateChatWithUser(decodeURIComponent(\'' + _encArg(id) + '\'),decodeURIComponent(\'' + _encArg(meta.name || t('profileUnknownUser')) + '\'))">'
+            + '<div class="dm-thread-name">' + _escHtml(meta.name || t('profileUnknownUser')) + (unread ? ' (' + unread + ')' : '') + '</div>'
             + '<div class="dm-thread-preview">' + _escHtml(_dmMessageText(last)) + '</div>'
             + '</div>';
     }).join('');
@@ -1537,13 +1596,13 @@ function _renderDMConversation() {
     const uid = currentUser?.uid || currentUser?.id;
     const active = privateDMState.activeUserId;
     if (!active) {
-        headEl.textContent = 'Bir konusma secin';
-        msgEl.innerHTML = '<div class="dm-empty">Soldan bir kullanici secip mesajlasmaya baslayabilirsiniz.</div>';
+        headEl.textContent = t('dmSelectConversation');
+        msgEl.innerHTML = '<div class="dm-empty">' + t('dmStartConversationHint') + '</div>';
         return;
     }
 
-    const user = privateDMState.userIndex[active] || { name: 'User' };
-    headEl.textContent = user.name || 'User';
+    const user = privateDMState.userIndex[active] || { name: t('profileUnknownUser') };
+    headEl.textContent = user.name || t('profileUnknownUser');
 
     const rows = privateDMState.rows.filter(r => {
         const sid = r.sender_id;
@@ -1552,7 +1611,7 @@ function _renderDMConversation() {
     });
 
     if (!rows.length) {
-        msgEl.innerHTML = '<div class="dm-empty">Henuz mesaj yok. Ilk mesaji gonderin.</div>';
+        msgEl.innerHTML = '<div class="dm-empty">' + t('dmSendFirstMessage') + '</div>';
         return;
     }
 
@@ -1599,16 +1658,16 @@ async function renderPrivateMessagingPanel() {
     }
 
     if (isGuest || !currentUser) {
-        threadEl.innerHTML = '<div class="dm-empty">Mesajlasma icin giris yapin.</div>';
-        msgEl.innerHTML = '<div class="dm-empty">Mesajlasma icin giris yapin.</div>';
+        threadEl.innerHTML = '<div class="dm-empty">' + t('dmSignInRequired') + '</div>';
+        msgEl.innerHTML = '<div class="dm-empty">' + t('dmSignInRequired') + '</div>';
         return;
     }
 
     const available = await _checkPrivateDMBackend();
     if (!available) {
-        const reason = privateDMState.backendReason || 'private_messages table bulunamadi.';
-        threadEl.innerHTML = '<div class="dm-empty">Ozel mesajlasma su an kullanilamiyor.</div>';
-        msgEl.innerHTML = '<div class="dm-empty">Sunucu tarafi ayari gerekiyor: private_messages tablosu. (' + _escHtml(reason) + ')</div>';
+        const reason = privateDMState.backendReason || 'private_messages table not found.';
+        threadEl.innerHTML = '<div class="dm-empty">' + t('dmUnavailable') + '</div>';
+        msgEl.innerHTML = '<div class="dm-empty">' + t('dmServerConfigRequired') + ' (' + _escHtml(reason) + ')</div>';
         return;
     }
 
@@ -1619,8 +1678,8 @@ async function renderPrivateMessagingPanel() {
         _renderDMConversation();
         await _markDMReadForActive();
     } catch (e) {
-        threadEl.innerHTML = '<div class="dm-empty">Mesajlar yuklenemedi.</div>';
-        msgEl.innerHTML = '<div class="dm-empty">Hata: ' + _escHtml(e.message) + '</div>';
+        threadEl.innerHTML = '<div class="dm-empty">' + t('dmLoadFailed') + '</div>';
+        msgEl.innerHTML = '<div class="dm-empty">' + t('dmErrorPrefix') + _escHtml(e.message) + '</div>';
     }
 }
 
@@ -1638,7 +1697,7 @@ window.openPrivateChatWithUser = async function(userId, name) {
     if (!privateDMState.userIndex[userId]) {
         privateDMState.userIndex[userId] = {
             user_id: userId,
-            name: name || 'User',
+            name: name || t('profileUnknownUser'),
             avatar: '👤',
             avatar_url: ''
         };
@@ -1656,7 +1715,7 @@ window.sendCurrentDMMessage = async function() {
     const text = input ? input.value.trim() : '';
 
     if (!uid || !targetId || !text) {
-        showNotification(_lang === 'en' ? 'Select a user and type a message.' : 'Kullanici secip mesaj yazin.', 'info');
+        showNotification(t('dmSelectUserAndType'), 'info');
         return;
     }
 
@@ -1678,7 +1737,7 @@ window.sendCurrentDMMessage = async function() {
     }
 
     if (!sent) {
-        showNotification((_lang === 'en' ? 'Message could not be sent: ' : 'Mesaj gonderilemedi: ') + (lastErr?.message || 'Unknown error'), 'error');
+        showNotification(t('dmSendFailedPrefix') + (lastErr?.message || 'Unknown error'), 'error');
         return;
     }
 
