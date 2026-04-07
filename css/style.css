@@ -9,16 +9,16 @@
     --bg-secondary: #171a20;
     --bg-card: #1d2129;
     --bg-hover: #252b35;
-    --accent-primary: #b5becd;
-    --accent-secondary: #909aaa;
-    --accent-tertiary: #778395;
+    --accent-primary: #b3122f;
+    --accent-secondary: #d91f43;
+    --accent-tertiary: #7a1024;
     --accent-gold: #fbbf24;
     --text-primary: #e8ecf2;
     --text-secondary: #a5afbd;
     --text-muted: #687384;
     --border: rgba(232,236,242,0.08);
     --border-hover: rgba(232,236,242,0.16);
-    --success: #a6afbe;
+    --success: #d91f43;
     --warning: #f59e0b;
     --danger: #ef4444;
     --shadow: 0 8px 32px rgba(0,0,0,0.4);
@@ -2644,12 +2644,12 @@ nav {
     border: 1px solid transparent !important;
 }
 
-.nav-tab:hover { color: #dbe2ec !important; background: rgba(176,186,201,0.10) !important; }
+.nav-tab:hover { color: #f3d9de !important; background: rgba(217,31,67,0.14) !important; }
 
 .nav-tab.active {
-    color: #f4f7fc !important;
-    background: rgba(198,207,220,0.17) !important;
-    border-color: rgba(198,207,220,0.34) !important;
+    color: #fff2f5 !important;
+    background: rgba(179,18,47,0.30) !important;
+    border-color: rgba(217,31,67,0.42) !important;
 }
 
 /* ----------------------------------------------------------------
@@ -2912,8 +2912,8 @@ nav {
 
 .psb-dot {
     width: 6px !important; height: 6px !important;
-    background: #aeb7c6 !important; border-radius: 50% !important;
-    box-shadow: 0 0 6px rgba(174,183,198,0.75) !important;
+    background: #d91f43 !important; border-radius: 50% !important;
+    box-shadow: 0 0 6px rgba(217,31,67,0.75) !important;
     animation: psbPulse 2s ease-in-out infinite !important;
     display: block !important;
 }
@@ -2970,9 +2970,9 @@ nav {
 .sh-more {
     font-size: 0.75rem !important;
     font-weight: 700 !important;
-    color: #cfd7e3 !important;
-    background: rgba(178,188,201,0.11) !important;
-    border: 1px solid rgba(178,188,201,0.22) !important;
+    color: #ffd6df !important;
+    background: rgba(179,18,47,0.18) !important;
+    border: 1px solid rgba(217,31,67,0.28) !important;
     border-radius: 7px !important;
     padding: 0.24rem 0.65rem !important;
     cursor: pointer !important;
@@ -2981,7 +2981,7 @@ nav {
 }
 
 .sh-more:hover {
-    background: rgba(178,188,201,0.18) !important;
+    background: rgba(217,31,67,0.25) !important;
     transform: translateX(2px) !important;
 }
 
@@ -3147,8 +3147,8 @@ nav {
     content: '' !important;
     position: absolute !important; inset: 0 !important;
     background:
-        radial-gradient(ellipse 50% 70% at 100% 0%, rgba(214,222,235,0.08) 0%, transparent 55%),
-        radial-gradient(ellipse 35% 45% at 0% 100%, rgba(168,178,193,0.08) 0%, transparent 50%) !important;
+        radial-gradient(ellipse 50% 70% at 100% 0%, rgba(217,31,67,0.11) 0%, transparent 55%),
+        radial-gradient(ellipse 35% 45% at 0% 100%, rgba(122,16,36,0.13) 0%, transparent 50%) !important;
     pointer-events: none !important;
 }
 
@@ -3167,7 +3167,7 @@ nav {
     line-height: 1 !important;
 }
 
-.features-sub { color: #8e98a8 !important; font-size: 0.85rem !important; }
+.features-sub { color: #a79197 !important; font-size: 0.85rem !important; }
 
 .features-grid {
     display: grid !important;
@@ -3193,13 +3193,13 @@ nav {
 .feature-card::before {
     content: '' !important;
     position: absolute !important; inset: 0 !important;
-    background: linear-gradient(135deg, rgba(183,193,208,0.10), transparent 62%) !important;
+    background: linear-gradient(135deg, rgba(217,31,67,0.14), transparent 62%) !important;
     opacity: 0 !important; transition: opacity 0.28s !important;
     border-radius: 16px !important;
 }
 
 .feature-card:hover {
-    border-color: rgba(187,197,212,0.34) !important;
+    border-color: rgba(217,31,67,0.34) !important;
     transform: translateY(-3px) !important;
     box-shadow: 0 14px 36px rgba(0,0,0,0.42) !important;
 }
@@ -3209,15 +3209,15 @@ nav {
 .feature-icon {
     font-size: 1.5rem !important;
     width: 48px !important; height: 48px !important; min-width: 48px !important;
-    background: rgba(183,193,208,0.10) !important;
-    border: 1px solid rgba(183,193,208,0.22) !important;
+    background: rgba(217,31,67,0.11) !important;
+    border: 1px solid rgba(217,31,67,0.24) !important;
     border-radius: 13px !important;
     display: flex !important; align-items: center !important; justify-content: center !important;
     transition: all 0.28s !important;
 }
 
 .feature-card:hover .feature-icon {
-    background: rgba(183,193,208,0.20) !important;
+    background: rgba(217,31,67,0.18) !important;
     transform: scale(1.08) rotate(-4deg) !important;
 }
 
@@ -3230,7 +3230,7 @@ nav {
 
 .feature-arrow {
     margin-left: auto !important; font-size: 0.9rem !important;
-    color: #c4ccd8 !important; opacity: 0 !important;
+    color: #ff8ea3 !important; opacity: 0 !important;
     transform: translateX(-5px) !important; transition: all 0.22s !important;
     align-self: center !important; flex-shrink: 0 !important;
 }
@@ -3259,7 +3259,7 @@ nav {
 }
 
 .community-card:hover {
-    border-color: rgba(184,194,209,0.24) !important;
+    border-color: rgba(217,31,67,0.24) !important;
     transform: translateY(-3px) !important;
     box-shadow: 0 12px 32px rgba(0,0,0,0.35) !important;
 }
@@ -3280,7 +3280,7 @@ nav {
 .csi-label { font-size: 0.8rem !important; color: #6b7280 !important; }
 .csi-val { font-family: 'Bebas Neue', cursive !important; font-size: 1.15rem !important; color: #dbe1eb !important; letter-spacing: 0.5px !important; }
 
-.join-card { background: linear-gradient(155deg, rgba(177,187,202,0.10), rgba(118,128,142,0.10)) !important; border-color: rgba(186,196,211,0.22) !important; }
+.join-card { background: linear-gradient(155deg, rgba(179,18,47,0.16), rgba(122,16,36,0.12)) !important; border-color: rgba(217,31,67,0.24) !important; }
 .join-card-icon { font-size: 2.4rem !important; margin-bottom: 0.6rem !important; }
 .join-badges { display: flex !important; gap: 0.4rem !important; flex-wrap: wrap !important; margin-top: 0.9rem !important; }
 .jb { background: rgba(255,255,255,0.04) !important; border: 1px solid rgba(255,255,255,0.07) !important; border-radius: 100px !important; padding: 0.18rem 0.65rem !important; font-size: 0.66rem !important; font-weight: 700 !important; color: #4b5563 !important; }
@@ -4362,13 +4362,13 @@ header {
 
 .anilist-banner::before {
     background:
-        radial-gradient(ellipse 60% 80% at 0% 50%, rgba(191,201,214,0.14) 0%, transparent 55%),
-        radial-gradient(ellipse 45% 65% at 100% 15%, rgba(155,165,179,0.12) 0%, transparent 55%),
-        radial-gradient(ellipse 35% 50% at 65% 100%, rgba(122,132,147,0.10) 0%, transparent 55%) !important;
+        radial-gradient(ellipse 60% 80% at 0% 50%, rgba(217,31,67,0.17) 0%, transparent 55%),
+        radial-gradient(ellipse 45% 65% at 100% 15%, rgba(179,18,47,0.14) 0%, transparent 55%),
+        radial-gradient(ellipse 35% 50% at 65% 100%, rgba(122,16,36,0.12) 0%, transparent 55%) !important;
 }
 
 .banner-title .gradient-text {
-    background: linear-gradient(135deg, #eef2f8 0%, #c5cedb 55%, #909aaa 100%) !important;
+    background: linear-gradient(135deg, #ffe7ec 0%, #ff7d98 55%, #b3122f 100%) !important;
     -webkit-background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
     background-clip: text !important;
@@ -4376,7 +4376,7 @@ header {
 
 .banner-actions .btn-primary,
 .banner-actions button.btn-primary {
-    background: linear-gradient(135deg, #8f99a9, #b3bccb) !important;
+    background: linear-gradient(135deg, #8f0f26, #d91f43) !important;
 }
 
 .discover-hero {
@@ -4387,18 +4387,18 @@ header {
 
 .discover-hero-bg {
     background:
-        radial-gradient(ellipse 50% 85% at 0% 50%, rgba(191,201,214,0.13) 0%, transparent 55%),
-        radial-gradient(ellipse 40% 55% at 100% 20%, rgba(155,165,179,0.12) 0%, transparent 55%) !important;
+        radial-gradient(ellipse 50% 85% at 0% 50%, rgba(217,31,67,0.15) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 55% at 100% 20%, rgba(122,16,36,0.12) 0%, transparent 55%) !important;
 }
 
 .discover-hero-title {
-    background: linear-gradient(135deg, #f3f6fb 30%, #aab4c3 100%) !important;
+    background: linear-gradient(135deg, #ffeef2 30%, #cf2a4d 100%) !important;
     -webkit-background-clip: text !important;
     -webkit-text-fill-color: transparent !important;
     background-clip: text !important;
 }
 
 .discover-tab.active {
-    background: linear-gradient(135deg, rgba(177,187,201,0.24), rgba(134,144,159,0.20)) !important;
-    border-color: rgba(177,187,201,0.34) !important;
+    background: linear-gradient(135deg, rgba(179,18,47,0.28), rgba(122,16,36,0.20)) !important;
+    border-color: rgba(217,31,67,0.34) !important;
 }
