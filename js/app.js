@@ -41,6 +41,37 @@ let trendingContent = [];
 let seasonContent = [];
 let contentLoaded = false;
 let contentLoading = false;
+let initialRouteRestored = false;
+
+function getSectionFromHash() {
+    const raw = String(window.location.hash || '').replace(/^#/, '').trim().toLowerCase();
+    if (!raw) return null;
+    const valid = ['home', 'discover', 'library', 'calendar', 'analytics', 'ai', 'achievements', 'profile', 'translate'];
+    if (valid.includes(raw)) return raw;
+    return null;
+}
+
+function getPreferredSection() {
+    const fromHash = getSectionFromHash();
+    const fromStorage = sessionStorage.getItem('onilist:lastSection');
+    const preferred = fromHash || fromStorage || 'home';
+
+    if (isGuest) {
+        const guestAllowed = ['home', 'discover', 'translate'];
+        return guestAllowed.includes(preferred) ? preferred : 'home';
+    }
+    return preferred;
+}
+
+function restoreInitialRouteIfNeeded() {
+    if (initialRouteRestored) return;
+    initialRouteRestored = true;
+
+    const preferred = getPreferredSection();
+    if (preferred && preferred !== 'home') {
+        switchSection(preferred, false);
+    }
+}
 
 // ===== iNiT =====
 function initializeApp() {
@@ -80,6 +111,9 @@ function initializeApp() {
 
     // Platform settings yukle (restrictions)
     loadPlatformSettings();
+
+    // F5 sonrasi kullaniciyi hash/session'daki son bolume geri dondur.
+    restoreInitialRouteIfNeeded();
 
     // Duyurulari kontrol et
     setTimeout(function() {
@@ -192,6 +226,7 @@ function _renderSection(section, scrollY = 0) {
 function switchSection(section, pushHistory = true) {
     previousSection = currentSection;
     currentSection = section;
+    sessionStorage.setItem('onilist:lastSection', section);
     _renderSection(section);
 
     if (pushHistory && section !== 'detail') {
@@ -203,7 +238,7 @@ function switchSection(section, pushHistory = true) {
 // Tarayici geri/ileri butonlari
 window.addEventListener('popstate', function(e) {
     const state = e.state || {};
-    const section = state.section || 'home';
+    const section = state.section || getSectionFromHash() || 'home';
 
     if (currentSection === 'detail') {
         const fromSection = state.section || previousSection || 'discover';

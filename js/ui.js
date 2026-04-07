@@ -2161,7 +2161,30 @@ function _renderAITasteCard(myItems, topGenres) {
     }
 }
 
-function refreshAIAnalysis() { renderAISection(); }
+async function refreshAIAnalysis() {
+    showNotification(_lang === 'en' ? 'Refreshing AI data... ⚡' : 'AI verisi yenileniyor... ⚡', 'info');
+
+    // AI onerilerinin gercekten degismesi icin tum icerik cache'lerini temizle.
+    const keysToClear = ['all_v7', 'all_v7_fast', 'season_v7', 'jk_season', 'al_seasonal'];
+    keysToClear.forEach(k => {
+        try { APICache.clear(k); } catch(e) {}
+    });
+
+    try {
+        contentLoaded = false;
+        contentLoading = false;
+        allContent = [];
+        trendingContent = [];
+        seasonContent = [];
+
+        await loadContentFromAPI();
+        renderAISection();
+        showNotification(_lang === 'en' ? 'AI fully refreshed! 🤖' : 'AI tamamen yenilendi! 🤖', 'success');
+    } catch (e) {
+        console.error('AI hard refresh failed:', e);
+        showNotification(_lang === 'en' ? 'AI refresh failed.' : 'AI yenileme basarisiz.', 'error');
+    }
+}
 
 
 
