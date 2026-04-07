@@ -3585,7 +3585,7 @@ header {
 .ai-hero {
     position: relative;
     background: #081018;
-    border: 1px solid rgba(0,194,168,0.2);
+    border: 1px solid rgba(217,31,67,0.24);
     border-radius: 22px;
     margin: 0 0 1.6rem;
     overflow: hidden;
@@ -3599,9 +3599,9 @@ header {
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(ellipse 58% 84% at 0% 38%, rgba(255,90,31,0.32) 0%, transparent 56%),
-        radial-gradient(ellipse 44% 62% at 100% 28%, rgba(0,194,168,0.2) 0%, transparent 58%),
-        radial-gradient(ellipse 34% 50% at 42% 100%, rgba(255,193,7,0.14) 0%, transparent 58%);
+        radial-gradient(ellipse 58% 84% at 0% 38%, rgba(217,31,67,0.34) 0%, transparent 56%),
+        radial-gradient(ellipse 44% 62% at 100% 28%, rgba(179,18,47,0.24) 0%, transparent 58%),
+        radial-gradient(ellipse 34% 50% at 42% 100%, rgba(122,16,36,0.18) 0%, transparent 58%);
     animation: aiHeroBg 11s ease-in-out infinite alternate;
     pointer-events: none;
 }
@@ -3615,8 +3615,8 @@ header {
     position: absolute;
     inset: 0;
     background-image:
-        linear-gradient(rgba(255,90,31,0.08) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,90,31,0.08) 1px, transparent 1px);
+        linear-gradient(rgba(217,31,67,0.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(217,31,67,0.12) 1px, transparent 1px);
     background-size: 42px 42px;
     pointer-events: none;
     mask-image: radial-gradient(ellipse at 24% 54%, black 22%, transparent 76%);
@@ -3639,9 +3639,9 @@ header {
     display: inline-flex;
     align-items: center;
     gap: 0.42rem;
-    background: rgba(255,90,31,0.16);
-    border: 1px solid rgba(255,90,31,0.35);
-    color: #ffd7c8;
+    background: rgba(179,18,47,0.24);
+    border: 1px solid rgba(217,31,67,0.42);
+    color: #ffd8e0;
     border-radius: 100px;
     padding: 0.34rem 0.9rem;
     font-size: 0.73rem;
@@ -3660,7 +3660,7 @@ header {
 }
 
 .ai-hero-accent {
-    background: linear-gradient(130deg, #ff5a1f, #ffc107 48%, #00c2a8 100%);
+    background: linear-gradient(130deg, #ff9ab0, #d91f43 52%, #7a1024 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -3679,23 +3679,23 @@ header {
 .ai-btn-primary {
     position: relative;
     overflow: hidden;
-    background: linear-gradient(130deg, #ff5a1f, #ff7a18 44%, #ffc107);
+    background: linear-gradient(130deg, #7a1024, #b3122f 44%, #d91f43);
     border: none;
     border-radius: 12px;
     padding: 0.84rem 1.55rem;
     font-size: 0.9rem;
     font-weight: 800;
-    color: #1d1409;
+    color: #ffe7ec;
     cursor: pointer;
     font-family: 'DM Sans', sans-serif;
-    box-shadow: 0 10px 30px rgba(255,90,31,0.38);
+    box-shadow: 0 10px 30px rgba(179,18,47,0.42);
     transition: all 0.25s;
     letter-spacing: 0.2px;
 }
 
 .ai-btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 15px 42px rgba(255,90,31,0.5);
+    box-shadow: 0 15px 42px rgba(217,31,67,0.52);
 }
 
 .ai-btn-shine {
@@ -3711,21 +3711,21 @@ header {
 .ai-btn-primary:hover .ai-btn-shine { left: 150%; }
 
 .ai-btn-ghost {
-    background: rgba(0,194,168,0.08);
-    border: 1px solid rgba(0,194,168,0.28);
+    background: rgba(179,18,47,0.1);
+    border: 1px solid rgba(217,31,67,0.3);
     border-radius: 12px;
     padding: 0.84rem 1.3rem;
     font-size: 0.87rem;
     font-weight: 700;
-    color: #b8fbf0;
+    color: #ffc8d3;
     cursor: pointer;
     font-family: 'DM Sans', sans-serif;
     transition: all 0.24s;
 }
 
 .ai-btn-ghost:hover {
-    background: rgba(0,194,168,0.16);
-    color: #e8fffb;
+    background: rgba(217,31,67,0.18);
+    color: #ffe6eb;
     transform: translateY(-2px);
 }
 
@@ -3746,7 +3746,7 @@ header {
 .ai-orb-1 {
     width: 122px;
     height: 122px;
-    background: rgba(255,90,31,0.32);
+    background: rgba(217,31,67,0.32);
     top: 11%;
     left: 8%;
 }
@@ -3754,7 +3754,7 @@ header {
 .ai-orb-2 {
     width: 84px;
     height: 84px;
-    background: rgba(0,194,168,0.24);
+    background: rgba(122,16,36,0.26);
     bottom: 7%;
     right: 4%;
     animation-delay: -2.45s;
@@ -3769,18 +3769,18 @@ header {
     position: absolute;
     inset: 0;
     border-radius: 50%;
-    border: 2px solid rgba(255,193,7,0.34);
+    border: 2px solid rgba(217,31,67,0.4);
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255,193,7,0.08);
+    background: rgba(179,18,47,0.15);
     backdrop-filter: blur(10px);
     animation: ringPulse 3s ease-in-out infinite;
 }
 
 @keyframes ringPulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(255,193,7,0.3); }
-    50% { box-shadow: 0 0 0 12px rgba(255,193,7,0); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(217,31,67,0.3); }
+    50% { box-shadow: 0 0 0 12px rgba(217,31,67,0); }
 }
 
 .ai-stat-ring-inner { text-align: center; }
@@ -3790,7 +3790,7 @@ header {
     font-family: 'Bebas Neue', cursive;
     font-size: 2.8rem;
     letter-spacing: 2px;
-    color: #ffd579;
+    color: #ffb6c5;
     line-height: 1;
 }
 
@@ -3824,13 +3824,13 @@ header {
 
 .ai-dash-card:hover {
     transform: translateY(-4px);
-    border-color: rgba(255,90,31,0.3);
+    border-color: rgba(217,31,67,0.34);
     box-shadow: 0 14px 32px rgba(0,0,0,0.42);
 }
 
 .ai-dash-highlight {
-    background: rgba(0,194,168,0.08);
-    border-color: rgba(0,194,168,0.3);
+    background: rgba(179,18,47,0.16);
+    border-color: rgba(217,31,67,0.34);
 }
 
 .ai-dash-icon {
@@ -3857,8 +3857,8 @@ header {
     display: block;
 }
 
-.ai-dash-accent { color: #ffc107 !important; }
-.ai-dash-green { color: #00c2a8 !important; }
+.ai-dash-accent { color: #ff8ea3 !important; }
+.ai-dash-green { color: #d91f43 !important; }
 
 .ai-dash-bar {
     height: 3px;
@@ -3870,7 +3870,7 @@ header {
 
 .ai-dash-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, #ff5a1f, #ffc107, #00c2a8);
+    background: linear-gradient(90deg, #7a1024, #b3122f, #d91f43);
     border-radius: 2px;
     transition: width 1s ease;
 }
@@ -3881,15 +3881,15 @@ header {
     right: 0.6rem;
     width: 6px;
     height: 6px;
-    background: #00c2a8;
+    background: #d91f43;
     border-radius: 50%;
-    box-shadow: 0 0 6px #00c2a8;
+    box-shadow: 0 0 6px #d91f43;
     animation: psbPulse 2s ease-in-out infinite;
 }
 
 .ai-taste-card {
     background: #101922;
-    border: 1px solid rgba(255,90,31,0.24);
+    border: 1px solid rgba(217,31,67,0.3);
     border-radius: 18px;
     padding: 1.55rem;
     margin-bottom: 1.8rem;
@@ -3904,7 +3904,7 @@ header {
     left: 0;
     right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255,90,31,0.58), transparent);
+    background: linear-gradient(90deg, transparent, rgba(217,31,67,0.62), transparent);
 }
 
 .ai-taste-header {
@@ -3918,8 +3918,8 @@ header {
     font-size: 1.55rem;
     width: 44px;
     height: 44px;
-    background: rgba(255,90,31,0.12);
-    border: 1px solid rgba(255,90,31,0.28);
+    background: rgba(179,18,47,0.16);
+    border: 1px solid rgba(217,31,67,0.3);
     border-radius: 12px;
     display: flex;
     align-items: center;
@@ -3941,9 +3941,9 @@ header {
 
 .ai-taste-badge {
     margin-left: auto;
-    background: rgba(0,194,168,0.12);
-    border: 1px solid rgba(0,194,168,0.35);
-    color: #7af0dc;
+    background: rgba(179,18,47,0.18);
+    border: 1px solid rgba(217,31,67,0.36);
+    color: #ff9eb1;
     border-radius: 100px;
     padding: 0.2rem 0.7rem;
     font-size: 0.66rem;
@@ -3958,9 +3958,9 @@ header {
     content: '';
     width: 5px;
     height: 5px;
-    background: #00c2a8;
+    background: #d91f43;
     border-radius: 50%;
-    box-shadow: 0 0 5px #00c2a8;
+    box-shadow: 0 0 5px #d91f43;
     animation: psbPulse 2s ease-in-out infinite;
 }
 
@@ -3978,9 +3978,9 @@ header {
 }
 
 .ai-genre-tag {
-    background: rgba(255,193,7,0.12);
-    border: 1px solid rgba(255,193,7,0.32);
-    color: #ffde88;
+    background: rgba(179,18,47,0.16);
+    border: 1px solid rgba(217,31,67,0.34);
+    color: #ffb4c3;
     border-radius: 100px;
     padding: 0.25rem 0.75rem;
     font-size: 0.72rem;
@@ -4011,16 +4011,16 @@ header {
 .ai-section-dot {
     width: 7px;
     height: 7px;
-    background: #ff5a1f;
+    background: #d91f43;
     border-radius: 50%;
-    box-shadow: 0 0 8px #ff5a1f;
+    box-shadow: 0 0 8px #d91f43;
     flex-shrink: 0;
     animation: psbPulse 2.5s ease-in-out infinite;
 }
 
 .ai-section-dot-purple {
-    background: #00c2a8;
-    box-shadow: 0 0 8px #00c2a8;
+    background: #b3122f;
+    box-shadow: 0 0 8px #b3122f;
 }
 
 .ai-section-sub {
@@ -4033,7 +4033,7 @@ header {
     text-align: center;
     padding: 3.7rem 2rem;
     background: #101922;
-    border: 1px dashed rgba(255,90,31,0.26);
+    border: 1px dashed rgba(217,31,67,0.34);
     border-radius: 20px;
     margin-bottom: 1.8rem;
 }
