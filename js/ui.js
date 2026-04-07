@@ -1185,6 +1185,9 @@ function renderProfilePage() {
     const dropped    = items.filter(i => i.status === 'dropped').length;
     const rated      = items.filter(i => i.rating);
     const avgRating  = rated.length ? (rated.reduce((s, i) => s + i.rating, 0) / rated.length).toFixed(1) : '—';
+    const joinDateText = d.social?.joinDate
+        ? new Date(d.social.joinDate).toLocaleDateString(_lang === 'en' ? 'en-GB' : 'tr-TR', { month: 'short', year: 'numeric' })
+        : (_lang === 'en' ? 'Recently joined' : 'Yeni katildi');
 
     set('profileTotalAnime',    items.filter(i => i.type === 'anime').length);
     set('profileTotalManga',    items.filter(i => i.type === 'manga').length);
@@ -1192,6 +1195,16 @@ function renderProfilePage() {
     set('profileCompletedTotal', completed);
     set('profileStreakVal',     d.streak?.longest || d.streak?.count || 0);
     set('profileXPTotal',      d.xp?.total || 0);
+    set('profileJoinBadge', joinDateText);
+    set('profileAvgRating', avgRating);
+    set('profileCompletionRate', items.length ? Math.round((completed / items.length) * 100) + '%' : '0%');
+
+    const actLevel = (items.length >= 120 || (d.streak?.count || 0) >= 30)
+        ? (_lang === 'en' ? 'Hardcore' : 'Hardcore')
+        : (items.length >= 45 || (d.streak?.count || 0) >= 10)
+            ? (_lang === 'en' ? 'Active' : 'Aktif')
+            : (_lang === 'en' ? 'New' : 'Yeni');
+    set('profileActivityLevel', actLevel);
 
     // Durum cubuklari
     const statusBar = document.getElementById('profileStatusBars');
@@ -1286,7 +1299,386 @@ function renderProfilePage() {
                 </div>`).join('')
             : '<div style="color:var(--text-muted);font-size:0.88rem;">' + t('noAchievements') + '</div>';
     }
+
+    renderProfileMemberDirectory();
+    renderPrivateMessagingPanel();
 }
+
+let profileDirectoryCache = [];
+let profileDirectoryLoadedAt = 0;
+let profileDirectoryLoading = false;
+
+const privateDMState = {
+    backendChecked: false,
+    backendAvailable: false,
+    backendReason: '',
+    rows: [],
+    activeUserId: null,
+    userIndex: {}
+};
+
+function _escHtml(str) {
+    return String(str || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+}
+
+function _encArg(str) {
+    return encodeURIComponent(String(str || ''));
+}
+
+async function _fetchProfileDirectory(force = false) {
+    const now = Date.now();
+    if (!force && profileDirectoryCache.length > 0 && (now - profileDirectoryLoadedAt) < 120000) {
+        return profileDirectoryCache;
+    }
+    if (profileDirectoryLoading || !window.supabaseClient) return profileDirectoryCache;
+
+    profileDirectoryLoading = true;
+    try {
+        const { data, error } = await window.supabaseClient
+            .from('public_leaderboard')
+            .select('user_id,name,avatar,avatar_url,level,xp_total')
+            .order('xp_total', { ascending: false })
+            .limit(80);
+
+        if (error) throw error;
+
+        const myId = currentUser?.uid || currentUser?.id;
+        profileDirectoryCache = (data || []).filter(u => u.user_id && u.user_id !== myId);
+        profileDirectoryLoadedAt = Date.now();
+        return profileDirectoryCache;
+    } catch (e) {
+        console.warn('Profile directory fetch error:', e.message);
+        return profileDirectoryCache;
+    } finally {
+        profileDirectoryLoading = false;
+    }
+}
+
+function _memberCardHtml(u) {
+    const avatar = u.avatar_url
+        ? '<div class="pm-avatar"><img src="' + _escHtml(u.avatar_url) + '" alt="avatar"></div>'
+        : '<div class="pm-avatar">' + _escHtml(u.avatar || '👤') + '</div>';
+
+    const safeName = u.name || 'User';
+    const name = _escHtml(safeName);
+    const lvl = u.level || 1;
+    const xp = Number(u.xp_total || 0).toLocaleString(_lang === 'en' ? 'en-US' : 'tr-TR');
+
+    return '<div class="profile-member-card">'
+        + avatar
+        + '<div class="pm-meta"><div class="pm-name">' + name + '</div><div class="pm-sub">Lv.' + lvl + ' · ' + xp + ' XP</div></div>'
+        + '<div class="pm-actions">'
+        + '<button class="pm-action-btn" onclick="openPublicProfile(decodeURIComponent(\'' + _encArg(u.user_id) + '\'),decodeURIComponent(\'' + _encArg(safeName) + '\'))">Profil</button>'
+        + '<button class="pm-action-btn" onclick="openPrivateChatWithUser(decodeURIComponent(\'' + _encArg(u.user_id) + '\'),decodeURIComponent(\'' + _encArg(safeName) + '\'))">Mesaj</button>'
+        + '</div></div>';
+}
+
+async function renderProfileMemberDirectory(force = false) {
+    const grid = document.getElementById('profileMemberGrid');
+    const inp = document.getElementById('profileMemberSearch');
+    if (!grid || !inp) return;
+
+    if (!inp.dataset.bound) {
+        inp.dataset.bound = '1';
+        inp.addEventListener('input', () => renderProfileMemberDirectory(false));
+    }
+
+    grid.innerHTML = '<div class="dm-empty">Yukleniyor...</div>';
+    const users = await _fetchProfileDirectory(force);
+    const q = inp.value.trim().toLowerCase();
+    const filtered = q ? users.filter(u => String(u.name || '').toLowerCase().includes(q)) : users;
+
+    if (!filtered.length) {
+        grid.innerHTML = '<div class="dm-empty">Kullanici bulunamadi.</div>';
+        return;
+    }
+    grid.innerHTML = filtered.slice(0, 40).map(_memberCardHtml).join('');
+}
+
+async function _checkPrivateDMBackend() {
+    if (privateDMState.backendChecked) return privateDMState.backendAvailable;
+    privateDMState.backendChecked = true;
+
+    if (!window.supabaseClient || !currentUser) {
+        privateDMState.backendAvailable = false;
+        privateDMState.backendReason = 'Supabase yok.';
+        return false;
+    }
+
+    try {
+        const { error } = await window.supabaseClient
+            .from('private_messages')
+            .select('id', { head: true, count: 'exact' });
+
+        if (error) {
+            privateDMState.backendAvailable = false;
+            privateDMState.backendReason = error.message || 'private_messages table erisilemedi.';
+            return false;
+        }
+        privateDMState.backendAvailable = true;
+        privateDMState.backendReason = '';
+        return true;
+    } catch (e) {
+        privateDMState.backendAvailable = false;
+        privateDMState.backendReason = e.message || 'private_messages table erisilemedi.';
+        return false;
+    }
+}
+
+async function _loadPrivateDMRows() {
+    const uid = currentUser?.uid || currentUser?.id;
+    if (!uid || !window.supabaseClient) return [];
+
+    const { data, error } = await window.supabaseClient
+        .from('private_messages')
+        .select('*')
+        .or('sender_id.eq.' + uid + ',receiver_id.eq.' + uid)
+        .order('created_at', { ascending: true })
+        .limit(600);
+
+    if (error) throw error;
+    return data || [];
+}
+
+async function _buildDMUserIndex(rows) {
+    const ids = new Set();
+    const uid = currentUser?.uid || currentUser?.id;
+    rows.forEach(r => {
+        const sid = r.sender_id;
+        const rid = r.receiver_id;
+        if (sid && sid !== uid) ids.add(sid);
+        if (rid && rid !== uid) ids.add(rid);
+    });
+
+    const index = {};
+    (profileDirectoryCache || []).forEach(u => {
+        if (u.user_id) index[u.user_id] = u;
+    });
+
+    const missing = [...ids].filter(id => !index[id]);
+    if (missing.length && window.supabaseClient) {
+        const { data } = await window.supabaseClient
+            .from('public_leaderboard')
+            .select('user_id,name,avatar,avatar_url,level,xp_total')
+            .in('user_id', missing);
+        (data || []).forEach(u => { index[u.user_id] = u; });
+    }
+
+    const myName = dataManager.data?.social?.name || currentUser?.displayName || 'You';
+    index[uid] = {
+        user_id: uid,
+        name: myName,
+        avatar: dataManager.data?.social?.avatar || '👤',
+        avatar_url: dataManager.data?.social?.avatarUrl || ''
+    };
+
+    privateDMState.userIndex = index;
+}
+
+function _dmMessageText(row) {
+    return row.message || row.content || '';
+}
+
+function _formatDMTime(ts) {
+    if (!ts) return '';
+    const d = new Date(ts);
+    return d.toLocaleString(_lang === 'en' ? 'en-GB' : 'tr-TR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+}
+
+function _renderDMThreads() {
+    const listEl = document.getElementById('dmThreadList');
+    if (!listEl) return;
+
+    const uid = currentUser?.uid || currentUser?.id;
+    const byUser = {};
+    privateDMState.rows.forEach(r => {
+        const otherId = r.sender_id === uid ? r.receiver_id : r.sender_id;
+        if (!otherId) return;
+        if (!byUser[otherId]) byUser[otherId] = [];
+        byUser[otherId].push(r);
+    });
+
+    const threadIds = Object.keys(byUser).sort((a, b) => {
+        const aLast = byUser[a][byUser[a].length - 1]?.created_at || '';
+        const bLast = byUser[b][byUser[b].length - 1]?.created_at || '';
+        return aLast < bLast ? 1 : -1;
+    });
+
+    if (!threadIds.length) {
+        listEl.innerHTML = '<div class="dm-empty">Henuz mesaj yok.</div>';
+        return;
+    }
+
+    listEl.innerHTML = threadIds.map(id => {
+        const rows = byUser[id];
+        const last = rows[rows.length - 1];
+        const meta = privateDMState.userIndex[id] || { name: 'User' };
+        const isActive = privateDMState.activeUserId === id;
+
+        const unread = rows.filter(r => r.receiver_id === uid && r.sender_id === id && !r.read_at).length;
+        return '<div class="dm-thread-item ' + (isActive ? 'active' : '') + '" onclick="openPrivateChatWithUser(decodeURIComponent(\'' + _encArg(id) + '\'),decodeURIComponent(\'' + _encArg(meta.name || 'User') + '\'))">'
+            + '<div class="dm-thread-name">' + _escHtml(meta.name || 'User') + (unread ? ' (' + unread + ')' : '') + '</div>'
+            + '<div class="dm-thread-preview">' + _escHtml(_dmMessageText(last)) + '</div>'
+            + '</div>';
+    }).join('');
+}
+
+function _renderDMConversation() {
+    const msgEl = document.getElementById('dmChatMessages');
+    const headEl = document.getElementById('dmChatHeader');
+    if (!msgEl || !headEl) return;
+
+    const uid = currentUser?.uid || currentUser?.id;
+    const active = privateDMState.activeUserId;
+    if (!active) {
+        headEl.textContent = 'Bir konusma secin';
+        msgEl.innerHTML = '<div class="dm-empty">Soldan bir kullanici secip mesajlasmaya baslayabilirsiniz.</div>';
+        return;
+    }
+
+    const user = privateDMState.userIndex[active] || { name: 'User' };
+    headEl.textContent = user.name || 'User';
+
+    const rows = privateDMState.rows.filter(r => {
+        const sid = r.sender_id;
+        const rid = r.receiver_id;
+        return (sid === uid && rid === active) || (sid === active && rid === uid);
+    });
+
+    if (!rows.length) {
+        msgEl.innerHTML = '<div class="dm-empty">Henuz mesaj yok. Ilk mesaji gonderin.</div>';
+        return;
+    }
+
+    msgEl.innerHTML = rows.map(r => {
+        const me = r.sender_id === uid;
+        return '<div class="dm-msg ' + (me ? 'me' : 'other') + '">'
+            + _escHtml(_dmMessageText(r))
+            + '<div class="dm-msg-time">' + _formatDMTime(r.created_at) + '</div>'
+            + '</div>';
+    }).join('');
+    msgEl.scrollTop = msgEl.scrollHeight;
+}
+
+async function _markDMReadForActive() {
+    const uid = currentUser?.uid || currentUser?.id;
+    const active = privateDMState.activeUserId;
+    if (!uid || !active || !window.supabaseClient) return;
+    try {
+        await window.supabaseClient
+            .from('private_messages')
+            .update({ read_at: new Date().toISOString() })
+            .eq('receiver_id', uid)
+            .eq('sender_id', active)
+            .is('read_at', null);
+    } catch (e) {
+        console.warn('DM read update warning:', e.message);
+    }
+}
+
+async function renderPrivateMessagingPanel() {
+    const threadEl = document.getElementById('dmThreadList');
+    const msgEl = document.getElementById('dmChatMessages');
+    const inputEl = document.getElementById('dmMessageInput');
+    if (!threadEl || !msgEl) return;
+
+    if (inputEl && !inputEl.dataset.boundEnter) {
+        inputEl.dataset.boundEnter = '1';
+        inputEl.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if (typeof window.sendCurrentDMMessage === 'function') window.sendCurrentDMMessage();
+            }
+        });
+    }
+
+    if (isGuest || !currentUser) {
+        threadEl.innerHTML = '<div class="dm-empty">Mesajlasma icin giris yapin.</div>';
+        msgEl.innerHTML = '<div class="dm-empty">Mesajlasma icin giris yapin.</div>';
+        return;
+    }
+
+    const available = await _checkPrivateDMBackend();
+    if (!available) {
+        const reason = privateDMState.backendReason || 'private_messages table bulunamadi.';
+        threadEl.innerHTML = '<div class="dm-empty">Ozel mesajlasma su an kullanilamiyor.</div>';
+        msgEl.innerHTML = '<div class="dm-empty">Sunucu tarafi ayari gerekiyor: private_messages tablosu. (' + _escHtml(reason) + ')</div>';
+        return;
+    }
+
+    try {
+        privateDMState.rows = await _loadPrivateDMRows();
+        await _buildDMUserIndex(privateDMState.rows);
+        _renderDMThreads();
+        _renderDMConversation();
+        await _markDMReadForActive();
+    } catch (e) {
+        threadEl.innerHTML = '<div class="dm-empty">Mesajlar yuklenemedi.</div>';
+        msgEl.innerHTML = '<div class="dm-empty">Hata: ' + _escHtml(e.message) + '</div>';
+    }
+}
+
+window.refreshProfileMemberDirectory = function() {
+    renderProfileMemberDirectory(true);
+};
+
+window.openPrivateChatWithUser = async function(userId, name) {
+    if (!userId) return;
+    if (typeof switchSection === 'function' && currentSection !== 'profile') {
+        switchSection('profile');
+    }
+    privateDMState.activeUserId = userId;
+
+    if (!privateDMState.userIndex[userId]) {
+        privateDMState.userIndex[userId] = {
+            user_id: userId,
+            name: name || 'User',
+            avatar: '👤',
+            avatar_url: ''
+        };
+    }
+
+    await renderPrivateMessagingPanel();
+    const input = document.getElementById('dmMessageInput');
+    if (input) input.focus();
+};
+
+window.sendCurrentDMMessage = async function() {
+    const uid = currentUser?.uid || currentUser?.id;
+    const targetId = privateDMState.activeUserId;
+    const input = document.getElementById('dmMessageInput');
+    const text = input ? input.value.trim() : '';
+
+    if (!uid || !targetId || !text) {
+        showNotification(_lang === 'en' ? 'Select a user and type a message.' : 'Kullanici secip mesaj yazin.', 'info');
+        return;
+    }
+
+    const sendPayloads = [
+        { sender_id: uid, receiver_id: targetId, message: text },
+        { sender_id: uid, receiver_id: targetId, content: text }
+    ];
+
+    let sent = false;
+    let lastErr = null;
+    for (const payload of sendPayloads) {
+        try {
+            const { error } = await window.supabaseClient.from('private_messages').insert(payload);
+            if (!error) { sent = true; break; }
+            lastErr = error;
+        } catch (e) {
+            lastErr = e;
+        }
+    }
+
+    if (!sent) {
+        showNotification((_lang === 'en' ? 'Message could not be sent: ' : 'Mesaj gonderilemedi: ') + (lastErr?.message || 'Unknown error'), 'error');
+        return;
+    }
+
+    if (input) input.value = '';
+    await renderPrivateMessagingPanel();
+};
 
 // ===== EDIT PROFILE =====
 function editProfile() {

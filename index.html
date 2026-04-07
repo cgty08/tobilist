@@ -931,12 +931,29 @@
                                 <div class="profile-badges">
                                     <span class="profile-badge level-badge-sm">Lv.<span id="profileLvBadge">1</span></span>
                                     <span class="profile-badge streak-badge"><span id="profileStreakBadge">0</span> day streak</span>
+                                    <span class="profile-badge" id="profileJoinBadge">Joined recently</span>
                                 </div>
                                 <div style="display:flex;gap:0.6rem;margin-top:0.9rem;flex-wrap:wrap;">
                                     <button class="btn btn-secondary" onclick="editProfile()" data-i18n="profileEditBtn">Profili Duzenle</button>
                                     <button class="btn btn-ghost" onclick="shareProfile()" data-i18n="profileShareBtn">Paylas</button>
+                                    <button class="btn btn-ghost" onclick="document.getElementById('dmMessageInput')?.focus()">Mesaj Kutusu</button>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-insight-row">
+                        <div class="profile-insight-card">
+                            <div class="pi-label">Ortalama Puan</div>
+                            <div class="pi-value" id="profileAvgRating">-</div>
+                        </div>
+                        <div class="profile-insight-card">
+                            <div class="pi-label">Tamamlama Orani</div>
+                            <div class="pi-value" id="profileCompletionRate">0%</div>
+                        </div>
+                        <div class="profile-insight-card">
+                            <div class="pi-label">Aktivite Seviyesi</div>
+                            <div class="pi-value" id="profileActivityLevel">Yeni</div>
                         </div>
                     </div>
 
@@ -967,6 +984,32 @@
                             <div class="profile-section-block">
                                 <div class="psb-title" data-i18n="profileAchievementsTitle">Son Basarimlar</div>
                                 <div class="recent-achievements" id="recentAchievements"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-network-grid">
+                        <div class="profile-section-block profile-members-block">
+                            <div class="profile-panel-head">
+                                <div class="psb-title" style="margin-bottom:0;">Kullanici Kesfet</div>
+                                <button class="share-btn copy" onclick="refreshProfileMemberDirectory()">Yenile</button>
+                            </div>
+                            <input id="profileMemberSearch" class="profile-member-search" placeholder="Kullanici ara..." />
+                            <div id="profileMemberGrid" class="profile-member-grid"></div>
+                        </div>
+
+                        <div class="profile-section-block profile-dm-block">
+                            <div class="psb-title" style="margin-bottom:0.65rem;">Ozel Mesajlar</div>
+                            <div class="profile-dm-layout">
+                                <div id="dmThreadList" class="dm-thread-list"></div>
+                                <div class="dm-chat-col">
+                                    <div id="dmChatHeader" class="dm-chat-header">Bir konusma secin</div>
+                                    <div id="dmChatMessages" class="dm-chat-messages"></div>
+                                    <div class="dm-chat-compose">
+                                        <textarea id="dmMessageInput" placeholder="Mesaj yaz..." rows="2"></textarea>
+                                        <button class="btn btn-primary" onclick="sendCurrentDMMessage()">Gonder</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1765,7 +1808,7 @@ window.openPublicProfile = async function(userId, fallbackName) {
         }
 
         if (!uData) throw new Error('Could not fetch user data');
-        renderPublicProfile(uData, null, fallbackName);
+        renderPublicProfile(uData, null, fallbackName, userId);
     } catch(e) {
         console.warn('Public profile error:', e.message);
         body.innerHTML = `
@@ -1777,7 +1820,7 @@ window.openPublicProfile = async function(userId, fallbackName) {
     }
 };
 
-function renderPublicProfile(d, updatedAt, fallbackName) {
+function renderPublicProfile(d, updatedAt, fallbackName, userId) {
     const body = document.getElementById('publicProfileBody');
     if (!body) return;
 
@@ -1878,6 +1921,9 @@ function renderPublicProfile(d, updatedAt, fallbackName) {
                 </div>
             </div>
             <p style="color:#8892a4;font-size:0.85rem;line-height:1.5;margin-bottom:1rem;">${bio}</p>
+            <div style="display:flex;gap:0.5rem;margin-bottom:0.95rem;flex-wrap:wrap;">
+                <button id="ppMessageBtn" style="padding:0.45rem 0.8rem;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);border-radius:8px;color:#e5e7eb;cursor:pointer;font-size:0.78rem;">✉ Ozel Mesaj</button>
+            </div>
 
             <!-- Istatistik kartlari -->
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-bottom:1rem;">
@@ -1920,6 +1966,16 @@ function renderPublicProfile(d, updatedAt, fallbackName) {
                 ${listHtml}
             </div>
         </div>`;
+
+    const msgBtn = body.querySelector('#ppMessageBtn');
+    if (msgBtn) {
+        msgBtn.onclick = function() {
+            if (typeof window.openPrivateChatWithUser === 'function') {
+                window.closePublicProfile();
+                window.openPrivateChatWithUser(userId, name);
+            }
+        };
+    }
 }
 
 window.closePublicProfile = function() {
