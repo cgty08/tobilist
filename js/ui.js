@@ -17,6 +17,7 @@ const translations = {
     tr: {
         // NAV
         home: 'Ana Sayfa', library: 'Kütüphanem', discover: 'Keşfet',
+        messages: 'Mesajlar',
         calendar: 'Takvim', analytics: 'Analitik', ai: 'AI Öneriler', achievements: 'Başarımlar',
         // HEADER / AUTH
         loginBtn: 'Giriş Yap', registerBtn: 'Kayıt Ol', logoutBtn: '🚪 Çıkış Yap',
@@ -105,6 +106,8 @@ const translations = {
         profileExportTitle: 'Dışa Aktar',
         profileTwitterBtn: "Twitter'da Paylaş", profileCopyBtn: 'Linki Kopyala', profileJSONBtn: 'JSON İndir',
         profileStreakSuffix: 'gün serisi',
+        messagesPageTitle: '💌 Özel Mesajlar', messagesPageSub: 'Bir kullanıcı seçin ve anında konuşmaya başlayın.',
+        openPrivateInboxBtn: 'Özel Mesajlar',
         profileJoinedRecently: 'Yeni katıldı', profileUnknownUser: 'Kullanıcı',
         profileActivityNew: 'Yeni', profileActivityActive: 'Aktif', profileActivityHardcore: 'Hardcore',
         droppedLabel: 'Bırakıldı',
@@ -245,6 +248,7 @@ const translations = {
     en: {
         // NAV
         home: 'Home', library: 'My Library', discover: 'Discover',
+        messages: 'Messages',
         calendar: 'Calendar', analytics: 'Analytics', ai: 'AI Recs', achievements: 'Achievements',
         // HEADER / AUTH
         loginBtn: 'Sign In', registerBtn: 'Sign Up', logoutBtn: '🚪 Sign Out',
@@ -333,6 +337,8 @@ const translations = {
         profileExportTitle: 'Export',
         profileTwitterBtn: 'Share on Twitter', profileCopyBtn: 'Copy Link', profileJSONBtn: 'Download JSON',
         profileStreakSuffix: 'day streak',
+        messagesPageTitle: '💌 Private Messages', messagesPageSub: 'Pick a user and start chatting instantly.',
+        openPrivateInboxBtn: 'Private Inbox',
         profileJoinedRecently: 'Recently joined', profileUnknownUser: 'User',
         profileActivityNew: 'New', profileActivityActive: 'Active', profileActivityHardcore: 'Hardcore',
         droppedLabel: 'Dropped',
@@ -777,12 +783,12 @@ function applyLanguage() {
     const piKeys = ['profileAvgRatingLabel', 'profileCompletionRateLabel', 'profileActivityLevelLabel'];
     piLabels.forEach((el, i) => { if (piKeys[i]) el.textContent = t(piKeys[i]); });
 
-    const profileDiscoverTitle = document.querySelector('#profileSection .profile-members-block .psb-title');
+    const profileDiscoverTitle = document.querySelector('#messagesSection .profile-members-block .psb-title');
     if (profileDiscoverTitle) profileDiscoverTitle.textContent = t('profileDiscoverUsersTitle');
-    const profileRefreshBtn = document.querySelector('#profileSection .profile-members-block button');
+    const profileRefreshBtn = document.querySelector('#messagesSection .profile-members-block button');
     if (profileRefreshBtn) profileRefreshBtn.textContent = t('profileRefreshBtn');
 
-    const profileDmTitle = document.querySelector('#profileSection .profile-dm-block .psb-title');
+    const profileDmTitle = document.querySelector('#messagesSection .profile-dm-block .psb-title');
     if (profileDmTitle) profileDmTitle.textContent = t('profilePrivateMessagesTitle');
 
     const profileStatCards = document.querySelectorAll('.profile-stat-card .psc-label');
@@ -1365,8 +1371,6 @@ function renderProfilePage() {
             : '<div style="color:var(--text-muted);font-size:0.88rem;">' + t('noAchievements') + '</div>';
     }
 
-    renderProfileMemberDirectory();
-    renderPrivateMessagingPanel();
 }
 
 let profileDirectoryCache = [];
@@ -1689,8 +1693,8 @@ window.refreshProfileMemberDirectory = function() {
 
 window.openPrivateChatWithUser = async function(userId, name) {
     if (!userId) return;
-    if (typeof switchSection === 'function' && currentSection !== 'profile') {
-        switchSection('profile');
+    if (typeof switchSection === 'function' && currentSection !== 'messages') {
+        switchSection('messages');
     }
     privateDMState.activeUserId = userId;
 

@@ -502,6 +502,7 @@
                     <button class="nav-tab active" onclick="switchSection('home')" data-section="home">🏠 <span data-i18n="home">Home</span></button>
                     <button class="nav-tab locked-tab" onclick="requireAuth('library')" data-section="library">📚 <span data-i18n="library">My Library</span></button>
                     <button class="nav-tab" onclick="switchSection('discover')" data-section="discover">🔍 <span data-i18n="discover">Discover</span></button>
+                    <button class="nav-tab locked-tab" onclick="requireAuth('messages')" data-section="messages">💌 <span data-i18n="messages">Messages</span></button>
                     <button class="nav-tab locked-tab" onclick="requireAuth('calendar')" data-section="calendar">📅 <span data-i18n="calendar">Calendar</span></button>
                     <button class="nav-tab locked-tab" onclick="requireAuth('analytics')" data-section="analytics">📊 <span data-i18n="analytics">Analytics</span></button>
                     <button class="nav-tab locked-tab" onclick="requireAuth('ai')" data-section="ai">🤖 <span data-i18n="ai">AI Recs</span></button>
@@ -550,7 +551,10 @@
                         <div class="inline-chat-box">
                             <div class="inline-chat-header">
                                 <span class="inline-chat-title">💬 Community Chat</span>
-                                <span class="inline-chat-online"><span class="chat-online-dot"></span> Live</span>
+                                <div style="display:flex;align-items:center;gap:0.55rem;">
+                                    <button class="btn btn-ghost" onclick="requireAuth('messages')" style="padding:0.3rem 0.65rem;font-size:0.72rem;" data-i18n="openPrivateInboxBtn">Private Inbox</button>
+                                    <span class="inline-chat-online"><span class="chat-online-dot"></span> Live</span>
+                                </div>
                             </div>
                             <div class="inline-chat-messages" id="inlineChatMessages">
                                 <div class="chat-loading"><span class="chat-loading-dots"><span></span><span></span><span></span></span></div>
@@ -936,7 +940,7 @@
                                 <div style="display:flex;gap:0.6rem;margin-top:0.9rem;flex-wrap:wrap;">
                                     <button class="btn btn-secondary" onclick="editProfile()" data-i18n="profileEditBtn">Profili Duzenle</button>
                                     <button class="btn btn-ghost" onclick="shareProfile()" data-i18n="profileShareBtn">Paylas</button>
-                                    <button class="btn btn-ghost" onclick="document.getElementById('dmMessageInput')?.focus()" data-i18n="profileMsgBoxBtn">Message Box</button>
+                                    <button class="btn btn-ghost" onclick="requireAuth('messages')" data-i18n="profileMsgBoxBtn">Message Box</button>
                                 </div>
                             </div>
                         </div>
@@ -966,29 +970,10 @@
                         <div class="profile-stat-card"><div class="psc-val" id="profileStreakVal">0</div><div class="psc-label" data-i18n="profileStreakLabel">En Uzun Seri</div></div>
                     </div>
 
-                    <div class="profile-network-grid">
-                        <div class="profile-section-block profile-members-block">
-                            <div class="profile-panel-head">
-                                <div class="psb-title" style="margin-bottom:0;" data-i18n="profileDiscoverUsersTitle">Discover Members</div>
-                                <button class="share-btn copy" onclick="refreshProfileMemberDirectory()" data-i18n="profileRefreshBtn">Refresh</button>
-                            </div>
-                            <input id="profileMemberSearch" class="profile-member-search" data-i18n-placeholder="profileSearchUsersPlaceholder" placeholder="Search users..." />
-                            <div id="profileMemberGrid" class="profile-member-grid"></div>
-                        </div>
-
-                        <div class="profile-section-block profile-dm-block">
-                            <div class="psb-title" style="margin-bottom:0.65rem;" data-i18n="profilePrivateMessagesTitle">Private Messages</div>
-                            <div class="profile-dm-layout">
-                                <div id="dmThreadList" class="dm-thread-list"></div>
-                                <div class="dm-chat-col">
-                                    <div id="dmChatHeader" class="dm-chat-header" data-i18n="dmSelectConversation">Select a conversation</div>
-                                    <div id="dmChatMessages" class="dm-chat-messages"></div>
-                                    <div class="dm-chat-compose">
-                                        <textarea id="dmMessageInput" data-i18n-placeholder="dmComposePlaceholder" placeholder="Type a message..." rows="2"></textarea>
-                                        <button class="btn btn-primary" onclick="sendCurrentDMMessage()" data-i18n="dmSendBtn">Send</button>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="profile-section-block" style="margin-bottom:1.2rem;">
+                        <div class="profile-panel-head">
+                            <div class="psb-title" style="margin-bottom:0;" data-i18n="profilePrivateMessagesTitle">Private Messages</div>
+                            <button class="share-btn copy" onclick="requireAuth('messages')" data-i18n="openPrivateInboxBtn">Private Inbox</button>
                         </div>
                     </div>
 
@@ -1020,6 +1005,39 @@
                             <button class="share-btn twitter" onclick="shareToTwitter()" data-i18n="profileTwitterBtn">Twitter'da Paylas</button>
                             <button class="share-btn copy" onclick="copyProfileLink()" data-i18n="profileCopyBtn">Linki Kopyala</button>
                             <button class="share-btn export" onclick="exportData('json')" data-i18n="profileJSONBtn">JSON Indir</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MESSAGES -->
+                <div id="messagesSection" class="section">
+                    <div class="page-header">
+                        <h2 class="page-title" data-i18n="messagesPageTitle">💌 Private Messages</h2>
+                        <p style="margin-top:0.35rem;color:var(--text-muted);font-size:0.88rem;" data-i18n="messagesPageSub">Pick a user and start chatting instantly.</p>
+                    </div>
+                    <div class="profile-network-grid" style="margin-top:1rem;">
+                        <div class="profile-section-block profile-members-block">
+                            <div class="profile-panel-head">
+                                <div class="psb-title" style="margin-bottom:0;" data-i18n="profileDiscoverUsersTitle">Discover Members</div>
+                                <button class="share-btn copy" onclick="refreshProfileMemberDirectory()" data-i18n="profileRefreshBtn">Refresh</button>
+                            </div>
+                            <input id="profileMemberSearch" class="profile-member-search" data-i18n-placeholder="profileSearchUsersPlaceholder" placeholder="Search users..." />
+                            <div id="profileMemberGrid" class="profile-member-grid"></div>
+                        </div>
+
+                        <div class="profile-section-block profile-dm-block">
+                            <div class="psb-title" style="margin-bottom:0.65rem;" data-i18n="profilePrivateMessagesTitle">Private Messages</div>
+                            <div class="profile-dm-layout">
+                                <div id="dmThreadList" class="dm-thread-list"></div>
+                                <div class="dm-chat-col">
+                                    <div id="dmChatHeader" class="dm-chat-header" data-i18n="dmSelectConversation">Select a conversation</div>
+                                    <div id="dmChatMessages" class="dm-chat-messages"></div>
+                                    <div class="dm-chat-compose">
+                                        <textarea id="dmMessageInput" data-i18n-placeholder="dmComposePlaceholder" placeholder="Type a message..." rows="2"></textarea>
+                                        <button class="btn btn-primary" onclick="sendCurrentDMMessage()" data-i18n="dmSendBtn">Send</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1510,14 +1528,14 @@
     </div><!-- /mainApp -->
 
     <!-- Scripts - DOGRU SIRADA -->
-    <script src="js/data-manager.js"></script>
-    <script src="js/xp-system.js"></script>
-    <script src="js/api.js"></script>
-    <script src="js/ui.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/chat.js"></script>
-    <script src="js/translate.js"></script>
+    <script src="js/data-manager.js?v=20260407m5"></script>
+    <script src="js/xp-system.js?v=20260407m5"></script>
+    <script src="js/api.js?v=20260407m5"></script>
+    <script src="js/ui.js?v=20260407m5"></script>
+    <script src="js/app.js?v=20260407m5"></script>
+    <script src="js/auth.js?v=20260407m5"></script>
+    <script src="js/chat.js?v=20260407m5"></script>
+    <script src="js/translate.js?v=20260407m5"></script>
 
     <!-- Home page live stats & leaderboard -->
     <script>

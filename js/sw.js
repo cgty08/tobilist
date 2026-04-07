@@ -6,9 +6,9 @@
 //   - Resimler: Cache-first, 7 gun TTL
 // ============================================================
 
-const CACHE_NAME    = 'onilist-v1.3';
-const API_CACHE     = 'onilist-api-v1.2';
-const IMG_CACHE     = 'onilist-img-v1.2';
+const CACHE_NAME    = 'onilist-v1.4';
+const API_CACHE     = 'onilist-api-v1.3';
+const IMG_CACHE     = 'onilist-img-v1.3';
 
 // Kurulumda onceden cache'e alinacak app shell dosyalari
 const SHELL_URLS = [

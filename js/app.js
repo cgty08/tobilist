@@ -46,7 +46,7 @@ let initialRouteRestored = false;
 function getSectionFromHash() {
     const raw = String(window.location.hash || '').replace(/^#/, '').trim().toLowerCase();
     if (!raw) return null;
-    const valid = ['home', 'discover', 'library', 'calendar', 'analytics', 'ai', 'achievements', 'profile', 'translate'];
+    const valid = ['home', 'discover', 'library', 'messages', 'calendar', 'analytics', 'ai', 'achievements', 'profile', 'translate'];
     if (valid.includes(raw)) return raw;
     return null;
 }
@@ -212,6 +212,10 @@ function _renderSection(section, scrollY = 0) {
     switch(section) {
         case 'home':         renderHomePage(); break;
         case 'profile':      if (!isGuest) renderProfilePage(); break;
+        case 'messages':
+            if (typeof renderProfileMemberDirectory === 'function') renderProfileMemberDirectory(false);
+            if (typeof renderPrivateMessagingPanel === 'function') renderPrivateMessagingPanel();
+            break;
         case 'calendar':     if (!isGuest) renderCalendar(); break;
         case 'analytics':    if (!isGuest) renderAnalytics(); break;
         case 'achievements': if (!isGuest) renderAchievements(); break;
