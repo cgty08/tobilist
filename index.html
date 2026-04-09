@@ -353,7 +353,7 @@
                 <form id="registerForm" onsubmit="handleRegister(event)" autocomplete="on">
                     <div class="auth-field">
                         <label for="registerUsername">👤 Username</label>
-                        <input type="text" id="registerUsername" name="username" placeholder="anime_hunter" required minlength="3" maxlength="20" autocomplete="username">
+                        <input type="text" id="registerUsername" name="username" placeholder="anime_hunter" required minlength="3" maxlength="20" pattern="[A-Za-z0-9_]{3,20}" title="Use 3-20 characters: letters, numbers, underscore" autocomplete="username">
                     </div>
                     <div class="auth-field">
                         <label for="registerEmail">📧 Email</label>
@@ -1533,7 +1533,7 @@
     <script src="js/api.js?v=20260407m5"></script>
     <script src="js/ui.js?v=20260407m5"></script>
     <script src="js/app.js?v=20260407m5"></script>
-    <script src="js/auth.js?v=20260407m5"></script>
+    <script src="js/auth.js?v=20260407m6"></script>
     <script src="js/chat.js?v=20260407m5"></script>
     <script src="js/translate.js?v=20260407m5"></script>
 

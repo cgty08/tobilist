@@ -91,10 +91,13 @@ async function loginSuccess(user) {
         return String(str).replace(/[<>"'&]/g, '').trim().substring(0, 50);
     }
 
+    const metaUsername = _sanitizeName(user.user_metadata?.username || '');
+    const safeFallbackName = metaUsername || ('member_' + String(user.id || '').slice(0, 6));
+
     currentUser = {
         uid: user.id,
         id: user.id,
-        displayName: _sanitizeName(user.user_metadata?.username || user.email.split('@')[0]),
+        displayName: safeFallbackName,
         email: user.email
     };
     window.currentUser = currentUser;
@@ -388,6 +391,23 @@ const ALLOWED_EMAIL_DOMAINS = [
     'outlook.com.tr'
 ];
 
+const RESERVED_USERNAMES = new Set([
+    'user', 'username', 'guest', 'admin', 'root', 'moderator', 'mod', 'onilist', 'kullanici'
+]);
+
+function isUsernameValid(username) {
+    const normalized = String(username || '').trim().toLowerCase();
+    if (!normalized) return { ok: false, reason: 'Lütfen kullanıcı adı girin.' };
+    if (normalized.length < 3) return { ok: false, reason: 'Kullanıcı adı en az 3 karakter olmalı.' };
+    if (!/^[a-zA-Z0-9_]{3,20}$/.test(normalized)) {
+        return { ok: false, reason: 'Kullanıcı adı sadece harf, rakam ve alt çizgi (_) içerebilir.' };
+    }
+    if (RESERVED_USERNAMES.has(normalized)) {
+        return { ok: false, reason: 'Bu kullanıcı adı kullanılamaz. Lütfen farklı bir isim seçin.' };
+    }
+    return { ok: true };
+}
+
 function isEmailDomainAllowed(email) {
     if (!email || typeof email !== 'string') return false;
     const parts = email.trim().toLowerCase().split('@');
@@ -511,8 +531,9 @@ async function handleRegister(event) {
 
     clearAllErrors();
 
-    if (!username || username.length < 3) {
-        showError('registerError', 'Kullanici adi en az 3 karakter olmali!');
+    const usernameCheck = isUsernameValid(username);
+    if (!usernameCheck.ok) {
+        showError('registerError', usernameCheck.reason);
         return;
     }
     if (!email) {
