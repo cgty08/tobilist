@@ -1195,11 +1195,7 @@ window.onload = async () => {
 // Admin vermek için: UPDATE user_data SET data = data || '{"is_admin": true}' WHERE data->>'email' = 'admin@x.com';
 
 async function checkIsAdmin(userId, userEmail) {
-    // Owner kontrolü: UUID OR email whitelist
-    const OWNER_ID = '174cb52b-38d5-4b66-8096-889289b24dcb';
-    const OWNER_EMAILS = ['list086@gmail.com'];
-    if (userId === OWNER_ID) return true;
-    if (userEmail && OWNER_EMAILS.includes(userEmail.toLowerCase())) return true;
+    // Admin kontrolu sadece Supabase user_data icindeki is_admin alanina dayanir.
     try {
         const { data, error } = await sb.from('user_data').select('data').eq('user_id', userId).single();
         if (!error && data?.data?.is_admin === true) return true;

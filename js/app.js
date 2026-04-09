@@ -889,23 +889,61 @@ async function openDetailPage(itemJsonStr) {
     loadSimilarContent(item);
 }
 
-function _fillDetailBasic(item) {
-    const s = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '—'; };
+function _setDetailText(id, val, fallback = '—') {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = (val === null || val === undefined || val === '') ? fallback : String(val);
+}
 
+function _setDetailLink(id, url, label) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (!url) {
+        el.textContent = '—';
+        return;
+    }
+    const safeUrl = _esc(String(url));
+    const safeLabel = _esc(String(label || (_lang === 'en' ? 'Open' : 'Ac')));
+    el.innerHTML = `<a class="dp-info-link" href="${safeUrl}" target="_blank" rel="noopener noreferrer">${safeLabel}</a>`;
+}
+
+function _fmtDetailDate(y, m, d) {
+    if (!y) return null;
+    const month = m || 1;
+    const day = d || 1;
+    const dt = new Date(y, month - 1, day);
+    if (Number.isNaN(dt.getTime())) return String(y);
+    return dt.toLocaleDateString(_lang === 'en' ? 'en-GB' : 'tr-TR', { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+function _fillDetailBasic(item) {
     const posterEl = document.getElementById('dpPoster');
     if (posterEl) { posterEl.src = item.poster || ''; posterEl.onerror = () => posterEl.style.display = 'none'; }
 
-    s('dpTitle', item.name);
-    s('dpYear', item.year);
-    s('dpScore', item.rating ? '⭐ ' + item.rating : '—');
-    s('dpEpisodes', item.episodes ? item.episodes + ' Episodes' : item.chapters ? item.chapters + ' Episodes' : '—');
+    _setDetailText('dpTitle', item.name);
+    _setDetailText('dpYear', item.year);
+    _setDetailText('dpScore', item.rating ? '⭐ ' + item.rating : '—');
+    _setDetailText('dpEpisodes', item.episodes ? item.episodes + ' Episodes' : item.chapters ? item.chapters + ' Chapters' : '—');
     window._detailSynopsis = { en: null, tr: null };
     const synopsisText = item.synopsis || ((typeof getCurrentLang === 'function' && getCurrentLang() === 'en') ? 'Loading description...' : 'Loading description...');
-    s('dpSynopsis', synopsisText);
-    s('dpStatus', '—');
-    s('dpRank', '—');
-    s('dpMembers', '—');
-    s('dpStudio', '—');
+    _setDetailText('dpSynopsis', synopsisText);
+    _setDetailText('dpStatus', '—');
+    _setDetailText('dpStatusSide', '—');
+    _setDetailText('dpRank', '—');
+    _setDetailText('dpMembers', '—');
+    _setDetailText('dpStudio', '—');
+    _setDetailText('dpTypeSide', (item.type || 'anime').toUpperCase());
+    _setDetailText('dpFormat', '—');
+    _setDetailText('dpSourceType', item.source || '—');
+    _setDetailText('dpDuration', '—');
+    _setDetailText('dpAired', '—');
+    _setDetailText('dpAltTitle', item.nameEn || item.name || '—');
+
+    const extUrl = item.malId
+        ? `https://myanimelist.net/${item.type === 'anime' ? 'anime' : 'manga'}/${item.malId}`
+        : (item.anilistId ? `https://anilist.co/${item.type === 'anime' ? 'anime' : 'manga'}/${item.anilistId}` : null);
+    _setDetailLink('dpExternalLink', extUrl, 'Open page');
+    _setDetailLink('dpTrailerLink', null);
 
     const badge = document.getElementById('dpTypeBadge');
     if (badge) { badge.textContent = (item.type || 'anime').toUpperCase(); badge.className = 'dp-type-badge ' + (item.type || 'anime'); }
@@ -943,14 +981,23 @@ async function _fetchFullDetail(item) {
             if (res.ok) {
                 const { data: d } = await res.json();
                 if (d) {
-                    const s = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
-                    s('dpScore', d.score ? '⭐ ' + d.score.toFixed(1) : null);
-                    s('dpEpisodes', d.episodes ? d.episodes + ' Episodes' : d.chapters ? d.chapters + ' Episodes' : null);
-                    s('dpStatus', d.status || null);
-                    s('dpRank', d.rank ? '#' + d.rank : null);
-                    s('dpMembers', d.members ? d.members.toLocaleString(_lang==='en'?'en-US':'tr-TR') : null);
-                    s('dpStudio', (d.studios?.[0]?.name) || (d.authors?.[0]?.name) || null);
-                    s('dpYear', d.year || (d.aired?.from ? new Date(d.aired.from).getFullYear() : null));
+                    _setDetailText('dpScore', d.score ? '⭐ ' + d.score.toFixed(1) : null);
+                    _setDetailText('dpEpisodes', d.episodes ? d.episodes + ' Episodes' : d.chapters ? d.chapters + ' Chapters' : null);
+                    _setDetailText('dpStatus', d.status || null);
+                    _setDetailText('dpStatusSide', d.status || null);
+                    _setDetailText('dpRank', d.rank ? '#' + d.rank : null);
+                    _setDetailText('dpMembers', d.members ? d.members.toLocaleString(_lang==='en'?'en-US':'tr-TR') : null);
+                    _setDetailText('dpStudio', (d.studios?.[0]?.name) || (d.authors?.[0]?.name) || null);
+                    _setDetailText('dpYear', d.year || (d.aired?.from ? new Date(d.aired.from).getFullYear() : null));
+                    _setDetailText('dpFormat', d.type || null);
+                    _setDetailText('dpSourceType', d.source || item.source || null);
+                    _setDetailText('dpDuration', d.duration || null);
+                    _setDetailText('dpAired', d.aired?.string || d.published?.string || null);
+                    _setDetailText('dpAltTitle', d.title_japanese || d.title_english || d.title || null);
+
+                    const malUrl = d.url || `https://myanimelist.net/${type}/${item.malId}`;
+                    _setDetailLink('dpExternalLink', malUrl, 'Open MAL');
+                    _setDetailLink('dpTrailerLink', d.trailer?.url || null, 'Watch trailer');
 
                     if (d.genres || d.themes) {
                         const genres = [...(d.genres || []), ...(d.themes || [])].map(g => g.name);
@@ -985,19 +1032,27 @@ async function _fetchFullDetail(item) {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    query: `query($s:String){Media(search:$s,type:ANIME){id description(asHtml:false) coverImage{large color} averageScore episodes status startDate{year} genres studios{nodes{name}}}}`,
+                    query: `query($s:String){Media(search:$s,type:ANIME){id description(asHtml:false) coverImage{large color} averageScore episodes duration format source status startDate{year month day} seasonYear genres title{romaji english native} studios{nodes{name}} siteUrl trailer{id site}}}`,
                     variables: { s: item.name }
                 })
             });
             const json = await res.json();
             const m = json?.data?.Media;
             if (m) {
-                const s = (id, val) => { const el = document.getElementById(id); if (el && val) el.textContent = val; };
-                s('dpScore', m.averageScore ? '⭐ ' + (m.averageScore/10).toFixed(1) : null);
-                s('dpEpisodes', m.episodes ? m.episodes + ' Episodes' : null);
-                s('dpStatus', m.status || null);
-                s('dpStudio', m.studios?.nodes?.[0]?.name || null);
-                s('dpYear', m.startDate?.year || null);
+                _setDetailText('dpScore', m.averageScore ? '⭐ ' + (m.averageScore/10).toFixed(1) : null);
+                _setDetailText('dpEpisodes', m.episodes ? m.episodes + ' Episodes' : null);
+                _setDetailText('dpStatus', m.status || null);
+                _setDetailText('dpStatusSide', m.status || null);
+                _setDetailText('dpStudio', m.studios?.nodes?.[0]?.name || null);
+                _setDetailText('dpYear', m.startDate?.year || null);
+                _setDetailText('dpFormat', m.format || null);
+                _setDetailText('dpSourceType', m.source || item.source || null);
+                _setDetailText('dpDuration', m.duration ? `${m.duration} min` : null);
+                _setDetailText('dpAired', _fmtDetailDate(m.startDate?.year, m.startDate?.month, m.startDate?.day));
+                _setDetailText('dpAltTitle', m.title?.native || m.title?.english || m.title?.romaji || null);
+                _setDetailLink('dpExternalLink', m.siteUrl || null, 'Open AniList');
+                _setDetailLink('dpTrailerLink', (m.trailer?.site && m.trailer?.id) ? `https://www.youtube.com/watch?v=${m.trailer.id}` : null, 'Watch trailer');
+
                 if (m.genres?.length) {
                     const el = document.getElementById('dpGenres');
                     if (el) el.innerHTML = m.genres.map(g => `<span class="dp-genre-tag">${_esc(g)}</span>`).join('');
@@ -1023,15 +1078,28 @@ async function _fetchAniListSynopsis(anilistId) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                query: `query($id:Int){Media(id:$id){description(asHtml:false)}}`,
+                query: `query($id:Int){Media(id:$id){description(asHtml:false) format source status episodes duration startDate{year month day} title{romaji english native} siteUrl trailer{id site}}}`,
                 variables: { id: parseInt(anilistId) }
             })
         });
         const json = await res.json();
-        const desc = json?.data?.Media?.description;
+        const media = json?.data?.Media;
+        const desc = media?.description;
         if (desc) {
             window._detailSynopsis.en = desc.replace(/<[^>]+>/g, '').trim();
             _applyDetailSynopsis();
+        }
+        if (media) {
+            _setDetailText('dpFormat', media.format || null);
+            _setDetailText('dpSourceType', media.source || null);
+            _setDetailText('dpStatus', media.status || null);
+            _setDetailText('dpStatusSide', media.status || null);
+            _setDetailText('dpEpisodes', media.episodes ? media.episodes + ' Episodes' : null);
+            _setDetailText('dpDuration', media.duration ? `${media.duration} min` : null);
+            _setDetailText('dpAired', _fmtDetailDate(media.startDate?.year, media.startDate?.month, media.startDate?.day));
+            _setDetailText('dpAltTitle', media.title?.native || media.title?.english || media.title?.romaji || null);
+            _setDetailLink('dpExternalLink', media.siteUrl || null, 'Open AniList');
+            _setDetailLink('dpTrailerLink', (media.trailer?.site && media.trailer?.id) ? `https://www.youtube.com/watch?v=${media.trailer.id}` : null, 'Watch trailer');
         }
     } catch(e) { /* ignore */ }
 }

@@ -2005,6 +2005,7 @@ function _getWeekBounds() {
 const ANILIST_WEEK_GQL = `
 query ($page: Int, $perPage: Int, $start: Int, $end: Int) {
   Page(page: $page, perPage: $perPage) {
+        pageInfo { hasNextPage }
     airingSchedules(
       airingAt_greater: $start
       airingAt_lesser: $end
@@ -2015,6 +2016,7 @@ query ($page: Int, $perPage: Int, $start: Int, $end: Int) {
       airingAt
       media {
         id
+                siteUrl
         title { romaji english }
         coverImage { medium color }
         averageScore
@@ -2022,6 +2024,9 @@ query ($page: Int, $perPage: Int, $start: Int, $end: Int) {
         genres
         episodes
         format
+                status
+                seasonYear
+                countryOfOrigin
       }
     }
   }
@@ -2034,36 +2039,45 @@ async function _fetchAniListCalendar() {
     if (cached) return cached;
 
     try {
-        // 3 sayfa paralel cek - haftalik schedule cok buyuk olabilir
-        const pages = await Promise.all([1, 2, 3].map(page =>
-            fetch('https://graphql.anilist.co', {
+        const pages = [];
+        let hasNextPage = true;
+        let page = 1;
+        const maxPages = 6;
+
+        while (hasNextPage && page <= maxPages) {
+            const json = await fetch('https://graphql.anilist.co', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                 body: JSON.stringify({
                     query: ANILIST_WEEK_GQL,
                     variables: { page, perPage: 50, start: week.start, end: week.end }
                 })
-            }).then(r => r.json())
-        ));
+            }).then(r => r.json());
+
+            pages.push(json);
+            hasNextPage = !!json?.data?.Page?.pageInfo?.hasNextPage;
+            page++;
+        }
 
         const allSchedules = pages.flatMap(j => j?.data?.Page?.airingSchedules || []);
 
-        // Gun bazinda grupla — her anime icin EN GUNCEL bolumu tut
-        // JS getDay(): 0=Paz, 1=Pzt, ... 6=Cmt
         const byDay = { 0:[], 1:[], 2:[], 3:[], 4:[], 5:[], 6:[] };
-        const seenId = new Map(); // mediaId → {day, idx} ile mukerrer onleme
+        const seenEpisode = new Set();
 
         allSchedules.forEach(s => {
             const media = s.media;
             if (!media || !media.title) return;
             const id  = media.id;
             const day = new Date(s.airingAt * 1000).getDay();
+            const uniqKey = `${id}_${s.episode}`;
+            if (seenEpisode.has(uniqKey)) return;
+            seenEpisode.add(uniqKey);
 
             const entry = {
                 id,
                 name:       media.title.romaji || media.title.english || '?',
                 nameEn:     media.title.english,
-                score:      media.averageScore ? (media.averageScore / 10).toFixed(1) : null,
+                score:      media.averageScore ? +((media.averageScore / 10).toFixed(1)) : null,
                 popularity: media.popularity || 0,
                 genres:     (media.genres || []).slice(0, 2),
                 episode:    s.episode,
@@ -2071,18 +2085,16 @@ async function _fetchAniListCalendar() {
                 cover:      media.coverImage?.medium,
                 color:      media.coverImage?.color,
                 airingAt:   s.airingAt,
+                format:     media.format || 'ANIME',
+                status:     media.status || null,
+                seasonYear: media.seasonYear || null,
+                country:    media.countryOfOrigin || null,
+                siteUrl:    media.siteUrl || null
             };
 
-            if (seenId.has(id)) {
-                // Ayni anime bu hafta birden fazla bolum yayinliyorsa hepsini ekle
-                byDay[day].push(entry);
-            } else {
-                seenId.set(id, true);
-                byDay[day].push(entry);
-            }
+            byDay[day].push(entry);
         });
 
-        // Her gun: once yayin saatine gore sirala, sonra populariteye gore
         Object.keys(byDay).forEach(d => {
             byDay[d].sort((a, b) => {
                 if (a.airingAt !== b.airingAt) return a.airingAt - b.airingAt;
@@ -2090,7 +2102,7 @@ async function _fetchAniListCalendar() {
             });
         });
 
-        APICache.set(cacheKey, byDay);
+        APICache.set(cacheKey, byDay, true);
         return byDay;
     } catch(e) {
         console.warn('AniList Calendar error:', e.message);
@@ -2100,6 +2112,9 @@ async function _fetchAniListCalendar() {
 
 async function renderCalendar() {
     const container = document.getElementById('weekdaysContainer');
+    const summaryEl = document.getElementById('calendarSummary');
+    const filterEl = document.getElementById('calendarTypeFilter');
+    const searchEl = document.getElementById('calendarSearchInput');
     if (!container || !dataManager.data) return;
 
     const week     = _getWeekBounds();
@@ -2107,6 +2122,21 @@ async function renderCalendar() {
     const dayJS    = [1, 2, 3, 4, 5, 6, 0];
     const myNames  = new Set(dataManager.data.items.map(i => (i.name || '').toLowerCase()));
     const todayJS  = new Date().getDay();
+
+    if (filterEl) {
+        const langTag = filterEl.dataset.lang || '';
+        if (langTag !== 'en' || !filterEl.options.length) {
+            const opts = [
+                ['all', 'All releases'],
+                ['in-library', 'In my library'],
+                ['high-score', 'High rated (8+)'],
+                ['today', 'Today only']
+            ];
+            filterEl.innerHTML = opts.map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
+            filterEl.dataset.lang = 'en';
+        }
+    }
+    if (searchEl) searchEl.placeholder = 'Search title or genre...';
 
     // Legend
     const calSection = document.getElementById('calendarSection');
@@ -2116,29 +2146,41 @@ async function renderCalendar() {
         legendEl.innerHTML = `
             <div class="cal-legend-item">
                 <span class="cal-legend-pip" style="background:#10b981;"></span>
-                <span>${_lang === 'en' ? 'In your library' : 'Kutuphanende var'}</span>
+                <span>In your library</span>
             </div>
             <div class="cal-legend-item">
                 <span class="cal-legend-pip" style="background:rgba(255,255,255,.18);"></span>
-                <span>${_lang === 'en' ? 'Not added yet' : 'Henuz eklenmemis'}</span>
+                <span>Not added yet</span>
             </div>`;
         container.parentElement.insertBefore(legendEl, container);
     }
 
     // Loading state
-    container.innerHTML = `
-        <div class="cal-full-loading">
-            <div class="cal-loading-spinner"></div>
-            <p>${t('calLoading')}</p>
-        </div>`;
+    container.className = 'weekdays';
+    container.innerHTML = `<div class="cal-full-loading"><div class="cal-loading-spinner"></div><p>${t('calLoading')}</p></div>`;
+    if (summaryEl) summaryEl.innerHTML = '';
 
     const byDay = await _fetchAniListCalendar();
-    _injectCalendarStyles();
 
     if (!byDay) {
         container.innerHTML = `<div class="cal-full-loading"><div style="font-size:2rem">⚠️</div><p>${t('calError')}</p></div>`;
         return;
     }
+
+    const filterValue = filterEl ? filterEl.value : 'all';
+    const searchValue = (searchEl?.value || '').trim().toLowerCase();
+
+    const applyFilter = (arr, jsDay) => {
+        return (arr || []).filter(a => {
+            const inLib = myNames.has((a.name || '').toLowerCase()) || (a.nameEn && myNames.has((a.nameEn || '').toLowerCase()));
+            if (filterValue === 'in-library' && !inLib) return false;
+            if (filterValue === 'high-score' && !(a.score && a.score >= 8)) return false;
+            if (filterValue === 'today' && jsDay !== todayJS) return false;
+            if (!searchValue) return true;
+            const text = `${(a.name || '').toLowerCase()} ${(a.nameEn || '').toLowerCase()} ${(a.genres || []).join(' ').toLowerCase()}`;
+            return text.includes(searchValue);
+        });
+    };
 
     const totalEntries = Object.values(byDay).reduce((s, a) => s + a.length, 0);
     if (totalEntries === 0) {
@@ -2146,17 +2188,43 @@ async function renderCalendar() {
         return;
     }
 
+    const totalInLibrary = Object.values(byDay)
+        .flat()
+        .filter(a => myNames.has((a.name || '').toLowerCase()) || (a.nameEn && myNames.has((a.nameEn || '').toLowerCase()))).length;
+    const dayCounts = dayJS.map(js => ({ js, count: (byDay[js] || []).length }));
+    const topDay = dayCounts.sort((a, b) => b.count - a.count)[0];
+    const topDayName = topDay ? dayNames[dayJS.indexOf(topDay.js)] : '-';
+
+    if (summaryEl) {
+        summaryEl.innerHTML = `
+            <div class="cal-stat">
+                <div class="cal-stat-label">Total episodes this week</div>
+                <div class="cal-stat-value">${totalEntries}</div>
+            </div>
+            <div class="cal-stat">
+                <div class="cal-stat-label">Matches in your library</div>
+                <div class="cal-stat-value">${totalInLibrary}</div>
+            </div>
+            <div class="cal-stat">
+                <div class="cal-stat-label">Busiest day</div>
+                <div class="cal-stat-value">${topDayName}${topDay ? ` (${topDay.count})` : ''}</div>
+            </div>`;
+    }
+
     // Build the 7-column grid
     container.innerHTML = '';
-    container.className = 'cal-grid';
+    container.className = 'weekdays';
+
+    let shownTotal = 0;
 
     dayNames.forEach((dayName, idx) => {
         const jsDay   = dayJS[idx];
         const isToday = (todayJS === jsDay);
         const dayDate = week.dates[idx];
         const dateStr = dayDate.toLocaleDateString(_lang === 'tr' ? 'tr-TR' : 'en-GB', { day: 'numeric', month: 'short' });
-        const animes  = byDay[jsDay] || [];
+        const animes  = applyFilter(byDay[jsDay] || [], jsDay);
         const shown   = animes.slice(0, 20);
+        shownTotal += shown.length;
 
         const col = document.createElement('div');
         col.className = 'cal-col' + (isToday ? ' cal-col--today' : '');
@@ -2193,35 +2261,38 @@ async function renderCalendar() {
                 const itemObj = {
                     id: 'al_' + a.id,
                     name: a.name,
+                    nameEn: a.nameEn || '',
                     type: 'anime',
                     poster: a.cover,
                     rating: a.score,
                     genres: a.genres || [],
                     episodes: a.totalEps,
-                    anilistId: a.id
+                    anilistId: a.id,
+                    status: a.status || null,
+                    format: a.format || null,
+                    source: 'anilist',
+                    siteUrl: a.siteUrl || null
                 };
                 const safeItem = JSON.stringify(itemObj).replace(/'/g, "\'").replace(/"/g, '&quot;');
 
                 const card = document.createElement('div');
                 card.className = 'cal-card' + (inLib ? ' cal-card--inlib' : '');
-                card.style.setProperty('--cal-accent', accentColor);
                 card.setAttribute('title', `${a.name} — Bolum ${a.episode}${a.totalEps ? '/'+a.totalEps : ''} • ${airTime}`);
                 card.onclick = () => openDetailPage(safeItem);
 
                 card.innerHTML = `
-                    <div class="cal-card-accent-bar"></div>
                     <div class="cal-card-cover-wrap">
                         ${a.cover
                             ? `<img class="cal-card-cover" src="${a.cover}" alt="" loading="lazy" onerror="this.parentElement.innerHTML='<div class=\'cal-card-cover-fb\'>🎬</div>'">`
                             : '<div class="cal-card-cover-fb">🎬</div>'
                         }
-                        ${inLib ? '<div class="cal-card-lib-badge">✓</div>' : ''}
                     </div>
                     <div class="cal-card-body">
                         <div class="cal-card-title">${a.name}</div>
                         <div class="cal-card-meta">
                             <span class="cal-card-time">⏰ ${airTime}</span>
                             <span class="cal-card-ep">Bl.${a.episode}${a.totalEps ? '<span class="cal-card-ep-total">/' + a.totalEps + '</span>' : ''}</span>
+                            ${a.format ? `<span class="cal-card-ep">${a.format}</span>` : ''}
                             ${a.score ? `<span class="cal-card-score" style="color:${scoreColor}">★${a.score}</span>` : ''}
                         </div>
                         ${a.genres && a.genres.length ? `<div class="cal-card-genres">${a.genres.slice(0,2).map(g => `<span class="cal-card-genre">${g}</span>`).join('')}</div>` : ''}
@@ -2241,210 +2312,14 @@ async function renderCalendar() {
         col.appendChild(itemsWrap);
         container.appendChild(col);
     });
+
+    if (shownTotal === 0) {
+        container.innerHTML = `<div class="cal-full-loading"><div style="font-size:2rem">🔎</div><p>No matches for your filters.</p></div>`;
+    }
 }
 
 function _injectCalendarStyles() {
-    if (document.getElementById('calendarStylesV4')) return;
-    const s = document.createElement('style');
-    s.id = 'calendarStylesV4';
-    s.textContent = `
-        .cal-grid {
-            display: grid;
-            grid-template-columns: repeat(7, minmax(0, 1fr));
-            gap: 0.75rem;
-            align-items: start;
-        }
-        .cal-full-loading {
-            grid-column: 1 / -1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-            padding: 4rem 1rem;
-            color: var(--text-muted, #4b5563);
-            font-size: 0.9rem;
-        }
-        .cal-loading-spinner {
-            width: 36px; height: 36px;
-            border: 3px solid rgba(255,255,255,.08);
-            border-top-color: #ff3366;
-            border-radius: 50%;
-            animation: calSpin .8s linear infinite;
-        }
-        @keyframes calSpin { to { transform: rotate(360deg); } }
-        .cal-col {
-            background: rgba(255,255,255,.025);
-            border: 1px solid rgba(255,255,255,.07);
-            border-radius: 14px;
-            overflow: hidden;
-            transition: border-color .2s;
-        }
-        .cal-col:hover { border-color: rgba(255,255,255,.12); }
-        .cal-col--today {
-            background: rgba(255,51,102,.04);
-            border-color: rgba(255,51,102,.35) !important;
-            box-shadow: 0 0 0 1px rgba(255,51,102,.12), 0 4px 24px rgba(255,51,102,.08);
-        }
-        .cal-col-header {
-            padding: .65rem .75rem .5rem;
-            border-bottom: 1px solid rgba(255,255,255,.06);
-            background: rgba(255,255,255,.02);
-        }
-        .cal-col--today .cal-col-header {
-            background: rgba(255,51,102,.06);
-            border-bottom-color: rgba(255,51,102,.15);
-        }
-        .cal-col-header-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: .3rem;
-            margin-bottom: .2rem;
-        }
-        .cal-day-name {
-            font-size: .72rem;
-            font-weight: 800;
-            letter-spacing: .7px;
-            text-transform: uppercase;
-            color: var(--text-secondary, #8892a4);
-        }
-        .cal-col--today .cal-day-name { color: #ff3366; }
-        .cal-today-badge {
-            background: #ff3366;
-            color: #fff;
-            font-size: .48rem;
-            font-weight: 800;
-            letter-spacing: .5px;
-            text-transform: uppercase;
-            padding: 2px 6px;
-            border-radius: 20px;
-            line-height: 1.4;
-            flex-shrink: 0;
-        }
-        .cal-col-header-bottom {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .cal-date-str { font-size: .62rem; color: var(--text-muted, #4b5563); font-weight: 500; }
-        .cal-ep-count {
-            font-size: .58rem;
-            font-weight: 700;
-            color: var(--text-muted, #4b5563);
-            background: rgba(255,255,255,.06);
-            padding: 1px 6px;
-            border-radius: 10px;
-        }
-        .cal-col--today .cal-ep-count { background: rgba(255,51,102,.15); color: #ff3366; }
-        .cal-items { padding: .45rem .4rem; display: flex; flex-direction: column; gap: .3rem; }
-        .cal-card {
-            display: flex;
-            align-items: center;
-            gap: .5rem;
-            padding: .4rem .45rem .4rem 0;
-            border-radius: 10px;
-            background: rgba(255,255,255,.03);
-            border: 1px solid rgba(255,255,255,.06);
-            cursor: pointer;
-            transition: background .15s, transform .15s, border-color .15s, box-shadow .15s;
-            position: relative;
-            overflow: hidden;
-        }
-        .cal-card:hover {
-            background: rgba(255,255,255,.07);
-            transform: translateY(-1px) scale(1.01);
-            border-color: rgba(255,255,255,.13);
-            box-shadow: 0 4px 16px rgba(0,0,0,.25);
-        }
-        .cal-card--inlib { background: rgba(16,185,129,.06); border-color: rgba(16,185,129,.2); }
-        .cal-card--inlib:hover { background: rgba(16,185,129,.1); border-color: rgba(16,185,129,.35); }
-        .cal-card-accent-bar {
-            position: absolute;
-            left: 0; top: 0; bottom: 0;
-            width: 3px;
-            background: var(--cal-accent, rgba(255,255,255,.1));
-        }
-        .cal-card-cover-wrap { position: relative; flex-shrink: 0; margin-left: 3px; }
-        .cal-card-cover {
-            width: 34px; height: 46px;
-            border-radius: 6px;
-            object-fit: cover;
-            display: block;
-            box-shadow: 0 2px 8px rgba(0,0,0,.35);
-        }
-        .cal-card-cover-fb {
-            width: 34px; height: 46px;
-            border-radius: 6px;
-            background: rgba(255,255,255,.06);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: .9rem;
-        }
-        .cal-card-lib-badge {
-            position: absolute;
-            top: -4px; right: -4px;
-            width: 14px; height: 14px;
-            background: #10b981;
-            border-radius: 50%;
-            font-size: .52rem;
-            font-weight: 800;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1.5px solid #141824;
-            line-height: 1;
-        }
-        .cal-card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: .18rem; }
-        .cal-card-title {
-            font-size: .68rem;
-            font-weight: 700;
-            color: var(--text1, #fff);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            line-height: 1.3;
-        }
-        .cal-card--inlib .cal-card-title { color: #10b981; }
-        .cal-card-meta { display: flex; align-items: center; gap: .28rem; flex-wrap: nowrap; overflow: hidden; }
-        .cal-card-time { font-size: .56rem; color: #00d4ff; font-weight: 700; white-space: nowrap; }
-        .cal-card-ep { font-size: .55rem; color: var(--text-muted, #4b5563); white-space: nowrap; font-weight: 600; }
-        .cal-card-ep-total { opacity: .5; }
-        .cal-card-score { font-size: .57rem; font-weight: 800; white-space: nowrap; margin-left: auto; flex-shrink: 0; }
-        .cal-card-genres { display: flex; gap: .2rem; flex-wrap: nowrap; overflow: hidden; }
-        .cal-card-genre {
-            font-size: .5rem; font-weight: 600;
-            color: rgba(255,255,255,.35);
-            background: rgba(255,255,255,.06);
-            padding: 1px 5px; border-radius: 10px; white-space: nowrap;
-        }
-        .cal-empty {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            gap: .3rem; padding: 1.5rem .5rem;
-            color: var(--text-muted, #4b5563); font-size: .7rem; text-align: center;
-        }
-        .cal-empty-icon { font-size: 1.6rem; opacity: .35; }
-        .cal-more {
-            font-size: .6rem; font-weight: 700; color: #ff3366;
-            text-align: center; padding: .35rem; border-radius: 8px;
-            background: rgba(255,51,102,.06); margin-top: .1rem; opacity: .85;
-        }
-        .cal-legend {
-            display: flex; align-items: center; gap: 1.2rem;
-            margin-bottom: 1rem; font-size: .75rem; color: var(--text-secondary, #8892a4);
-        }
-        .cal-legend-item { display: flex; align-items: center; gap: .4rem; }
-        .cal-legend-pip { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; display: block; }
-        @media (max-width: 1200px) { .cal-grid { grid-template-columns: repeat(4, minmax(0,1fr)); } }
-        @media (max-width: 800px)  { .cal-grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }
-        @media (max-width: 480px)  {
-            .cal-grid { display: flex; flex-direction: row; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; gap: .6rem; padding-bottom: .5rem; }
-            .cal-col { min-width: 220px; scroll-snap-align: start; flex-shrink: 0; }
-        }
-    `;
-    document.head.appendChild(s);
+    return;
 }
 
 

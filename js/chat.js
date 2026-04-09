@@ -35,18 +35,29 @@ const ChatCore = (function () {
         } catch(e) {}
     }
 
+    function sanitizeAvatarUrl(raw) {
+        if (!raw || typeof raw !== 'string') return '';
+        try {
+            const u = new URL(raw, window.location.origin);
+            if (u.protocol !== 'https:') return '';
+            return u.toString();
+        } catch {
+            return '';
+        }
+    }
+
     function getAvatarHtml(row) {
-        let url   = row.avatar_url || '';
+        let url   = sanitizeAvatarUrl(row.avatar_url || '');
         let emoji = row.avatar || '👤';
 
         const cache = _avatarCache[row.user_id] || (window._avatarCache && window._avatarCache[row.user_id]);
-        if (!url && cache) { url = cache.avatarUrl || ''; emoji = cache.avatar || emoji; }
+        if (!url && cache) { url = sanitizeAvatarUrl(cache.avatarUrl || ''); emoji = cache.avatar || emoji; }
 
         if (!url && row.user_id) {
             const myId = getMyUserId();
             if (myId && row.user_id === myId) {
                 const soc = window.dataManager?.data?.social || {};
-                url   = soc.avatarUrl || '';
+                url   = sanitizeAvatarUrl(soc.avatarUrl || '');
                 emoji = soc.avatar || emoji;
             }
         }

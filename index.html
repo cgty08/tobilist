@@ -165,7 +165,7 @@
 
     <!-- ===== FONTS (optimize) ===== -->
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700;900&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="css/style.css?v=20260407m4">
+        <link rel="stylesheet" href="css/style.css?v=20260409m1">
         <link rel="stylesheet" href="css/auth.css">
         <link rel="stylesheet" href="css/chat.css">
         <link rel="stylesheet" href="css/translate.css">
@@ -1050,6 +1050,11 @@
                             <span data-i18n="weeklySchedule">Haftalik Yayin Takvimi</span>
                             <button class="btn btn-secondary" onclick="syncCalendar()" data-i18n="calendarSyncBtn">🔄 Senkronize Et</button>
                         </div>
+                        <div id="calendarSummary" class="calendar-summary"></div>
+                        <div class="calendar-tools">
+                            <select id="calendarTypeFilter" class="calendar-select" onchange="renderCalendar()"></select>
+                            <input id="calendarSearchInput" class="calendar-search-input" oninput="renderCalendar()" placeholder="Search title or genre..." />
+                        </div>
                         <div class="weekdays" id="weekdaysContainer"></div>
                     </div>
                 </div>
@@ -1273,10 +1278,17 @@
                                 <h3 class="dp-card-title" data-i18n="dpInfoTitle">ℹ️ Bilgiler</h3>
                                 <div class="dp-info-list">
                                     <div class="dp-info-row"><span class="dp-info-label" data-i18n="dpTypeLabel">Tur</span><span id="dpTypeSide">—</span></div>
+                                    <div class="dp-info-row"><span class="dp-info-label">Format</span><span id="dpFormat">—</span></div>
+                                    <div class="dp-info-row"><span class="dp-info-label">Duration</span><span id="dpDuration">—</span></div>
                                     <div class="dp-info-row"><span class="dp-info-label" data-i18n="dpRankLabel">Siralama</span><span id="dpRank">—</span></div>
                                     <div class="dp-info-row"><span class="dp-info-label" data-i18n="dpMembersLabel">Uye</span><span id="dpMembers">—</span></div>
                                     <div class="dp-info-row"><span class="dp-info-label" data-i18n="dpStudioLabel">Studyo</span><span id="dpStudio">—</span></div>
                                     <div class="dp-info-row"><span class="dp-info-label" data-i18n="dpStatusLabel">Durum</span><span id="dpStatusSide">—</span></div>
+                                    <div class="dp-info-row"><span class="dp-info-label">Source</span><span id="dpSourceType">—</span></div>
+                                    <div class="dp-info-row"><span class="dp-info-label">Aired</span><span id="dpAired">—</span></div>
+                                    <div class="dp-info-row"><span class="dp-info-label">Alt Title</span><span id="dpAltTitle">—</span></div>
+                                    <div class="dp-info-row"><span class="dp-info-label">External</span><span id="dpExternalLink">—</span></div>
+                                    <div class="dp-info-row"><span class="dp-info-label">Trailer</span><span id="dpTrailerLink">—</span></div>
                                 </div>
                             </div>
                         </div>
@@ -1530,9 +1542,9 @@
     <!-- Scripts - DOGRU SIRADA -->
     <script src="js/data-manager.js?v=20260407m5"></script>
     <script src="js/xp-system.js?v=20260407m5"></script>
-    <script src="js/api.js?v=20260407m5"></script>
-    <script src="js/ui.js?v=20260407m5"></script>
-    <script src="js/app.js?v=20260407m5"></script>
+    <script src="js/api.js?v=20260409m1"></script>
+    <script src="js/ui.js?v=20260409m1"></script>
+    <script src="js/app.js?v=20260409m1"></script>
     <script src="js/auth.js?v=20260407m6"></script>
     <script src="js/chat.js?v=20260407m5"></script>
     <script src="js/translate.js?v=20260407m5"></script>

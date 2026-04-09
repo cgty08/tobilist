@@ -1,4 +1,4 @@
-// APi.JS v7.0 - Jikan + AniList + Kitsu — ~5000+ icerik
+// APi.JS v7.1 - Jikan + AniList + Kitsu — adaptive deep paging
 // Cache stratejisi: sadece final "all_v7" sonucu localStorage'a yazilir,
 // ara sorgular sadece memory cache'te tutulur → localStorage tasmaz.
 
@@ -7,6 +7,7 @@ const APICache = {
     PREFIX: 'at7_',
     HOURS: 72,
     _mem: {},
+    _persistQueue: {},
 
     get(key) {
         if (this._mem[key] && (Date.now() - this._mem[key].ts) / 3.6e6 < this.HOURS) {
@@ -30,21 +31,40 @@ const APICache = {
         const ts = Date.now();
         this._mem[key] = { data, ts };
         if (memOnly) return;
-        try {
-            localStorage.setItem(this.PREFIX + key, JSON.stringify({ data, ts }));
-        } catch {
+        const payload = JSON.stringify({ data, ts });
+        this._schedulePersist(key, payload);
+    },
+
+    _schedulePersist(key, payload) {
+        const fullKey = this.PREFIX + key;
+        this._persistQueue[fullKey] = payload;
+
+        const flush = () => {
+            const queued = this._persistQueue[fullKey];
+            if (!queued) return;
+            delete this._persistQueue[fullKey];
             try {
-                Object.keys(localStorage)
-                    .filter(k => k.startsWith(this.PREFIX))
-                    .map(k => {
-                        try { const p = JSON.parse(localStorage.getItem(k)); return { key: k, ts: p?.ts || 0 }; }
-                        catch { return { key: k, ts: 0 }; }
-                    })
-                    .sort((a, b) => a.ts - b.ts)
-                    .slice(0, 10)
-                    .forEach(({ key: k }) => localStorage.removeItem(k));
-                localStorage.setItem(this.PREFIX + key, JSON.stringify({ data, ts }));
-            } catch {}
+                localStorage.setItem(fullKey, queued);
+            } catch {
+                try {
+                    Object.keys(localStorage)
+                        .filter(k => k.startsWith(this.PREFIX))
+                        .map(k => {
+                            try { const p = JSON.parse(localStorage.getItem(k)); return { key: k, ts: p?.ts || 0 }; }
+                            catch { return { key: k, ts: 0 }; }
+                        })
+                        .sort((a, b) => a.ts - b.ts)
+                        .slice(0, 10)
+                        .forEach(({ key: k }) => localStorage.removeItem(k));
+                    localStorage.setItem(fullKey, queued);
+                } catch {}
+            }
+        };
+
+        if (typeof requestIdleCallback === 'function') {
+            requestIdleCallback(flush, { timeout: 1500 });
+        } else {
+            setTimeout(flush, 0);
         }
     },
 
@@ -121,6 +141,25 @@ function deduplicateContent(items) {
     return result;
 }
 
+function slimContentForCache(items) {
+    return (items || []).map(i => ({
+        id: i.id,
+        name: i.name,
+        nameEn: i.nameEn || '',
+        type: i.type,
+        poster: i.poster || '',
+        rating: i.rating ?? null,
+        year: i.year ?? null,
+        episodes: i.episodes ?? null,
+        chapters: i.chapters ?? null,
+        genres: i.genres || [],
+        malId: i.malId ?? null,
+        anilistId: i.anilistId ?? null,
+        source: i.source || null,
+        synopsis: i.synopsis ? String(i.synopsis).substring(0, 140) : ''
+    }));
+}
+
 // ===== JiKAN APi (MAL) =====
 const _Jikan = {
     BASE: 'https://api.jikan.moe/v4',
@@ -180,10 +219,11 @@ const _Jikan = {
         };
     },
 
-    async _fetchPages(urlFn, mapper, pages, ckKey) {
+    async _fetchPages(urlFn, mapper, pages, ckKey, startPage = 1) {
         const c = APICache.get(ckKey); if (c) return c;
         const out = [];
-        for (let p = 1; p <= pages; p++) {
+        const endPage = startPage + pages - 1;
+        for (let p = startPage; p <= endPage; p++) {
             try {
                 const d = await this.fetch(urlFn(p));
                 if (d.data) out.push(...d.data.map(mapper));
@@ -194,28 +234,28 @@ const _Jikan = {
         return out;
     },
 
-    topAnime(pages = 16) {
+    topAnime(pages = 16, startPage = 1) {
         return this._fetchPages(
             p => `${this.BASE}/top/anime?page=${p}&limit=25&filter=bypopularity`,
-            i => this._na(i), pages, 'jk_a_' + pages
+            i => this._na(i), pages, 'jk_a_' + pages + '_s' + startPage, startPage
         );
     },
-    topManga(pages = 12) {
+    topManga(pages = 12, startPage = 1) {
         return this._fetchPages(
             p => `${this.BASE}/top/manga?page=${p}&limit=25&filter=bypopularity`,
-            i => this._nm(i), pages, 'jk_m_' + pages
+            i => this._nm(i), pages, 'jk_m_' + pages + '_s' + startPage, startPage
         );
     },
-    topWebtoon(pages = 12) {
+    topWebtoon(pages = 12, startPage = 1) {
         return this._fetchPages(
             p => `${this.BASE}/manga?type=manhwa&order_by=score&sort=desc&page=${p}&limit=25&sfw=true`,
-            i => this._nm(i), pages, 'jk_w_' + pages
+            i => this._nm(i), pages, 'jk_w_' + pages + '_s' + startPage, startPage
         );
     },
-    topManhua(pages = 8) {
+    topManhua(pages = 8, startPage = 1) {
         return this._fetchPages(
             p => `${this.BASE}/manga?type=manhua&order_by=score&sort=desc&page=${p}&limit=25&sfw=true`,
-            i => this._nm(i), pages, 'jk_mh_' + pages
+            i => this._nm(i), pages, 'jk_mh_' + pages + '_s' + startPage, startPage
         );
     },
 
@@ -291,10 +331,11 @@ const _AniList = {
     FRAG: `id title{romaji english native} format coverImage{extraLarge large} averageScore seasonYear startDate{year} episodes chapters description genres countryOfOrigin`,
 
     // Helper: pages yukle, memOnly cache
-    async _pages(ck, gql, mapper, pages) {
+    async _pages(ck, gql, mapper, pages, startPage = 1) {
         const c = APICache.get(ck); if (c) return c;
         const out = [];
-        for (let p = 1; p <= pages; p++) {
+        const endPage = startPage + pages - 1;
+        for (let p = startPage; p <= endPage; p++) {
             try {
                 const d = await this.query(gql, { p });
                 const media = d?.Page?.media || [];
@@ -306,55 +347,55 @@ const _AniList = {
         return out;
     },
 
-    topAnime(pages = 15) {
-        return this._pages('al_a_pop_' + pages,
+    topAnime(pages = 15, startPage = 1) {
+        return this._pages('al_a_pop_' + pages + '_s' + startPage,
             `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:ANIME,sort:[POPULARITY_DESC],isAdult:false){${this.FRAG}}}}`,
-            i => this._norm(i, 'anime'), pages);
+            i => this._norm(i, 'anime'), pages, startPage);
     },
-    topManga(pages = 14) {
-        return this._pages('al_m_pop_' + pages,
+    topManga(pages = 14, startPage = 1) {
+        return this._pages('al_m_pop_' + pages + '_s' + startPage,
             `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:MANGA,sort:[POPULARITY_DESC],isAdult:false,countryOfOrigin:"JP"){${this.FRAG}}}}`,
-            i => this._norm(i, 'manga'), pages);
+            i => this._norm(i, 'manga'), pages, startPage);
     },
-    topWebtoon(pages = 20) {
-        return this._pages('al_w_pop_' + pages,
+    topWebtoon(pages = 20, startPage = 1) {
+        return this._pages('al_w_pop_' + pages + '_s' + startPage,
             `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:MANGA,sort:[POPULARITY_DESC],isAdult:false,countryOfOrigin:"KR"){${this.FRAG}}}}`,
-            i => this._norm(i, 'webtoon'), pages);
+            i => this._norm(i, 'webtoon'), pages, startPage);
     },
-    topManhua(pages = 10) {
-        return this._pages('al_mh_pop_' + pages,
+    topManhua(pages = 10, startPage = 1) {
+        return this._pages('al_mh_pop_' + pages + '_s' + startPage,
             `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:MANGA,sort:[POPULARITY_DESC],isAdult:false,countryOfOrigin:"CN"){${this.FRAG}}}}`,
-            i => this._norm(i, 'webtoon'), pages);
+            i => this._norm(i, 'webtoon'), pages, startPage);
     },
-    topAnimeByScore(pages = 10) {
-        return this._pages('al_a_score_' + pages,
+    topAnimeByScore(pages = 10, startPage = 1) {
+        return this._pages('al_a_score_' + pages + '_s' + startPage,
             `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:ANIME,sort:[SCORE_DESC],isAdult:false,averageScore_greater:60){${this.FRAG}}}}`,
-            i => this._norm(i, 'anime'), pages);
+            i => this._norm(i, 'anime'), pages, startPage);
     },
-    topMangaByScore(pages = 8) {
-        return this._pages('al_m_score_' + pages,
+    topMangaByScore(pages = 8, startPage = 1) {
+        return this._pages('al_m_score_' + pages + '_s' + startPage,
             `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:MANGA,sort:[SCORE_DESC],isAdult:false,countryOfOrigin:"JP",averageScore_greater:60){${this.FRAG}}}}`,
-            i => this._norm(i, 'manga'), pages);
+            i => this._norm(i, 'manga'), pages, startPage);
     },
-    topWebtoonByScore(pages = 10) {
-        return this._pages('al_w_score_' + pages,
+    topWebtoonByScore(pages = 10, startPage = 1) {
+        return this._pages('al_w_score_' + pages + '_s' + startPage,
             `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:MANGA,sort:[SCORE_DESC],isAdult:false,countryOfOrigin:"KR"){${this.FRAG}}}}`,
-            i => this._norm(i, 'webtoon'), pages);
+            i => this._norm(i, 'webtoon'), pages, startPage);
     },
-    topManhuaByScore(pages = 6) {
-        return this._pages('al_mh_score_' + pages,
+    topManhuaByScore(pages = 6, startPage = 1) {
+        return this._pages('al_mh_score_' + pages + '_s' + startPage,
             `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:MANGA,sort:[SCORE_DESC],isAdult:false,countryOfOrigin:"CN"){${this.FRAG}}}}`,
-            i => this._norm(i, 'webtoon'), pages);
+            i => this._norm(i, 'webtoon'), pages, startPage);
     },
-    topAnimeTrending(pages = 5) {
-        return this._pages('al_a_trend_' + pages,
+    topAnimeTrending(pages = 5, startPage = 1) {
+        return this._pages('al_a_trend_' + pages + '_s' + startPage,
             `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:ANIME,sort:[TRENDING_DESC],isAdult:false){${this.FRAG}}}}`,
-            i => this._norm(i, 'anime'), pages);
+            i => this._norm(i, 'anime'), pages, startPage);
     },
-    topMangaTrending(pages = 5) {
-        return this._pages('al_m_trend_' + pages,
+    topMangaTrending(pages = 5, startPage = 1) {
+        return this._pages('al_m_trend_' + pages + '_s' + startPage,
             `query($p:Int){Page(page:$p,perPage:50){pageInfo{hasNextPage}media(type:MANGA,sort:[TRENDING_DESC],isAdult:false){${this.FRAG}}}}`,
-            i => this._norm(i), pages);
+            i => this._norm(i), pages, startPage);
     },
 
     async seasonal() {
@@ -420,10 +461,11 @@ const _Kitsu = {
         };
     },
 
-    async topAnime(pages = 10) {
-        const ck = 'kt_a_' + pages; const c = APICache.get(ck); if (c) return c;
+    async topAnime(pages = 10, startPage = 0) {
+        const ck = 'kt_a_' + pages + '_s' + startPage; const c = APICache.get(ck); if (c) return c;
         const out = [];
-        for (let p = 0; p < pages; p++) {
+        const endPage = startPage + pages;
+        for (let p = startPage; p < endPage; p++) {
             try {
                 const d = await this.fetch(`${this.BASE}/anime?sort=-averageRating&page[limit]=20&page[offset]=${p * 20}&filter[subtype]=TV,ONA&fields[anime]=canonicalTitle,titles,posterImage,averageRating,startDate,episodeCount,synopsis`);
                 if (d.data) out.push(...d.data.map(i => this._na(i)));
@@ -434,10 +476,11 @@ const _Kitsu = {
         return out;
     },
 
-    async topManga(pages = 8) {
-        const ck = 'kt_m_' + pages; const c = APICache.get(ck); if (c) return c;
+    async topManga(pages = 8, startPage = 0) {
+        const ck = 'kt_m_' + pages + '_s' + startPage; const c = APICache.get(ck); if (c) return c;
         const out = [];
-        for (let p = 0; p < pages; p++) {
+        const endPage = startPage + pages;
+        for (let p = startPage; p < endPage; p++) {
             try {
                 const d = await this.fetch(`${this.BASE}/manga?sort=-averageRating&page[limit]=20&page[offset]=${p * 20}&fields[manga]=canonicalTitle,titles,posterImage,averageRating,startDate,chapterCount,synopsis,subtype`);
                 if (d.data) out.push(...d.data.map(i => this._nm(i)));
@@ -487,12 +530,12 @@ const JikanAPI = {
     },
 
     async loadAllContent(onProgress) {
-        const ck = 'all_v7';
+        const ck = 'all_v8';
         const c = APICache.get(ck);
         if (c) { if (onProgress) onProgress(c.length, c.length); return c; }
 
         // ── ASAMA 1: HiZLi ON YUKLEMI (3-5 saniye) ─────────────────────────
-        const ckFast = 'all_v7_fast';
+        const ckFast = 'all_v8_fast';
         const cached_fast = APICache.get(ckFast);
 
         if (!cached_fast) {
@@ -509,7 +552,7 @@ const JikanAPI = {
                 ...(fastW.status === 'fulfilled' ? fastW.value : []),
             ];
             const fastDeduped = deduplicateContent(fastAll);
-            APICache.set(ckFast, fastDeduped, true); // memOnly
+            APICache.set(ckFast, slimContentForCache(fastDeduped), true); // memOnly
             if (onProgress) onProgress(fastDeduped.length, fastDeduped.length);
             console.log(`⚡ Hizli yukleme: ${fastDeduped.length} icerik`);
             document.dispatchEvent(new CustomEvent('onilist:fastContentReady', { detail: fastDeduped }));
@@ -568,17 +611,62 @@ const JikanAPI = {
             ...(ktM.status   === 'fulfilled' ? ktM.value   : []),
         ];
 
-        const deduped = deduplicateContent(all);
+        let deduped = deduplicateContent(all);
+
+        // Ilk sonucta icerik az kalirsa daha derin sayfalari da yukle.
+        if (deduped.length < 2200) {
+            console.log('📈 APi: Derin sayfa genisletmesi basliyor...');
+            const [
+                alA2, alM2, alW2, alMH2,
+                alAS2, alMS2, alWS2, alMHS2,
+                jkA2, jkM2, jkW2, jkMH2,
+                ktA2, ktM2
+            ] = await Promise.allSettled([
+                _AniList.topAnime(20, 16),
+                _AniList.topManga(18, 15),
+                _AniList.topWebtoon(20, 21),
+                _AniList.topManhua(12, 11),
+                _AniList.topAnimeByScore(12, 11),
+                _AniList.topMangaByScore(12, 9),
+                _AniList.topWebtoonByScore(12, 11),
+                _AniList.topManhuaByScore(8, 7),
+                _Jikan.topAnime(20, 17),
+                _Jikan.topManga(16, 13),
+                _Jikan.topWebtoon(12, 13),
+                _Jikan.topManhua(10, 9),
+                _Kitsu.topAnime(14, 10),
+                _Kitsu.topManga(12, 8),
+            ]);
+
+            const extra = [
+                ...(alA2.status === 'fulfilled' ? alA2.value : []),
+                ...(alM2.status === 'fulfilled' ? alM2.value : []),
+                ...(alW2.status === 'fulfilled' ? alW2.value : []),
+                ...(alMH2.status === 'fulfilled' ? alMH2.value : []),
+                ...(alAS2.status === 'fulfilled' ? alAS2.value : []),
+                ...(alMS2.status === 'fulfilled' ? alMS2.value : []),
+                ...(alWS2.status === 'fulfilled' ? alWS2.value : []),
+                ...(alMHS2.status === 'fulfilled' ? alMHS2.value : []),
+                ...(jkA2.status === 'fulfilled' ? jkA2.value : []),
+                ...(jkM2.status === 'fulfilled' ? jkM2.value : []),
+                ...(jkW2.status === 'fulfilled' ? jkW2.value : []),
+                ...(jkMH2.status === 'fulfilled' ? jkMH2.value : []),
+                ...(ktA2.status === 'fulfilled' ? ktA2.value : []),
+                ...(ktM2.status === 'fulfilled' ? ktM2.value : []),
+            ];
+            deduped = deduplicateContent([...all, ...extra]);
+        }
+
         const ac = deduped.filter(i => i.type === 'anime').length;
         const mc = deduped.filter(i => i.type === 'manga').length;
         const wc = deduped.filter(i => i.type === 'webtoon').length;
         console.log(`✅ ${deduped.length} icerik — Anime:${ac} Manga:${mc} Webtoon:${wc}`);
 
         // Sadece final sonucu localStorage'a yaz (~2-3MB max)
-        APICache.set(ck, deduped); // localStorage'a yaz
+        APICache.set(ck, slimContentForCache(deduped)); // localStorage'a hafif payload yaz
         if (onProgress) onProgress(deduped.length, deduped.length);
         return deduped;
     }
 };
 
-console.log('✅ APi v7.0 — ~5000+ icerik, tek cache key');
+console.log('✅ APi v7.1 — adaptive deep paging, tek cache key');
