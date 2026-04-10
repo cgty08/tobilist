@@ -105,6 +105,7 @@ function initializeApp() {
     }
 
     loadContentFromAPI();
+    bindDiscoverHotkeys();
     if (!isGuest) renderProfilePage();
     setupPWA();
     setupNetworkListeners();
@@ -464,6 +465,87 @@ function _searchLocalContent(query, limit) {
         .slice(0, limit || 6);
 }
 
+function _toSafeDiscoverItemJson(item) {
+    const itemJson = JSON.stringify({
+        id: item.id,
+        name: item.name,
+        type: item.type,
+        poster: item.poster,
+        episodes: item.episodes,
+        chapters: item.chapters,
+        rating: item.rating,
+        genres: item.genres,
+        malId: item.malId,
+        nameEn: item.nameEn,
+        altNames: item.altNames,
+        anilistId: item.anilistId,
+        kitsuId: item.kitsuId,
+        source: item.source,
+        isFreshRelease: !!item.isFreshRelease
+    });
+    return itemJson.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+
+function renderDiscoverHotStrip(sourceItems) {
+    const host = document.getElementById('discoverHotStrip');
+    if (!host) return;
+
+    const list = (sourceItems || allContent || [])
+        .filter(i => i && i.type === 'anime' && i.isFreshRelease)
+        .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+        .slice(0, 10);
+
+    if (!list.length) {
+        host.style.display = 'none';
+        host.innerHTML = '';
+        return;
+    }
+
+    host.style.display = 'block';
+    host.innerHTML =
+        '<div class="discover-hot-head">'
+        + '<span class="discover-hot-title">Just Dropped</span>'
+        + '<span class="discover-hot-hint">Press / to focus search</span>'
+        + '</div>'
+        + '<div class="discover-hot-track">'
+        + list.map(item => {
+            const safeItem = _toSafeDiscoverItemJson(item);
+            return '<button class="discover-hot-pill" onclick="openDetailPage(\'' + safeItem + '\')">'
+                + '<span class="discover-hot-dot"></span>'
+                + '<span>' + _esc(item.name || 'Untitled') + '</span>'
+                + '</button>';
+        }).join('')
+        + '</div>';
+}
+
+function bindDiscoverHotkeys() {
+    if (window.__discoverHotkeysBound) return;
+    window.__discoverHotkeysBound = true;
+
+    document.addEventListener('keydown', function(e) {
+        const tag = (e.target && e.target.tagName || '').toUpperCase();
+        const editing = tag === 'INPUT' || tag === 'TEXTAREA' || (e.target && e.target.isContentEditable);
+
+        if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey && !editing && currentSection === 'discover') {
+            const input = document.getElementById('discoverSearch');
+            if (!input) return;
+            e.preventDefault();
+            input.focus();
+            input.select();
+        }
+
+        if (e.key === 'Escape' && currentSection === 'discover') {
+            const input = document.getElementById('discoverSearch');
+            if (!input) return;
+            if (document.activeElement === input && input.value) {
+                input.value = '';
+                discoverPage = 1;
+                renderDiscoverGrid();
+            }
+        }
+    });
+}
+
 function _findBestDiscoverSuggestion(query) {
     const q = _normalizeSearchText(query);
     if (!q || q.length < 3) return null;
@@ -532,6 +614,19 @@ function renderDiscoverGrid() {
     else if (sort === 'name') filtered.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'tr'));
     else if (sort === 'year') filtered.sort((a, b) => (b.year || 0) - (a.year || 0));
 
+    // Fresh seasonal releases should surface immediately in default discover browsing.
+    if (
+        !search &&
+        currentGenreFilter === 'all' &&
+        (currentDiscoverType === 'all' || currentDiscoverType === 'anime')
+    ) {
+        const fresh = filtered.filter(i => i.isFreshRelease);
+        const rest = filtered.filter(i => !i.isFreshRelease);
+        filtered = [...fresh, ...rest];
+    }
+
+    renderDiscoverHotStrip(filtered);
+
     const total = filtered.length;
     const page  = filtered.slice(0, discoverPage * DISCOVER_PAGE_SIZE);
 
@@ -560,16 +655,8 @@ function renderDiscoverGrid() {
         const rating = item.rating ? '⭐ ' + item.rating : '';
         const meta = [item.year, item.type === 'anime' ? (item.episodes ? item.episodes + ' Ep' : '') : (item.chapters ? item.chapters + ' Ch' : '')].filter(Boolean).join(' · ');
 
-        const itemJson = JSON.stringify({
-            id: item.id, name: item.name, type: item.type,
-            poster: item.poster, episodes: item.episodes,
-            chapters: item.chapters, rating: item.rating,
-            genres: item.genres, malId: item.malId,
-            nameEn: item.nameEn, altNames: item.altNames,
-            anilistId: item.anilistId, kitsuId: item.kitsuId,
-            source: item.source
-        });
-        const safeItem = itemJson.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        const safeItem = _toSafeDiscoverItemJson(item);
+        const freshBadge = item.isFreshRelease ? '<span class="media-fresh-badge">NEW</span>' : '';
 
         const addBtn = isGuest
             ? '<button class="add-to-list-btn" onclick="openAuthModal(\'register\')">🔐 Sign up & add</button>'
@@ -582,6 +669,7 @@ function renderDiscoverGrid() {
                       '<div class="media-poster-fallback" style="display:none">' + getTypeIcon(item.type) + '</div>'
                     : '<div class="media-poster-fallback">' + getTypeIcon(item.type) + '</div>') +
                 '<span class="media-type-badge ' + safeType(item.type) + '">' + safeType(item.type) + '</span>' +
+                                freshBadge +
                 (rating ? '<div class="media-score-badge">' + rating + '</div>' : '') +
             '</div>' +
             '<div class="media-info">' +

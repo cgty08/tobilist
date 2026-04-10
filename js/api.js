@@ -217,12 +217,18 @@ function deduplicateContent(items) {
 
         if (existingKey) {
             const ex = seenNames.get(existingKey);
+            const fresh = !!(item.isFreshRelease || ex.isFreshRelease);
             const itemBetter = (item.rating || 0) > (ex.rating || 0) || (!ex.poster && item.poster);
             if (itemBetter) {
+                item.isFreshRelease = fresh;
                 const idx = result.findIndex(r => r.id === ex.id);
                 if (idx !== -1) result[idx] = item;
                 seenNames.set(key1, item);
                 if (key2) seenNames.set(key2, item);
+            } else if (fresh && !ex.isFreshRelease) {
+                ex.isFreshRelease = true;
+                const idx = result.findIndex(r => r.id === ex.id);
+                if (idx !== -1) result[idx].isFreshRelease = true;
             }
             continue;
         }
@@ -605,11 +611,16 @@ const _Kitsu = {
 const JikanAPI = {
 
     async fetchSeasonNow(limit = 25) {
-        const ck = 'season_v7'; const c = APICache.get(ck); if (c) return c;
+        const sixHourBucket = Math.floor(Date.now() / (6 * 3600 * 1000));
+        const ck = 'season_v8_' + sixHourBucket;
+        const c = APICache.get(ck);
+        if (c) return c;
         let results = [];
         try { results = await _AniList.seasonal(); } catch {}
         if (results.length < 10) { try { results = [...results, ...await _Jikan.seasonNow()]; } catch {} }
-        const out = deduplicateContent(results).slice(0, limit);
+        const out = deduplicateContent(results)
+            .map(i => ({ ...i, isFreshRelease: true }))
+            .slice(0, limit);
         APICache.set(ck, out, true);
         return out;
     },
@@ -639,7 +650,15 @@ const JikanAPI = {
     async loadAllContent(onProgress) {
         const ck = 'all_v8';
         const c = APICache.get(ck);
-        if (c) { if (onProgress) onProgress(c.length, c.length); return c; }
+        if (c) {
+            let merged = c;
+            try {
+                const fresh = await this.fetchSeasonNow(120);
+                merged = deduplicateContent([...(fresh || []), ...c]);
+            } catch {}
+            if (onProgress) onProgress(merged.length, merged.length);
+            return merged;
+        }
 
         // ── ASAMA 1: HiZLi ON YUKLEMI (3-5 saniye) ─────────────────────────
         const ckFast = 'all_v8_fast';
@@ -700,6 +719,7 @@ const JikanAPI = {
         ]);
 
         const all = [
+            ...(await this.fetchSeasonNow(120)),
             ...(alA.status   === 'fulfilled' ? alA.value   : []),
             ...(alM.status   === 'fulfilled' ? alM.value   : []),
             ...(alW.status   === 'fulfilled' ? alW.value   : []),
