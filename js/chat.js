@@ -22,7 +22,7 @@ const ChatCore = (function () {
             const { data } = await window.supabaseClient
                 .from('public_leaderboard')
                 .select('user_id,name,avatar,avatar_url')
-                .limit(50);
+                .limit(400);
             if (data) data.forEach(u => {
                 if (u.user_id) _avatarCache[u.user_id] = {
                     avatar: u.avatar || '👤',
@@ -37,6 +37,8 @@ const ChatCore = (function () {
 
     function sanitizeAvatarUrl(raw) {
         if (!raw || typeof raw !== 'string') return '';
+        const dataImageOk = /^data:image\/(png|jpe?g|webp|gif);base64,[a-z0-9+/=\s]+$/i;
+        if (dataImageOk.test(raw)) return raw.trim();
         try {
             const u = new URL(raw, window.location.origin);
             if (u.protocol !== 'https:') return '';
@@ -227,6 +229,11 @@ const ChatCore = (function () {
         const avatarUrl   = social.avatarUrl || '';
         const uid         = user.uid || user.id;
 
+        if (uid) {
+            _avatarCache[uid] = { avatar, avatarUrl, name: displayName };
+            window._avatarCache = _avatarCache;
+        }
+
         // Optimistic render
         renderMessage({
             id: 'opt_' + now, user_id: uid,
@@ -270,7 +277,7 @@ const ChatCore = (function () {
 
     return {
         TABLE, MAX_LEN, RATE_LIMIT_MS,
-        loadAvatarCache, getAvatarHtml, escapeHTML,
+        loadAvatarCache, getAvatarHtml, escapeHTML, sanitizeAvatarUrl,
         getMyUserId, getDisplayName, formatTime,
         renderMessage, scrollToBottom,
         loadMessages, subscribeRealtime, sendMessage,
@@ -501,7 +508,17 @@ const InlineChat = (function () {
             guest.style.display = 'none';
             const avatarEl = q('inlineChatMyAvatar');
             if (avatarEl) {
-                avatarEl.textContent = window.dataManager?.data?.social?.avatar || '👤';
+                const social = window.dataManager?.data?.social || {};
+                const safeUrl = ChatCore.sanitizeAvatarUrl ? ChatCore.sanitizeAvatarUrl(social.avatarUrl || '') : '';
+                if (safeUrl) {
+                    avatarEl.textContent = '';
+                    avatarEl.style.backgroundImage = 'url(' + safeUrl + ')';
+                    avatarEl.style.backgroundSize = 'cover';
+                    avatarEl.style.backgroundPosition = 'center';
+                } else {
+                    avatarEl.style.backgroundImage = '';
+                    avatarEl.textContent = social.avatar || '👤';
+                }
             }
         } else {
             inputArea.style.display = 'none';

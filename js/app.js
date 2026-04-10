@@ -142,8 +142,8 @@ async function loadContentFromAPI() {
                 console.log('⚡ Hizli icerik gosteriliyor:', fastContent.length);
                 renderHomePage();
                 renderDiscoverGrid();
+                document.removeEventListener('onilist:fastContentReady', _fastContentHandler);
             }
-            document.removeEventListener('onilist:fastContentReady', _fastContentHandler);
         }
         document.addEventListener('onilist:fastContentReady', _fastContentHandler);
 
@@ -327,13 +327,18 @@ function renderMediaRow(containerId, items) {
         const itemJson = JSON.stringify({
             id: item.id,
             name: item.name,
+            nameEn: item.nameEn,
+            altNames: item.altNames,
             type: item.type,
             poster: item.poster,
             episodes: item.episodes,
             chapters: item.chapters,
             rating: item.rating,
             genres: item.genres,
-            malId: item.malId
+            malId: item.malId,
+            anilistId: item.anilistId,
+            kitsuId: item.kitsuId,
+            source: item.source
         });
         const safeItem = itemJson.replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
@@ -376,6 +381,132 @@ function filterByGenre(genre, btn) {
     renderDiscoverGrid();
 }
 
+function _normalizeSearchText(s) {
+    return String(s || '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af\s]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function _levenshteinWithin(a, b, maxDist) {
+    if (!a || !b) return false;
+    if (a === b) return true;
+    const la = a.length;
+    const lb = b.length;
+    if (Math.abs(la - lb) > maxDist) return false;
+
+    let prev = new Array(lb + 1);
+    let cur = new Array(lb + 1);
+    for (let j = 0; j <= lb; j++) prev[j] = j;
+
+    for (let i = 1; i <= la; i++) {
+        cur[0] = i;
+        let rowMin = cur[0];
+        const ca = a.charCodeAt(i - 1);
+        for (let j = 1; j <= lb; j++) {
+            const cost = (ca === b.charCodeAt(j - 1)) ? 0 : 1;
+            cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + cost);
+            if (cur[j] < rowMin) rowMin = cur[j];
+        }
+        if (rowMin > maxDist) return false;
+        const tmp = prev;
+        prev = cur;
+        cur = tmp;
+    }
+    return prev[lb] <= maxDist;
+}
+
+function _hasFuzzyTermInText(term, text) {
+    if (!term || !text) return false;
+    const maxDist = term.length >= 7 ? 2 : 1;
+    const tokens = text.split(' ').filter(Boolean);
+    for (let i = 0; i < tokens.length; i++) {
+        const tok = tokens[i];
+        if (tok.includes(term) || term.includes(tok)) return true;
+        if (Math.abs(tok.length - term.length) > maxDist) continue;
+        if (_levenshteinWithin(term, tok, maxDist)) return true;
+    }
+    return false;
+}
+
+function _matchesContentSearch(item, query) {
+    const nq = _normalizeSearchText(query);
+    if (!nq) return true;
+
+    const candidates = [item.name, item.nameEn]
+        .concat(item.altNames || [])
+        .concat(item.genres || [])
+        .filter(Boolean)
+        .map(_normalizeSearchText)
+        .filter(Boolean);
+
+    if (!candidates.length) return false;
+    const hay = candidates.join(' | ');
+    if (hay.includes(nq)) return true;
+
+    const terms = nq.split(' ').filter(t => t.length >= 2);
+    if (!terms.length) return false;
+    if (terms.every(t => hay.includes(t))) return true;
+
+    // Typo-tolerant fallback: each query term should fuzzy-match at least one candidate token.
+    return terms.every(term => candidates.some(c => _hasFuzzyTermInText(term, c)));
+}
+
+function _searchLocalContent(query, limit) {
+    const q = _normalizeSearchText(query);
+    if (!q) return [];
+    return (allContent || [])
+        .filter(item => _matchesContentSearch(item, q))
+        .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+        .slice(0, limit || 6);
+}
+
+function _findBestDiscoverSuggestion(query) {
+    const q = _normalizeSearchText(query);
+    if (!q || q.length < 3) return null;
+
+    const seen = new Set();
+    const pool = [];
+    (allContent || []).forEach(item => {
+        [item.name, item.nameEn].concat(item.altNames || []).forEach(raw => {
+            const label = String(raw || '').trim();
+            if (!label) return;
+            const norm = _normalizeSearchText(label);
+            if (!norm || seen.has(norm)) return;
+            seen.add(norm);
+            pool.push({ label, norm });
+        });
+    });
+
+    let best = null;
+    for (let i = 0; i < pool.length; i++) {
+        const c = pool[i];
+        let score = 0;
+        if (c.norm === q) score = 200;
+        else if (c.norm.startsWith(q) || q.startsWith(c.norm)) score = 140;
+        else if (c.norm.includes(q) || q.includes(c.norm)) score = 110;
+        else if (_hasFuzzyTermInText(q, c.norm) || _hasFuzzyTermInText(c.norm, q)) score = 80;
+        if (!score) continue;
+
+        score -= Math.abs(c.norm.length - q.length) * 2;
+        if (!best || score > best.score) best = { label: c.label, score };
+    }
+
+    if (!best || best.score < 50) return null;
+    return best.label;
+}
+
+function applyDiscoverSuggestion(text) {
+    const input = document.getElementById('discoverSearch');
+    if (!input) return;
+    input.value = text || '';
+    discoverPage = 1;
+    renderDiscoverGrid();
+}
+
 function renderDiscoverGrid() {
     const grid = document.getElementById('discoverGrid');
     if (!grid) return;
@@ -393,7 +524,7 @@ function renderDiscoverGrid() {
     let filtered = allContent.filter(item => {
         if (currentDiscoverType !== 'all' && item.type !== currentDiscoverType) return false;
         if (currentGenreFilter !== 'all' && !(item.genres || []).includes(currentGenreFilter)) return false;
-        if (search && !(item.name || '').toLowerCase().includes(search) && !(item.nameEn || '').toLowerCase().includes(search)) return false;
+        if (search && !_matchesContentSearch(item, search)) return false;
         return true;
     });
 
@@ -408,7 +539,19 @@ function renderDiscoverGrid() {
     if (statsEl) statsEl.textContent = total + (_lang==='en' ? ' results found' : ' results found');
 
     if (page.length === 0) {
-        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:3rem;font-size:1.1rem;">🔍 No results found</div>';
+        const suggestion = _findBestDiscoverSuggestion(search);
+        if (suggestion) {
+            const safeSuggestion = _esc(suggestion);
+            const safeArg = suggestion.replace(/'/g, "\\'");
+            grid.innerHTML =
+                '<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:2.5rem 1rem;">'
+                + '<div style="font-size:1.1rem;margin-bottom:0.45rem;">🔍 No results found</div>'
+                + '<div style="font-size:0.9rem;margin-bottom:0.9rem;">Did you mean: <strong style="color:var(--text-primary);">' + safeSuggestion + '</strong> ?</div>'
+                + '<button class="btn btn-secondary" onclick="applyDiscoverSuggestion(\'' + safeArg + '\')">Use suggestion</button>'
+                + '</div>';
+        } else {
+            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:3rem;font-size:1.1rem;">🔍 No results found</div>';
+        }
         return;
     }
 
@@ -421,7 +564,10 @@ function renderDiscoverGrid() {
             id: item.id, name: item.name, type: item.type,
             poster: item.poster, episodes: item.episodes,
             chapters: item.chapters, rating: item.rating,
-            genres: item.genres, malId: item.malId
+            genres: item.genres, malId: item.malId,
+            nameEn: item.nameEn, altNames: item.altNames,
+            anilistId: item.anilistId, kitsuId: item.kitsuId,
+            source: item.source
         });
         const safeItem = itemJson.replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
@@ -485,6 +631,8 @@ function quickAdd(item) {
     const newItem = {
         id: Date.now() + '_' + Math.random().toString(36).substr(2, 5),
         name: item.name || '',
+        nameEn: item.nameEn || '',
+        altNames: Array.isArray(item.altNames) ? item.altNames.slice(0, 8) : [],
         type: item.type || 'anime',
         status: 'plantowatch',
         poster: item.poster || '',
@@ -494,7 +642,10 @@ function quickAdd(item) {
         genre: (item.genres || [])[0] || '',
         notes: '',
         addedDate: new Date().toISOString(),
-        malId: item.malId || null
+        malId: item.malId || null,
+        anilistId: item.anilistId || null,
+        kitsuId: item.kitsuId || null,
+        source: item.source || null
     };
 
     dataManager.data.items.unshift(newItem);
@@ -576,7 +727,15 @@ async function searchAPI() {
     searchTimeout = setTimeout(async () => {
         resultsDiv.innerHTML = '<div style="color:var(--text-muted);text-align:center;padding:0.8rem;font-size:0.85rem;">🔍 Araniyor...</div>';
         try {
-            const results = await JikanAPI.searchAll(query, 5);
+            const apiResults = await JikanAPI.searchAll(query, 5);
+            const localFallback = _searchLocalContent(query, 5);
+            const mergedMap = new Map();
+            [...apiResults, ...localFallback].forEach(item => {
+                const key = String(item.id || '') + '|' + String(item.name || '').toLowerCase();
+                if (!mergedMap.has(key)) mergedMap.set(key, item);
+            });
+            const results = Array.from(mergedMap.values()).slice(0, 10);
+
             if (results.length > 0) {
                 resultsDiv.innerHTML = results.map(item => {
                     const safeData = JSON.stringify({
@@ -592,6 +751,7 @@ async function searchAPI() {
                             : '<div style="width:40px;height:55px;background:var(--bg-card);border-radius:4px;display:flex;align-items:center;justify-content:center;">' + getTypeIcon(item.type) + '</div>') +
                         '<div>' +
                             '<div class="api-result-title">' + _esc(item.name || '') + '</div>' +
+                            ((item.nameEn && item.nameEn !== item.name) ? '<div style="font-size:0.72rem;color:var(--text-muted);margin-top:1px;">' + _esc(item.nameEn) + '</div>' : '') +
                             '<div class="api-result-meta">' + item.type + ' · ' + (item.episodes ? item.episodes + ' ep' : item.chapters ? item.chapters + ' ch' : '?') + (item.rating ? ' · ⭐' + item.rating : '') + '</div>' +
                         '</div>' +
                     '</div>';

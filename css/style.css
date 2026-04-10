@@ -1610,9 +1610,16 @@ select {
     outline: none;
 }
 
+.calendar-select { color-scheme: dark; }
+
 .calendar-search-input::placeholder { color: var(--text-muted); }
 .calendar-select:focus,
 .calendar-search-input:focus { border-color: rgba(217,31,67,0.55); }
+
+.calendar-select option {
+    background: #121722;
+    color: #d9dfeb;
+}
 
 .weekdays {
     display: grid;
@@ -1869,6 +1876,110 @@ select {
 }
 
 .bar-fill { height: 100%; border-radius: 10px; transition: width 0.5s ease; }
+
+.analytics-kpi-grid {
+    margin-top: 1rem;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.6rem;
+}
+
+.analytics-kpi {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 0.55rem 0.6rem;
+}
+
+.analytics-kpi span {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    margin-bottom: 0.2rem;
+}
+
+.analytics-kpi strong {
+    font-size: 1.15rem;
+    line-height: 1;
+}
+
+.analytics-chip-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.analytics-chip {
+    background: rgba(217,31,67,0.12);
+    border: 1px solid rgba(217,31,67,0.3);
+    color: #ffb3c3;
+    border-radius: 999px;
+    padding: 0.26rem 0.62rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.analytics-activity {
+    margin-top: 1rem;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.45rem;
+    align-items: end;
+}
+
+.activity-bar-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.32rem;
+}
+
+.activity-bar {
+    width: 100%;
+    border-radius: 8px 8px 4px 4px;
+    background: linear-gradient(180deg, rgba(255,77,116,0.9), rgba(255,77,116,0.25));
+    border: 1px solid rgba(255,255,255,0.1);
+    min-height: 14px;
+}
+
+.activity-bar-wrap span {
+    color: var(--text-muted);
+    font-size: 0.66rem;
+}
+
+.insight-list,
+.recency-list {
+    display: grid;
+    gap: 0.55rem;
+}
+
+.insight-item,
+.recency-item {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 0.6rem 0.7rem;
+    color: var(--text-secondary);
+    font-size: 0.84rem;
+}
+
+.recency-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+}
+
+.recency-item span {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.recency-item small {
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    flex-shrink: 0;
+}
 
 /* ====== Ai SECTiON ====== */
 .ai-header-card {
@@ -2882,6 +2993,14 @@ select {
     .dp-right-col {
         width: 100% !important;
         min-width: unset !important;
+    }
+
+    .analytics-kpi-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .analytics-activity {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }/* ================================================================
    OniList Visual Upgrade v3 — Kompakt, dengeli, profesyonel

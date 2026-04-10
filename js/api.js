@@ -107,6 +107,99 @@ function normalizeTitle(name) {
         .substring(0, 30);
 }
 
+function buildAltNames() {
+    const out = [];
+    const seen = new Set();
+    for (const v of arguments) {
+        if (!v) continue;
+        if (Array.isArray(v)) {
+            v.forEach(x => {
+                const s = String(x || '').trim();
+                if (!s) return;
+                const k = s.toLowerCase();
+                if (seen.has(k)) return;
+                seen.add(k);
+                out.push(s);
+            });
+            continue;
+        }
+        const s = String(v).trim();
+        if (!s) continue;
+        const k = s.toLowerCase();
+        if (seen.has(k)) continue;
+        seen.add(k);
+        out.push(s);
+    }
+    return out;
+}
+
+function normalizeSearchText(name) {
+    return String(name || '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af]+/g, '');
+}
+
+function levenshteinWithin(a, b, maxDist) {
+    if (!a || !b) return false;
+    if (a === b) return true;
+    const la = a.length;
+    const lb = b.length;
+    if (Math.abs(la - lb) > maxDist) return false;
+
+    let prev = new Array(lb + 1);
+    let cur = new Array(lb + 1);
+    for (let j = 0; j <= lb; j++) prev[j] = j;
+
+    for (let i = 1; i <= la; i++) {
+        cur[0] = i;
+        let rowMin = cur[0];
+        const ca = a.charCodeAt(i - 1);
+        for (let j = 1; j <= lb; j++) {
+            const cost = ca === b.charCodeAt(j - 1) ? 0 : 1;
+            cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + cost);
+            if (cur[j] < rowMin) rowMin = cur[j];
+        }
+        if (rowMin > maxDist) return false;
+        const tmp = prev;
+        prev = cur;
+        cur = tmp;
+    }
+    return prev[lb] <= maxDist;
+}
+
+function fuzzyTokenMatch(term, text) {
+    if (!term || !text) return false;
+    const maxDist = term.length >= 7 ? 2 : 1;
+    const tokens = String(text).split(/\s+/).filter(Boolean);
+    for (let i = 0; i < tokens.length; i++) {
+        const tok = normalizeSearchText(tokens[i]);
+        if (!tok) continue;
+        if (tok.includes(term) || term.includes(tok)) return true;
+        if (Math.abs(tok.length - term.length) > maxDist) continue;
+        if (levenshteinWithin(term, tok, maxDist)) return true;
+    }
+    return false;
+}
+
+function searchMatchScore(item, query) {
+    const q = normalizeSearchText(query);
+    if (!q) return 0;
+    const names = [item.name, item.nameEn].concat(item.altNames || []);
+    let best = 0;
+    names.forEach(n => {
+        const s = normalizeSearchText(n);
+        if (!s) return;
+        if (s === q) best = Math.max(best, 120);
+        else if (s.startsWith(q)) best = Math.max(best, 90);
+        else if (s.includes(q)) best = Math.max(best, 70);
+        else if (q.includes(s) && s.length >= 4) best = Math.max(best, 50);
+        else if (q.length >= 4 && fuzzyTokenMatch(q, s)) best = Math.max(best, 58);
+    });
+    return best;
+}
+
 function deduplicateContent(items) {
     const seenIds = new Set();
     const seenNames = new Map();
@@ -146,6 +239,7 @@ function slimContentForCache(items) {
         id: i.id,
         name: i.name,
         nameEn: i.nameEn || '',
+        altNames: i.altNames || [],
         type: i.type,
         poster: i.poster || '',
         rating: i.rating ?? null,
@@ -193,6 +287,7 @@ const _Jikan = {
         return {
             id: 'mal_a_' + i.mal_id,
             name: i.title, nameEn: i.title_english || i.title, type: 'anime',
+            altNames: buildAltNames(i.title_english, i.title_japanese, i.title, i.title_synonyms || []),
             poster: i.images?.jpg?.large_image_url || i.images?.jpg?.image_url || '',
             rating: i.score ? +i.score.toFixed(1) : null,
             year: i.year || (i.aired?.from ? new Date(i.aired.from).getFullYear() : null),
@@ -208,6 +303,7 @@ const _Jikan = {
         return {
             id: 'mal_m_' + i.mal_id,
             name: i.title, nameEn: i.title_english || i.title,
+            altNames: buildAltNames(i.title_english, i.title_japanese, i.title, i.title_synonyms || []),
             type: isW ? 'webtoon' : 'manga',
             poster: i.images?.jpg?.large_image_url || i.images?.jpg?.image_url || '',
             rating: i.score ? +i.score.toFixed(1) : null,
@@ -316,6 +412,7 @@ const _AniList = {
             id: 'al_' + i.id,
             name: i.title?.romaji || i.title?.english || i.title?.native || 'Unknown',
             nameEn: i.title?.english || i.title?.romaji || '',
+            altNames: buildAltNames(i.title?.english, i.title?.romaji, i.title?.native),
             type,
             poster: i.coverImage?.extraLarge || i.coverImage?.large || i.coverImage?.medium || '',
             rating: i.averageScore ? +(i.averageScore / 10).toFixed(1) : null,
@@ -433,8 +530,10 @@ const _Kitsu = {
     _na(i) {
         const a = i.attributes || {};
         const title = a.canonicalTitle || a.titles?.en || a.titles?.en_jp || 'Unknown';
+        const kitsuTitles = Object.values(a.titles || {}).filter(Boolean);
         return {
             id: 'kt_a_' + i.id, name: title, nameEn: a.titles?.en || title, type: 'anime',
+            altNames: buildAltNames(title, kitsuTitles),
             poster: a.posterImage?.large || a.posterImage?.medium || a.posterImage?.small || '',
             rating: a.averageRating ? +(parseFloat(a.averageRating) / 10).toFixed(1) : null,
             year: a.startDate ? new Date(a.startDate).getFullYear() : null,
@@ -447,10 +546,12 @@ const _Kitsu = {
     _nm(i) {
         const a = i.attributes || {};
         const title = a.canonicalTitle || a.titles?.en || a.titles?.en_jp || 'Unknown';
+        const kitsuTitles = Object.values(a.titles || {}).filter(Boolean);
         const sub = (a.subtype || '').toLowerCase();
         const isW = sub === 'manhwa' || sub === 'manhua' || sub === 'webtoon';
         return {
             id: 'kt_m_' + i.id, name: title, nameEn: a.titles?.en || title,
+            altNames: buildAltNames(title, kitsuTitles),
             type: isW ? 'webtoon' : 'manga',
             poster: a.posterImage?.large || a.posterImage?.medium || a.posterImage?.small || '',
             rating: a.averageRating ? +(parseFloat(a.averageRating) / 10).toFixed(1) : null,
@@ -526,7 +627,13 @@ const JikanAPI = {
             ...(al.status === 'fulfilled' ? al.value : []),
             ...(kt.status === 'fulfilled' ? kt.value : []),
         ];
-        return deduplicateContent(all).sort((a, b) => (b.rating||0) - (a.rating||0)).slice(0, limit * 2);
+        return deduplicateContent(all)
+            .sort((a, b) => {
+                const ms = searchMatchScore(b, query) - searchMatchScore(a, query);
+                if (ms !== 0) return ms;
+                return (b.rating || 0) - (a.rating || 0);
+            })
+            .slice(0, limit * 2);
     },
 
     async loadAllContent(onProgress) {
@@ -562,34 +669,34 @@ const JikanAPI = {
         }
 
         // ── ASAMA 2: TAM YUKLEMI — 3 Batch paralel ─────────────────────────
-        console.log('🚀 APi v7: Tam yukleme basliyor...');
+        console.log('🚀 APi v7.2: Tam yukleme basliyor...');
 
         // Batch 1: AniList popularity (ana kaynak, en guvenilir)
         const [alA, alM, alW, alMH] = await Promise.allSettled([
-            _AniList.topAnime(15),
-            _AniList.topManga(14),
-            _AniList.topWebtoon(20),
-            _AniList.topManhua(10),
+            _AniList.topAnime(12),
+            _AniList.topManga(10),
+            _AniList.topWebtoon(14),
+            _AniList.topManhua(8),
         ]);
 
         // Batch 2: AniList score + trending (popularity'de olmayan icerikler)
         const [alAS, alMS, alWS, alMHS, alAT, alMT] = await Promise.allSettled([
-            _AniList.topAnimeByScore(10),
-            _AniList.topMangaByScore(8),
-            _AniList.topWebtoonByScore(10),
-            _AniList.topManhuaByScore(6),
-            _AniList.topAnimeTrending(5),
-            _AniList.topMangaTrending(5),
+            _AniList.topAnimeByScore(7),
+            _AniList.topMangaByScore(6),
+            _AniList.topWebtoonByScore(8),
+            _AniList.topManhuaByScore(4),
+            _AniList.topAnimeTrending(4),
+            _AniList.topMangaTrending(4),
         ]);
 
         // Batch 3: Jikan + Kitsu (MAL tabanli farkli icerikler)
         const [jkA, jkM, jkW, jkMH, ktA, ktM] = await Promise.allSettled([
-            _Jikan.topAnime(16),
-            _Jikan.topManga(12),
-            _Jikan.topWebtoon(12),
-            _Jikan.topManhua(8),
-            _Kitsu.topAnime(10),
-            _Kitsu.topManga(8),
+            _Jikan.topAnime(12),
+            _Jikan.topManga(10),
+            _Jikan.topWebtoon(8),
+            _Jikan.topManhua(6),
+            _Kitsu.topAnime(8),
+            _Kitsu.topManga(6),
         ]);
 
         const all = [
@@ -614,28 +721,24 @@ const JikanAPI = {
         let deduped = deduplicateContent(all);
 
         // Ilk sonucta icerik az kalirsa daha derin sayfalari da yukle.
-        if (deduped.length < 2200) {
+        if (deduped.length < 1500) {
             console.log('📈 APi: Derin sayfa genisletmesi basliyor...');
             const [
                 alA2, alM2, alW2, alMH2,
-                alAS2, alMS2, alWS2, alMHS2,
-                jkA2, jkM2, jkW2, jkMH2,
+                alAS2, alMS2,
+                jkA2, jkM2,
                 ktA2, ktM2
             ] = await Promise.allSettled([
-                _AniList.topAnime(20, 16),
-                _AniList.topManga(18, 15),
-                _AniList.topWebtoon(20, 21),
-                _AniList.topManhua(12, 11),
-                _AniList.topAnimeByScore(12, 11),
-                _AniList.topMangaByScore(12, 9),
-                _AniList.topWebtoonByScore(12, 11),
-                _AniList.topManhuaByScore(8, 7),
-                _Jikan.topAnime(20, 17),
-                _Jikan.topManga(16, 13),
-                _Jikan.topWebtoon(12, 13),
-                _Jikan.topManhua(10, 9),
-                _Kitsu.topAnime(14, 10),
-                _Kitsu.topManga(12, 8),
+                _AniList.topAnime(12, 13),
+                _AniList.topManga(10, 11),
+                _AniList.topWebtoon(10, 15),
+                _AniList.topManhua(8, 9),
+                _AniList.topAnimeByScore(8, 8),
+                _AniList.topMangaByScore(8, 7),
+                _Jikan.topAnime(12, 12),
+                _Jikan.topManga(10, 10),
+                _Kitsu.topAnime(10, 7),
+                _Kitsu.topManga(8, 6),
             ]);
 
             const extra = [
@@ -645,12 +748,8 @@ const JikanAPI = {
                 ...(alMH2.status === 'fulfilled' ? alMH2.value : []),
                 ...(alAS2.status === 'fulfilled' ? alAS2.value : []),
                 ...(alMS2.status === 'fulfilled' ? alMS2.value : []),
-                ...(alWS2.status === 'fulfilled' ? alWS2.value : []),
-                ...(alMHS2.status === 'fulfilled' ? alMHS2.value : []),
                 ...(jkA2.status === 'fulfilled' ? jkA2.value : []),
                 ...(jkM2.status === 'fulfilled' ? jkM2.value : []),
-                ...(jkW2.status === 'fulfilled' ? jkW2.value : []),
-                ...(jkMH2.status === 'fulfilled' ? jkMH2.value : []),
                 ...(ktA2.status === 'fulfilled' ? ktA2.value : []),
                 ...(ktM2.status === 'fulfilled' ? ktM2.value : []),
             ];

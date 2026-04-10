@@ -1940,11 +1940,50 @@ function renderAnalytics() {
     const dropped    = items.filter(i => i.status === 'dropped').length;
     const rated      = items.filter(i => i.rating > 0);
     const avg = rated.length > 0 ? (rated.reduce((a, i) => a + i.rating, 0) / rated.length).toFixed(2) : '0.00';
+    const completionRate = items.length ? Math.round((completed / items.length) * 100) : 0;
+
+    const genreMap = {};
+    items.forEach(i => {
+        const gs = Array.isArray(i.genres) && i.genres.length ? i.genres : (i.genre ? [i.genre] : []);
+        gs.forEach(g => {
+            const key = String(g || '').trim();
+            if (!key) return;
+            genreMap[key] = (genreMap[key] || 0) + 1;
+        });
+    });
+    const topGenres = Object.entries(genreMap)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 6);
+
+    const now = Date.now();
+    const dayMs = 24 * 60 * 60 * 1000;
+    const activityBuckets = Array.from({ length: 6 }, () => 0);
+    items.forEach(i => {
+        if (!i.addedDate) return;
+        const diffDays = Math.floor((now - new Date(i.addedDate).getTime()) / dayMs);
+        if (diffDays >= 0 && diffDays < 30) {
+            const bucket = Math.floor(diffDays / 5);
+            activityBuckets[Math.min(5, bucket)]++;
+        }
+    });
+    const activityMax = Math.max(...activityBuckets, 1);
+
+    const recentItems = [...items]
+        .filter(i => i.addedDate)
+        .sort((a, b) => new Date(b.addedDate).getTime() - new Date(a.addedDate).getTime())
+        .slice(0, 5);
+
+    const suggestions = [];
+    if (planToWatch >= Math.max(10, completed * 2)) suggestions.push('Your backlog is stacking up. Try completing 3 items this week.');
+    if (dropped >= Math.max(5, Math.floor(items.length * 0.2))) suggestions.push('Drop rate is high. Prioritize shorter titles (12-24 episodes).');
+    if (anime / total > 0.7) suggestions.push('Your library is anime-heavy. Mix in manga/webtoon for variety.');
+    if (completionRate >= 60) suggestions.push('Great consistency. Push for a 7-day completion streak challenge.');
+    if (!suggestions.length) suggestions.push('Healthy balance detected. Keep rating titles to improve recommendations.');
 
     const bar = (label, val, tot, color) =>
         `<div class="bar-row">
             <div class="bar-header"><span>${label}</span><span style="font-weight:700;">${val}</span></div>
-            <div class="bar-track"><div class="bar-fill" style="width:${(val/tot*100).toFixed(1)}%;background:${color};"></div></div>
+            <div class="bar-track"><div class="bar-fill" style="width:${tot > 0 ? (val/tot*100).toFixed(1) : 0}%;background:${color};"></div></div>
         </div>`;
 
     container.innerHTML =
@@ -1975,6 +2014,26 @@ function renderAnalytics() {
                     </div>`
                 ).join('')}
             </div>
+            <div class="analytics-kpi-grid">
+                <div class="analytics-kpi"><span>Completion Rate</span><strong>${completionRate}%</strong></div>
+                <div class="analytics-kpi"><span>Rated Titles</span><strong>${rated.length}</strong></div>
+                <div class="analytics-kpi"><span>Active Watching</span><strong>${watching}</strong></div>
+            </div>
+        </div>
+        <div class="chart-container"><h3 class="chart-title">Top Genres</h3>
+            ${topGenres.length ? `<div class="analytics-chip-list">${topGenres.map(([name,count]) => `<span class="analytics-chip">${_escHtml(name)} · ${count}</span>`).join('')}</div>` : `<p style="color:var(--text-secondary);margin:0;">No genre data yet.</p>`}
+            <div class="analytics-activity">
+                ${activityBuckets.map((n, idx) => `<div class="activity-bar-wrap"><div class="activity-bar" style="height:${Math.max(14, Math.round((n/activityMax)*88))}px"></div><span>${idx*5+1}-${(idx+1)*5}</span></div>`).join('')}
+            </div>
+            <p style="margin-top:.7rem;color:var(--text-muted);font-size:.78rem;">Library adds in the last 30 days.</p>
+        </div>
+        <div class="chart-container"><h3 class="chart-title">Smart Suggestions</h3>
+            <div class="insight-list">
+                ${suggestions.map(s => `<div class="insight-item">💡 ${_escHtml(s)}</div>`).join('')}
+            </div>
+        </div>
+        <div class="chart-container"><h3 class="chart-title">Recent Additions</h3>
+            ${recentItems.length ? `<div class="recency-list">${recentItems.map(i => `<div class="recency-item"><span>${_escHtml(i.name || 'Untitled')}</span><small>${new Date(i.addedDate).toLocaleDateString(_lang === 'en' ? 'en-US' : 'tr-TR')}</small></div>`).join('')}</div>` : `<p style="color:var(--text-secondary);margin:0;">Add content to see timeline insights.</p>`}
         </div>`;
 }
 
