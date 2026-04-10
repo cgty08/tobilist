@@ -1149,6 +1149,16 @@ const charts = {};
 window.onload = async () => {
     sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
+    // Optional secure shortcut: prefill email only (no auth bypass)
+    try {
+        const qp = new URLSearchParams(window.location.search);
+        const prefillEmail = (qp.get('email') || '').trim();
+        if (prefillEmail && prefillEmail.includes('@')) {
+            const emailEl = document.getElementById('adminEmail');
+            if (emailEl) emailEl.value = prefillEmail;
+        }
+    } catch(_) {}
+
     // Lock check — show on page load
     const lockUntil = isLockedOut();
     if (lockUntil) {
@@ -1162,14 +1172,19 @@ window.onload = async () => {
         if (session?.user) {
             const isAdm = await checkIsAdmin(session.user.id, session.user.email);
             if (isAdm) { currentAdmin = session.user; boot(); return; }
+
+            // Signed-in but not admin: keep gate visible with safe account switch action
+            var deniedGate = document.getElementById('_adminGate');
+            if (deniedGate) {
+                deniedGate.innerHTML = '<div style="text-align:center;max-width:460px;padding:0 1rem;"><div style="font-size:4rem;margin-bottom:1rem;">🔒</div><div style="font-size:1.5rem;font-weight:700;color:#ff3366;margin-bottom:0.5rem;">403 - Unauthorized</div><div style="color:#9ca3af;font-size:0.9rem;line-height:1.45;">Signed in as <b style="color:#e5e7eb;">' + (session.user.email || 'unknown') + '</b>, but this account does not have admin role.</div><div style="display:flex;gap:.6rem;justify-content:center;flex-wrap:wrap;margin-top:1.2rem;"><button onclick="adminSwitchAccount()" style="padding:0.62rem 1.1rem;background:#111827;color:#fff;border:1px solid #374151;border-radius:8px;cursor:pointer;font-size:0.9rem;">Switch Account</button><button onclick="location.href=\'/\'" style="padding:0.62rem 1.1rem;background:#ff3366;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.9rem;">Back to Home</button></div></div>';
+            }
+            return;
         }
     } catch(e) { console.warn(e); }
 
-    // Yetkisiz erişim — overlay'i 403 ekranına çevir
+    // No active session: remove gate and show admin login form
     var gate = document.getElementById('_adminGate');
-    if (gate) {
-        gate.innerHTML = '<div style="text-align:center;"><div style="font-size:4rem;margin-bottom:1rem;">🔒</div><div style="font-size:1.5rem;font-weight:700;color:#ff3366;margin-bottom:0.5rem;">403 — Yetkisiz Erişim</div><div style="color:#6b7280;font-size:0.85rem;">Bu sayfaya erişim yetkiniz bulunmamaktadır.</div><button onclick="location.href=\'/\'" style="margin-top:1.5rem;padding:0.6rem 1.5rem;background:#ff3366;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:0.9rem;">Ana Sayfaya Dön</button></div>';
-    }
+    if (gate) gate.remove();
 
     // Aktif admin oturumu yok — login formunu göster
     const _scmEl = document.getElementById('sessionCheckMsg');
@@ -1199,8 +1214,24 @@ async function checkIsAdmin(userId, userEmail) {
     try {
         const { data, error } = await sb.from('user_data').select('data').eq('user_id', userId).single();
         if (!error && data?.data?.is_admin === true) return true;
+
+        // Backward-compatible fallback: some rows may be keyed by email in data JSON.
+        if (userEmail) {
+            const { data: byEmail, error: emailErr } = await sb
+                .from('user_data')
+                .select('data')
+                .eq('data->>email', userEmail)
+                .single();
+            if (!emailErr && byEmail?.data?.is_admin === true) return true;
+        }
+
         return false;
     } catch(e) { return false; }
+}
+
+async function adminSwitchAccount() {
+    try { if (sb) await sb.auth.signOut(); } catch(_) {}
+    window.location.href = 'admin.html';
 }
 
 function boot() {
