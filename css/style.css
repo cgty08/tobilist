@@ -3837,11 +3837,16 @@ nav {
 
 .discover-hot-strip {
     margin: 0.7rem 0 0.9rem;
-    border: 1px solid rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
     border-radius: 14px;
-    background: linear-gradient(120deg, rgba(255,51,102,0.08), rgba(0,212,255,0.08));
-    padding: 0.65rem 0.7rem;
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
+    background:
+        radial-gradient(120% 160% at 0% 0%, rgba(255,51,102,0.22), transparent 55%),
+        radial-gradient(120% 160% at 100% 0%, rgba(0,212,255,0.2), transparent 55%),
+        linear-gradient(180deg, rgba(11,16,27,0.96), rgba(8,12,20,0.96));
+    padding: 0.66rem 0.72rem;
+    box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.04),
+        0 14px 28px rgba(0,0,0,0.28);
 }
 
 .discover-hot-head {
@@ -3852,17 +3857,46 @@ nav {
     margin-bottom: 0.45rem;
 }
 
+.discover-hot-title-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.42rem;
+}
+
+.discover-hot-live {
+    font-size: 0.57rem;
+    font-weight: 900;
+    letter-spacing: 0.8px;
+    color: #fff;
+    background: linear-gradient(135deg, #ff345e, #ff7f4a);
+    border-radius: 999px;
+    padding: 0.16rem 0.42rem;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.22), 0 6px 14px rgba(255,52,94,0.35);
+}
+
 .discover-hot-title {
     font-size: 0.72rem;
-    font-weight: 800;
-    letter-spacing: 0.9px;
+    font-weight: 900;
+    letter-spacing: 1px;
     text-transform: uppercase;
-    color: #ffd3de;
+    color: #ffe4ec;
+}
+
+.discover-hot-count {
+    min-width: 24px;
+    text-align: center;
+    font-size: 0.64rem;
+    font-weight: 800;
+    color: #9be8ff;
+    border: 1px solid rgba(155,232,255,0.35);
+    background: rgba(29,67,79,0.35);
+    border-radius: 999px;
+    padding: 0.08rem 0.35rem;
 }
 
 .discover-hot-hint {
     font-size: 0.68rem;
-    color: var(--text-muted);
+    color: #7e8ea6;
 }
 
 .discover-hot-track {
@@ -3870,15 +3904,19 @@ nav {
     gap: 0.45rem;
     overflow-x: auto;
     padding-bottom: 0.1rem;
-    scrollbar-width: thin;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    mask-image: linear-gradient(to right, transparent, black 12px, black calc(100% - 12px), transparent);
 }
 
+.discover-hot-track::-webkit-scrollbar { height: 0; width: 0; }
+
 .discover-hot-pill {
-    border: 1px solid rgba(255,255,255,0.08);
-    background: rgba(8,12,20,0.72);
+    border: 1px solid rgba(255,255,255,0.13);
+    background: linear-gradient(180deg, rgba(15,21,35,0.92), rgba(10,15,25,0.92));
     color: var(--text-primary);
     border-radius: 999px;
-    padding: 0.38rem 0.62rem;
+    padding: 0.38rem 0.66rem;
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
@@ -3886,13 +3924,14 @@ nav {
     font-size: 0.76rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 }
 
 .discover-hot-pill:hover {
-    border-color: rgba(255,51,102,0.45);
-    transform: translateY(-1px);
-    background: rgba(255,51,102,0.12);
+    border-color: rgba(255,87,132,0.62);
+    transform: translateY(-1px) scale(1.01);
+    background: linear-gradient(180deg, rgba(49,19,35,0.92), rgba(28,13,24,0.92));
+    box-shadow: 0 10px 18px rgba(0,0,0,0.28);
 }
 
 .discover-hot-dot {
@@ -3902,6 +3941,24 @@ nav {
     background: #ff4a7c;
     box-shadow: 0 0 0 3px rgba(255,74,124,0.18);
     flex-shrink: 0;
+    animation: hotDotPulse 1.8s ease-in-out infinite;
+}
+
+.discover-hot-pill-text {
+    max-width: 290px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.discover-hot-pill-score {
+    color: #95a7bf;
+    font-size: 0.66rem;
+    font-weight: 700;
+}
+
+@keyframes hotDotPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 0 3px rgba(255,74,124,0.18); }
+    50% { transform: scale(1.22); box-shadow: 0 0 0 5px rgba(255,74,124,0.12); }
 }
 
 .media-fresh-badge {
@@ -3910,13 +3967,14 @@ nav {
     right: 0.45rem;
     z-index: 4;
     border-radius: 999px;
-    background: linear-gradient(135deg, #ff4d74, #ff8f3f);
+    background: linear-gradient(135deg, #ff3f69, #ff7446 60%, #ffb13f);
     color: #fff;
-    font-size: 0.62rem;
+    font-size: 0.6rem;
     font-weight: 800;
-    letter-spacing: 0.5px;
-    padding: 0.2rem 0.45rem;
-    box-shadow: 0 8px 16px rgba(255,77,116,0.34);
+    letter-spacing: 0.7px;
+    padding: 0.2rem 0.46rem;
+    box-shadow: 0 10px 18px rgba(255,77,116,0.34), inset 0 0 0 1px rgba(255,255,255,0.22);
+    text-transform: uppercase;
 }
 
 @media (max-width: 768px) {

@@ -200,6 +200,13 @@ function searchMatchScore(item, query) {
     return best;
 }
 
+function isRecentSeasonYear(year) {
+    const y = Number(year) || 0;
+    if (!y) return true;
+    const nowY = new Date().getFullYear();
+    return y >= (nowY - 1);
+}
+
 function deduplicateContent(items) {
     const seenIds = new Set();
     const seenNames = new Map();
@@ -619,7 +626,7 @@ const JikanAPI = {
         try { results = await _AniList.seasonal(); } catch {}
         if (results.length < 10) { try { results = [...results, ...await _Jikan.seasonNow()]; } catch {} }
         const out = deduplicateContent(results)
-            .map(i => ({ ...i, isFreshRelease: true }))
+            .map(i => ({ ...i, isFreshRelease: isRecentSeasonYear(i.year) }))
             .slice(0, limit);
         APICache.set(ck, out, true);
         return out;

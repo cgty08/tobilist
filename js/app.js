@@ -486,12 +486,20 @@ function _toSafeDiscoverItemJson(item) {
     return itemJson.replace(/'/g, "\\'").replace(/"/g, '&quot;');
 }
 
+function _isFreshForDisplay(item) {
+    if (!item || !item.isFreshRelease) return false;
+    const y = Number(item.year) || 0;
+    if (!y) return true;
+    const nowY = new Date().getFullYear();
+    return y >= (nowY - 1);
+}
+
 function renderDiscoverHotStrip(sourceItems) {
     const host = document.getElementById('discoverHotStrip');
     if (!host) return;
 
     const list = (sourceItems || allContent || [])
-        .filter(i => i && i.type === 'anime' && i.isFreshRelease)
+        .filter(i => i && i.type === 'anime' && _isFreshForDisplay(i))
         .sort((a, b) => (b.rating || 0) - (a.rating || 0))
         .slice(0, 10);
 
@@ -502,17 +510,24 @@ function renderDiscoverHotStrip(sourceItems) {
     }
 
     host.style.display = 'block';
+    const freshCount = list.length;
     host.innerHTML =
         '<div class="discover-hot-head">'
+        + '<div class="discover-hot-title-wrap">'
+        + '<span class="discover-hot-live">LIVE</span>'
         + '<span class="discover-hot-title">Just Dropped</span>'
+        + '<span class="discover-hot-count">' + freshCount + '</span>'
+        + '</div>'
         + '<span class="discover-hot-hint">Press / to focus search</span>'
         + '</div>'
         + '<div class="discover-hot-track">'
         + list.map(item => {
             const safeItem = _toSafeDiscoverItemJson(item);
+            const score = item.rating ? ' <small class="discover-hot-pill-score">' + _esc(String(item.rating)) + '/10</small>' : '';
             return '<button class="discover-hot-pill" onclick="openDetailPage(\'' + safeItem + '\')">'
                 + '<span class="discover-hot-dot"></span>'
-                + '<span>' + _esc(item.name || 'Untitled') + '</span>'
+                + '<span class="discover-hot-pill-text">' + _esc(item.name || 'Untitled') + '</span>'
+                + score
                 + '</button>';
         }).join('')
         + '</div>';
@@ -620,8 +635,8 @@ function renderDiscoverGrid() {
         currentGenreFilter === 'all' &&
         (currentDiscoverType === 'all' || currentDiscoverType === 'anime')
     ) {
-        const fresh = filtered.filter(i => i.isFreshRelease);
-        const rest = filtered.filter(i => !i.isFreshRelease);
+        const fresh = filtered.filter(i => _isFreshForDisplay(i));
+        const rest = filtered.filter(i => !_isFreshForDisplay(i));
         filtered = [...fresh, ...rest];
     }
 
@@ -656,7 +671,7 @@ function renderDiscoverGrid() {
         const meta = [item.year, item.type === 'anime' ? (item.episodes ? item.episodes + ' Ep' : '') : (item.chapters ? item.chapters + ' Ch' : '')].filter(Boolean).join(' · ');
 
         const safeItem = _toSafeDiscoverItemJson(item);
-        const freshBadge = item.isFreshRelease ? '<span class="media-fresh-badge">NEW</span>' : '';
+        const freshBadge = _isFreshForDisplay(item) ? '<span class="media-fresh-badge">NEW DROP</span>' : '';
 
         const addBtn = isGuest
             ? '<button class="add-to-list-btn" onclick="openAuthModal(\'register\')">🔐 Sign up & add</button>'
