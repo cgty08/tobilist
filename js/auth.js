@@ -916,6 +916,9 @@ function updateUIForLoggedIn() {
     if (currentUser && currentUser.isAdmin) {
         if (adminLink) adminLink.style.display = 'block';
         if (adminShortcut) adminShortcut.style.display = 'inline-flex';
+    } else {
+        if (adminLink) adminLink.style.display = 'none';
+        if (adminShortcut) adminShortcut.style.display = 'none';
     }
 
     const bannerActions = document.getElementById('bannerActions');
@@ -952,6 +955,11 @@ function updateUIForGuest() {
     if (quickStats) quickStats.style.display = 'none';
     const continueBlock = document.getElementById('continueWatchingBlock');
     if (continueBlock) continueBlock.style.display = 'none';
+
+    const adminLink = document.getElementById('adminPanelLink');
+    const adminShortcut = document.getElementById('adminShortcutBtn');
+    if (adminLink) adminLink.style.display = 'none';
+    if (adminShortcut) adminShortcut.style.display = 'none';
 
     const bannerActions = document.getElementById('bannerActions');
     if (bannerActions) {
