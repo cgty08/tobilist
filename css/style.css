@@ -1529,6 +1529,41 @@ select {
 
 .delete-btn:hover { background: rgba(239,68,68,0.14); border-color: var(--danger); }
 
+.item-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    margin-top: 0.75rem;
+}
+
+.item-action-btn {
+    flex: 1 1 calc(50% - 0.35rem);
+    min-width: 120px;
+    padding: 0.65rem 0.85rem;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.05);
+    color: var(--text);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.item-action-btn:hover { background: rgba(255,255,255,0.12); }
+
+.item-action-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.item-action-complete {
+    background: rgba(16,185,129,0.12);
+    border-color: rgba(16,185,129,0.22);
+    color: #a7f3d0;
+}
+
+.item-action-complete:hover { background: rgba(16,185,129,0.18); }
+
 /* ====== EMPTY STATE ====== */
 .empty-state {
     text-align: center;

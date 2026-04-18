@@ -1126,12 +1126,18 @@ function renderLibraryGrid(items) {
     container.innerHTML = items.map(item => {
         const progress = (item.totalEpisodes || 0) > 0
             ? Math.min(100, ((item.currentEpisode || 0) / item.totalEpisodes * 100)).toFixed(0) : 0;
+        const safeId = String(item.id).replace(/'/g, "\\'");
         const stars = [1,2,3,4,5].map(s =>
-            `<button class="star-btn" onclick="updateItem('${item.id}','rating',${s})">${s <= (item.rating || 0) ? '⭐' : '☆'}</button>`
+            `<button class="star-btn" onclick="event.stopPropagation();updateItem('${safeId}','rating',${s})">${s <= (item.rating || 0) ? '⭐' : '☆'}</button>`
         ).join('');
+        const nextDisabled = item.totalEpisodes > 0 && (item.currentEpisode || 0) >= item.totalEpisodes;
+        const actionButtons = `<div class="item-actions">
+                    <button class="item-action-btn" onclick="event.stopPropagation();advanceEpisode('${safeId}')"${nextDisabled ? ' disabled' : ''}>▶ Next Ep</button>
+                    <button class="item-action-btn item-action-complete" onclick="event.stopPropagation();completeItem('${safeId}')">✅ Complete</button>
+                </div>`;
 
         return `<div class="item-card">
-            <div class="item-poster" style="cursor:pointer" onclick="openDetailPageFromLibrary('${item.id}')">
+            <div class="item-poster" style="cursor:pointer" onclick="openDetailPageFromLibrary('${safeId}')">
                 ${item.poster
                     ? `<img src="${item.poster}" alt="${(item.name||'').replace(/"/g,'&quot;')}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
                        <div class="media-poster-fallback" style="display:none">${getTypeIcon(item.type)}</div>`
@@ -1144,7 +1150,7 @@ function renderLibraryGrid(items) {
             </div>
             <div class="item-body">
                 <label>${t('statusLabel')}</label>
-                <select onchange="updateItem('${item.id}','status',this.value)">
+                <select onclick="event.stopPropagation();" onchange="event.stopPropagation();updateItem('${safeId}','status',this.value)">
                     ${Object.entries(statusLabels).map(([val, label]) =>
                         `<option value="${val}"${item.status === val ? ' selected' : ''}>${label}</option>`
                     ).join('')}
@@ -1152,14 +1158,15 @@ function renderLibraryGrid(items) {
                 <label>${t('episodeLabel')}</label>
                 <div class="ep-row">
                     <input type="number" min="0" max="${item.totalEpisodes || 9999}" value="${item.currentEpisode || 0}"
-                        onchange="updateItem('${item.id}','currentEpisode',parseInt(this.value)||0)" placeholder="Current">
+                        onclick="event.stopPropagation();" onchange="event.stopPropagation();updateItem('${safeId}','currentEpisode',parseInt(this.value)||0)" placeholder="Current">
                     <input type="number" min="0" value="${item.totalEpisodes || 0}"
-                        onchange="updateItem('${item.id}','totalEpisodes',parseInt(this.value)||0)" placeholder="Total">
+                        onclick="event.stopPropagation();" onchange="event.stopPropagation();updateItem('${safeId}','totalEpisodes',parseInt(this.value)||0)" placeholder="Total">
                 </div>
                 <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
+                ${actionButtons}
                 <label>${t('ratingLabel')}</label>
                 <div class="star-rating">${stars}</div>
-                <button class="delete-btn" onclick="deleteItem('${item.id}')">${t('deleteBtn')}</button>
+                <button class="delete-btn" onclick="event.stopPropagation();deleteItem('${safeId}')">${t('deleteBtn')}</button>
             </div>
         </div>`;
     }).join('');
@@ -1184,6 +1191,48 @@ function updateItem(id, field, value) {
     dataManager.saveAll();
     filterItems();
     updateStats();
+}
+
+function advanceEpisode(id) {
+    if (!dataManager.data) return;
+    const item = dataManager.data.items.find(i => String(i.id) === String(id));
+    if (!item) return;
+
+    const current = Number(item.currentEpisode || 0);
+    const total = Number(item.totalEpisodes || 0);
+    if (total > 0 && current >= total) {
+        showNotification(_lang === 'en' ? 'Already at the final episode.' : 'Zaten son bolumdesiniz.', 'info');
+        return;
+    }
+
+    item.currentEpisode = current + 1;
+    if (total > 0 && item.currentEpisode >= total) {
+        item.currentEpisode = total;
+        item.status = 'completed';
+    } else if (item.status === 'plantowatch' || item.status === 'dropped') {
+        item.status = 'watching';
+    }
+
+    dataManager.saveAll();
+    checkAchievements();
+    filterItems();
+    updateStats();
+    showNotification(_lang === 'en' ? 'Episode progress saved.' : 'Bolum ilerlemesi kaydedildi.', 'success');
+}
+
+function completeItem(id) {
+    if (!dataManager.data) return;
+    const item = dataManager.data.items.find(i => String(i.id) === String(id));
+    if (!item) return;
+
+    item.status = 'completed';
+    if (item.totalEpisodes > 0) item.currentEpisode = item.totalEpisodes;
+
+    dataManager.saveAll();
+    checkAchievements();
+    filterItems();
+    updateStats();
+    showNotification(_lang === 'en' ? 'Marked as completed.' : 'Tamamlandi olarak isaretlendi.', 'success');
 }
 
 function deleteItem(id) {

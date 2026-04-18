@@ -935,11 +935,6 @@ function updateUIForLoggedIn() {
         bannerActions.appendChild(addBtn);
         bannerActions.appendChild(discBtn);
     }
-
-    const quickAccessLabel = document.getElementById('quickAccessProfileBtnLabel');
-    if (quickAccessLabel) {
-        quickAccessLabel.textContent = (typeof _lang !== 'undefined' && _lang === 'tr') ? 'Profil' : 'Profile';
-    }
 }
 
 function updateUIForGuest() {
@@ -979,11 +974,6 @@ function updateUIForGuest() {
         discBtn.textContent = (typeof _lang !== 'undefined' && _lang === 'en') ? '🔍 Discover' : '🔍 Kesfet';
         bannerActions.appendChild(regBtn);
         bannerActions.appendChild(discBtn);
-    }
-
-    const quickAccessLabel = document.getElementById('quickAccessProfileBtnLabel');
-    if (quickAccessLabel) {
-        quickAccessLabel.textContent = (typeof _lang !== 'undefined' && _lang === 'tr') ? 'Giris Yap' : 'Sign In';
     }
 }
 
